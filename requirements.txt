@@ -1,0 +1,3 @@
+glfw
+skia-python
+PyOpenGL

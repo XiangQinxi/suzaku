@@ -1,0 +1,23 @@
+[project]
+name = "suzaku"
+version = "0.0.1-alpha2"
+description = "Placeholder description (to be updated) 暂时仅作占位作用，无需下载安装"
+keywords = ["suzaku","future","lightweight","gui","framework"]
+authors = [
+    {name = "XiangQinxi",email = "XiangQinxi@outlook.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "skia-python",
+    "glfw",
+    "pyopengl"
+]
+
+[tool.poetry]
+packages = [{include = "suzaku"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
