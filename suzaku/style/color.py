@@ -34,12 +34,12 @@ class Color:
     def get_color_hex(self, hex: str):
         import skia
         hex_color = hex.lstrip('#')
-        if len(hex_color) == 6:  # RRGGBB 格式，默认不透明（Alpha=255）
+        if len(hex_color) == 6:  # RRGGBB 格式，默认不透明(Alpha=255)
             r = int(hex_color[0:2], 16)
             g = int(hex_color[2:4], 16)
             b = int(hex_color[4:6], 16)
             return skia.ColorSetRGB(r, g, b)  # 返回不透明颜色
-        elif len(hex_color) == 8:  # AARRGGBB 格式（含 Alpha 通道）
+        elif len(hex_color) == 8:  # AARRGGBB 格式(含 Alpha 通道)
             a = int(hex_color[0:2], 16)
             r = int(hex_color[2:4], 16)
             g = int(hex_color[4:6], 16)

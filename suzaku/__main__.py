@@ -9,7 +9,12 @@ if __name__ == "__main__":
     SkButton(appwindow, text=f"切换至Light主题", command=lambda: appwindow.theme.use_theme("light")).vbox(padx=10, pady=10)
     SkButton(appwindow, text=f"切换至Dark主题", command=lambda: appwindow.theme.use_theme("dark")).vbox(padx=10, pady=10)
 
-    SkButton(appwindow, text=f"按钮").vbox(padx=10, pady=10, expand=True)
+    SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
+
+    SkButton(appwindow, text=f"水平布局", command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"垂直布局", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
+
+    SkButton(appwindow, text=f"关闭窗口", command=appwindow.quit).vbox(padx=10, pady=10)
 
     #SkButton(appwindow, text=f"按钮").put(margin=(10, 10, 10, 10))
 

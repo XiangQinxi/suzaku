@@ -1,11 +1,18 @@
 class Application:
 
+    """
+    应用程序
+    """
+
     _instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        初始化
+        """
+
         self.windows = []
         self.running = False
-        self.visuals = {}
         self.init_glfw()
         if Application._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -13,32 +20,50 @@ class Application:
 
     # 这里用这个可以使`Window`的初始化更加简单，可以不选择填`parent=App`
     @classmethod
-    def get_instance(cls):
-        if cls._instance is None:
-            raise RuntimeError("App not initialized")
-        return cls._instance
+    def get_instance(self) -> int:
+        """
+        获取实例的数量
 
-    def init_glfw(self):
+        :return: 示例数量
+        """
+
+        if self._instance is None:
+            raise RuntimeError("App not initialized")
+        return self._instance
+
+    def init_glfw(self) -> None:
+        """
+        初始化glfw库
+
+        :return: None
+        """
+
         import glfw
         if not glfw.init():
             raise RuntimeError('glfw.init() failed')
         # 设置全局GLFW配置
         glfw.window_hint(glfw.STENCIL_BITS, 8)
 
-    def get_visual_with_id(self, id):
-        return self.visuals[id]
+    from .window import Window
 
-    def add(self, visual):
-        self.visuals[visual.winfo_id()] = visual
+    def add_window(self, window: Window) -> "Application":
+        """
+        添加窗口
 
-    def add_window(self, window):
-        """添加窗口到应用程序"""
+        :param window: 窗口
+        :return self
+        """
         self.windows.append(window)
         # 将窗口的GLFW初始化委托给Application
         window.set_application(self)
         return self
 
-    def run(self):
+    def run(self) -> None:
+        """
+        运行应用程序
+
+        :return: None
+        """
         import glfw
         if not self.windows:
             raise RuntimeError('至少需要添加一个窗口才能运行应用程序')
@@ -60,16 +85,24 @@ class Application:
                         surface.flushAndSubmit()
                     glfw.swap_buffers(window.winfo_glfw_window())
 
-        # 清理资源
         self.cleanup()
 
-    def cleanup(self):
+    def cleanup(self) -> None:
+        """
+        清理资源
+
+        :return: None
+        """
         import glfw
         for window in self.windows:
             glfw.destroy_window(window.winfo_glfw_window())
         glfw.terminate()
         self.running = False
 
-    def quit(self):
-        """退出应用程序"""
+    def quit(self) -> None:
+        """
+        退出应用程序
+
+        :return None
+        """
         self.running = False

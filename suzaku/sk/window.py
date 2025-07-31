@@ -39,19 +39,21 @@ class SkWindow(Window):
                 visual.event_generate("mouse_pressed", event)
                 break
 
-    def _motion(self, mouse_x, mouse_y):
-        from ..base.event import Event
-        self.window_attr["mouse_x"] = mouse_x
-        self.window_attr["mouse_y"] = mouse_y
-        self.window_attr["mouse_rootx"] = mouse_x + self.winfo_x()
-        self.window_attr["mouse_rooty"] = mouse_y + self.winfo_y()
+    from ..base.event import Event
+
+    def _motion(self, evt: Event):
+        self.window_attr["mouse_x"] = evt.x
+        self.window_attr["mouse_y"] = evt.y
+        self.window_attr["mouse_rootx"] = evt.x + self.winfo_x()
+        self.window_attr["mouse_rooty"] = evt.y + self.winfo_y()
         current_visual = None
-        event = Event(x=mouse_x, y=mouse_y, rootx=self.window_attr["mouse_rootx"], rooty=self.window_attr["mouse_rooty"])
+        from ..base.event import Event
+        event = Event(x=evt.x, y=evt.y, rootx=self.window_attr["mouse_rootx"], rooty=self.window_attr["mouse_rooty"])
 
         # 找到当前鼠标所在的视觉元素
         for visual in reversed(self.visuals):
-            if (visual.winfo_x() <= mouse_x <= visual.winfo_x() + visual.winfo_width() and
-                visual.winfo_y() <= mouse_y <= visual.winfo_y() + visual.winfo_height()):
+            if (visual.winfo_x() <= evt.x <= visual.winfo_x() + visual.winfo_width() and
+                visual.winfo_y() <= evt.y <= visual.winfo_y() + visual.winfo_height()):
                 current_visual = visual
                 break
 

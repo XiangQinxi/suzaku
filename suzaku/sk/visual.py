@@ -3,7 +3,9 @@ from ..base.event import EventHanding
 
 
 class SkVisual(Layout, EventHanding):
-    "基础可视化组件，告诉SkWindow如何绘制"
+    """
+    基础可视化组件，告诉SkWindow如何绘制
+    """
 
     _instance_count = 0
 
@@ -13,7 +15,18 @@ class SkVisual(Layout, EventHanding):
 
     theme = theme
 
-    def __init__(self, parent: SkWindow, size=(100, 30), id=None):
+    def __init__(self, parent: SkWindow, size=(100, 30), id: str = None) -> None:
+
+        """
+        初始化
+
+        :param parent: 父组件，一般为"Window"
+        :param size: 默认大小(而非布局后的实际大小)
+        :param id: 标识码
+        """
+
+        super().__init__()
+
         SkVisual._instance_count += 1
 
         self.visual_attr = {
@@ -22,6 +35,8 @@ class SkVisual(Layout, EventHanding):
             "cursor": "arrow",
             "x": 0,
             "y": 0,
+            "d_width": size[0],  # 默认宽度
+            "d_height": size[1],  # 默认高度
             "width": size[0],
             "height": size[1],
             "id": id or ("sk_visual." + str(self.get_instance_count())),
@@ -59,6 +74,9 @@ class SkVisual(Layout, EventHanding):
         self.bind("mouse_pressed", mouse_pressed)
         self.bind("mouse_released", mouse_released)
 
+    def __str__(self) -> str:
+        return self.winfo_id()
+
     def configure(self, **kwargs):
         self.visual_attr.update(kwargs)
 
@@ -94,6 +112,12 @@ class SkVisual(Layout, EventHanding):
 
     def winfo_height(self):
         return self.visual_attr["height"]
+
+    def winfo_dwidth(self):
+        return self.visual_attr["d_width"]
+
+    def winfo_dheight(self):
+        return self.visual_attr["d_height"]
 
     def winfo_x(self):
         return self.visual_attr["x"]

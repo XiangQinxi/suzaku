@@ -1,14 +1,34 @@
 class Boxes:
 
+    """
+    Box布局管理器
+    """
+
     from .window import SkWindow
 
     def __init__(self, parent: SkWindow, direction="h"):
+
+        """
+        初始化
+
+        :param parent: 得到布局的容器
+        :param direction: 布局的方向(h为水平方向布局，v为垂直方向布局)
+        """
 
         self.parent = parent
         self.children = []
         self.direction = direction
 
-    def add_child(self, child, padx=5, pady=5, expand=False):
+    def add_child(self, child, padx=5, pady=5, expand=False) -> None:
+        """
+        添加组件至该布局
+
+        :param child: 组件
+        :param padx: 左右的外边距
+        :param pady: 上下的外边距
+        :param expand: 是否占满剩余空间
+        :return: None
+        """
         self.children.append(
             {
                 "child": child,
@@ -20,8 +40,15 @@ class Boxes:
 
         self.parent.bind("resize", self.update)
 
-    def change_direction(self, direction):
+    def change_direction(self, direction: str):
+        """
+        改变布局方向
+
+        :param direction:
+        :return:
+        """
         self.direction = direction
+        self.update(self.parent.winfo_width(), self.parent.winfo_height())
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
 
     def update(self, width, height):
@@ -59,6 +86,7 @@ class Boxes:
                 else:
                     c.visual_attr["x"] = current_x
                     c.visual_attr["y"] = child["pady"]
+                    c.visual_attr["width"] = c.visual_attr["d_height"]
                     c.visual_attr["height"] = height - child["pady"] * 2
 
                 current_x += c.visual_attr["width"]  # 移动到下一个元素的位置
@@ -95,6 +123,7 @@ class Boxes:
                     c.visual_attr["x"] = child["padx"]
                     c.visual_attr["y"] = current_y
                     c.visual_attr["width"] = width - child["padx"] * 2
+                    c.visual_attr["height"] = c.visual_attr["d_height"]
 
                 current_y += c.visual_attr["height"]
 

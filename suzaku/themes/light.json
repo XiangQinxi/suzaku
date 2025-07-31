@@ -2,7 +2,7 @@
   "name": "light",
 
   "SkWindow": {
-    "bg": [255, 255, 255]
+    "bg": [255, 255, 255, 235]
   },
 
   "SkButton": {
