@@ -26,11 +26,15 @@ class Window(EventHanding):
             "mouse_y": 0,
             "mouse_rootx": 0,
             "mouse_rooty": 0,
+
+            "default_cursor": "arrow",
+            "cursor": "arrow"
         }
 
         self.evts = {
             "close": [],
             "move": [],
+            "update": [],
             "mouse_motion": [],
             "mouse_pressed": [],
             "mouse_released": [],
@@ -201,6 +205,7 @@ class Window(EventHanding):
         :return: None
         """
         if self.window_attr["visible"]:
+            self.event_generate("update")
             from glfw import swap_buffers
             swap_buffers(self.winfo_glfw_window())
 
@@ -210,6 +215,55 @@ class Window(EventHanding):
         :return: 窗口字符串表示
         """
         return f"Window(title={self.title}, width={self.width}, height={self.height})"
+
+    def cursor(self, cursorname: str = None):
+        from glfw import (set_cursor, create_standard_cursor, ARROW_CURSOR, HAND_CURSOR, VRESIZE_CURSOR,
+                          RESIZE_NWSE_CURSOR, RESIZE_NS_CURSOR, RESIZE_NESW_CURSOR, RESIZE_EW_CURSOR, RESIZE_ALL_CURSOR,
+                          POINTING_HAND_CURSOR, NOT_ALLOWED_CURSOR, NO_CURRENT_CONTEXT, IBEAM_CURSOR, HRESIZE_CURSOR,
+                          CROSSHAIR_CURSOR, CENTER_CURSOR)
+        if cursorname is None:
+            return self.window_attr["cursor"]
+        name = cursorname.lower()
+        if name == "arrow":
+            c = create_standard_cursor(ARROW_CURSOR)
+        elif name == "hand":
+            c = create_standard_cursor(HAND_CURSOR)
+        elif name == "vresize":
+            c = create_standard_cursor(VRESIZE_CURSOR)
+        elif name == "resize_nwse":
+            c = create_standard_cursor(RESIZE_NWSE_CURSOR)
+        elif name == "resize_ns":
+            c = create_standard_cursor(RESIZE_NS_CURSOR)
+        elif name == "resize_nesw":
+            c = create_standard_cursor(RESIZE_NESW_CURSOR)
+        elif name == "resize_ew":
+            c = create_standard_cursor(RESIZE_EW_CURSOR)
+        elif name == "resize_all":
+            c = create_standard_cursor(RESIZE_ALL_CURSOR)
+        elif name == "pointing_hand":
+            c = create_standard_cursor(POINTING_HAND_CURSOR)
+        elif name == "not_allowed":
+            c = create_standard_cursor(NOT_ALLOWED_CURSOR)
+        elif name == "no_current":
+            c = create_standard_cursor(NO_CURRENT_CONTEXT)
+        elif name == "ibeam":
+            c = create_standard_cursor(IBEAM_CURSOR)
+        elif name == "hresize":
+            c = create_standard_cursor(HRESIZE_CURSOR)
+        elif name == "crosshair":
+            c = create_standard_cursor(CROSSHAIR_CURSOR)
+        elif name == "center":
+            c = create_standard_cursor(CENTER_CURSOR)
+        else:
+            return self.window_attr["cursor"]
+        self.window_attr["cursor"] = name
+        set_cursor(self.winfo_glfw_window(), c)
+        return self
+
+    def default_cursor(self, cursorname: str = None):
+        if cursorname is None:
+            return self.window_attr["default_cursor"]
+        self.window_attr["default_cursor"] = cursorname
 
     def opacity(self, value: float = None):
         """
@@ -329,20 +383,28 @@ class Window(EventHanding):
         调整窗口大小
         :param width: 宽度
         :param height: 高度
+        :param animation_s: 动画持续时间(秒)，0表示无动画
         :return: self
         """
         if width is None:
             width = self.width
         if height is None:
             height = self.height
+
         self.window_attr["width"] = width
         self.window_attr["height"] = height
 
         from glfw import set_window_size
         set_window_size(self.winfo_glfw_window(), width, height)
-        self.event_generate("resize")
+        self.event_generate("resize", width, height)
 
         return self
+
+    def after(self, ms, func):
+        """延迟执行函数"""
+        import threading
+        timer = threading.Timer(ms / 1000, func)
+        timer.start()
 
     def move(self, x: int = None, y: int = None):
         """
@@ -487,8 +549,8 @@ class Window(EventHanding):
                 monitor = None
             # 使用应用程序的GLFW配置
             window = glfw.create_window(
-                self.winfo_width(), 
-                self.winfo_height(), 
+                self.winfo_width(),
+                self.winfo_height(),
                 self.title(),
                 monitor, None
             )
@@ -503,6 +565,8 @@ class Window(EventHanding):
 
             self.window_attr["x"] = pos[0]
             self.window_attr["y"] = pos[1]
+
+            self.cursor(self.default_cursor())
 
             return window
         else:
@@ -524,3 +588,5 @@ class Window(EventHanding):
         glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
         glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
         glfw.set_window_pos_callback(window, self._on_window_pos)
+
+

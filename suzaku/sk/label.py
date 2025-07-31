@@ -2,14 +2,14 @@ from .visual import SkVisual
 
 
 class SkLabel(SkVisual):
-    def __init__(self, *args, text: str = "SkLabel", bg="transparent", fg=(0, 0, 0, 245), **kwargs):
+    def __init__(self, *args, text: str = "SkLabel", **kwargs):
         super().__init__(*args, **kwargs)
         self.visual_attr["text"] = text
         self.visual_attr["name"] = "sk_label"
 
         from ..style.color import color
-        self.visual_attr["bg"] = color(bg)
-        self.visual_attr["fg"] = color(fg)
+        self.visual_attr["bg"] = color(self.theme.get_theme()["SkLabel"]["bg"])
+        self.visual_attr["fg"] = color(self.theme.get_theme()["SkLabel"]["fg"])
 
     def draw(self, canvas, rect):
         import skia

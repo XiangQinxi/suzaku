@@ -3,15 +3,20 @@ import skia
 
 
 class SkWindow(Window):
-    def __init__(self, *args, background="white", **kwargs):
+    def __init__(self, *args, themename="light", **kwargs):
         super().__init__(*args, **kwargs)
+
+        from ..themes import theme
+
+        self.theme = theme
+        self.theme.use_theme(themename)
+
         self.window_attr["name"] = "sk_window"
         self.window_attr["layout"] = None
         self.draws = []
         self.visuals = []
         self.previous_visual = None  # 跟踪上一个鼠标悬停的元素
-        from ..style.color import color
-        self.window_attr["background"] = color(background)
+
         self.set_draw_func(self.draw)
         self.bind("mouse_motion", self._motion, add=True)
         self.bind("mouse_pressed", self._mouse)
@@ -52,15 +57,18 @@ class SkWindow(Window):
 
         # 处理上一个元素的离开事件
         if self.previous_visual and self.previous_visual != current_visual:
+            self.cursor(self.default_cursor())
             self.previous_visual.event_generate("mouse_leave", event)
             self.previous_visual.is_mouse_enter = False
 
         # 处理当前元素的进入和移动事件
         if current_visual:
             if not current_visual.is_mouse_enter:
+                self.cursor(current_visual.visual_attr["cursor"])
                 current_visual.event_generate("mouse_enter", event)
                 current_visual.is_mouse_enter = True
             else:
+                self.cursor(current_visual.visual_attr["cursor"])
                 current_visual.event_generate("mouse_motion", event)
             self.previous_visual = current_visual
         else:
@@ -85,7 +93,8 @@ class SkWindow(Window):
         :param canvas: Skia画布
         :return: None
         """
-        canvas.clear(self.window_attr["background"])
+        from ..style.color import color
+        canvas.clear(color(self.theme.get_theme()["SkWindow"]["bg"]))
 
         for i, f in enumerate(self.draws):
             #print(i, f)

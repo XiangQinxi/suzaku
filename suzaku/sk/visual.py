@@ -9,12 +9,17 @@ class SkVisual(Layout, EventHanding):
 
     from .window import SkWindow
 
+    from ..themes import theme
+
+    theme = theme
+
     def __init__(self, parent: SkWindow, size=(100, 30), id=None):
         SkVisual._instance_count += 1
 
         self.visual_attr = {
             "parent": parent,
             "name": "sk_visual",
+            "cursor": "arrow",
             "x": 0,
             "y": 0,
             "width": size[0],
@@ -53,6 +58,14 @@ class SkVisual(Layout, EventHanding):
         self.bind("mouse_leave", mouse_leave)
         self.bind("mouse_pressed", mouse_pressed)
         self.bind("mouse_released", mouse_released)
+
+    def configure(self, **kwargs):
+        self.visual_attr.update(kwargs)
+
+    config = configure
+
+    def cget(self, name):
+        return self.visual_attr[name]
 
     def draw(self, canvas, rect):
         pass

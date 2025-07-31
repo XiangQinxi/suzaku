@@ -1,5 +1,7 @@
 class Boxes:
+
     from .window import SkWindow
+
     def __init__(self, parent: SkWindow, direction="h"):
 
         self.parent = parent
@@ -17,6 +19,10 @@ class Boxes:
         )
 
         self.parent.bind("resize", self.update)
+
+    def change_direction(self, direction):
+        self.direction = direction
+        self.update(self.parent.winfo_width(), self.parent.winfo_height())
 
     def update(self, width, height):
         if self.direction == "h":
@@ -103,8 +109,9 @@ class Box:
             parent.set_layout(l)
         else:
             l = layout
-        l.add_child(self, padx=padx, pady=pady, expand=expand)
-        l.update(parent.winfo_width(), parent.winfo_height())
+        if not self in l.children:
+            l.add_child(self, padx=padx, pady=pady, expand=expand)
+            l.update(parent.winfo_width(), parent.winfo_height())
 
     box = box_configure
 
@@ -134,7 +141,54 @@ class Place:
     place = place_configure
 
 
-class Layout(Box, Place):
-    pass
-    pass
+class Puts:
+
+    from .window import SkWindow
+
+    def __init__(self, parent: SkWindow):
+
+        self.parent = parent
+        self.children = []
+
+    def add_child(self, child, margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
+        self.children.append(
+            {
+                "child": child,
+                "margin": margin,
+            }
+        )
+
+        self.parent.bind("resize", self.update)
+
+    def update(self, width, height):
+        for child in self.children:
+            c = child["child"]
+            c.visual_attr["x"] = child["margin"][0]
+            c.visual_attr["y"] = child["margin"][1]
+            c.visual_attr["width"] = width - child["margin"][2] - child["margin"][3]
+            c.visual_attr["height"] = height - child["margin"][1] - child["margin"][3]
+
+
+class Put:
+
+    """
+    相对位置布局
+    """
+
+    def put_configure(self, margin: tuple[int, int, int, int] = (0, 0, 0, 0)):
+        parent = self.winfo_parent()
+        layout = parent.winfo_layout()
+        if not layout:
+            l = Puts(parent)
+            parent.set_layout(l)
+        else:
+            l = layout
+        if not self in l.children:
+            l.add_child(self, margin=margin)
+            l.update(parent.winfo_width(), parent.winfo_height())
+
+    put = put_configure
+
+
+class Layout(Box, Place, Put):
     pass
