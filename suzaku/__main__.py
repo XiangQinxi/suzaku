@@ -22,7 +22,7 @@ if __name__ == "__main__":
     SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
 
     SkButton(appwindow, text=f"Horizontal Layout / 水平布局", command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
-    SkButton(appwindow, text=f"Vertical Layout / 垂直布局", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Vertical Layout / 垂直 布局", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
 
     SkButton(appwindow, text=f"Close Window / 关闭窗口", command=appwindow.destroy, style="Close.SkButton").vbox(padx=10, pady=10)
 

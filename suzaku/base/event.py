@@ -52,14 +52,10 @@ class EventHanding(After):
 
         if not name in self.evts:
             self.evts[name] = []
-            try:
-                for evt in self.evts[name]:
-                    return evt(*args, **kwargs)
-            except Exception as e:
-                print(e)
-                return False
-        else:
-            return True
+
+        for evt in self.evts[name]:
+            evt(*args, **kwargs)
+
 
     def bind(self, name: str, func: callable, add: bool=True) -> "EventHanding":
         """
@@ -127,7 +123,7 @@ class Event:
     用于传递事件的参数。
     """
 
-    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None):
+    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: int = None):
         """
         Used to pass event via arguments.
 
@@ -159,3 +155,4 @@ class Event:
         self.y = y
         self.rootx = rootx
         self.rooty = rooty
+        self.key = key
