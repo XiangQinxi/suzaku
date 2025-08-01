@@ -1,9 +1,9 @@
 from suzaku import *
 
-app = SkApp()
-window = SkWindow(themename="dark")
+app = Sk(themename="light")
 
-SkButton(window, command=lambda: window.destroy()).vbox(padx=10, pady=10)
-SkEntry(window, text="111111111111111").vbox(padx=10, pady=10)
+SkButton(app, text=f"切换至Light主题", command=lambda: app.theme.use_theme("light")).vbox(padx=10, pady=10)
+SkButton(app, text=f"切换至Dark主题", command=lambda: app.theme.use_theme("dark")).vbox(padx=10, pady=10)
+SkEntry(app, placeholder="请输入名称").vbox(padx=10, pady=10)
 
 app.run()

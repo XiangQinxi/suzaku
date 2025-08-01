@@ -61,7 +61,6 @@ class SkButton(SkVisual):
 
         self.evts["click"] = []
         self.visual_attr["name"] = "sk_button"
-        self._id(id=id)
         self.visual_attr["text"] = text
 
         self.visual_attr["cursor"] = cursor
@@ -88,16 +87,6 @@ class SkButton(SkVisual):
         """
         if self.is_mouse_enter:
             self.event_generate("click", evt)
-
-    def _id(self, id=None) -> str:
-        """
-        设置当前组件标识符
-
-        :param id:
-        :return: 标识符
-        """
-        self.visual_attr["id"] = id or (self.winfo_name() + "." + str(self.get_instance_count()))
-        return self.visual_attr["id"]
 
     def draw(self, canvas, rect) -> None:
         """

@@ -21,6 +21,7 @@ class SkWindow(Window):
         self.window_attr["name"] = "sk_window"
         self.window_attr["layout"] = None
         self.window_attr["style"] = style
+        self.window_attr["focus_visual"] = self
         self.draws = []
         self.visuals = []
         self.previous_visual = None  # 跟踪上一个鼠标悬停的元素
@@ -33,8 +34,15 @@ class SkWindow(Window):
         self.bind("focus_out", self._leave)
         self.bind("mouse_leave", self._leave)
 
+        self.bind("key_pressed", self._key_pressed)
+
         #self.bind("window_mouse_enter", self._motion, add=True)
         #self.bind("window_mouse_leave", self._motion, add=True)
+
+    def _key_pressed(self, evt):
+        #print(self.cget("focus_visual"))
+        if self.focus_get() is not self:
+            self.focus_get().event_generate("key_pressed", evt)
 
     def _leave(self, evt):
         from ..base.event import Event
@@ -58,6 +66,7 @@ class SkWindow(Window):
             if (visual.winfo_x() <= event.x <= visual.winfo_x() + visual.winfo_width() and
                     visual.winfo_y() <= event.y <= visual.winfo_y() + visual.winfo_height()):
                 visual.focus_set()
+                print(visual)
                 visual.event_generate("mouse_pressed", event)
                 break
 
@@ -182,4 +191,8 @@ class SkWindow(Window):
                 visual.is_mouse_pressed = False
         return None
 
+    def focus_get(self):
+        return self.window_attr["focus_visual"]
 
+    def focus_set(self, visual):
+        self.window_attr["focus_visual"] = visual
