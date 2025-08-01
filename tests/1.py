@@ -1,7 +1,8 @@
 from suzaku import *
 
 app = SkApp()
-window = SkWindow()
-btn = SkButton(window, text="Hello World")
-btn.place(10, 10)
+window = SkWindow(themename="dark")
+
+SkButton(window, text="Button").vbox(padx=10, pady=10)
+
 app.run()
