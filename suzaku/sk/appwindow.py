@@ -17,6 +17,7 @@ class SkAppWindow(SkWindow):
     def run(self, *args, **kwargs) -> None:
         """
         Run application.
+
         运行应用程序。
         """
         self.app.run(*args, **kwargs)
@@ -24,6 +25,7 @@ class SkAppWindow(SkWindow):
     def quit(self, *args, **kwargs) -> None:
         """
         Exit application.
+        
         退出应用程序。
         """
         self.app.quit(*args, **kwargs)
@@ -33,6 +35,7 @@ class SkAppWindow(SkWindow):
     def winfo_app(self) -> SkApp:
         """
         Get SkApp class.
-        获取SkApp类。
+
+        获取`SkApp`类。
         """
         return self.app

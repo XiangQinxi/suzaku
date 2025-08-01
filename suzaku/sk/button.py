@@ -5,8 +5,57 @@ from typing import Any
 
 
 class SkButton(SkVisual):
-    def __init__(self, *args, text: str="SkButton", size: tuple[int, int]=(110, 40), cursor: str="hand", 
-                 command: Union[function, None]=None, id: Any=None, **kwargs):
+
+    def __init__(self, *args, text: str = "SkButton", size: tuple[int, int]=(105, 35), cursor: Union[str, None]="hand", 
+                 command: Union[function, None]=None, id: Union[str, None]=None, **kwargs) -> None:
+
+        """
+        Button Component.
+
+        按钮组件。
+
+        **Will be re-written in future. 将被重写。**
+
+        Args:
+            *args: 
+                Passed to `SkVisual`.
+
+                `SkVisual`参数。
+
+            text (str): 
+                Button text.
+
+                标签文本。
+
+            size (tuple[int, int]): 
+                Default size.
+
+                默认大小。
+
+            cursor (str | None): 
+                Cursor style when floating.
+
+                鼠标放上去的光标样式。
+
+            command (function | None): 
+                Function to run when clicked
+
+                触发点击按钮时，执行的函数（无回调）。
+
+            id (str | None):
+                Identification code (Optional).
+
+                可选ID标识码
+                
+            **kwargs: 
+                Passed to `SkVisual`
+
+                `SkVisual`参数。
+        
+        Returns:
+            None
+        """
+
         super().__init__(*args, size=size, **kwargs)
 
         self.evts["click"] = []
@@ -29,14 +78,35 @@ class SkButton(SkVisual):
         #self.bind("mouse_pressed", lambda evt: print("pressed"))
         self.bind("mouse_released", self._click)
 
-    def _click(self, evt):
+    def _click(self, evt) -> None:
+        """
+        Check click event (not pressed).
+
+        判断点击事件，而非按下事件。
+        
+        :return: None
+        """
         if self.is_mouse_enter:
             self.event_generate("click", evt)
 
-    def _id(self, id=None):
-        self.visual_attr["id"] = id or (self.winfo_name() + "." + str(self.get_instance_count()))
+    def _id(self, id=None) -> str:
+        """
+        设置当前组件标识符
 
-    def draw(self, canvas, rect):
+        :param id:
+        :return: 标识符
+        """
+        self.visual_attr["id"] = id or (self.winfo_name() + "." + str(self.get_instance_count()))
+        return self.visual_attr["id"]
+
+    def draw(self, canvas, rect) -> None:
+        """
+        绘制按钮方法。
+
+        :param canvas: 传入的skia.Surface
+        :param rect: 给出的矩形
+        :return:
+        """
         import skia
         rect_paint = skia.Paint(
             AntiAlias=True,
@@ -52,6 +122,7 @@ class SkButton(SkVisual):
                 sheets = self.theme.get_theme()["SkButton"]["hover"]
         else:
             sheets = self.theme.get_theme()["SkButton"]["rest"]
+
         rect_paint.setColor(color(sheets["bg"]))
         rect_paint.setStrokeWidth(sheets["width"])
 
@@ -72,7 +143,7 @@ class SkButton(SkVisual):
 
         #canvas.drawTextBlob(text, self.winfo_x(), self.winfo_y()+self.winfo_height()/2, paint2)
 
-
+        # 计算位置，绘制文本居中
         text_width = font.measureText(self.visual_attr["text"])
         metrics = font.getMetrics()
 

@@ -1,10 +1,44 @@
 def color(color):
+    """
+    颜色对象工厂函数
+
+    根据输入参数类型自动转换颜色格式，支持以下格式：
+    - 颜色名称字符串（如 'RED'）
+    - 十六进制字符串（如 '#RRGGBB' 或 '#AARRGGBB'）
+    - RGB/RGBA 元组或列表（3或4个元素）
+
+    Args:
+        color: 颜色参数，支持多种格式的输入
+
+    Returns:
+        skia.Color: 对应的Skia颜色对象
+
+    Example:
+        >>> color('red')
+        >>> color('#ff0000')
+        >>> color((255, 0, 0))
+    """
     c = Color()
     return c.get(color)
 
 
 class Color:
+    """颜色转换核心类，处理不同格式的颜色值转换"""
+
     def get(self, color):
+        """颜色值分发器
+
+        根据输入参数类型调用对应的颜色转换方法
+
+        Args:
+            color: 颜色参数，支持字符串/元组/列表格式
+
+        Returns:
+            skia.Color: 转换后的Skia颜色对象
+
+        Raises:
+            ValueError: 当输入格式不符合要求时抛出
+        """
         typec = type(color)
         if typec is str:
             if color.startswith("#"):
@@ -19,6 +53,17 @@ class Color:
                 raise ValueError("Color tuple/list must have 3 (RGB) or 4 (RGBA) elements")
 
     def get_color_name(self, name: str):
+        """转换颜色名称字符串为Skia颜色
+
+        Args:
+            name: 颜色名称（如 'RED'）
+
+        Returns:
+            skia.Color: 对应的预定义颜色对象
+
+        Raises:
+            ValueError: 颜色名称不存在时抛出
+        """
         import skia
         try:
             color = getattr(skia, f"Color{name.upper()}")
@@ -28,10 +73,34 @@ class Color:
             return color
 
     def get_color_rgb(self, r, g, b, a=255):
+        """
+        转换RGB/RGBA值为Skia颜色
+
+        Args:
+            r: 红色通道 (0-255)
+            g: 绿色通道 (0-255)
+            b: 蓝色通道 (0-255)
+            a: 透明度通道 (0-255，默认255)
+
+        Returns:
+            skia.Color: 对应的RGBA颜色对象
+        """
         import skia
         return skia.Color(r, g, b, a)
 
     def get_color_hex(self, hex: str):
+        """
+        转换十六进制颜色字符串为Skia颜色
+
+        Args:
+            hex: 十六进制颜色字符串（支持 #RRGGBB 和 #AARRGGBB 格式）
+
+        Returns:
+            skia.Color: 对应的RGBA颜色对象
+
+        Raises:
+            ValueError: 当十六进制格式无效时抛出
+        """
         import skia
         hex_color = hex.lstrip('#')
         if len(hex_color) == 6:  # RRGGBB 格式，默认不透明(Alpha=255)

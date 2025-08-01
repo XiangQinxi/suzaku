@@ -2,7 +2,14 @@ from .visual import SkVisual
 
 
 class SkLabel(SkVisual):
-    def __init__(self, *args, text: str = "SkLabel", **kwargs):
+    def __init__(self, *args, text: str = "SkLabel", **kwargs) -> None:
+        """
+        初始化标签
+
+        :param args: SkVisual参数
+        :param text: 标签文本
+        :param kwargs: SkVisual参数
+        """
         super().__init__(*args, **kwargs)
         self.visual_attr["text"] = text
         self.visual_attr["name"] = "sk_label"
@@ -11,7 +18,14 @@ class SkLabel(SkVisual):
         self.visual_attr["bg"] = color(self.theme.get_theme()["SkLabel"]["bg"])
         self.visual_attr["fg"] = color(self.theme.get_theme()["SkLabel"]["fg"])
 
-    def draw(self, canvas, rect):
+    def draw(self, canvas, rect) -> None:
+        """
+        绘制标签
+
+        :param canvas: 传入的skia.Surface
+        :param rect: 给出的矩形
+        :return: None
+        """
         import skia
         rect_paint = skia.Paint(
             Style=skia.Paint.kFill_Style,
