@@ -70,7 +70,7 @@ class Font:
             else:
                 raise ValueError
         except:
-            warnings.warn("Invalid font arugments or font! Falling back to default")
+            warnings.warn("Invalid font arguments or font! Falling back to default")
 
 
     def get_font(self):
