@@ -6,16 +6,16 @@ if __name__ == "__main__":
     appwindow = Sk(title="Suzaku GUI", themename="light", size=(300, 300))
     appwindow.bind("close", lambda: print("Window closed"))
 
-    SkButton(appwindow, text=f"切换至Light主题", command=lambda: appwindow.theme.use_theme("light")).vbox(padx=10, pady=10)
-    SkButton(appwindow, text=f"切换至Dark主题", command=lambda: appwindow.theme.use_theme("dark")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Switch to light theme", command=lambda: appwindow.theme.use_theme("light")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Switch to dark theme", command=lambda: appwindow.theme.use_theme("dark")).vbox(padx=10, pady=10)
 
     SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
 
-    SkButton(appwindow, text=f"水平布局", command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
-    SkButton(appwindow, text=f"垂直布局", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Horizontal layout", command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Vertical layout", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
 
-    SkButton(appwindow, text=f"关闭窗口", command=appwindow.quit).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Close this window", command=appwindow.quit).vbox(padx=10, pady=10)
 
-    #SkButton(appwindow, text=f"按钮").put(margin=(10, 10, 10, 10))
+    #SkButton(appwindow, text=f"Button").put(margin=(10, 10, 10, 10))
 
     appwindow.run()
