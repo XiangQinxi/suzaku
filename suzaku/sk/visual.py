@@ -81,12 +81,15 @@ class SkVisual(Layout, EventHanding):
     def __str__(self) -> str:
         return self.winfo_id()
 
-    def configure(self, **kwargs):
+    def configure(self, **kwargs) -> None:
+        """
+        Configure the SkVisual conponent.
+        """
         self.visual_attr.update(kwargs)
 
     config = configure
 
-    def cget(self, name):
+    def cget(self, name) -> str:
         return self.visual_attr[name]
 
     def draw(self, canvas, rect):
