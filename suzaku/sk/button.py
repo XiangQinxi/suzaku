@@ -1,23 +1,59 @@
 from .visual import SkVisual
 
+from typing import Union
+from typing import Any
+
 
 class SkButton(SkVisual):
 
-    """
-    按钮组件
-    """
-
-    def __init__(self, *args, text: str = "SkButton", size=(105, 35), cursor="hand", command=None, id=None, **kwargs) -> None:
+    def __init__(self, *args, text: str = "SkButton", size: tuple[int, int]=(105, 35), cursor: Union[str, None]="hand", 
+                 command: Union[function, None]=None, id: Union[str, None]=None, **kwargs) -> None:
 
         """
+        Button Component.
 
-        :param args: SkVisual参数
-        :param text: 标签文本
-        :param size: 默认大小
-        :param cursor: 鼠标放上去的光标样式
-        :param command: 触发点击按钮时，执行的函数（无回调）
-        :param id: 可选ID标识码
-        :param kwargs: SkVisual参数
+        按钮组件。
+
+        **Will be re-written in future. 将被重写。**
+
+        Args:
+            *args: 
+                Passed to `SkVisual`.
+
+                `SkVisual`参数。
+
+            text (str): 
+                Button text.
+
+                标签文本。
+
+            size (tuple[int, int]): 
+                Default size.
+
+                默认大小。
+
+            cursor (str | None): 
+                Cursor style when floating.
+
+                鼠标放上去的光标样式。
+
+            command (function | None): 
+                Function to run when clicked
+
+                触发点击按钮时，执行的函数（无回调）。
+
+            id (str | None):
+                Identification code (Optional).
+
+                可选ID标识码
+                
+            **kwargs: 
+                Passed to `SkVisual`
+
+                `SkVisual`参数。
+        
+        Returns:
+            None
         """
 
         super().__init__(*args, size=size, **kwargs)
@@ -44,9 +80,10 @@ class SkButton(SkVisual):
 
     def _click(self, evt) -> None:
         """
-        判断点击事件，而非按下事件
+        Check click event (not pressed).
 
-        :param evt: 传参
+        判断点击事件，而非按下事件。
+        
         :return: None
         """
         if self.is_mouse_enter:
