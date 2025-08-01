@@ -11,6 +11,8 @@ if __name__ == "__main__":
 
     SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
 
+    btn = SkButton(appwindow, text=f"移除自己", command=lambda: btn.box_forget()).vbox(padx=10, pady=10)
+
     SkButton(appwindow, text=f"水平布局", command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
     SkButton(appwindow, text=f"垂直布局", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
 

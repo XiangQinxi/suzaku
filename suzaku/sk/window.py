@@ -4,6 +4,13 @@ import skia
 
 class SkWindow(Window):
     def __init__(self, *args, themename="light", **kwargs):
+        """
+        初始化
+
+        :param args: Window参数
+        :param themename: 主题名称
+        :param kwargs: Window参数
+        """
         super().__init__(*args, **kwargs)
 
         from ..themes import theme
@@ -26,6 +33,10 @@ class SkWindow(Window):
         #self.bind("window_mouse_leave", self._motion, add=True)
 
     def _mouse(self):
+        """
+        回调组件接收鼠标按下自己事件
+        :return: None
+        """
         from ..base.event import Event
         event = Event(
             x=self.window_attr["mouse_x"],
@@ -42,6 +53,11 @@ class SkWindow(Window):
     from ..base.event import Event
 
     def _motion(self, evt: Event):
+        """
+        回调组件接收鼠标移动、进入、离开事件
+        :param evt: 事件对象
+        :return: None
+        """
         self.window_attr["mouse_x"] = evt.x
         self.window_attr["mouse_y"] = evt.y
         self.window_attr["mouse_rootx"] = evt.x + self.winfo_x()
@@ -76,10 +92,16 @@ class SkWindow(Window):
         else:
             self.previous_visual = None
 
-    def set_layout(self, layout):
+    def set_layout(self, layout) -> None:
+        """
+        设置窗口布局
+
+        :param layout: 布局类 Boxes、Puts等
+        :return: None
+        """
         self.window_attr["layout"] = layout
 
-    def add_draw(self, draw_func):
+    def add_draw(self, draw_func) -> None:
         """
         添加可视化元素绘制函数
 
@@ -88,7 +110,16 @@ class SkWindow(Window):
         """
         self.draws.append(draw_func)
 
-    def draw(self, canvas: skia.Surfaces):
+    def remove_draw(self, draw_func) -> None:
+        """
+        移除可视化元素绘制函数
+
+        :param draw_func: 绘制函数
+        :return: None
+        """
+        self.draws.remove(draw_func)
+
+    def draw(self, canvas: skia.Surfaces) -> None:
         """
         绘制Skia画布与其上的可视化元素
 
@@ -101,11 +132,22 @@ class SkWindow(Window):
         for i, f in enumerate(self.draws):
             #print(i, f)
             f(canvas)
+        return None
 
-    def winfo_layout(self):
+    def winfo_layout(self) -> type:
+        """
+        获取窗口的布局
+
+        :return: 布局类
+        """
         return self.window_attr["layout"]
 
-    def _mouse_released(self):
+    def _mouse_released(self) -> None:
+        """
+        鼠标释放事件处理函数，将会触发mouse_release事件。
+
+        :return: None
+        """
         from ..base.event import Event
         event = Event(
             x=self.window_attr["mouse_x"],
@@ -117,3 +159,4 @@ class SkWindow(Window):
             if visual.is_mouse_pressed:
                 visual.event_generate("mouse_released", event)
                 visual.is_mouse_pressed = False
+        return None

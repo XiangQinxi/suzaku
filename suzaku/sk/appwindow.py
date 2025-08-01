@@ -17,15 +17,15 @@ class SkAppWindow(SkWindow):
         self.window_attr["name"] = "sk_appwindow"
 
     def run(self, *args, **kwargs) -> None:
-        "运行应用程序"
+        """运行应用程序"""
         self.app.run(*args, **kwargs)
 
     def quit(self, *args, **kwargs) -> None:
-        "退出应用程序"
+        """退出应用程序"""
         self.app.quit(*args, **kwargs)
 
     from .app import SkApp
 
     def winfo_app(self) -> SkApp:
-        "获取SkApp类"
+        """获取SkApp类"""
         return self.app

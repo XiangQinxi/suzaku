@@ -1,6 +1,6 @@
 [project]
 name = "suzaku"
-version = "0.0.1-alpha3"
+version = "0.0.1-alpha4"
 description = "Placeholder description (to be updated) 暂时仅作占位作用，无需下载安装"
 keywords = ["suzaku","future","lightweight","gui","framework"]
 authors = [

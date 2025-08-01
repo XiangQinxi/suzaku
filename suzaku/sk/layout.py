@@ -40,7 +40,7 @@ class Boxes:
 
         self.parent.bind("resize", self.update)
 
-    def change_direction(self, direction: str):
+    def change_direction(self, direction: str) -> None:
         """
         改变布局方向
 
@@ -50,8 +50,16 @@ class Boxes:
         self.direction = direction
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
+        # 别问我为什么要放两个update，我也不知道为什么，这样做布局意外的正常改变了
 
-    def update(self, width, height):
+    def update(self, width, height) -> None:
+        """
+        更新布局
+
+        :param width: 容器宽度
+        :param height: 容器高度
+        :return: None
+        """
         if self.direction == "h":
             # 水平布局
 
@@ -128,7 +136,15 @@ class Boxes:
                 current_y += c.visual_attr["height"]
 
 class Box:
-    def box_configure(self, padx=5, pady=5, expand=False, direction=None):
+    def box_configure(self, padx=5, pady=5, expand=False, direction=None) -> "Box":
+        """
+        配置组件布局
+        :param padx: 左右的外边距
+        :param pady: 上下的外边距
+        :param expand: 是否占满剩余空间
+        :param direction: 布局的方向(h为水平方向布局，v为垂直方向布局)
+        :return: None
+        """
         parent = self.winfo_parent()
         layout = parent.winfo_layout()
         if not layout:
@@ -141,23 +157,59 @@ class Box:
         if not self in l.children:
             l.add_child(self, padx=padx, pady=pady, expand=expand)
             l.update(parent.winfo_width(), parent.winfo_height())
+            self._show()
+        return self
 
     box = box_configure
 
-    def hbox_configure(self, *args, **kwargs):
-        self.box_configure(*args, **kwargs, direction="h")
+    def hbox_configure(self, *args, **kwargs) -> "Box":
+        """
+        水平布局
+        :param args: box_configure参数
+        :param kwargs: box_configure参数
+        :return:
+        """
+        return self.box_configure(*args, **kwargs, direction="h")
 
     hbox = hbox_configure
 
-    def vbox_configure(self, *args, **kwargs):
-        self.box_configure(*args, **kwargs, direction="v")
+    def vbox_configure(self, *args, **kwargs) -> "Box":
+        """
+        垂直布局
+        :param args: box_configure参数
+        :param kwargs: box_configure参数
+        :return:
+        """
+        return self.box_configure(*args, **kwargs, direction="v")
 
     vbox = vbox_configure
+
+    def box_forget(self) ->  "Box":
+        """
+        移除组件布局
+        :return: None
+        """
+        layout = self.winfo_parent().winfo_layout()
+        if layout:
+            for child in layout.children:
+                if self is child["child"]:
+                    layout.children.remove(child)
+                    self._hide()
+                    layout.update(layout.parent.winfo_width(), layout.parent.winfo_height())
+        return self
 
 
 
 class Place:
     def place_configure(self, x: int, y: int, width: int = None, height: int = None):
+        """
+        绝对位置布局
+        :param x: 组件的x坐标
+        :param y: 组件的y坐标
+        :param width: 组件的宽度（不填则为dwidth）
+        :param height: 组件的高度（不填则为dheight）
+        :return: None
+        """
         self.winfo_parent().set_layout("place")
 
         self.visual_attr["x"] = x
@@ -167,19 +219,42 @@ class Place:
         if height is not None:
             self.visual_attr["height"] = height
 
+        self._show()
+
     place = place_configure
+
+    def place_forget(self) -> None:
+        """
+        移除组件布局
+        :return: None
+        """
+        self._hide()
 
 
 class Puts:
 
+    """
+    绝对位置布局管理器
+    """
+
     from .window import SkWindow
 
     def __init__(self, parent: SkWindow):
+        """
+        初始化
+        :param parent: 父组件
+        """
 
         self.parent = parent
         self.children = []
 
     def add_child(self, child, margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
+        """
+        添加组件
+        :param child: 组件
+        :param margin: 组件与容器的间距
+        :return: None
+        """
         self.children.append(
             {
                 "child": child,
@@ -190,6 +265,12 @@ class Puts:
         self.parent.bind("resize", self.update)
 
     def update(self, width, height):
+        """
+        更新布局
+        :param width: 容器宽度
+        :param height: 容器高度
+        :return: None
+        """
         for child in self.children:
             c = child["child"]
             c.visual_attr["x"] = child["margin"][0]
@@ -204,7 +285,14 @@ class Put:
     相对位置布局
     """
 
-    def put_configure(self, margin: tuple[int, int, int, int] = (0, 0, 0, 0)):
+    def put_configure(self, margin: tuple[int, int, int, int] = (0, 0, 0, 0)) -> None:
+        """
+        相对组件所在容器布局
+        （未来将会制作anchor来对齐位置）
+
+        :param margin: 组件与容器的间距
+        :return: None
+        """
         parent = self.winfo_parent()
         layout = parent.winfo_layout()
         if not layout:
@@ -214,9 +302,25 @@ class Put:
             l = layout
         if not self in l.children:
             l.add_child(self, margin=margin)
-            l.update(parent.winfo_width(), parent.winfo_height())
+            l.update(parent.winfo_dwidth(), parent.winfo_dheight())
+            self._show()
+        return None
 
     put = put_configure
+
+    def put_forget(self) -> None:
+        """
+        移除组件布局
+        :return: None
+        """
+        parent = self.winfo_parent()
+        layout = parent.winfo_layout()
+        if layout:
+            l = layout
+            if self in l.children:
+                l.children.remove(self)
+                l.update(parent.winfo_dwidth(), parent.winfo_dheight())
+                self._hide()
 
 
 class Layout(Box, Place, Put):
