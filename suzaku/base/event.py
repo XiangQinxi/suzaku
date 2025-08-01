@@ -1,49 +1,91 @@
 from .after import After
 
+from typing import Union, Any
+
 
 class EventHanding(After):
 
     """
-    事件绑定管理器
+    Event binding manager.
+
+    事件绑定管理器。
+
     """
 
     def __init__(self):
 
         """
-        初始化所有可绑定的事件
+        Initialize all bindable events.
+
+        初始化所有可绑定的事件。
+
         """
 
         self.evts = {}
 
-    def event_generate(self, name: str, *args, **kwargs) -> bool:
+    def event_generate(self, name: str, *args, **kwargs) -> Union[bool, Any]:
         """
-        发出事件信号
+        Send event signal.
 
-        :param name: 事件名称，没有则创建
-        :param args: 传参
-        :param kwargs: 传参
-        :return:
+        发出事件信号。
+
+        Args:
+            name (str): 
+                Event name, create if not existed.
+
+                事件名称，没有则创建。
+
+            *args: 
+                Passed to `evt`.
+
+                传参。
+
+            **kwargs: 
+                Passed to `evt`.
+
+                传参。
+
+        Returns:
+            function_return (Any): Return value from the function, or False for failed. 函数返回值，出错则False。
+
         """
 
         if not name in self.evts:
             self.evts[name] = []
-        try:
-            for evt in self.evts[name]:
-                evt(*args, **kwargs)
-        except Exception as e:
-            print(e)
-            return False
+            try:
+                for evt in self.evts[name]:
+                    return evt(*args, **kwargs)
+            except Exception as e:
+                print(e)
+                return False
         else:
             return True
 
-    def bind(self, name: str, func: callable, add: bool = True) -> "EventHanding":
+    def bind(self, name: str, func: callable, add: bool=True) -> "EventHanding":
         """
-        绑定事件
+        Bind event.
 
-        :param name: 事件名称，没有则创建
-        :param func: 绑定函数
-        :param add: 是否在绑定的事件后添加，而不是清除其他事件只保留自己
-        :return: self
+        绑定事件。
+
+        Args:
+            name (str): 
+                Event name, create if not existed.
+
+                事件名称，没有则创建。
+
+            func (callable): 
+                Function to bind.
+                
+                绑定函数。
+
+            add (bool): 
+                Whether to add after existed events, otherwise clean other and add itself.
+
+                是否在绑定的事件后添加，而不是清除其他事件只保留自己。
+
+        Returns:
+            self
+
         """
         if name not in self.evts:
             self.evts[name] = [func]
@@ -53,15 +95,26 @@ class EventHanding(After):
             self.evts[name] = [func]
         return self
 
-    def unbind(self, name, func):
+    def unbind(self, name: str, func: callable) -> None:
         """
-        解绑事件
+        Unbind event.
+
+        解绑事件。
 
         -> 后续事件将以ID作为识别码来解绑
 
-        :param name: 事件名称
-        :param func: 要解绑函数
-        :return:
+        Args:
+            name (str): 
+                Name of the event.
+                
+                事件名称。
+
+            func (callable): 
+                Function to unbind.
+                
+                要解绑函数。
+        Returns:
+            None
         """
         self.evts[name].remove(func)
 
@@ -69,17 +122,38 @@ class EventHanding(After):
 class Event:
 
     """
-    用于传递事件的参数
+    Used to pass event via arguments.
+
+    用于传递事件的参数。
     """
 
     def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None):
         """
-        初始化
+        Used to pass event via arguments.
 
-        :param x: 鼠标的/组建的X坐标(相对于窗口)
-        :param y: 鼠标的/组建的Y坐标(相对于窗口)
-        :param rootx: 鼠标的/组建的X坐标(相对于屏幕)
-        :param rooty: 鼠标的/组建的Y坐标(相对于屏幕)
+        用于传递事件的参数。
+
+        Args:
+            x: 
+                x position of cursor / component (Relative to window).
+
+                鼠标的/组件的x坐标(相对于窗口)。
+
+            y: 
+                y position of cursor / component (Relative to window).
+
+                鼠标的/组件的y坐标(相对于窗口)。
+
+            rootx: 
+                x position of cursor / component (Relative to screen).
+
+                鼠标的/组件的x坐标(相对于荧幕)。
+
+            rooty: 
+                y position of cursor / component (Relative to screen).
+
+                鼠标的/组件的y坐标(相对于荧幕)。
+
         """
         self.x = x
         self.y = y
