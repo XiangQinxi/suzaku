@@ -43,7 +43,6 @@ class Window(EventHanding):
             "default_cursor": "arrow",
             "cursor": "arrow",
             "focus": True,
-            "focus_visual": self,
             "force_hardware_acceleration": force_hardware_acceleration
         }
 
@@ -134,6 +133,28 @@ class Window(EventHanding):
         finally:
             if 'context' in locals():
                 context.releaseResourcesAndAbandonContext()
+
+    def _on_key(self, window, key, scancode, action, mods):
+        """
+        触发键盘事件
+
+        Args:
+            window: GLFW窗口
+            key: 按键
+            scancode: 扫描码
+            action: 动作
+            mods: 修饰键
+
+        Returns:
+
+        """
+        from glfw import PRESS, RELEASE
+        from .event import Event
+        evt = Event(key=key)
+        if action == PRESS:
+            self.event_generate("key_pressed", evt)
+        elif action == RELEASE:
+            self.event_generate("key_released", evt)
 
     def _on_focus(self, window, focused):
         from .event import Event
@@ -316,39 +337,15 @@ class Window(EventHanding):
                           CROSSHAIR_CURSOR, CENTER_CURSOR)
         if cursorname is None:
             return self.window_attr["cursor"]
+
         name = cursorname.lower()
-        if name == "arrow":
-            c = create_standard_cursor(ARROW_CURSOR)
-        elif name == "hand":
-            c = create_standard_cursor(HAND_CURSOR)
-        elif name == "vresize":
-            c = create_standard_cursor(VRESIZE_CURSOR)
-        elif name == "resize_nwse":
-            c = create_standard_cursor(RESIZE_NWSE_CURSOR)
-        elif name == "resize_ns":
-            c = create_standard_cursor(RESIZE_NS_CURSOR)
-        elif name == "resize_nesw":
-            c = create_standard_cursor(RESIZE_NESW_CURSOR)
-        elif name == "resize_ew":
-            c = create_standard_cursor(RESIZE_EW_CURSOR)
-        elif name == "resize_all":
-            c = create_standard_cursor(RESIZE_ALL_CURSOR)
-        elif name == "pointing_hand":
-            c = create_standard_cursor(POINTING_HAND_CURSOR)
-        elif name == "not_allowed":
-            c = create_standard_cursor(NOT_ALLOWED_CURSOR)
-        elif name == "no_current":
-            c = create_standard_cursor(NO_CURRENT_CONTEXT)
-        elif name == "ibeam":
-            c = create_standard_cursor(IBEAM_CURSOR)
-        elif name == "hresize":
-            c = create_standard_cursor(HRESIZE_CURSOR)
-        elif name == "crosshair":
-            c = create_standard_cursor(CROSSHAIR_CURSOR)
-        elif name == "center":
-            c = create_standard_cursor(CENTER_CURSOR)
+
+        cursorget = vars()[f"{name.upper()}_CURSOR"] # e.g. crosschair -> CROSSHAIR_CURSOR
+        if cursorget:
+            c = create_standard_cursor(cursorget)
         else:
             return self.window_attr["cursor"]
+
         self.window_attr["cursor"] = name
         set_cursor(self.winfo_glfw_window(), c)
         return self
@@ -588,28 +585,28 @@ class Window(EventHanding):
     def winfo_x(self) -> int:
         """
         获取窗口的x坐标
-        :return: x坐标
+        return: x坐标
         """
         return self.window_attr["x"]
 
     def winfo_y(self) -> int:
         """
         获取窗口的y坐标
-        :return: y坐标
+        return: y坐标
         """
         return self.window_attr["y"]
 
     def winfo_rootx(self) -> int:
         """
         获取窗口的根窗口x坐标
-        :return: x坐标
+        return: x坐标
         """
         return self.window_attr["rootx"]
 
     def winfo_rooty(self) -> int:
         """
         获取窗口的根窗口y坐标
-        :return: y坐标
+        return: y坐标
         """
         return self.window_attr["rooty"]
 
@@ -619,8 +616,8 @@ class Window(EventHanding):
     def set_draw_func(self, func: callable) -> "Window":
         """
         处理Skia绘制事件
-        :param func: 绘制函数
-        :return: self
+        param func: 绘制函数
+        return: self
         """
         self.draw_func = func
         return self
@@ -628,8 +625,8 @@ class Window(EventHanding):
     def set_application(self, app) -> "Window":
         """
         供Application调用，一般来说无需使用该方法
-        :param app: Application实例
-        :return: self
+        param app: Application实例
+        return: self
         """
         self.application = app
         return self
@@ -637,7 +634,9 @@ class Window(EventHanding):
     def create(self) -> any:
         """
         创建GLFW窗口
-        :return: GLFW窗口
+
+        Returns:
+            any: GLFW窗口
         """
 
         import glfw
@@ -647,6 +646,16 @@ class Window(EventHanding):
                 monitor = glfw.get_primary_monitor()
             else:
                 monitor = None
+
+            import sys
+            glfw.window_hint(glfw.STENCIL_BITS, 8)
+            # see https://www.glfw.org/faq#macos
+            if sys.platform.startswith("darwin"):
+                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
+                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
+                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
             # 使用应用程序的GLFW配置
             window = glfw.create_window(
                 self.winfo_width(),
@@ -682,7 +691,9 @@ class Window(EventHanding):
     def create_bind(self) -> None:
         """
         绑定GLFW窗口事件
-        :return: None
+
+        Returns:
+            None
         """
         window =  self.winfo_glfw_window()
         import glfw
@@ -696,6 +707,6 @@ class Window(EventHanding):
         glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
         glfw.set_window_pos_callback(window, self._on_window_pos)
         glfw.set_window_focus_callback(window, self._on_focus)
-
+        glfw.set_key_callback(window, self._on_key)
 
 

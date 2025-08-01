@@ -70,6 +70,8 @@ class SkVisual(Layout, EventHanding):
             "mouse_released": [],
             "focus_in": [],
             "focus_out": [],
+            "key_pressed": [],
+            "key_released": [],
         }
 
         self.winfo_parent().add(self)
@@ -343,11 +345,12 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["name"]
 
-    def winfo_style(self):
+    def winfo_style(self) -> dict:
         """
         获取组件样式
 
-        :return:
+        Returns:
+            self.visual_attr["style"] (dict): Style value. 样式值。
         """
         return self.visual_attr["style"]
 
@@ -375,6 +378,7 @@ class SkVisual(Layout, EventHanding):
         self.winfo_master_window().window_attr["focus_visual"] = self
         from ..base.event import Event
         self.event_generate("focus_in", Event())
+
 
     def focus_get(self):
         """

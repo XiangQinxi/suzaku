@@ -7,7 +7,7 @@ class SkEntry(SkVisual):
     按钮组件
     """
 
-    def __init__(self, *args, text: str = "SkEntry", size=(105, 35), cursor="crosshair", style="SkEntry", id=None, **kwargs) -> None:
+    def __init__(self, *args, placeholder: str = "", size=(105, 35), cursor="ibeam", style="SkEntry", id=None, **kwargs) -> None:
 
         """
 
@@ -24,24 +24,21 @@ class SkEntry(SkVisual):
 
         self.evts["click"] = []
         self.visual_attr["name"] = "sk_button"
-        self._id(id=id)
-        self.visual_attr["text"] = text
+        self.visual_attr["placeholder"] = placeholder
+        self.visual_attr["text"] = ""
 
         self.visual_attr["cursor"] = cursor
 
-    def _id(self, id=None) -> str:
-        """
-        设置当前组件标识符
+        self.bind("key_pressed", self._key_pressed)
 
-        :param id:
-        :return: 标识符
-        """
-        self.visual_attr["id"] = id or (self.winfo_name() + "." + str(self.get_instance_count()))
-        return self.visual_attr["id"]
+    def _key_pressed(self, evt):
+        if evt.key == "BackSpace":
+            print(123)
+            self.visual_attr["text"] = self.visual_attr["text"][:-1]
 
     def draw(self, canvas, rect) -> None:
         """
-        绘制按钮方法。
+        绘制输入框方法。
 
         :param canvas: 传入的skia.Surface
         :param rect: 给出的矩形
@@ -84,13 +81,22 @@ class SkEntry(SkVisual):
         from ..base.font import default_font
         font = default_font()
 
-        #canvas.drawTextBlob(text, self.winfo_x(), self.winfo_y()+self.winfo_height()/2, paint2)
+        if not self.is_focus:
+            if self.visual_attr["placeholder"] and not self.visual_attr["text"]:
+                text_width = font.measureText(self.visual_attr["placeholder"])
+                metrics = font.getMetrics()
 
-        # 计算位置，绘制文本居中
-        text_width = font.measureText(self.visual_attr["text"])
-        metrics = font.getMetrics()
+                draw_x = self.winfo_x() + sheets["width"] * 2
+                draw_y = self.winfo_y() + self.winfo_height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
 
-        draw_x = self.winfo_x() + sheets["width"] * 2
-        draw_y = self.winfo_y() + self.winfo_height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
+                canvas.drawSimpleText(self.visual_attr["placeholder"], draw_x, draw_y, font, text_paint)
+        else:
+            text_width = font.measureText(self.visual_attr["text"])
+            metrics = font.getMetrics()
 
-        canvas.drawSimpleText(self.visual_attr["text"], draw_x, draw_y, font, text_paint)
+            draw_x = self.winfo_x() + sheets["width"] * 2
+            draw_y = self.winfo_y() + self.winfo_height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
+
+            canvas.drawSimpleText(self.visual_attr["text"], draw_x, draw_y, font, text_paint)
+
+            canvas.drawSimpleText("|", draw_x+5, draw_y, font, text_paint)
