@@ -8,7 +8,9 @@ class Application:
 
     def __init__(self) -> None:
         """
-        初始化
+        Application.
+
+        应用程式。
         """
 
         self.windows = []
@@ -22,9 +24,12 @@ class Application:
     @classmethod
     def get_instance(self) -> int:
         """
-        获取实例的数量
+        Get instance count.
 
-        :return: 示例数量
+        获取实例的数量。
+
+        Returns:
+            self._instance (int): 实例数量
         """
 
         if self._instance is None:
@@ -33,9 +38,12 @@ class Application:
 
     def init_glfw(self) -> None:
         """
-        初始化glfw库
+        Initialize GLFW module.
 
-        :return: None
+        初始化glfw库。
+
+        Returns:
+            None
         """
 
         import glfw
@@ -48,10 +56,18 @@ class Application:
 
     def add_window(self, window: Window) -> "Application":
         """
-        添加窗口
+        Add a window.
 
-        :param window: 窗口
-        :return self
+        添加窗口。
+
+        Args:
+            window (Window): 
+                The window.
+
+                窗口
+
+        Returns:
+            self
         """
         self.windows.append(window)
         # 将窗口的GLFW初始化委托给Application
@@ -62,7 +78,7 @@ class Application:
     def run(self) -> None:
         import glfw
         if not self.windows:
-            raise RuntimeError('至少需要添加一个窗口才能运行应用程序')
+            raise RuntimeError('At least one window is required to run application!')
 
         self.running = True
         for window in self.windows:
@@ -98,9 +114,12 @@ class Application:
 
     def cleanup(self) -> None:
         """
-        清理资源
+        Clean up resources.
 
-        :return: None
+        清理资源。
+
+        Returns:
+            None
         """
         import glfw
         for window in self.windows:
@@ -110,9 +129,12 @@ class Application:
 
     def quit(self) -> None:
         """
-        退出应用程序
+        Quit application.
 
-        :return None
+        退出应用程序。
+
+        Returns:
+            None
         """
         self.running = False
         self.running = False
