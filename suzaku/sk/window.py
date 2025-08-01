@@ -81,14 +81,15 @@ class SkWindow(Window):
 
         # 处理当前元素的进入和移动事件
         if current_visual:
-            if not current_visual.is_mouse_enter:
-                self.cursor(current_visual.visual_attr["cursor"])
-                current_visual.event_generate("mouse_enter", event)
-                current_visual.is_mouse_enter = True
-            else:
-                self.cursor(current_visual.visual_attr["cursor"])
-                current_visual.event_generate("mouse_motion", event)
-            self.previous_visual = current_visual
+            if current_visual.winfo_visible():
+                if not current_visual.is_mouse_enter:
+                    self.cursor(current_visual.visual_attr["cursor"])
+                    current_visual.event_generate("mouse_enter", event)
+                    current_visual.is_mouse_enter = True
+                else:
+                    self.cursor(current_visual.visual_attr["cursor"])
+                    current_visual.event_generate("mouse_motion", event)
+                self.previous_visual = current_visual
         else:
             self.previous_visual = None
 
@@ -131,7 +132,8 @@ class SkWindow(Window):
 
         for i, f in enumerate(self.draws):
             #print(i, f)
-            f(canvas)
+            if self.visuals[i].winfo_visible():
+                f(canvas)
         return None
 
     def winfo_layout(self) -> type:

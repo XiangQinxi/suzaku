@@ -106,7 +106,7 @@ class SkButton(SkVisual):
 
         #canvas.drawTextBlob(text, self.winfo_x(), self.winfo_y()+self.winfo_height()/2, paint2)
 
-
+        # 计算位置，绘制文本居中
         text_width = font.measureText(self.visual_attr["text"])
         metrics = font.getMetrics()
 

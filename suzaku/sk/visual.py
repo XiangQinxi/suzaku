@@ -40,7 +40,7 @@ class SkVisual(Layout, EventHanding):
             "width": size[0],
             "height": size[1],
             "id": id or ("sk_visual." + str(self.get_instance_count())),
-            "visible": True,
+            "visible": False,
         }
 
         self.evts = {
@@ -50,7 +50,6 @@ class SkVisual(Layout, EventHanding):
             "mouse_pressed": [],
             "mouse_released": [],
         }
-
 
         self.winfo_parent().add(self)
 
@@ -70,6 +69,7 @@ class SkVisual(Layout, EventHanding):
             self.is_mouse_pressed = False
 
         self.draw_func = lambda canvas: self._draw(canvas)
+        self.winfo_parent().add_draw(self.draw_func)
 
         self.bind("mouse_enter", mouse_enter)
         self.bind("mouse_leave", mouse_leave)
@@ -84,14 +84,16 @@ class SkVisual(Layout, EventHanding):
         显示组件
         :return: None
         """
-        self.winfo_parent().add_draw(self.draw_func)
+        """self.winfo_parent().add_draw(self.draw_func)"""
+        self.visual_attr["visible"] = True
 
     def _hide(self) -> None:
         """
         隐藏组件
         :return: None
         """
-        self.winfo_parent().remove_draw(self.draw_func)
+        """self.winfo_parent().remove_draw(self.draw_func)"""
+        self.visual_attr["visible"] = False
 
     def configure(self, **kwargs) -> None:
         """
@@ -223,3 +225,11 @@ class SkVisual(Layout, EventHanding):
         :return:
         """
         return self.visual_attr["name"]
+
+    def winfo_visible(self) -> bool:
+        """
+        获取组件是否可见
+
+        :return:
+        """
+        return self.visual_attr["visible"]
