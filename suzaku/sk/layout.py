@@ -367,7 +367,7 @@ class Puts:
     from .window import SkWindow
     from .visual import SkVisual
 
-    def __init__(self, parent: Union[SkWindow, SkVisual]):
+    def __init__(self, parent: Union[SkWindow, SkVisual]) -> None:
         """
         Rerlative layout manager.
 
@@ -377,6 +377,9 @@ class Puts:
             parent (SkWindow | SkVisual): 
                 Parent component
                 父组件
+        
+        Returns:
+            None
         """
 
         self.parent = parent
