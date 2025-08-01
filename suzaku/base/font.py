@@ -63,7 +63,7 @@ class Font:
                 self.name = name
                 self.font = skia.Font(skia.Typeface(name), size)
             elif path:
-                if not os.path.exists("path"):
+                if not os.path.exists(path):
                     raise FileNotFoundError
                 self.path = path
                 self.font = skia.Font(skia.Typeface.MakeFromFile(self.path), size)
@@ -71,7 +71,7 @@ class Font:
                 raise ValueError
         except:
             warnings.warn("Invalid font arugments or font! Falling back to default")
-            self.font = default_font()
+
 
     def get_font(self):
         """
