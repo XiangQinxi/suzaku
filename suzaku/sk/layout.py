@@ -9,25 +9,56 @@ class Boxes:
     def __init__(self, parent: SkWindow, direction="h"):
 
         """
-        初始化
 
-        :param parent: 得到布局的容器
-        :param direction: 布局的方向(h为水平方向布局，v为垂直方向布局)
+        Box layout manager.
+
+        Box布局管理器。
+
+        Args:
+            parent (SkWindow | SkVisual):
+                Container that accepts the layout.
+
+                接受布局的容器。
+
+            direction (str):
+                Direction of the layout, either `v` for vertical or `h` for horizontal.
+
+                布局的方向（`h`为水平方向布局，`v`为垂直方向布局）。
         """
 
         self.parent = parent
         self.children = []
         self.direction = direction
 
-    def add_child(self, child, padx=5, pady=5, expand=False) -> None:
+    def add_child(self, child: "SkVisual", padx=5, pady=5, expand=False) -> None:
         """
-        添加组件至该布局
+        Add a component to the layout.
 
-        :param child: 组件
-        :param padx: 左右的外边距
-        :param pady: 上下的外边距
-        :param expand: 是否占满剩余空间
-        :return: None
+        添加组件至该布局。
+
+        Args:
+            child (SkVisual):
+                Conponent.
+
+                组件。
+
+            padx (int):
+                Paddings on x direction.
+
+                左右的外边距。
+
+            pady (int):
+                Paddings on y direction.
+
+                上下的外边距。
+
+            expand (int):
+                Whether should the children expand to fill empty space.
+
+                是否占满剩余空间。
+
+        Returns:
+            None
         """
         self.children.append(
             {
@@ -42,23 +73,44 @@ class Boxes:
 
     def change_direction(self, direction: str) -> None:
         """
-        改变布局方向
+        Change layout direction.
 
-        :param direction:
-        :return:
+        改变布局方向。
+
+        Args
+            direction (str):
+                Direction of the layout, either `v` or `h`
+
+                布局方向，`v`代表纵向或`h`代表横向。
+
+        Returns:
+            None
         """
         self.direction = direction
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
+        # Don't ask why to update twice here, idk how but it gets the layout finally correct.
         # 别问我为什么要放两个update，我也不知道为什么，这样做布局意外的正常改变了
 
     def update(self, width, height) -> None:
         """
-        更新布局
+        Update layout.
 
-        :param width: 容器宽度
-        :param height: 容器高度
-        :return: None
+        更新布局。
+
+        Args:
+            width (int):
+                Container width.
+
+                容器宽度。
+
+            height (int):
+                Container height.
+
+                容器高度。
+
+        Returns:
+            None
         """
         if self.direction == "h":
             # 水平布局
@@ -138,12 +190,33 @@ class Boxes:
 class Box:
     def box_configure(self, padx=5, pady=5, expand=False, direction=None) -> "Box":
         """
-        配置组件布局
-        :param padx: 左右的外边距
-        :param pady: 上下的外边距
-        :param expand: 是否占满剩余空间
-        :param direction: 布局的方向(h为水平方向布局，v为垂直方向布局)
-        :return: None
+        Set components layout.
+
+        配置组件布局。
+
+        Args:
+            padx (int):
+                Paddings on x direction.
+
+                左右的外边距。
+
+            pady (int):
+                Paddings on y direction
+
+                上下的外边距。
+
+            expand (bool):
+                Whether should the component expand to fill empty space.
+
+                是否占满剩余空间。
+
+            direction (str):
+                Layout direction, either `v` for vertical or `h` for horizontal.
+
+                布局的方向(`h`为水平方向布局，`v`为垂直方向布局)。
+
+        Returns:
+            Box: The box itself.
         """
         parent = self.winfo_parent()
         layout = parent.winfo_layout()
@@ -164,10 +237,23 @@ class Box:
 
     def hbox_configure(self, *args, **kwargs) -> "Box":
         """
+        Horizontal layout
+
         水平布局
-        :param args: box_configure参数
-        :param kwargs: box_configure参数
-        :return:
+
+        Args:
+            *args:
+                Will be sent to `box_configure()`.
+
+                `box_configure()`参数。
+
+            **kwargs:
+                Will be sent to `box_configure()`.
+
+                `box_configure()`参数。
+
+        Returns:
+            Box: The box itself.
         """
         return self.box_configure(*args, **kwargs, direction="h")
 
@@ -175,10 +261,23 @@ class Box:
 
     def vbox_configure(self, *args, **kwargs) -> "Box":
         """
-        垂直布局
-        :param args: box_configure参数
-        :param kwargs: box_configure参数
-        :return:
+        Vertical layout.
+
+        垂直布局。
+
+        Args:
+            *args:
+                Will be sent to `box_configure()`.
+
+                `box_configure()`参数。
+
+            **kwargs:
+                Will be sent to `box_configure()`.
+
+                `box_configure()`参数。
+
+        Returns:
+            Box: The box itself.
         """
         return self.box_configure(*args, **kwargs, direction="v")
 
@@ -186,8 +285,12 @@ class Box:
 
     def box_forget(self) ->  "Box":
         """
-        移除组件布局
-        :return: None
+        Remove box layout.
+
+        移除组件布局。
+
+        Returns:
+            None
         """
         layout = self.winfo_parent().winfo_layout()
         if layout:
@@ -203,12 +306,33 @@ class Box:
 class Place:
     def place_configure(self, x: int, y: int, width: int = None, height: int = None):
         """
-        绝对位置布局
-        :param x: 组件的x坐标
-        :param y: 组件的y坐标
-        :param width: 组件的宽度（不填则为dwidth）
-        :param height: 组件的高度（不填则为dheight）
-        :return: None
+        Absolute positioning layout.
+
+        绝对位置布局。
+
+        Args:
+            x:
+                x position of the component.
+
+                组件的x坐标。
+
+            y:
+                y position of the component.
+
+                组件的y坐标。
+
+            width:
+                Width of the component, `dwidth` by default.
+
+                组件的宽度（不填则为`dwidth`）。
+
+            height:
+                Height of the component, `dheight` by default.
+
+                组件的高度（不填则为`dheight`）。
+
+        Returns:
+            None
         """
         self.winfo_parent().set_layout("place")
 
@@ -225,24 +349,32 @@ class Place:
 
     def place_forget(self) -> None:
         """
-        移除组件布局
-        :return: None
+        Remove layout.
+        移除组件布局。
+
+        Returns:
+            None
         """
         self._hide()
 
 
 class Puts:
 
-    """
-    绝对位置布局管理器
-    """
-
     from .window import SkWindow
 
     def __init__(self, parent: SkWindow):
         """
-        初始化
-        :param parent: 父组件
+        Rerlative layout manager.
+
+        相对位置布局管理器。
+
+        Args:
+            parent (SkWindow | SkVisual):
+                Parent component
+                父组件
+
+        Returns:
+            None
         """
 
         self.parent = parent
@@ -250,10 +382,23 @@ class Puts:
 
     def add_child(self, child, margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
         """
-        添加组件
-        :param child: 组件
-        :param margin: 组件与容器的间距
-        :return: None
+        Add child component.
+
+        添加组件。
+
+        Args:
+            child (SkVisual):
+                The child component.
+
+                组件。
+
+            margin (tuple[int, int, int, int]):
+                Distance from the components to the container.
+
+                组件与容器的间距。
+
+        Returns:
+            None
         """
         self.children.append(
             {
@@ -266,10 +411,23 @@ class Puts:
 
     def update(self, width, height):
         """
-        更新布局
-        :param width: 容器宽度
-        :param height: 容器高度
-        :return: None
+        Update layout.
+
+        更新布局。
+
+        Args:
+            width:
+                Container width.
+
+                容器宽度。
+
+            height:
+                Container height.
+
+                容器高度。
+
+        Returns:
+            None
         """
         for child in self.children:
             c = child["child"]
@@ -282,16 +440,24 @@ class Puts:
 class Put:
 
     """
-    相对位置布局
+    Relative layout.
+
+    相对位置布局。
     """
 
     def put_configure(self, margin: tuple[int, int, int, int] = (0, 0, 0, 0)) -> None:
         """
-        相对组件所在容器布局
-        （未来将会制作anchor来对齐位置）
+        Relative layout. ()
+        相对组件所在容器布局。（未来将会制作anchor来对齐位置）。
 
-        :param margin: 组件与容器的间距
-        :return: None
+        Args:
+            margin:
+                Distance from the components to the container.
+
+                组件与容器的间距。
+
+        Returns:
+            None
         """
         parent = self.winfo_parent()
         layout = parent.winfo_layout()
@@ -309,10 +475,16 @@ class Put:
     put = put_configure
 
     def put_forget(self) -> None:
+
         """
-        移除组件布局
-        :return: None
+        Remove component layuout.
+
+        移除组件布局。
+
+        Returns:
+            None
         """
+
         parent = self.winfo_parent()
         layout = parent.winfo_layout()
         if layout:

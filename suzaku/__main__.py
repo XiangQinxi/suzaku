@@ -1,7 +1,10 @@
-from suzaku import *
+try:
+    from suzaku import *
+except:
+    raise ModuleNotFoundError("Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir.")
 import skia
 
-from skia import Canvas, Rect
+
 if __name__ == "__main__":
     # 修改主窗口创建代码
     appwindow = Sk(

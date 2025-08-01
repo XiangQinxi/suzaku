@@ -1,4 +1,4 @@
-# Suzuka 朱雀
+# Suzaku 朱雀
 
 基于`skia-python`、`pyopengl`与`glfw`高级界面库
 
