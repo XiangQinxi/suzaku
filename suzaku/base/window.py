@@ -317,36 +317,9 @@ class Window(EventHanding):
         if cursorname is None:
             return self.window_attr["cursor"]
         name = cursorname.lower()
-        if name == "arrow":
-            c = create_standard_cursor(ARROW_CURSOR)
-        elif name == "hand":
-            c = create_standard_cursor(HAND_CURSOR)
-        elif name == "vresize":
-            c = create_standard_cursor(VRESIZE_CURSOR)
-        elif name == "resize_nwse":
-            c = create_standard_cursor(RESIZE_NWSE_CURSOR)
-        elif name == "resize_ns":
-            c = create_standard_cursor(RESIZE_NS_CURSOR)
-        elif name == "resize_nesw":
-            c = create_standard_cursor(RESIZE_NESW_CURSOR)
-        elif name == "resize_ew":
-            c = create_standard_cursor(RESIZE_EW_CURSOR)
-        elif name == "resize_all":
-            c = create_standard_cursor(RESIZE_ALL_CURSOR)
-        elif name == "pointing_hand":
-            c = create_standard_cursor(POINTING_HAND_CURSOR)
-        elif name == "not_allowed":
-            c = create_standard_cursor(NOT_ALLOWED_CURSOR)
-        elif name == "no_current":
-            c = create_standard_cursor(NO_CURRENT_CONTEXT)
-        elif name == "ibeam":
-            c = create_standard_cursor(IBEAM_CURSOR)
-        elif name == "hresize":
-            c = create_standard_cursor(HRESIZE_CURSOR)
-        elif name == "crosshair":
-            c = create_standard_cursor(CROSSHAIR_CURSOR)
-        elif name == "center":
-            c = create_standard_cursor(CENTER_CURSOR)
+        cursorget = vars()[f"{name.upper()}_CURSOR"] # e.g. crosschair -> CROSSHAIR_CURSOR
+        if cursorget:
+            c = create_standard_cursor(cursorget)
         else:
             return self.window_attr["cursor"]
         self.window_attr["cursor"] = name

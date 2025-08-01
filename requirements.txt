@@ -1,0 +1,2 @@
+skia-python
+pyopengl
