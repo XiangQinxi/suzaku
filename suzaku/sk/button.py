@@ -1,8 +1,12 @@
 from .visual import SkVisual
 
+from typing import Union
+from typing import Any
+
 
 class SkButton(SkVisual):
-    def __init__(self, *args, text: str = "SkButton", size=(110, 40), cursor="hand", command=None, id=None, **kwargs):
+    def __init__(self, *args, text: str="SkButton", size: tuple[int, int]=(110, 40), cursor: str="hand", 
+                 command: Union[function, None]=None, id: Any=None, **kwargs):
         super().__init__(*args, size=size, **kwargs)
 
         self.evts["click"] = []

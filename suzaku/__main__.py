@@ -1,9 +1,12 @@
-from suzaku import *
+try:
+    from suzaku import *
+except:
+    raise ModuleNotFoundError("Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir.")
 import skia
 
 
 if __name__ == "__main__":
-    appwindow = Sk(title="Suzaku GUI", themename="light", size=(300, 300))
+    appwindow = Sk(title="Suzaku GUI", themename="light", size=(480, 300))
     appwindow.bind("close", lambda: print("Window closed"))
 
     SkButton(appwindow, text=f"Switch to light theme", command=lambda: appwindow.theme.use_theme("light")).vbox(padx=10, pady=10)
@@ -11,7 +14,8 @@ if __name__ == "__main__":
 
     SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
 
-    SkButton(appwindow, text=f"Horizontal layout", command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Horizontal layout (May mess up the window)", 
+             command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
     SkButton(appwindow, text=f"Vertical layout", command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
 
     SkButton(appwindow, text=f"Close this window", command=appwindow.quit).vbox(padx=10, pady=10)

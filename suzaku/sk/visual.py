@@ -1,11 +1,10 @@
 from .layout import Layout
 from ..base.event import EventHanding
 
+from typing import Union
+
 
 class SkVisual(Layout, EventHanding):
-    """
-    基础可视化组件，告诉SkWindow如何绘制
-    """
 
     _instance_count = 0
 
@@ -15,14 +14,19 @@ class SkVisual(Layout, EventHanding):
 
     theme = theme
 
-    def __init__(self, parent: SkWindow, size=(100, 30), id: str = None) -> None:
+    def __init__(self, parent: Union[SkWindow], size: tuple[int, int]=(100, 30), id: str = None) -> None:
 
         """
-        初始化
+        Basic visual component, telling SkWindow how to draw.
 
-        :param parent: 父组件，一般为"Window"
-        :param size: 默认大小(而非布局后的实际大小)
-        :param id: 标识码
+        基础可视化组件，告诉SkWindow如何绘制。
+
+        :param parent: 
+        Parent component (Usually a SkWindow).
+        :param size: 
+        Default size (not the final drawn size).
+        :param id: 
+        Identification code.
         """
 
         super().__init__()
@@ -35,8 +39,8 @@ class SkVisual(Layout, EventHanding):
             "cursor": "arrow",
             "x": 0,
             "y": 0,
-            "d_width": size[0],  # 默认宽度
-            "d_height": size[1],  # 默认高度
+            "d_width": size[0],  # Default width
+            "d_height": size[1],  # Default height
             "width": size[0],
             "height": size[1],
             "id": id or ("sk_visual." + str(self.get_instance_count())),
@@ -90,13 +94,13 @@ class SkVisual(Layout, EventHanding):
 
     def _draw(self, canvas):
         import skia
-        rect = skia.Rect(self.visual_attr["x"], self.visual_attr["y"], self.visual_attr["x"] + self.visual_attr["width"], self.visual_attr["y"] + self.visual_attr["height"])
-        #print(self.winfo_id(), self.visual_attr["x"], self.visual_attr["y"], self.visual_attr["x"] + self.visual_attr["width"], self.visual_attr["y"] + self.visual_attr["height"])
+        rect = skia.Rect(self.visual_attr["x"], self.visual_attr["y"], self.visual_attr["x"] + self.visual_attr["width"], 
+                         self.visual_attr["y"] + self.visual_attr["height"])
         self.draw(canvas, rect)
 
     @classmethod
     def get_instance_count(cls):
-        return cls._instance_count  # 返回当前计数
+        return cls._instance_count  # Return current count
 
     def winfo(self):
         return self.visual_attr

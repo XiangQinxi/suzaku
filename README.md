@@ -32,7 +32,7 @@ app.run()
 
 `SkApp`管理着所有的`SkWindow`。我们将每一个可视化的元素&组件视为一个个的`SkVisual`，居于`SkWindow`中。
 
-A number of properties are owned by `SkVisual`, telling `SkWindow` how it should be drawn. `SkVisual` components are added to the window via`SkWindow.add_draw()`, then be drawn by `SkWindow.draw()`
+A number of properties are owned by `SkVisual`, telling `SkWindow` how it should be drawn. `SkVisual` components are added to the window via`SkWindow.add_draw()`, then be drawn by `SkWindow.draw()`.
 
 `SkVisual`具有一个个属性，告诉`SkWindow`自己该如何被绘制，用`SkWindow.add_draw()`将自己的绘制方式加入进去，然后在`SkWindow.draw()`中被一个个的绘制在画布上。
 

@@ -1,15 +1,16 @@
-class Boxes:
+import warnings
+from typing import Union, Any
 
-    """
-    Box布局管理器
-    """
+class Boxes:
 
     from .window import SkWindow
 
-    def __init__(self, parent: SkWindow, direction="h"):
+    def __init__(self, parent: SkWindow, direction: str="h") -> None:
 
         """
-        初始化
+        Box layout manager.
+
+        Box布局管理器。
 
         :param parent: 得到布局的容器
         :param direction: 布局的方向(h为水平方向布局，v为垂直方向布局)
@@ -21,6 +22,8 @@ class Boxes:
 
     def add_child(self, child, padx=5, pady=5, expand=False) -> None:
         """
+        Add a component to the layout.
+
         添加组件至该布局
 
         :param child: 组件
@@ -42,18 +45,29 @@ class Boxes:
 
     def change_direction(self, direction: str):
         """
+        Change layout direction.
+
         改变布局方向
 
-        :param direction:
+        :param direction: Direction of the layout, either v or h
         :return:
         """
+        direction = direction.lower()
+        if direction not in ["v", "h"]:
+            warnings.warn(f"Invalid direction '{direction}', ingnored and kept old layout direction.")
+            return
         self.direction = direction
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
 
     def update(self, width, height):
+        """
+        Update layout.
+
+        更新布局
+        """
         if self.direction == "h":
-            # 水平布局
+            # Horizontal Layout
 
             width -= self.children[-1]["padx"]
 
@@ -61,7 +75,7 @@ class Boxes:
             expand_count = 0
             total_padx = 0
 
-            # 计算固定宽度元素总宽度和可扩展元素数量
+            # Calculate total width of fixed elements, and number of available extended elements.
             for child in self.children:
                 total_padx += child["padx"]
                 if child["expand"]:
@@ -69,14 +83,14 @@ class Boxes:
                 else:
                     fixed_width += child["child"].visual_attr["width"]
 
-            # 计算剩余可分配宽度(减去所有padx)
+            # Calculate available width (minus all padx)
             remaining_width = max(0, width - fixed_width - total_padx)
             expand_width = remaining_width // expand_count if expand_count > 0 else 0
 
             current_x = 0
             for child in self.children:
                 c = child["child"]
-                current_x += child["padx"]  # 添加当前元素的padx
+                current_x += child["padx"]  # Add padx of current element
 
                 if child["expand"]:
                     c.visual_attr["x"] = current_x
@@ -89,9 +103,9 @@ class Boxes:
                     c.visual_attr["width"] = c.visual_attr["d_height"]
                     c.visual_attr["height"] = height - child["pady"] * 2
 
-                current_x += c.visual_attr["width"]  # 移动到下一个元素的位置
+                current_x += c.visual_attr["width"]  # Move to next element
         else:
-            # 垂直布局
+            # Vertival Layout
 
             height -= self.children[-1]["pady"]
 
