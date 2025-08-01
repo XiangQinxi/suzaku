@@ -8,7 +8,7 @@ class Window(EventHanding):
 
     _instance_count = 0
 
-    def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0):
+    def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0, force_hardware_acceleration: bool = False):
 
         """
         初始化窗口
@@ -41,7 +41,10 @@ class Window(EventHanding):
             "mouse_rooty": 0,
 
             "default_cursor": "arrow",
-            "cursor": "arrow"
+            "cursor": "arrow",
+            "focus": True,
+            "focus_visual": self,
+            "force_hardware_acceleration": force_hardware_acceleration
         }
 
         self.evts = {
@@ -55,6 +58,8 @@ class Window(EventHanding):
             "mouse_leave": [],
             "key_pressed": [],
             "key_released": [],
+            "focus_in": [],
+            "focus_out": [],
             "resize": [],
         }
 
@@ -103,31 +108,48 @@ class Window(EventHanding):
 
     import contextlib
 
+    # 修改窗口类的skia_surface方法
     @contextlib.contextmanager
     def skia_surface(self, window):
-        """
-        处理窗口内显示内容
-
-        :param window:
-        :return:
-        """
-
         import skia, glfw
         from OpenGL import GL
-        context = skia.GrDirectContext.MakeGL()
-        (fb_width, fb_height) = glfw.get_framebuffer_size(window)
-        backend_render_target = skia.GrBackendRenderTarget(
-            fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8))
-        surface = skia.Surface.MakeFromBackendRenderTarget(
-            context, backend_render_target, skia.kBottomLeft_GrSurfaceOrigin,
-            skia.kRGBA_8888_ColorType, skia.ColorSpace.MakeSRGB())
-        assert surface is not None
-        yield surface
-        #context.abandonContext()  <-- 危险方法！容易造成内存泄露
-        context.releaseResourcesAndAbandonContext()
+
+        # 添加窗口有效性检查
+        if not glfw.get_current_context() or glfw.window_should_close(window):
+            yield None
+            return
+
+        try:
+            context = skia.GrDirectContext.MakeGL()
+            (fb_width, fb_height) = glfw.get_framebuffer_size(window)
+            backend_render_target = skia.GrBackendRenderTarget(
+                fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8))
+            surface = skia.Surface.MakeFromBackendRenderTarget(
+                context, backend_render_target, skia.kBottomLeft_GrSurfaceOrigin,
+                skia.kRGBA_8888_ColorType, skia.ColorSpace.MakeSRGB())
+            # 将断言改为更友好的错误处理
+            if surface is None:
+                raise RuntimeError("Failed to create Skia surface")
+            yield surface
+        finally:
+            if 'context' in locals():
+                context.releaseResourcesAndAbandonContext()
+
+    def _on_focus(self, window, focused):
+        from .event import Event
+        evt = Event()
+        if focused:
+            self.window_attr["focus"] = True
+            self.event_generate("focus_in", evt)
+        else:
+            self.window_attr["focus"] = False
+            self.event_generate("focus_out", evt)
 
     def _on_framebuffer_size(self, window, width, height, ) -> None:
         if self.draw_func:
+            # 确保设置当前窗口上下文
+            import glfw
+            glfw.make_context_current(window)
             with self.skia_surface(window) as surface:
                 with surface as canvas:
                     self.draw_func(canvas)
@@ -173,7 +195,8 @@ class Window(EventHanding):
         :return: None
         """
         #from glfw import terminate
-        self.event_generate("closed")
+        from .event import Event
+        self.event_generate("closed", Event())
         #terminate()
 
     def _on_mouse_button(self, window, arg1, is_pressed: bool, arg2) -> None:
@@ -191,10 +214,15 @@ class Window(EventHanding):
         :return: None
         """
         #print(arg1, arg2)
+
+        from .event import Event
+        from glfw import get_cursor_pos
+        pos = get_cursor_pos(window)
+
         if is_pressed:
-            self.event_generate("mouse_pressed")
+            self.event_generate("mouse_pressed", Event(x=pos[0], y=pos[1]))
         else:
-            self.event_generate("mouse_released")
+            self.event_generate("mouse_released", Event(x=pos[0], y=pos[1]))
 
     def _on_cursor_enter(self, window, is_enter: bool) -> None:
         """
@@ -207,10 +235,15 @@ class Window(EventHanding):
         :param is_enter: 是否进入窗口
         :return: None
         """
+
+        from .event import Event
+        from glfw import get_cursor_pos
+        pos = get_cursor_pos(window)
+
         if is_enter:
-            self.event_generate("mouse_enter")
+            self.event_generate("mouse_enter", Event(x=pos[0], y=pos[1]))
         else:
-            self.event_generate("mouse_leave")
+            self.event_generate("mouse_leave", Event(x=pos[0], y=pos[1]))
 
     def _on_cursor_pos(self, window, x, y) -> None:
         """
@@ -422,13 +455,12 @@ class Window(EventHanding):
         self.visuals.append(visual)
         return self
 
-    def destory(self) -> None:
-        """
-        销毁窗口
-        :return: None
-        """
-        from glfw import destroy_window
-        destroy_window(self.winfo_glfw_window())
+    def destroy(self) -> None:
+        """Proper window destruction"""
+        if self.window_attr["glfw_window"]:
+            import glfw
+            glfw.destroy_window(self.window_attr["glfw_window"])
+            self.window_attr["glfw_window"] = None  # Clear the reference
 
     def title(self, text: str = None) -> str | type:
         """
@@ -581,6 +613,9 @@ class Window(EventHanding):
         """
         return self.window_attr["rooty"]
 
+    def winfo_master_window(self) -> "Window":
+        return self
+
     def set_draw_func(self, func: callable) -> "Window":
         """
         处理Skia绘制事件
@@ -633,6 +668,13 @@ class Window(EventHanding):
 
             self.cursor(self.default_cursor())
 
+            if self.window_attr["force_hardware_acceleration"]:
+                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
+                glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
+                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
             return window
         else:
             raise RuntimeError("窗口必须先添加到Application实例")
@@ -653,5 +695,7 @@ class Window(EventHanding):
         glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
         glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
         glfw.set_window_pos_callback(window, self._on_window_pos)
+        glfw.set_window_focus_callback(window, self._on_focus)
+
 
 

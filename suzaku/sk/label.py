@@ -2,7 +2,7 @@ from .visual import SkVisual
 
 
 class SkLabel(SkVisual):
-    def __init__(self, *args, text: str = "SkLabel", **kwargs) -> None:
+    def __init__(self, *args, text: str = "SkLabel", style="SkLabel", **kwargs) -> None:
         """
         初始化标签
 
@@ -10,13 +10,9 @@ class SkLabel(SkVisual):
         :param text: 标签文本
         :param kwargs: SkVisual参数
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, style=style, **kwargs)
         self.visual_attr["text"] = text
         self.visual_attr["name"] = "sk_label"
-
-        from ..style.color import color
-        self.visual_attr["bg"] = color(self.theme.get_theme()["SkLabel"]["bg"])
-        self.visual_attr["fg"] = color(self.theme.get_theme()["SkLabel"]["fg"])
 
     def draw(self, canvas, rect) -> None:
         """
@@ -27,16 +23,17 @@ class SkLabel(SkVisual):
         :return: None
         """
         import skia
+        from ..style.color import color
         rect_paint = skia.Paint(
             Style=skia.Paint.kFill_Style,
-            Color=self.visual_attr["bg"],
+            Color=color(self.theme.get_theme()[self.winfo_style()]["bg"]),
         )
 
         canvas.drawRect(rect, rect_paint)
 
         text_paint = skia.Paint(
             AntiAlias=True,
-            Color=self.visual_attr["fg"]
+            Color=color(self.theme.get_theme()[self.winfo_style()]["fg"])
         )
 
         from ..base.font import default_font

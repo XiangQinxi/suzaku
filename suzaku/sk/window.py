@@ -3,7 +3,7 @@ import skia
 
 
 class SkWindow(Window):
-    def __init__(self, *args, themename="light", **kwargs):
+    def __init__(self, *args, themename="light", style="SkWindow", **kwargs) -> None:
         """
         初始化
 
@@ -20,6 +20,7 @@ class SkWindow(Window):
 
         self.window_attr["name"] = "sk_window"
         self.window_attr["layout"] = None
+        self.window_attr["style"] = style
         self.draws = []
         self.visuals = []
         self.previous_visual = None  # 跟踪上一个鼠标悬停的元素
@@ -29,10 +30,19 @@ class SkWindow(Window):
         self.bind("mouse_pressed", self._mouse)
         self.bind("mouse_released", self._mouse_released)
 
+        self.bind("focus_out", self._leave)
+        self.bind("mouse_leave", self._leave)
+
         #self.bind("window_mouse_enter", self._motion, add=True)
         #self.bind("window_mouse_leave", self._motion, add=True)
 
-    def _mouse(self):
+    def _leave(self, evt):
+        from ..base.event import Event
+        event = Event(x=self.window_attr["x"], y=self.window_attr["y"], rootx=self.window_attr["mouse_rootx"], rooty=self.window_attr["mouse_rooty"])
+        for visual in self.visuals:
+            visual.event_generate("mouse_leave", event)
+
+    def _mouse(self, evt) -> None:
         """
         回调组件接收鼠标按下自己事件
         :return: None
@@ -47,12 +57,13 @@ class SkWindow(Window):
         for visual in self.visuals:
             if (visual.winfo_x() <= event.x <= visual.winfo_x() + visual.winfo_width() and
                     visual.winfo_y() <= event.y <= visual.winfo_y() + visual.winfo_height()):
+                visual.focus_set()
                 visual.event_generate("mouse_pressed", event)
                 break
 
     from ..base.event import Event
 
-    def _motion(self, evt: Event):
+    def _motion(self, evt: Event) -> None:
         """
         回调组件接收鼠标移动、进入、离开事件
         :param evt: 事件对象
@@ -128,7 +139,7 @@ class SkWindow(Window):
         :return: None
         """
         from ..style.color import color
-        canvas.clear(color(self.theme.get_theme()["SkWindow"]["bg"]))
+        canvas.clear(color(self.theme.get_theme()[self.winfo_style()]["bg"]))
 
         for i, f in enumerate(self.draws):
             #print(i, f)
@@ -144,7 +155,15 @@ class SkWindow(Window):
         """
         return self.window_attr["layout"]
 
-    def _mouse_released(self) -> None:
+    def winfo_style(self) -> str:
+        """
+        获取窗口的样式
+
+        :return: 样式字符串
+        """
+        return self.window_attr["style"]
+
+    def _mouse_released(self, evt) -> None:
         """
         鼠标释放事件处理函数，将会触发mouse_release事件。
 
@@ -152,8 +171,8 @@ class SkWindow(Window):
         """
         from ..base.event import Event
         event = Event(
-            x=self.window_attr["mouse_x"],
-            y=self.window_attr["mouse_y"],
+            x=evt.x,
+            y=evt.y,
             rootx=self.window_attr["mouse_rootx"],
             rooty=self.window_attr["mouse_rooty"]
         )
@@ -162,3 +181,5 @@ class SkWindow(Window):
                 visual.event_generate("mouse_released", event)
                 visual.is_mouse_pressed = False
         return None
+
+

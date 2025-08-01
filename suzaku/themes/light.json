@@ -1,5 +1,6 @@
 {
   "name": "light",
+  "base": "default",
 
   "SkWindow": {
     "bg": [255, 255, 255, 235]
@@ -19,11 +20,61 @@
       "border": [25, 125, 225, 235],
       "width": 2
     },
+    "focus": {
+      "bg": [0, 0, 0, 20],
+      "fg": [0, 0, 0, 235],
+      "border": [0, 0, 0, 200],
+      "width": 2
+    },
     "pressed": {
       "bg": [0, 0, 0, 60],
       "fg": [0, 0, 0, 155],
       "border": [0, 0, 0, 10],
       "width": 3
+    }
+  },
+
+  "Close.SkButton": {
+    "radius": 8,
+    "rest": {
+      "bg": "transparent",
+      "fg": [0, 0, 0, 235],
+      "border": "transparent",
+      "width": 0
+    },
+    "hover": {
+      "bg": [195, 45, 30, 255],
+      "fg": [255, 255, 255, 235],
+      "border": "transparent",
+      "width": 0
+    },
+    "pressed": {
+      "bg": [195, 45, 30, 185],
+      "fg": [255, 255, 255, 235],
+      "border": "transparent",
+      "width": 0
+    }
+  },
+
+  "SkEntry": {
+    "radius": 8,
+    "rest": {
+      "bg": [0, 0, 0, 20],
+      "fg": [0, 0, 0, 235],
+      "border": [0, 0, 0, 10],
+      "width": 2
+    },
+    "hover": {
+      "bg": [0, 0, 0, 40],
+      "fg": [0, 0, 0, 235],
+      "border": [25, 125, 225, 235],
+      "width": 2
+    },
+    "focus": {
+      "bg": [0, 0, 0, 60],
+      "fg": [0, 0, 0, 235],
+      "border": [25, 125, 225, 235],
+      "width": 2
     }
   },
 

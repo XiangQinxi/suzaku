@@ -7,7 +7,7 @@ class SkButton(SkVisual):
     按钮组件
     """
 
-    def __init__(self, *args, text: str = "SkButton", size=(105, 35), cursor="hand", command=None, id=None, **kwargs) -> None:
+    def __init__(self, *args, text: str = "SkButton", size=(105, 35), cursor="hand", command=None, style="SkButton", id=None, **kwargs) -> None:
 
         """
 
@@ -20,14 +20,13 @@ class SkButton(SkVisual):
         :param kwargs: SkVisual参数
         """
 
-        super().__init__(*args, size=size, **kwargs)
+        super().__init__(*args, size=size, style=style, **kwargs)
 
         self.evts["click"] = []
         self.visual_attr["name"] = "sk_button"
         self._id(id=id)
         self.visual_attr["text"] = text
 
-        self.visual_attr["radius"] = self.theme.get_theme()["SkButton"]["radius"]
         self.visual_attr["cursor"] = cursor
 
         self.command = command
@@ -80,21 +79,25 @@ class SkButton(SkVisual):
 
         if self.is_mouse_enter:
             if self.is_mouse_pressed:
-                sheets = self.theme.get_theme()["SkButton"]["pressed"]
+                sheets = self.theme.get_theme()[self.winfo_style()]["pressed"]
             else:
-                sheets = self.theme.get_theme()["SkButton"]["hover"]
+                sheets = self.theme.get_theme()[self.winfo_style()]["hover"]
         else:
-            sheets = self.theme.get_theme()["SkButton"]["rest"]
+            if self.focus_get() is self and "focus" in self.theme.get_theme()[self.winfo_style()]:
+                sheets = self.theme.get_theme()[self.winfo_style()]["focus"]
+            else:
+                sheets = self.theme.get_theme()[self.winfo_style()]["rest"]
 
+        radius = self.theme.get_theme()[self.winfo_style()]["radius"]
         rect_paint.setColor(color(sheets["bg"]))
         rect_paint.setStrokeWidth(sheets["width"])
 
-        canvas.drawRoundRect(rect, self.visual_attr["radius"], self.visual_attr["radius"], rect_paint)
+        canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
         rect_paint.setStyle(skia.Paint.kStroke_Style)
         rect_paint.setColor(color(sheets["border"]))
 
-        canvas.drawRoundRect(rect, self.visual_attr["radius"], self.visual_attr["radius"], rect_paint)
+        canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
         text_paint = skia.Paint(
             AntiAlias=True,

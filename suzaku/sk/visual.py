@@ -15,7 +15,7 @@ class SkVisual(Layout, EventHanding):
 
     theme = theme
 
-    def __init__(self, parent: SkWindow, size=(100, 30), id: str = None) -> None:
+    def __init__(self, parent: SkWindow, size=(100, 30), style="", id: str = None) -> None:
 
         """
         初始化
@@ -39,6 +39,7 @@ class SkVisual(Layout, EventHanding):
             "d_height": size[1],  # 默认高度
             "width": size[0],
             "height": size[1],
+            "style": style,
             "id": id or ("sk_visual." + str(self.get_instance_count())),
             "visible": False,
         }
@@ -49,12 +50,19 @@ class SkVisual(Layout, EventHanding):
             "mouse_leave": [],
             "mouse_pressed": [],
             "mouse_released": [],
+            "focus_in": [],
+            "focus_out": [],
         }
 
         self.winfo_parent().add(self)
 
         self.is_mouse_enter = False
         self.is_mouse_pressed = False
+        self.is_focus = False
+
+        self.draw_func = lambda canvas: self._draw(canvas)
+        self.winfo_master_window().add_draw(self.draw_func)
+
 
         def mouse_enter(evt):
             self.is_mouse_enter = True
@@ -68,13 +76,19 @@ class SkVisual(Layout, EventHanding):
         def mouse_released(evt):
             self.is_mouse_pressed = False
 
-        self.draw_func = lambda canvas: self._draw(canvas)
-        self.winfo_parent().add_draw(self.draw_func)
-
         self.bind("mouse_enter", mouse_enter)
         self.bind("mouse_leave", mouse_leave)
         self.bind("mouse_pressed", mouse_pressed)
         self.bind("mouse_released", mouse_released)
+
+        def focus_in(evt):
+            self.is_focus = True
+
+        def focus_out(evt):
+            self.is_focus = False
+
+        self.bind("focus_in", focus_in)
+        self.bind("focus_out", focus_out)
 
     def __str__(self) -> str:
         return self.winfo_id()
@@ -162,6 +176,14 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["parent"]
 
+    def winfo_master_window(self) -> SkWindow:
+        """
+        获取组件主窗口
+
+        :return: 主窗口
+        """
+        return self.winfo_parent().winfo_master_window()
+
     def winfo_id(self) -> str:
         """
         获取组件ID
@@ -226,6 +248,14 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["name"]
 
+    def winfo_style(self):
+        """
+        获取组件样式
+
+        :return:
+        """
+        return self.visual_attr["style"]
+
     def winfo_visible(self) -> bool:
         """
         获取组件是否可见
@@ -233,3 +263,34 @@ class SkVisual(Layout, EventHanding):
         :return:
         """
         return self.visual_attr["visible"]
+
+    def focus_set(self):
+        """
+        使当前组件获得焦点
+
+        :return: None
+        """
+        self.is_focus = True
+        if isinstance(self.winfo_master_window().window_attr["focus_visual"], SkVisual):
+            self.winfo_master_window().window_attr["focus_visual"].focus_forget()
+        self.winfo_master_window().window_attr["focus_visual"] = self
+        from ..base.event import Event
+        self.event_generate("focus_in", Event())
+
+    def focus_get(self):
+        """
+        获取窗口当前获得焦点的组件
+
+        :return: 组件对象
+        """
+        return self.winfo_master_window().window_attr["focus_visual"]
+
+    def focus_forget(self):
+        """
+        使当前组件失去焦点
+
+        :return: None
+        """
+        self.is_focus = False
+        from ..base.event import Event
+        self.event_generate("focus_out", Event())

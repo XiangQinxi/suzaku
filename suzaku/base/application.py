@@ -58,12 +58,8 @@ class Application:
         window.set_application(self)
         return self
 
+    # 修改Application类的run方法
     def run(self) -> None:
-        """
-        运行应用程序
-
-        :return: None
-        """
         import glfw
         if not self.windows:
             raise RuntimeError('至少需要添加一个窗口才能运行应用程序')
@@ -73,17 +69,30 @@ class Application:
             window.create_bind()
 
         # 主事件循环
-        while self.running and not any(glfw.window_should_close(win.winfo_glfw_window()) for win in self.windows):
+        while self.running and self.windows:
             glfw.poll_events()
 
-            for window in self.windows:
+            # 创建窗口列表副本避免迭代时修改
+            current_windows = list(self.windows)
+
+            for window in current_windows:
+                # 检查窗口有效性
+                if not window.winfo_glfw_window() or glfw.window_should_close(window.winfo_glfw_window()):
+                    window.destroy()
+                    self.windows.remove(window)
+                    continue
+
+                # 仅绘制可见窗口
                 if window.visible():
+                    # 为每个窗口设置当前上下文
+                    glfw.make_context_current(window.winfo_glfw_window())
                     with window.skia_surface(window.winfo_glfw_window()) as surface:
-                        with surface as canvas:
-                            if hasattr(window, 'draw_func') and window.draw_func:
-                                window.draw_func(canvas)
-                        surface.flushAndSubmit()
-                    glfw.swap_buffers(window.winfo_glfw_window())
+                        if surface:
+                            with surface as canvas:
+                                if hasattr(window, 'draw_func') and window.draw_func:
+                                    window.draw_func(canvas)
+                            surface.flushAndSubmit()
+                            glfw.swap_buffers(window.winfo_glfw_window())
 
         self.cleanup()
 
@@ -105,4 +114,5 @@ class Application:
 
         :return None
         """
+        self.running = False
         self.running = False
