@@ -1,14 +1,17 @@
-# Suzuka 朱雀
 
-基于`skia-python`、`pyopengl`与`glfw`高级界面库
+# Suzuka
 
-正在抓紧制作中...
+Based on `skia-python`, `pyopengl` and `glfw` advanced interface libraries
 
-正处于开发中可以自行下载，来预览我暂时的成果
+Under development...
+
+You can download it yourself to preview my current progress
+
+> [是否要查阅中文文档？](README-zh_hans.md)
 
 ---
 
-## 简单示例
+## Simple Example
 
 ![v0.0.1a1.png](https://youke1.picui.cn/s1/2025/07/29/68888666134bf.png)
 
@@ -22,13 +25,13 @@ btn.place(10, 10)
 app.run()
 ```
 
-## 原理
-### 基础原理
-`SkApp`管理着所有的`SkWindow`。我们将每一个可视化的元素&组件视为一个个的`SkVisual`，居于`SkWindow`中。
-`SkVisual`具有一个个属性，告诉`SkWindow`自己该如何被绘制，用`SkWindow.add_draw()`将自己的绘制方式加入进去，然后在`SkWindow.draw()`中被一个个的绘制在画布上。
+## Principle
+### Basic Principle
+`SkApp` manages all `SkWindow`s. We regard each visual element & component as individual `SkVisual`s, residing within `SkWindow`s.
+`SkVisual`s have various properties that tell `SkWindow` how they should be drawn. They add their drawing methods using `SkWindow.add_draw()`, and then get drawn one by one on the canvas in `SkWindow.draw()`.
 
-## 布局
+## Layout
 ###
 
-## 取名原因
-`suzuka`是朱雀的意思，朱雀是中国古代的四大神兽之一。取这名呢感觉很霸气，先占个名先。
+## Naming Reason
+`suzuka` means "Vermilion Bird", which is one of the four legendary神兽 in ancient Chinese mythology. I chose this name because it sounds powerful and霸气, so I'm claiming it first.
