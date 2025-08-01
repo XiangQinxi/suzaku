@@ -1,12 +1,11 @@
-class Boxes:
+import warnings
+from typing import Union, Any
 
-    """
-    Box布局管理器
-    """
+class Boxes:
 
     from .window import SkWindow
 
-    def __init__(self, parent: SkWindow, direction="h"):
+    def __init__(self, parent: Union[SkWindow, "SkVisual"], direction: str="h") -> None:
 
         """
 
@@ -15,12 +14,12 @@ class Boxes:
         Box布局管理器。
 
         Args:
-            parent (SkWindow | SkVisual):
+            parent (SkWindow | SkVisual): 
                 Container that accepts the layout.
 
                 接受布局的容器。
-
-            direction (str):
+        
+            direction (str): 
                 Direction of the layout, either `v` for vertical or `h` for horizontal.
 
                 布局的方向（`h`为水平方向布局，`v`为垂直方向布局）。
@@ -30,31 +29,31 @@ class Boxes:
         self.children = []
         self.direction = direction
 
-    def add_child(self, child: "SkVisual", padx=5, pady=5, expand=False) -> None:
+    def add_child(self, child: "SkVisual", padx: int=5, pady: int=5, expand: bool=False) -> None:
         """
         Add a component to the layout.
 
         添加组件至该布局。
 
         Args:
-            child (SkVisual):
+            child (SkVisual): 
                 Conponent.
 
                 组件。
 
-            padx (int):
+            padx (int): 
                 Paddings on x direction.
 
                 左右的外边距。
 
-            pady (int):
+            pady (int): 
                 Paddings on y direction.
-
+                
                 上下的外边距。
 
-            expand (int):
+            expand (int): 
                 Whether should the children expand to fill empty space.
-
+                
                 是否占满剩余空间。
 
         Returns:
@@ -78,7 +77,7 @@ class Boxes:
         改变布局方向。
 
         Args
-            direction (str):
+            direction (str): 
                 Direction of the layout, either `v` or `h`
 
                 布局方向，`v`代表纵向或`h`代表横向。
@@ -86,34 +85,38 @@ class Boxes:
         Returns:
             None
         """
+        direction = direction.lower()
+        if direction not in ["v", "h"]:
+            warnings.warn(f"Invalid direction '{direction}', ingnored and kept old layout direction.")
+            return
         self.direction = direction
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
         self.update(self.parent.winfo_width(), self.parent.winfo_height())
         # Don't ask why to update twice here, idk how but it gets the layout finally correct.
         # 别问我为什么要放两个update，我也不知道为什么，这样做布局意外的正常改变了
 
-    def update(self, width, height) -> None:
+    def update(self, width: int, height: int) -> None:
         """
         Update layout.
 
         更新布局。
 
         Args:
-            width (int):
+            width (int): 
                 Container width.
 
                 容器宽度。
 
-            height (int):
+            height (int): 
                 Container height.
-
+            
                 容器高度。
 
-        Returns:
+        Returns: 
             None
         """
         if self.direction == "h":
-            # 水平布局
+            # Horizontal Layout
 
             width -= self.children[-1]["padx"]
 
@@ -121,7 +124,7 @@ class Boxes:
             expand_count = 0
             total_padx = 0
 
-            # 计算固定宽度元素总宽度和可扩展元素数量
+            # Calculate total width of fixed elements, and number of available extended elements.
             for child in self.children:
                 total_padx += child["padx"]
                 if child["expand"]:
@@ -129,14 +132,14 @@ class Boxes:
                 else:
                     fixed_width += child["child"].visual_attr["width"]
 
-            # 计算剩余可分配宽度(减去所有padx)
+            # Calculate available width (minus all padx)
             remaining_width = max(0, width - fixed_width - total_padx)
             expand_width = remaining_width // expand_count if expand_count > 0 else 0
 
             current_x = 0
             for child in self.children:
                 c = child["child"]
-                current_x += child["padx"]  # 添加当前元素的padx
+                current_x += child["padx"]  # Add padx of current element
 
                 if child["expand"]:
                     c.visual_attr["x"] = current_x
@@ -149,9 +152,9 @@ class Boxes:
                     c.visual_attr["width"] = c.visual_attr["d_height"]
                     c.visual_attr["height"] = height - child["pady"] * 2
 
-                current_x += c.visual_attr["width"]  # 移动到下一个元素的位置
+                current_x += c.visual_attr["width"]  # Move to next element
         else:
-            # 垂直布局
+            # Vertival Layout
 
             height -= self.children[-1]["pady"]
 
@@ -188,7 +191,7 @@ class Boxes:
                 current_y += c.visual_attr["height"]
 
 class Box:
-    def box_configure(self, padx=5, pady=5, expand=False, direction=None) -> "Box":
+    def box_configure(self, padx: int=5, pady: int=5, expand: bool=False, direction=None) -> "Box":
         """
         Set components layout.
 
@@ -197,20 +200,20 @@ class Box:
         Args:
             padx (int):
                 Paddings on x direction.
-
+                
                 左右的外边距。
 
-            pady (int):
+            pady (int): 
                 Paddings on y direction
-
+                
                 上下的外边距。
 
-            expand (bool):
+            expand (bool): 
                 Whether should the component expand to fill empty space.
-
+                
                 是否占满剩余空间。
 
-            direction (str):
+            direction (str): 
                 Layout direction, either `v` for vertical or `h` for horizontal.
 
                 布局的方向(`h`为水平方向布局，`v`为垂直方向布局)。
@@ -242,16 +245,16 @@ class Box:
         水平布局
 
         Args:
-            *args:
+            *args: 
                 Will be sent to `box_configure()`.
 
                 `box_configure()`参数。
 
-            **kwargs:
+            **kwargs: 
                 Will be sent to `box_configure()`.
 
                 `box_configure()`参数。
-
+        
         Returns:
             Box: The box itself.
         """
@@ -266,16 +269,16 @@ class Box:
         垂直布局。
 
         Args:
-            *args:
+            *args: 
                 Will be sent to `box_configure()`.
 
                 `box_configure()`参数。
 
-            **kwargs:
+            **kwargs: 
                 Will be sent to `box_configure()`.
 
                 `box_configure()`参数。
-
+        
         Returns:
             Box: The box itself.
         """
@@ -330,7 +333,7 @@ class Place:
                 Height of the component, `dheight` by default.
 
                 组件的高度（不填则为`dheight`）。
-
+        
         Returns:
             None
         """
@@ -362,17 +365,17 @@ class Puts:
 
     from .window import SkWindow
 
-    def __init__(self, parent: SkWindow):
+    def __init__(self, parent: Union[SkWindow, "SkVisual"]) -> None:
         """
         Rerlative layout manager.
 
         相对位置布局管理器。
 
         Args:
-            parent (SkWindow | SkVisual):
+            parent (SkWindow | SkVisual): 
                 Parent component
                 父组件
-
+        
         Returns:
             None
         """
@@ -380,23 +383,23 @@ class Puts:
         self.parent = parent
         self.children = []
 
-    def add_child(self, child, margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
+    def add_child(self, child: "SkVisual", margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
         """
         Add child component.
 
         添加组件。
 
         Args:
-            child (SkVisual):
+            child (SkVisual): 
                 The child component.
 
                 组件。
 
-            margin (tuple[int, int, int, int]):
+            margin (tuple[int, int, int, int]): 
                 Distance from the components to the container.
 
                 组件与容器的间距。
-
+        
         Returns:
             None
         """
@@ -416,17 +419,17 @@ class Puts:
         更新布局。
 
         Args:
-            width:
+            width: 
                 Container width.
 
                 容器宽度。
 
             height:
                 Container height.
-
+                
                 容器高度。
 
-        Returns:
+        Returns: 
             None
         """
         for child in self.children:
@@ -475,7 +478,6 @@ class Put:
     put = put_configure
 
     def put_forget(self) -> None:
-
         """
         Remove component layuout.
 
@@ -484,7 +486,6 @@ class Put:
         Returns:
             None
         """
-
         parent = self.winfo_parent()
         layout = parent.winfo_layout()
         if layout:

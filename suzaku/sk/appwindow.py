@@ -25,7 +25,7 @@ class SkAppWindow(SkWindow):
     def quit(self, *args, **kwargs) -> None:
         """
         Exit application.
-
+        
         退出应用程序。
         """
         self.app.quit(*args, **kwargs)

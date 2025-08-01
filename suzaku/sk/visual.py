@@ -1,6 +1,8 @@
 from .layout import Layout
 from ..base.event import EventHanding
 
+from typing import Union, Any
+
 
 class SkVisual(Layout, EventHanding):
 
@@ -8,13 +10,13 @@ class SkVisual(Layout, EventHanding):
 
     from .window import SkWindow
 
-    from ..themes import theme
-
     from skia import Canvas, Rect
+
+    from ..themes import theme
 
     theme = theme
 
-    def __init__(self, parent: SkWindow, size: tuple[int, int] = (100, 30), style="", id: str = None) -> None:
+    def __init__(self, parent: Union[SkWindow, "SkVisual"], size: tuple[int, int]=(100, 30), style="", id: str = None) -> None:
 
         """
         Basic visual component, telling SkWindow how to draw.
@@ -51,12 +53,12 @@ class SkVisual(Layout, EventHanding):
             "cursor": "arrow",
             "x": -999,
             "y": -999,
-            "d_width": size[0],  # 默认宽度
-            "d_height": size[1],  # 默认高度
+            "d_width": size[0],  # Default width
+            "d_height": size[1],  # Default height
             "width": size[0],
             "height": size[1],
             "style": style,
-            "id": id or ("sk_visual." + str(self.get_instance_count())),
+            "id": str(id) or ("sk_visual." + str(self.get_instance_count())),
             "visible": False,
         }
 
@@ -78,7 +80,6 @@ class SkVisual(Layout, EventHanding):
 
         self.draw_func = lambda canvas: self._draw(canvas)
         self.winfo_master_window().add_draw(self.draw_func)
-
 
         def mouse_enter(evt):
             self.is_mouse_enter = True
@@ -118,7 +119,7 @@ class SkVisual(Layout, EventHanding):
         Returns:
             None
         """
-        """self.winfo_parent().add_draw(self.draw_func)"""
+        # self.winfo_parent().add_draw(self.draw_func)
         self.visual_attr["visible"] = True
 
     def _hide(self) -> None:
@@ -130,7 +131,7 @@ class SkVisual(Layout, EventHanding):
         Returns:
             None
         """
-        """self.winfo_parent().remove_draw(self.draw_func)"""
+        # self.winfo_parent().remove_draw(self.draw_func)
         self.visual_attr["visible"] = False
 
     def configure(self, **kwargs) -> None:
@@ -140,7 +141,7 @@ class SkVisual(Layout, EventHanding):
         配置组件属性。
 
         Args:
-            **kwargs:
+            **kwargs: 
                 Names and values of attributes.
 
                 属性名和属性值。
@@ -148,24 +149,23 @@ class SkVisual(Layout, EventHanding):
         Returns:
             None
         """
-
         self.visual_attr.update(kwargs)
 
-    config = configure  # 别名
+    config = configure  # Alias
 
-    def cget(self, name) -> any:
+    def cget(self, name: str) -> Any:
         """
         Get value of the property with the given name.
 
         通过值获取对应的属性值。
 
         Args:
-            name (str):
-                Property name.
-
+            name (str): 
+                Property name. 
+                
                 属性名。
 
-        Returns:
+        Returns: 
             self.visual_attr[name] (Any): Property value. 属性值。
         """
         return self.visual_attr[name]
@@ -177,12 +177,12 @@ class SkVisual(Layout, EventHanding):
         负责绘制组件。
 
         Args:
-            canvas (Canvas):
+            canvas (Canvas): 
                 Which canvas to draw.
 
                 画布。
 
-            rect (Rect):
+            rect (Rect): 
                 Region to draw.
 
                 绘制区域。
@@ -192,14 +192,14 @@ class SkVisual(Layout, EventHanding):
         """
         pass
 
-    def _draw(self, canvas: Canvas) -> None:
+    def _draw(self, canvas) -> None:
         """
         Passes the canvas to the draw function and the position of the component when drawing.
 
         负责传给draw函数画布和绘制时组件的位置。
 
         Args:
-            canvas:
+            canvas: 
                 Which canvas to draw.
 
                 画布。
@@ -208,8 +208,8 @@ class SkVisual(Layout, EventHanding):
             None
         """
         import skia
-        rect = skia.Rect(self.visual_attr["x"], self.visual_attr["y"], self.visual_attr["x"] + self.visual_attr["width"], self.visual_attr["y"] + self.visual_attr["height"])
-        #print(self.winfo_id(), self.visual_attr["x"], self.visual_attr["y"], self.visual_attr["x"] + self.visual_attr["width"], self.visual_attr["y"] + self.visual_attr["height"])
+        rect = skia.Rect(self.visual_attr["x"], self.visual_attr["y"], self.visual_attr["x"] + self.visual_attr["width"], 
+                         self.visual_attr["y"] + self.visual_attr["height"])
         self.draw(canvas, rect)
 
     @classmethod
@@ -235,7 +235,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr
 
-    def winfo_parent(self) -> SkWindow:
+    def winfo_parent(self) -> Union[SkWindow, "SkVisual"]:
         """
         Get parent component.
 
@@ -254,6 +254,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.winfo_parent().winfo_master_window()
 
+
     def winfo_id(self) -> str:
         """
         Get component ID.
@@ -265,7 +266,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["id"]
 
-    def winfo_width(self) -> int | float:
+    def winfo_width(self) -> Union[int, float]:
         """
         Get current width of the component.
 
@@ -276,7 +277,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["width"]
 
-    def winfo_height(self) -> int | float:
+    def winfo_height(self) -> Union[int, float]:
         """
         Get current height of the component.
 
@@ -287,7 +288,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["height"]
 
-    def winfo_dwidth(self) -> int | float:
+    def winfo_dwidth(self) -> Union[int, float]:
         """
         Get default width of the component.
 
@@ -298,7 +299,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["d_width"]
 
-    def winfo_dheight(self) -> int | float:
+    def winfo_dheight(self) -> Union[int, float]:
         """
         Get default height of the component.
 
@@ -309,7 +310,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["d_height"]
 
-    def winfo_x(self) -> int | float:
+    def winfo_x(self) -> Union[int, float]:
         """
         Get X coordinate of the component relative to the window.
 
@@ -320,7 +321,7 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr["x"]
 
-    def winfo_y(self) -> int | float:
+    def winfo_y(self) -> Union[int, float]:
         """
         Get Y coordinate of the component relative to the window.
 
@@ -349,6 +350,7 @@ class SkVisual(Layout, EventHanding):
         :return:
         """
         return self.visual_attr["style"]
+
 
     def winfo_visible(self) -> bool:
         """
@@ -391,3 +393,4 @@ class SkVisual(Layout, EventHanding):
         self.is_focus = False
         from ..base.event import Event
         self.event_generate("focus_out", Event())
+
