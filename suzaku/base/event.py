@@ -57,7 +57,7 @@ class EventHanding(After):
             evt(*args, **kwargs)
 
 
-    def bind(self, name: str, func: callable, add: bool=True) -> "EventHanding":
+    def bind(self, name: str, func: function, add: bool=True) -> "EventHanding":
         """
         Bind event.
 
@@ -69,7 +69,7 @@ class EventHanding(After):
 
                 事件名称，没有则创建。
 
-            func (callable): 
+            func (function): 
                 Function to bind.
                 
                 绑定函数。
@@ -91,7 +91,7 @@ class EventHanding(After):
             self.events[name] = [func]
         return self
 
-    def unbind(self, name: str, func: callable) -> None:
+    def unbind(self, name: str, func: function) -> None:
         """
         Unbind event.
 
@@ -105,7 +105,7 @@ class EventHanding(After):
                 
                 事件名称。
 
-            func (callable): 
+            func (function): 
                 Function to unbind.
                 
                 要解绑函数。
@@ -123,9 +123,10 @@ class Event:
     用于传递事件的参数。
     """
 
-    def __init__(self, event_type: str, x: int = None, y: int = None, rootx: int = None, rooty: int = None,
-                 key: int = None, keyname: str = None, mods: str = None, char: str = None,
-                 width: int = None, height: int = None):
+    def __init__(self, event_type: str, x: Union[int, None] = None, y: Union[int, None] = None, 
+                 rootx: Union[int, None] = None, rooty: Union[int, None] = None, key: Union[int, None] = None, 
+                 keyname: Union[str, None] = None, mods: Union[str, None] = None, char: Union[int, None] = None,
+                 width: Union[int, None] = None, height: Union[int, None] = None):
         """
         Used to pass event via arguments.
 

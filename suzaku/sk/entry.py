@@ -1,7 +1,7 @@
-from .widget import SkWidget
+from .visual import SkVisual
 
 
-class SkEntry(SkWidget):
+class SkEntry(SkVisual):
 
     """
     输入框组件
@@ -26,7 +26,7 @@ class SkEntry(SkWidget):
 
         self.visual_attr["right_margin"] = 20
 
-        self.events["click"] = []
+        self.evts["click"] = []
         self.visual_attr["placeholder"] = placeholder
         self.visual_attr["cursor_pos"] = 0
         self.visual_attr["scroll_offset"] = 0
