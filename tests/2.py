@@ -1,6 +1,7 @@
 from suzaku import *
 
-root = Sk()
-btn = SkButton(root, text="Hello World")
-btn.place(10, 10)
-root.mainloop()
+app = SkAppWindow()
+app.title("Test")
+app.configure(opacity=0.5)
+
+app.run()

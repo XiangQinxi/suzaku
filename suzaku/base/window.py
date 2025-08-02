@@ -8,7 +8,7 @@ class Window(EventHanding):
 
     _instance_count = 0
 
-    def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0, force_hardware_acceleration: bool = False):
+    def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0, force_hardware_acceleration: bool = False, name="window"):
 
         """
         初始化窗口
@@ -21,32 +21,45 @@ class Window(EventHanding):
         :param opacity: 窗口透明度
         """
 
-        self.window_attr = {
-            "name": "window",
-            "parent": None,
-            "glfw_window": None,
-            "title": "",
-            "width": 0,
-            "height": 0,
-            "x": 0,
-            "y": 0,
-            "visible": False,
-            "id": "",
-            "fullscreen": False,
+        from .application import Application
+        parent = parent if parent is not None else Application.get_instance()
+        self.parent = parent
+        if isinstance(parent, Application):
+            self.application = parent
+        else:
+            self.application = parent.application
+        if isinstance(parent, Application):
+            parent.add_window(self)
+
+        self.name = name
+
+        if not id:
+            id = self.name + "." + str(self.get_instance_count())
+        self.id = id
+
+        self.x = 0
+        self.y = 0
+        self.width = size[0]
+        self.height = size[1]
+        self.glfw_window = None
+        self.visible = False
+        self.id = id
+        self.mouse_x = 0
+        self.mouse_y = 0
+        self.mouse_rootx = 0
+        self.mouse_rooty = 0
+
+        self.new_cursor = "arrow"
+        self.focus = True
+
+        self.attributes = {
+            "title": title,
             "opacity": 1.0,
-
-            "mouse_x": 0,
-            "mouse_y": 0,
-            "mouse_rootx": 0,
-            "mouse_rooty": 0,
-
-            "default_cursor": "arrow",
-            "cursor": "arrow",
-            "focus": True,
+            "cursor": "arrow",  # default cursor
             "force_hardware_acceleration": force_hardware_acceleration
         }
 
-        self.evts = {
+        self.events = {
             "closed": [],
             "move": [],
             "update": [],
@@ -68,34 +81,17 @@ class Window(EventHanding):
             "resize": [],
         }
 
-        self.visuals = []
-
         Window._instance_count += 1
 
-        ### 获取Application示例，并把自己添加进去。 ###
-        from .application import Application
-        parent = parent if parent is not None else Application.get_instance()
-        self.window_attr["parent"] = parent
-        if isinstance(parent, Application):
-            parent.add_window(self)
-        ##########################################
+        self.width = size[0]
+        self.height = size[1]
 
-        ### 初始化窗口属性 ###
-        self.window_attr["title"] = title
+        self.attributes["fullscreen"] = fullscreen
 
-        if not id:
-            id = self.window_attr["name"] + "." + str(self.get_instance_count())
-        self.window_attr["id"] = id
-
-        self.window_attr["width"] = size[0]
-        self.window_attr["height"] = size[1]
-
-        self.window_attr["fullscreen"] = fullscreen
-
-        if self.window_attr["width"] <= 0 or self.window_attr["height"] <= 0:
+        if self.width <= 0 or self.height <= 0:
             raise ValueError("窗口宽度和高度必须为正数")
 
-        self.window_attr["opacity"] = opacity
+        self.attributes["opacity"] = opacity
 
         ####################
 
@@ -152,8 +148,7 @@ class Window(EventHanding):
             None
         """
         from .event import Event
-        evt = Event(char=chr(char))
-        self.event_generate("char", evt)
+        self.event_generate("char", Event(event_type="char", char=chr(char)))
 
     def _on_key(self, window, key, scancode, action, mods) -> None:
         """
@@ -191,26 +186,23 @@ class Window(EventHanding):
         except KeyError:
             m = "none"
 
-        evt = Event(key=key, keyname=keyname, mods=m)
-
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
-            self.event_generate("key_press", evt)
+            self.event_generate("key_press", Event(event_type="key_press", key=key, keyname=keyname, mods=m))
         elif action == RELEASE:
-            self.event_generate("key_release", evt)
+            self.event_generate("key_release", Event(event_type="key_release", key=key, keyname=keyname, mods=m))
         elif action == REPEAT:
-            self.event_generate("key_repeat", evt)
+            self.event_generate("key_repeat", Event(event_type="key_repeat", key=key, keyname=keyname, mods=m))
 
     def _on_focus(self, window, focused) -> None:
         from .event import Event
-        evt = Event()
         if focused:
-            self.window_attr["focus"] = True
-            self.event_generate("focus_in", evt)
+            self.attributes["focus"] = True
+            self.event_generate("focus_in", Event(event_type="focus_in"))
         else:
-            self.window_attr["focus"] = False
-            self.event_generate("focus_out", evt)
+            self.attributes["focus"] = False
+            self.event_generate("focus_out", Event(event_type="focus_out"))
 
     def _on_framebuffer_size(self, window, width, height, ) -> None:
         if self.draw_func:
@@ -235,9 +227,10 @@ class Window(EventHanding):
         from OpenGL import GL
         GL.glViewport(0, 0, width, height)
         self._on_framebuffer_size(window, width, height)
-        self.window_attr["width"] = width
-        self.window_attr["height"] = height
-        self.event_generate("resize", width, height)
+        self.width = width
+        self.height = height
+        from .event import Event
+        self.event_generate("resize", Event(event_type="resize", width=width, height=height))
         #self.update()
 
     def _on_window_pos(self, window, x, y) -> None:
@@ -249,10 +242,10 @@ class Window(EventHanding):
         :param y: 传递鼠标相对窗口的X坐标
         :return: None
         """
-        self.window_attr["x"] = x
-        self.window_attr["y"] = y
+        self.x = x
+        self.y = y
         from .event import Event
-        self.event_generate("move", Event(x=x, y=y))
+        self.event_generate("move", Event(event_type="move", x=x, y=y))
 
     def _on_closed(self, window) -> None:
         """
@@ -263,20 +256,20 @@ class Window(EventHanding):
         """
         #from glfw import terminate
         from .event import Event
-        self.event_generate("closed", Event())
+        self.event_generate("closed", Event(event_type="closed"))
         #terminate()
 
-    def _on_mouse_button(self, window, arg1, is_pressed: bool, arg2) -> None:
+    def _on_mouse_button(self, window, arg1, is_press: bool, arg2) -> None:
         """
         触发mouse_pressed事件(鼠标按下时触发)或mouser_released事件(鼠标松开时触发)
 
         is_pressed:
-          True  -> 鼠标按键按下时触发`window_mouse_pressed`事件
-          False -> 鼠标按键松开时触发`window_mouse_released`事件
+          True  -> 鼠标按键按下时触发`window_mouse_press`事件
+          False -> 鼠标按键松开时触发`window_mouse_release`事件
 
         :param window: GLFW窗口
         :param arg1: 按键
-        :param is_pressed: 是否按下
+        :param is_press: 是否按下
         :param arg2: 修饰键
         :return: None
         """
@@ -285,11 +278,15 @@ class Window(EventHanding):
         from .event import Event
         from glfw import get_cursor_pos
         pos = get_cursor_pos(window)
+        self.mouse_x = pos[0]
+        self.mouse_y = pos[1]
+        self.mouse_rootx = pos[0] + self.x
+        self.mouse_rooty = pos[1] + self.y
 
-        if is_pressed:
-            self.event_generate("mouse_pressed", Event(x=pos[0], y=pos[1]))
+        if is_press:
+            self.event_generate("mouse_press", Event(event_type="mouse_press", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_released", Event(x=pos[0], y=pos[1]))
+            self.event_generate("mouse_release", Event(event_type="mouse_release", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
 
     def _on_cursor_enter(self, window, is_enter: bool) -> None:
         """
@@ -306,11 +303,15 @@ class Window(EventHanding):
         from .event import Event
         from glfw import get_cursor_pos
         pos = get_cursor_pos(window)
+        self.mouse_x = pos[0]
+        self.mouse_y = pos[1]
+        self.mouse_rootx = pos[0] + self.x
+        self.mouse_rooty = pos[1] + self.y
 
         if is_enter:
-            self.event_generate("mouse_enter", Event(x=pos[0], y=pos[1]))
+            self.event_generate("mouse_enter", Event(event_type="mouse_enter", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_leave", Event(x=pos[0], y=pos[1]))
+            self.event_generate("mouse_leave", Event(event_type="mouse_leave", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
 
     def _on_cursor_pos(self, window, x, y) -> None:
         """
@@ -324,40 +325,49 @@ class Window(EventHanding):
 
         from .event import Event
 
-        self.event_generate("mouse_motion", Event(x=x, y=y))
+        self.mouse_x = x
+        self.mouse_y = y
+        self.mouse_rootx = x
+        self.mouse_rooty = y
+
+        self.event_generate("mouse_motion", Event(event_type="mouse_motion", x=x, y=y, rootx=self.mouse_rootx, rooty=self.mouse_rooty))
 
     def update(self) -> None:
         """
         更新窗口
         :return: None
         """
-        if self.window_attr["visible"]:
-            self.event_generate("update")
+        if self.visible:
+            from .event import Event
+            self.event_generate("update", Event(event_type="update"))
             from glfw import swap_buffers
-            swap_buffers(self.winfo_glfw_window())
+            swap_buffers(self.glfw_window)
 
     def __str__(self):
         """
         获取窗口字符串表示
         :return: 窗口字符串表示
         """
-        return self.winfo_id()
+        return self.id
 
     def configure(self, **kwargs) -> "Window":
         """
-        配置window_attr中的属性
+        配置attributes中的属性
 
         :param kwargs: 需要设置的属性
         :return: self
         """
-        self.window_attr.update(kwargs)
+        self.attributes.update(kwargs)
+        if "opacity" in kwargs:
+            from glfw import set_window_opacity
+            set_window_opacity(self.glfw_window, kwargs.pop("opacity"))
         return self
 
     config = configure  # 别名
 
     def cget(self, name: str) -> any:
         """
-        获取window_attr中的属性
+        获取attributes中的属性
 
         :param name: 需要获取属性的名称
         :return: any
@@ -382,7 +392,7 @@ class Window(EventHanding):
                           POINTING_HAND_CURSOR, NOT_ALLOWED_CURSOR, NO_CURRENT_CONTEXT, IBEAM_CURSOR, HRESIZE_CURSOR,
                           CROSSHAIR_CURSOR, CENTER_CURSOR)
         if cursorname is None:
-            return self.window_attr["cursor"]
+            return self.new_cursor
 
         name = cursorname.lower()
 
@@ -390,10 +400,10 @@ class Window(EventHanding):
         if cursorget:
             c = create_standard_cursor(cursorget)
         else:
-            return self.window_attr["cursor"]
+            return self.new_cursor
 
-        self.window_attr["cursor"] = name
-        set_cursor(self.winfo_glfw_window(), c)
+        self.new_cursor = name
+        set_cursor(self.glfw_window, c)
         return self
 
     def default_cursor(self, cursorname: str = None) -> str | type:
@@ -408,27 +418,8 @@ class Window(EventHanding):
         :return: 光标吗
         """
         if cursorname is None:
-            return self.window_attr["default_cursor"]
-        self.window_attr["default_cursor"] = cursorname
-        return self
-
-    def opacity(self, value: float = None) -> float | type:
-        """
-        获取或设置窗口透明度
-
-        value:
-          None -> 获取窗口透明度
-          其他 -> 设置窗口透明度
-
-        :param value: 透明度
-        :return: self
-        """
-        if value is None:
-            return self.window_attr["opacity"]
-        else:
-            self.window_attr["opacity"] = value
-            from glfw import set_window_opacity
-            set_window_opacity(self.winfo_glfw_window(), value)
+            return self.new_cursor
+        self.new_cursor = cursorname
         return self
 
     def visible(self, is_visible: bool = None) -> bool | type:
@@ -444,7 +435,7 @@ class Window(EventHanding):
         :return: self
         """
         if is_visible is None:
-            return self.window_attr["visible"]
+            return self.visible
         elif is_visible:
             self.show()
         else:
@@ -457,8 +448,8 @@ class Window(EventHanding):
         :return: self
         """
         from glfw import show_window
-        show_window(self.winfo_glfw_window())
-        self.window_attr["visible"] = True
+        show_window(self.glfw_window)
+        self.visible = True
         return self
 
     def hide(self) -> "Window":
@@ -467,8 +458,8 @@ class Window(EventHanding):
         :return: self
         """
         from glfw import hide_window
-        hide_window(self.winfo_glfw_window())
-        self.window_attr["visible"] = False
+        hide_window(self.glfw_window)
+        self.visible = False
         return self
 
     def maximize(self) -> "Window":
@@ -477,7 +468,7 @@ class Window(EventHanding):
         :return: self
         """
         from glfw import maximize_window
-        maximize_window(self.winfo_glfw_window())
+        maximize_window(self.glfw_window)
         return self
 
     def restore(self) -> "Window":
@@ -486,7 +477,7 @@ class Window(EventHanding):
         :return: self
         """
         from glfw import restore_window
-        restore_window(self.winfo_glfw_window())
+        restore_window(self.glfw_window)
         return self
 
     def add(self, visual) -> "Window":
@@ -500,10 +491,10 @@ class Window(EventHanding):
 
     def destroy(self) -> None:
         """Proper window destruction"""
-        if self.window_attr["glfw_window"]:
+        if self.glfw_window:
             import glfw
-            glfw.destroy_window(self.window_attr["glfw_window"])
-            self.window_attr["glfw_window"] = None  # Clear the reference
+            glfw.destroy_window(self.glfw_window)
+            self.glfw_window = None  # Clear the reference
 
     def title(self, text: str = None) -> str | type:
         """
@@ -517,11 +508,11 @@ class Window(EventHanding):
         :return: self
         """
         if text is None:
-            return self.window_attr["title"]
+            return self.attributes["title"]
         else:
-            self.window_attr["title"] = text
+            self.attributes["title"] = text
             from glfw import set_window_title
-            set_window_title(self.winfo_glfw_window(), text)
+            set_window_title(self.glfw_window, text)
             return self
 
     def resize(self, width: int = None, height: int = None) -> "Window":
@@ -537,12 +528,13 @@ class Window(EventHanding):
         if height is None:
             height = self.height
 
-        self.window_attr["width"] = width
-        self.window_attr["height"] = height
+        self.width = width
+        self.height = height
 
         from glfw import set_window_size
-        set_window_size(self.winfo_glfw_window(), width, height)
-        self.event_generate("resize", width, height)
+        set_window_size(self.glfw_window, width, height)
+        from .event import Event
+        self.event_generate("resize", Event(event_type="resize", width=width, height=height))
 
         return self
 
@@ -557,11 +549,12 @@ class Window(EventHanding):
             x = self.x
         if y is None:
             y = self.y
-        self.window_attr["x"] = x
-        self.window_attr["y"] = y
+        self.x = x
+        self.y = y
         from glfw import set_window_pos
-        set_window_pos(self.winfo_glfw_window(), x, y)
-        self.event_generate("move")
+        set_window_pos(self.glfw_window, x, y)
+        from .event import Event
+        self.event_generate("move", Event(event_type="move", x=x, y=y))
 
         return self
 
@@ -584,80 +577,17 @@ class Window(EventHanding):
         :param key: 属性名
         :return: 属性值
         """
-        return self.window_attr[key]
-
-    def winfo(self) -> dict:
+        return self.attributes[key]
+    
+    def get_attribute(self, attribute_name: str) -> Any:
         """
         获取窗口的全部属性
         :return: 窗口属性
         """
-        return self.window_attr
+        return self.attributes[attribute_name]
 
-    def winfo_parent(self) -> "Application":
-        """
-        获取父Application
-        :return: Application
-        """
-        return self.window_attr["parent"]
-
-    def winfo_glfw_window(self) -> any:
-        """
-        获取GLFW窗口
-        :return: GLFW窗口
-        """
-        return self.window_attr["glfw_window"]
-
-    def winfo_id(self) -> str:
-        """
-        获取窗口的ID(与GLFW窗口ID不同，仅供Application记录作为标识符)
-        :return: ID
-        """
-        return self.window_attr["id"]
-
-    def winfo_width(self) -> int:
-        """
-        获取窗口的宽度
-        :return: 宽度
-        """
-        return self.window_attr["width"]
-
-    def winfo_height(self) -> int:
-        """
-        获取窗口的高度
-        :return: 高度
-        """
-        return self.window_attr["height"]
-
-    def winfo_x(self) -> int:
-        """
-        获取窗口的x坐标
-        return: x坐标
-        """
-        return self.window_attr["x"]
-
-    def winfo_y(self) -> int:
-        """
-        获取窗口的y坐标
-        return: y坐标
-        """
-        return self.window_attr["y"]
-
-    def winfo_rootx(self) -> int:
-        """
-        获取窗口的根窗口x坐标
-        return: x坐标
-        """
-        return self.window_attr["rootx"]
-
-    def winfo_rooty(self) -> int:
-        """
-        获取窗口的根窗口y坐标
-        return: y坐标
-        """
-        return self.window_attr["rooty"]
-
-    def winfo_master_window(self) -> "Window":
-        return self
+    def set_attribute(self, **kwargs):
+        self.attributes.update(**kwargs)
 
     def set_draw_func(self, func: callable) -> "Window":
         """
@@ -666,15 +596,6 @@ class Window(EventHanding):
         return: self
         """
         self.draw_func = func
-        return self
-
-    def set_application(self, app) -> "Window":
-        """
-        供Application调用，一般来说无需使用该方法
-        param app: Application实例
-        return: self
-        """
-        self.application = app
         return self
 
     def create(self) -> any:
@@ -688,7 +609,7 @@ class Window(EventHanding):
         import glfw
 
         if hasattr(self, 'application') and self.application:
-            if self.window_attr["fullscreen"]:
+            if self.attributes["fullscreen"]:
                 monitor = glfw.get_primary_monitor()
             else:
                 monitor = None
@@ -704,26 +625,26 @@ class Window(EventHanding):
 
             # 使用应用程序的GLFW配置
             window = glfw.create_window(
-                self.winfo_width(),
-                self.winfo_height(),
+                self.width,
+                self.height,
                 self.title(),
                 monitor, None
             )
             if not window:
                 raise RuntimeError("无法创建GLFW窗口")
 
-            self.window_attr["visible"] = True
+            self.visible = True
 
-            self.window_attr["glfw_window"] = window
+            self.glfw_window = window
 
             pos = glfw.get_window_pos(window)
 
-            self.window_attr["x"] = pos[0]
-            self.window_attr["y"] = pos[1]
+            self.x = pos[0]
+            self.y = pos[1]
 
             self.cursor(self.default_cursor())
 
-            if self.window_attr["force_hardware_acceleration"]:
+            if self.attributes["force_hardware_acceleration"]:
                 glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
                 glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
                 glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
@@ -741,13 +662,13 @@ class Window(EventHanding):
         Returns:
             None
         """
-        window =  self.winfo_glfw_window()
+        window =  self.glfw_window
         import glfw
         glfw.make_context_current(window)
         glfw.set_window_size_callback(window, self._on_resizing)
         glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
         glfw.set_window_close_callback(window, self._on_closed)
-        glfw.set_window_opacity(window, self.window_attr["opacity"])
+        glfw.set_window_opacity(window, self.attributes["opacity"])
         glfw.set_mouse_button_callback(window, self._on_mouse_button)
         glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
         glfw.set_cursor_pos_callback(window, self._on_cursor_pos)

@@ -21,7 +21,7 @@ class EventHanding(After):
 
         """
 
-        self.evts = {}
+        self.events = {}
 
     def event_generate(self, name: str, *args, **kwargs) -> Union[bool, Any]:
         """
@@ -50,10 +50,10 @@ class EventHanding(After):
 
         """
 
-        if not name in self.evts:
-            self.evts[name] = []
+        if not name in self.events:
+            self.events[name] = []
 
-        for evt in self.evts[name]:
+        for evt in self.events[name]:
             evt(*args, **kwargs)
 
 
@@ -83,12 +83,12 @@ class EventHanding(After):
             self
 
         """
-        if name not in self.evts:
-            self.evts[name] = [func]
+        if name not in self.events:
+            self.events[name] = [func]
         if add:
-            self.evts[name].append(func)
+            self.events[name].append(func)
         else:
-            self.evts[name] = [func]
+            self.events[name] = [func]
         return self
 
     def unbind(self, name: str, func: callable) -> None:
@@ -112,7 +112,7 @@ class EventHanding(After):
         Returns:
             None
         """
-        self.evts[name].remove(func)
+        self.events[name].remove(func)
 
 
 class Event:
@@ -123,44 +123,33 @@ class Event:
     用于传递事件的参数。
     """
 
-    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: int = None, keyname: str = None, mods: str = None, char: str = None):
+    def __init__(self, event_type: str, x: int = None, y: int = None, rootx: int = None, rooty: int = None,
+                 key: int = None, keyname: str = None, mods: str = None, char: str = None,
+                 width: int = None, height: int = None):
         """
         Used to pass event via arguments.
-
-        用于传递事件的参数。
 
         Args:
             x: 
                 x position of cursor / component (Relative to window).
 
-                鼠标的/组件的x坐标(相对于窗口)。
-
             y: 
                 y position of cursor / component (Relative to window).
-
-                鼠标的/组件的y坐标(相对于窗口)。
 
             rootx: 
                 x position of cursor / component (Relative to screen).
 
-                鼠标的/组件的x坐标(相对于荧幕)。
-
             rooty: 
                 y position of cursor / component (Relative to screen).
-
-                鼠标的/组件的y坐标(相对于荧幕)。
 
             key:
                 Key name.
 
-                按键名称。
-
             mods:
                 Modifier keys.
 
-                修饰键。
-
         """
+        self.event_type = event_type
         self.x = x
         self.y = y
         self.rootx = rootx

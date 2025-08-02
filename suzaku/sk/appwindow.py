@@ -12,7 +12,7 @@ class SkAppWindow(SkWindow):
         from .app import SkApp
         self.app = SkApp()
         super().__init__(parent=self.app, *args, **kwargs)
-        self.window_attr["name"] = "sk_appwindow"
+        self.attributes["name"] = "sk_appwindow"
 
     def run(self, *args, **kwargs) -> None:
         """

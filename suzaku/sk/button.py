@@ -57,7 +57,7 @@ class SkButton(SkWidget):
 
         super().__init__(*args, size=size, style=style, name="sk_button", **kwargs)
 
-        self.evts["click"] = []
+        self.events["click"] = []
         self.visual_attr["text"] = text
 
         self.visual_attr["cursor"] = cursor

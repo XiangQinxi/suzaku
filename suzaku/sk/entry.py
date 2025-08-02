@@ -25,7 +25,7 @@ class SkEntry(SkWidget):
 
         self.visual_attr["right_margin"] = 20
 
-        self.evts["click"] = []
+        self.events["click"] = []
         self.visual_attr["placeholder"] = placeholder
         self.visual_attr["cursor_pos"] = 0
         self.visual_attr["scroll_offset"] = 0

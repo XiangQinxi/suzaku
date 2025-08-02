@@ -71,7 +71,6 @@ class Application:
         """
         self.windows.append(window)
         # 将窗口的GLFW初始化委托给Application
-        window.set_application(self)
         return self
 
     # 修改Application类的run方法
@@ -93,22 +92,22 @@ class Application:
 
             for window in current_windows:
                 # 检查窗口有效性
-                if not window.winfo_glfw_window() or glfw.window_should_close(window.winfo_glfw_window()):
+                if not window.glfw_window or glfw.window_should_close(window.glfw_window):
                     window.destroy()
                     self.windows.remove(window)
                     continue
 
                 # 仅绘制可见窗口
-                if window.visible():
+                if window.visible:
                     # 为每个窗口设置当前上下文
-                    glfw.make_context_current(window.winfo_glfw_window())
-                    with window.skia_surface(window.winfo_glfw_window()) as surface:
+                    glfw.make_context_current(window.glfw_window)
+                    with window.skia_surface(window.glfw_window) as surface:
                         if surface:
                             with surface as canvas:
                                 if hasattr(window, 'draw_func') and window.draw_func:
                                     window.draw_func(canvas)
                             surface.flushAndSubmit()
-                            glfw.swap_buffers(window.winfo_glfw_window())
+                            glfw.swap_buffers(window.glfw_window)
 
         self.cleanup()
 
@@ -123,7 +122,7 @@ class Application:
         """
         import glfw
         for window in self.windows:
-            glfw.destroy_window(window.winfo_glfw_window())
+            glfw.destroy_window(window.glfw_window)
         glfw.terminate()
         self.running = False
 

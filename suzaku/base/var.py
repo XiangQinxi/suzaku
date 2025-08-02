@@ -2,43 +2,44 @@ from .event import EventHanding
 
 
 class Var(EventHanding):
-    def __init__(self, default_value, typ: type = any):
+    def __init__(self, default_value, value_type: type = any):
         """
-        存储、共享数值。
+        Save a variable.
 
         Args:
-            default_value: 初始值
+            default_value: The initial value of the variable.
+            typ: The type of the variable.
         """
 
         super().__init__()
-        self.evts = {
+        self.events = {
             "change": []
         }
         self.value: type = default_value
-        self.type = typ
+        self.value_type = value_type
 
     def set(self, value: any) -> None:
         """
-        设置值，并创建change事件。
+        Set the value of the variable.
 
         Args:
-            value: 新值
+            value: The new value of the variable.
 
         Returns:
-
+            None
         """
-        if not type(value) is self.type:
-            raise ValueError(f"Value must be {self.type}")
+        if not type(value) is self.value_type:
+            raise ValueError(f"Value must be {self.value_type}")
         self.value = value
         self.event_generate("change", value)
         return None
 
     def get(self) -> any:
         """
-        获取值。
+        Get the value of the variable.
 
         Returns:
-            any: 值
+            any: The value of the variable.
         """
         return self.value
 

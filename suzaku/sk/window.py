@@ -3,28 +3,30 @@ import skia
 
 
 class SkWindow(Window):
-    def __init__(self, *args, themename="light", style="SkWindow", **kwargs) -> None:
+    def __init__(self, *args, themename="light", style="SkWindow", name="sk_window", **kwargs) -> None:
         """
-        初始化
+        SkWindow, inherited from Window
 
-        :param args: Window参数
-        :param themename: 主题名称
-        :param kwargs: Window参数
+        :param args: Window Args
+        :param themename: Theme name
+        :param kwargs: Window Kwargs
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, name=name, **kwargs)
 
         from suzaku.style.themes import theme
 
         self.theme = theme
         self.theme.use_theme(themename)
 
-        self.window_attr["name"] = "sk_window"
-        self.window_attr["layout"] = None
-        self.window_attr["style"] = style
-        self.window_attr["focus_visual"] = self
+        self.layout = None
+        self.attributes["style"] = style
+        self.focus_widget = self
         self.draws = []
-        self.visuals = []
-        self.previous_visual = None  # 跟踪上一个鼠标悬停的元素
+        self.children = []
+
+        self.window = self
+
+        self.previous_widget = None
 
         self.set_draw_func(self.draw)
         self.bind("mouse_motion", self._motion, add=True)
@@ -42,180 +44,147 @@ class SkWindow(Window):
 
         self.bind("update", self._update)
 
-        #self.bind("window_mouse_enter", self._motion, add=True)
-        #self.bind("window_mouse_leave", self._motion, add=True)
+    def _update(self, event):
+        """
+        Update event for SkWindow.
 
-    def _update(self):
-        for visual in self.visuals:
-            visual.event_generate("update")
+        Args:
+            event: Update event.
 
-    def _key_pressed(self, evt):
-        #print(self.cget("focus_visual"))
+        Returns:
+
+        """
+        for widget in self.children:
+            from ..base.event import Event
+            widget.event_generate("update", Event(event_type="update"))
+
+    def _key_pressed(self, event):
+        #print(self.cget("focus_widget"))
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_press", evt)
+            self.focus_get().event_generate("key_press", event)
 
-    def _key_repect(self, evt):
+    def _key_repect(self, event):
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_repeat", evt)
+            self.focus_get().event_generate("key_repeat", event)
 
-    def _key_release(self, evt):
+    def _key_release(self, event):
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_release", evt)
+            self.focus_get().event_generate("key_release", event)
 
-    def _char(self, evt):
+    def _char(self, event):
         #print(12)
         if self.focus_get() is not self:
-            self.focus_get().event_generate("char", evt)
+            self.focus_get().event_generate("char", event)
 
-    def _leave(self, evt):
+    def _leave(self, event):
         from ..base.event import Event
-        event = Event(x=self.window_attr["x"], y=self.window_attr["y"], rootx=self.window_attr["mouse_rootx"], rooty=self.window_attr["mouse_rooty"])
-        for visual in self.visuals:
-            visual.event_generate("mouse_leave", event)
+        event = Event(event_type="mouse_leave", x=self.x, y=self.y, rootx=self.mouse_rootx, rooty=self.mouse_rooty)
+        for widget in self.children:
+            widget.event_generate("mouse_leave", event)
 
-    def _mouse(self, evt) -> None:
-        """
-        回调组件接收鼠标按下自己事件
-        :return: None
-        """
+    def _mouse(self, event) -> None:
         from ..base.event import Event
-        event = Event(
-            x=self.window_attr["mouse_x"],
-            y=self.window_attr["mouse_y"],
-            rootx=self.window_attr["mouse_rootx"],
-            rooty=self.window_attr["mouse_rooty"]
-        )
-        for visual in self.visuals:
-            if (visual.winfo_x() <= event.x <= visual.winfo_x() + visual.winfo_width() and
-                    visual.winfo_y() <= event.y <= visual.winfo_y() + visual.winfo_height()):
-                visual.focus_set()
-                #print(visual)
-                visual.event_generate("mouse_pressed", event)
+        for widget in self.children:
+            if (widget.x <= event.x <= widget.x + widget.width and
+                    widget.y <= event.y <= widget.y + widget.height):
+                widget.focus_set()
+                #print(widget)
+                widget.event_generate("mouse_pressed", event)
                 break
 
     from ..base.event import Event
 
-    def _motion(self, evt: Event) -> None:
+    def _motion(self, event: Event) -> None:
         """
-        回调组件接收鼠标移动、进入、离开事件
-        :param evt: 事件对象
-        :return: None
+
+        Args:
+            event:
+
+        Returns:
+
         """
-        self.window_attr["mouse_x"] = evt.x
-        self.window_attr["mouse_y"] = evt.y
-        self.window_attr["mouse_rootx"] = evt.x + self.winfo_x()
-        self.window_attr["mouse_rooty"] = evt.y + self.winfo_y()
-        current_visual = None
+        current_widget = None
         from ..base.event import Event
-        event = Event(x=evt.x, y=evt.y, rootx=self.window_attr["mouse_rootx"], rooty=self.window_attr["mouse_rooty"])
+        event = Event(event_type="mouse_motion", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
 
         # 找到当前鼠标所在的视觉元素
-        for visual in reversed(self.visuals):
-            if (visual.winfo_x() <= evt.x <= visual.winfo_x() + visual.winfo_width() and
-                visual.winfo_y() <= evt.y <= visual.winfo_y() + visual.winfo_height()):
-                current_visual = visual
+        for widget in reversed(self.children):
+            if (widget.x <= event.x <= widget.x + widget.width and
+                widget.y <= event.y <= widget.y + widget.height):
+                current_widget = widget
                 break
 
         # 处理上一个元素的离开事件
-        if self.previous_visual and self.previous_visual != current_visual:
+        if self.previous_widget and self.previous_widget != current_widget:
             self.cursor(self.default_cursor())
-            self.previous_visual.event_generate("mouse_leave", event)
-            self.previous_visual.is_mouse_enter = False
+            self.previous_widget.event_generate("mouse_leave", event)
+            self.previous_widget.is_mouse_enter = False
 
         # 处理当前元素的进入和移动事件
-        if current_visual:
-            if current_visual.winfo_visible():
-                if not current_visual.is_mouse_enter:
-                    self.cursor(current_visual.visual_attr["cursor"])
-                    current_visual.event_generate("mouse_enter", event)
-                    current_visual.is_mouse_enter = True
+        if current_widget:
+            if current_widget.winfo_visible():
+                if not current_widget.is_mouse_enter:
+                    self.cursor(current_widget.widget_attr["cursor"])
+                    current_widget.event_generate("mouse_enter", event)
+                    current_widget.is_mouse_enter = True
                 else:
-                    self.cursor(current_visual.visual_attr["cursor"])
-                    current_visual.event_generate("mouse_motion", event)
-                self.previous_visual = current_visual
+                    self.cursor(current_widget.widget_attr["cursor"])
+                    current_widget.event_generate("mouse_motion", event)
+                self.previous_widget = current_widget
         else:
-            self.previous_visual = None
+            self.previous_widget = None
+
+    def add_child(self, child: "SkWidget"):
+        """
+        Add child widget to window.
+
+        Args:
+            child: SkWidget
+
+        Returns:
+            None
+        """
+        self.children.append(child)
 
     def set_layout(self, layout) -> None:
-        """
-        设置窗口布局
-
-        :param layout: 布局类 Boxes、Puts等
-        :return: None
-        """
-        self.window_attr["layout"] = layout
+        self.layout = layout
 
     def add_draw(self, draw_func) -> None:
-        """
-        添加可视化元素绘制函数
-
-        :param draw_func: 绘制函数
-        :return: None
-        """
         self.draws.append(draw_func)
 
     def remove_draw(self, draw_func) -> None:
-        """
-        移除可视化元素绘制函数
-
-        :param draw_func: 绘制函数
-        :return: None
-        """
         self.draws.remove(draw_func)
 
     def draw(self, canvas: skia.Surfaces) -> None:
-        """
-        绘制Skia画布与其上的可视化元素
-
-        :param canvas: Skia画布
-        :return: None
-        """
         from ..style.color import color
         canvas.clear(color(self.theme.get_theme()[self.winfo_style()]["bg"]))
 
         for i, f in enumerate(self.draws):
             #print(i, f)
-            if self.visuals[i].winfo_visible():
+            if self.children[i].winfo_visible():
                 f(canvas)
         return None
 
-    def winfo_layout(self) -> type:
-        """
-        获取窗口的布局
-
-        :return: 布局类
-        """
-        return self.window_attr["layout"]
-
     def winfo_style(self) -> str:
-        """
-        获取窗口的样式
+        return self.attributes["style"]
 
-        :return: 样式字符串
-        """
-        return self.window_attr["style"]
-
-    def _mouse_released(self, evt) -> None:
-        """
-        鼠标释放事件处理函数，将会触发mouse_release事件。
-
-        :return: None
-        """
+    def _mouse_released(self, event) -> None:
         from ..base.event import Event
         event = Event(
-            x=evt.x,
-            y=evt.y,
-            rootx=self.window_attr["mouse_rootx"],
-            rooty=self.window_attr["mouse_rooty"]
+            event_type="mouse_released",
+            x=event.x,
+            y=event.y,
+            rootx=self.mouse_rootx,
+            rooty=self.mouse_rooty
         )
-        for visual in self.visuals:
-            if visual.is_mouse_pressed:
-                visual.event_generate("mouse_released", event)
-                visual.is_mouse_pressed = False
+        for widget in self.children:
+            if widget.is_mouse_pressed:
+                widget.event_generate("mouse_released", event)
+                widget.is_mouse_pressed = False
         return None
 
     def focus_get(self):
-        return self.window_attr["focus_visual"]
+        return self.focus_widget
 
-    def focus_set(self, visual):
-        self.window_attr["focus_visual"] = visual
+    def focus_set(self, widget):
+        self.focus_widget = widget
