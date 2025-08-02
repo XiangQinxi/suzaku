@@ -26,7 +26,8 @@
       "bg": [0, 0, 0, 40],
       "fg": [0, 0, 0, 235],
       "bd": [25, 125, 225, 235],
-      "width": 2
+      "width": 2,
+      "bd_shadow": true
     },
     "focus": {
       "bg": [0, 0, 0, 20],
@@ -55,13 +56,15 @@
       "bg": [195, 45, 30, 255],
       "fg": [255, 255, 255, 235],
       "bd": "transparent",
-      "width": 0
+      "width": 0,
+      "bd_shadow": true
     },
     "pressed": {
       "bg": [195, 45, 30, 185],
       "fg": [255, 255, 255, 235],
       "bd": "transparent",
-      "width": 0
+      "width": 0,
+      "bd_shadow": true
     }
   },
 
@@ -71,13 +74,16 @@
       "bg": [0, 0, 0, 10],
       "fg": [0, 0, 0, 235],
       "bd": [0, 0, 0, 10],
-      "width": 2
+      "width": 2,
+      "placeholder": [0, 0, 0, 165]
     },
     "hover": {
       "bg": [0, 0, 0, 30],
       "fg": [0, 0, 0, 235],
       "bd": [25, 125, 225, 235],
-      "width": 2
+      "width": 2,
+      "bd_shadow": true,
+      "placeholder": [0, 0, 0, 165]
     },
     "focus": {
       "bg": [0, 0, 0, 15],

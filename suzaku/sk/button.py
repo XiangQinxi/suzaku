@@ -124,13 +124,19 @@ class SkButton(SkVisual):
         # 绘制边框
         rect_paint.setStyle(skia.Paint.kStroke_Style)
 
-        rect_paint.setColor(color(sheets["bd"]))
+        # 绘制阴影
+        if "bd_shadow" in sheets:
+            if "bd_shadw":
+                from .packs import set_drop_shadow
+                set_drop_shadow(rect_paint, color(sheets["bd"]))
 
+        # Rainbow Border Effect
         if "bd_shader" in sheets:
             if sheets["bd_shader"] == "rainbow":
                 from .packs import set_rainbow_shader
                 set_rainbow_shader(rect_paint, rect)
 
+        rect_paint.setColor(color(sheets["bd"]))
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
 

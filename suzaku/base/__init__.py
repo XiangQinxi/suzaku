@@ -3,4 +3,5 @@
 
 from .application import Application
 from .event import Event, EventHanding
+from .var import Var, StringVar, IntVar, FloatVar, BooleanVar
 from .window import Window

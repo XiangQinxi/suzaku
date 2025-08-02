@@ -13,7 +13,7 @@ class SkWindow(Window):
         """
         super().__init__(*args, **kwargs)
 
-        from ..themes import theme
+        from suzaku.style.themes import theme
 
         self.theme = theme
         self.theme.use_theme(themename)
@@ -34,7 +34,11 @@ class SkWindow(Window):
         self.bind("focus_out", self._leave)
         self.bind("mouse_leave", self._leave)
 
-        self.bind("key_pressed", self._key_pressed)
+        self.bind("char", self._char)
+
+        self.bind("key_press", self._key_pressed)
+        self.bind("key_repeat", self._key_repect)
+        self.bind("key_release", self._key_release)
 
         self.bind("update", self._update)
 
@@ -48,7 +52,20 @@ class SkWindow(Window):
     def _key_pressed(self, evt):
         #print(self.cget("focus_visual"))
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_pressed", evt)
+            self.focus_get().event_generate("key_press", evt)
+
+    def _key_repect(self, evt):
+        if self.focus_get() is not self:
+            self.focus_get().event_generate("key_repeat", evt)
+
+    def _key_release(self, evt):
+        if self.focus_get() is not self:
+            self.focus_get().event_generate("key_release", evt)
+
+    def _char(self, evt):
+        #print(12)
+        if self.focus_get() is not self:
+            self.focus_get().event_generate("char", evt)
 
     def _leave(self, evt):
         from ..base.event import Event

@@ -2,7 +2,10 @@ from .visual import SkVisual
 
 
 class SkLabel(SkVisual):
-    def __init__(self, *args, text: str = "SkLabel", style="SkLabel", **kwargs) -> None:
+
+    from ..base.var import Var
+
+    def __init__(self, *args, text: str = "SkLabel", style="SkLabel", textvariable: Var = None, **kwargs) -> None:
         """
         初始化标签
 
@@ -12,7 +15,16 @@ class SkLabel(SkVisual):
         """
         super().__init__(*args, style=style, name="sk_visual", **kwargs)
 
-        self.visual_attr["text"] = text
+        if textvariable is not None:
+            self.visual_attr["text"] = textvariable.get()
+            textvariable.bind("change", self._textvariable)
+        else:
+            self.visual_attr["text"] = text
+        self.visual_attr["textvariable"] = textvariable
+        self.bind("textvariable", self._textvariable)
+
+    def _textvariable(self, evt):
+        self.visual_attr["text"] = self.visual_attr["textvariable"].get()
 
     def draw(self, canvas, rect) -> None:
         """
@@ -30,7 +42,6 @@ class SkLabel(SkVisual):
         )
 
         canvas.drawRect(rect, rect_paint)
-
 
         from .packs import central_text
 

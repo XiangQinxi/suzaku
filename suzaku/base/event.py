@@ -123,7 +123,7 @@ class Event:
     用于传递事件的参数。
     """
 
-    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: str = None, mods: str = None):
+    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: int = None, keyname: str = None, mods: str = None, char: str = None):
         """
         Used to pass event via arguments.
 
@@ -166,4 +166,6 @@ class Event:
         self.rootx = rootx
         self.rooty = rooty
         self.key = key
+        self.keyname = keyname
         self.mods = mods
+        self.char = char

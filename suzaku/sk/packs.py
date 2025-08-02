@@ -44,7 +44,13 @@ def set_rainbow_shader(rect_paint, rect):
                 skia.ColorCYAN,
                 skia.ColorMAGENTA,
                 skia.ColorYELLOW,
-                skia.ColorCYAN
+                skia.ColorCYAN,
             ]
         )
+    )
+
+def set_drop_shadow(rect_paint, color):
+    import skia
+    rect_paint.setImageFilter(
+        skia.ImageFilters.DropShadow(dx=2, dy=2, sigmaX=4, sigmaY=4, color=color)
     )

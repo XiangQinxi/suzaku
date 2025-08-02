@@ -9,21 +9,28 @@ Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 > Evaluate out current achievements by downloading this project whilt it is still under development.
 > 
 > 您可以下载正在开发的版本来进行评估。
+> 
 
 ---
 
 ## Basic Example / 简单示例
 
-![v0.0.1a1.png (This image is stored on external site. If failed to load then check the URL.)](https://youke1.picui.cn/s1/2025/07/29/68888666134bf.png)
+```bash
+python3 -m suzaku
+```
+![0.0.2a1.png](https://youke1.picui.cn/s1/2025/08/02/688dd38fc1d9a.png)
+
+Minimal Exanple / 最小示例
+
+![mini.png](https://youke1.picui.cn/s1/2025/08/02/688dd41f6d338.png)
 
 ```python
 from suzaku import *
 
-app = SkApp()
-window = SkWindow()
+root = Sk()
 btn = SkButton(window, text="Hello World")
 btn.place(10, 10)
-app.run()
+root.mainloop()
 ```
 
 ## How it Works / 原理

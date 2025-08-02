@@ -50,15 +50,21 @@ class Window(EventHanding):
             "closed": [],
             "move": [],
             "update": [],
+
             "mouse_motion": [],
             "mouse_pressed": [],
             "mouse_released": [],
             "mouse_enter": [],
             "mouse_leave": [],
-            "key_pressed": [],
-            "key_released": [],
+
+            "key_press": [],
+            "key_release": [],
+            "key_repeat": [],
+            "char": [],
+
             "focus_in": [],
             "focus_out": [],
+
             "resize": [],
         }
 
@@ -134,7 +140,22 @@ class Window(EventHanding):
             if 'context' in locals():
                 context.releaseResourcesAndAbandonContext()
 
-    def _on_key(self, window, key, scancode, action, mods):
+    def _on_char(self, window, char) -> None:
+        """
+        触发字符事件
+
+        Args:
+            window: GLFW窗口
+            char: 字符
+
+        Returns:
+            None
+        """
+        from .event import Event
+        evt = Event(char=chr(char))
+        self.event_generate("char", evt)
+
+    def _on_key(self, window, key, scancode, action, mods) -> None:
         """
         触发键盘事件
 
@@ -151,31 +172,37 @@ class Window(EventHanding):
         from glfw import PRESS, RELEASE, REPEAT, MOD_CONTROL, MOD_ALT, MOD_SHIFT, MOD_SUPER, MOD_NUM_LOCK, MOD_CAPS_LOCK
         from .event import Event
         from glfw import get_key_name
-        keyname: str = get_key_name(key, scancode)
 
+        keyname: str = get_key_name(key, scancode)  # 获取对应的键名，不同平台scancode不同，因此需要输入scancode来正确转换。有些按键不具备键名
         mods_dict = {
             MOD_CONTROL: "control",
             MOD_ALT: "alt",
             MOD_SHIFT: "shift",
             MOD_SUPER: "super",
             MOD_NUM_LOCK: "num_lock",
-            MOD_CAPS_LOCK: "caps_qlock",
+            MOD_CAPS_LOCK: "caps_lock",
         }
 
-        if keyname:
+        try:
             if mods:
                 m = mods_dict[mods]
             else:
                 m = "none"
-            evt = Event(key=keyname, mods=m)
-            if action == PRESS:
-                self.event_generate("key_pressed", evt)
-            elif action == RELEASE:
-                self.event_generate("key_released", evt)
-            elif action == REPEAT:
-                self.event_generate("key_repeated", evt)
+        except KeyError:
+            m = "none"
 
-    def _on_focus(self, window, focused):
+        evt = Event(key=key, keyname=keyname, mods=m)
+
+        # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
+
+        if action == PRESS:
+            self.event_generate("key_press", evt)
+        elif action == RELEASE:
+            self.event_generate("key_release", evt)
+        elif action == REPEAT:
+            self.event_generate("key_repeat", evt)
+
+    def _on_focus(self, window, focused) -> None:
         from .event import Event
         evt = Event()
         if focused:
@@ -727,5 +754,6 @@ class Window(EventHanding):
         glfw.set_window_pos_callback(window, self._on_window_pos)
         glfw.set_window_focus_callback(window, self._on_focus)
         glfw.set_key_callback(window, self._on_key)
+        glfw.set_char_callback(window, self._on_char)
 
 

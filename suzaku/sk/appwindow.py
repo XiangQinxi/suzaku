@@ -22,6 +22,8 @@ class SkAppWindow(SkWindow):
         """
         self.app.run(*args, **kwargs)
 
+    mainloop = run  # 别名
+
     def quit(self, *args, **kwargs) -> None:
         """
         Exit application.

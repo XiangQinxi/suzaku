@@ -12,7 +12,7 @@ class SkVisual(Layout, EventHanding):
 
     from skia import Canvas, Rect
 
-    from ..themes import theme
+    from suzaku.style.themes import theme
 
     theme = theme
 
@@ -72,11 +72,16 @@ class SkVisual(Layout, EventHanding):
             "mouse_released": [],
             "focus_in": [],
             "focus_out": [],
-            "key_pressed": [],
-            "key_released": [],
+            "key_press": [],
+            "key_release": [],
+            "key_repeat": [],
+            "char": [],
         }
 
-        self.winfo_parent().add(self)
+        try:
+            self.winfo_parent().add(self)
+        except AttributeError:
+            raise AttributeError("Parent component is not SkWindow or SkVisual.")
 
         self.is_mouse_enter = False
         self.is_mouse_pressed = False
