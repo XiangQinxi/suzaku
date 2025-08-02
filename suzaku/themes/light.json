@@ -10,7 +10,7 @@
     "radius": 99,
     "bg": [5, 105, 200, 255],
     "fg": [255, 255, 255, 235],
-    "border": "transparent",
+    "bd": "transparent",
     "width": 0
   },
 
@@ -19,25 +19,26 @@
     "rest": {
       "bg": [0, 0, 0, 20],
       "fg": [0, 0, 0, 235],
-      "border": [0, 0, 0, 10],
+      "bd": [0, 0, 0, 10],
       "width": 2
     },
     "hover": {
       "bg": [0, 0, 0, 40],
       "fg": [0, 0, 0, 235],
-      "border": [25, 125, 225, 235],
+      "bd": [25, 125, 225, 235],
       "width": 2
     },
     "focus": {
       "bg": [0, 0, 0, 20],
       "fg": [0, 0, 0, 235],
-      "border": [0, 0, 0, 200],
-      "width": 2
+      "bd": [0, 0, 0, 150],
+      "width": 3,
+      "bd_shader": "rainbow"
     },
     "pressed": {
       "bg": [0, 0, 0, 60],
       "fg": [0, 0, 0, 155],
-      "border": [0, 0, 0, 10],
+      "bd": [0, 0, 0, 10],
       "width": 3
     }
   },
@@ -47,19 +48,19 @@
     "rest": {
       "bg": "transparent",
       "fg": [0, 0, 0, 235],
-      "border": "transparent",
+      "bd": "transparent",
       "width": 0
     },
     "hover": {
       "bg": [195, 45, 30, 255],
       "fg": [255, 255, 255, 235],
-      "border": "transparent",
+      "bd": "transparent",
       "width": 0
     },
     "pressed": {
       "bg": [195, 45, 30, 185],
       "fg": [255, 255, 255, 235],
-      "border": "transparent",
+      "bd": "transparent",
       "width": 0
     }
   },
@@ -69,20 +70,21 @@
     "rest": {
       "bg": [0, 0, 0, 10],
       "fg": [0, 0, 0, 235],
-      "border": [0, 0, 0, 10],
+      "bd": [0, 0, 0, 10],
       "width": 2
     },
     "hover": {
       "bg": [0, 0, 0, 30],
       "fg": [0, 0, 0, 235],
-      "border": [0, 0, 0, 20],
+      "bd": [25, 125, 225, 235],
       "width": 2
     },
     "focus": {
       "bg": [0, 0, 0, 15],
       "fg": [0, 0, 0, 235],
-      "border": [25, 125, 225, 235],
-      "width": 2
+      "bd": [25, 125, 225, 235],
+      "width": 2,
+      "bd_shader": "rainbow"
     }
   },
 

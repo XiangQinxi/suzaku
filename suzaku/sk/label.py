@@ -10,9 +10,9 @@ class SkLabel(SkVisual):
         :param text: 标签文本
         :param kwargs: SkVisual参数
         """
-        super().__init__(*args, style=style, **kwargs)
+        super().__init__(*args, style=style, name="sk_visual", **kwargs)
+
         self.visual_attr["text"] = text
-        self.visual_attr["name"] = "sk_label"
 
     def draw(self, canvas, rect) -> None:
         """
@@ -31,19 +31,8 @@ class SkLabel(SkVisual):
 
         canvas.drawRect(rect, rect_paint)
 
-        text_paint = skia.Paint(
-            AntiAlias=True,
-            Color=color(self.theme.get_theme()[self.winfo_style()]["fg"])
-        )
 
-        from ..base.font import default_font
+        from .packs import central_text
 
-        font = default_font()
+        central_text(canvas, self.cget("text"), color(self.theme.get_theme()[self.winfo_style()]["fg"]), self.winfo_x(), self.winfo_y(), self.winfo_width(), self.winfo_height())
 
-        text_width = font.measureText(self.visual_attr["text"])
-        metrics = font.getMetrics()
-
-        draw_x = self.winfo_x() + self.winfo_width() / 2 - text_width / 2
-        draw_y = self.winfo_y() + self.winfo_height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
-
-        canvas.drawSimpleText(self.visual_attr["text"], draw_x, draw_y, font, text_paint)

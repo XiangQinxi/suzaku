@@ -2,7 +2,7 @@ from .visual import SkVisual
 
 class SkBadge(SkVisual):
     def __init__(self, *args, text: str = "SkBadge", style = "SkBadge", **kwargs) -> None:
-        super().__init__(*args, style=style, **kwargs)
+        super().__init__(*args, style=style, name="sk_badge", **kwargs)
 
         self.visual_attr["text"] = text
         self.visual_attr["name"] = "sk_badge"
@@ -35,7 +35,7 @@ class SkBadge(SkVisual):
             Color=color(theme["fg"])
         )
 
-        from ..base.font import default_font
+        from suzaku.style.font import default_font
         font = default_font()
 
         # canvas.drawTextBlob(text, self.winfo_x(), self.winfo_y()+self.winfo_height()/2, paint2)

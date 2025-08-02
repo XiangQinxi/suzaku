@@ -3,5 +3,4 @@
 
 from .application import Application
 from .event import Event, EventHanding
-from .font import Font, default_font, font
 from .window import Window

@@ -16,7 +16,7 @@ class SkVisual(Layout, EventHanding):
 
     theme = theme
 
-    def __init__(self, parent: Union[SkWindow, "SkVisual"], size: tuple[int, int]=(100, 30), style="", id: str = None) -> None:
+    def __init__(self, parent: Union[SkWindow, "SkVisual"], size: tuple[int, int]=(100, 30), style="", id: str = None, name="sk_visual") -> None:
 
         """
         Basic visual component, telling SkWindow how to draw.
@@ -49,7 +49,7 @@ class SkVisual(Layout, EventHanding):
 
         self.visual_attr = {
             "parent": parent,
-            "name": "sk_visual",
+            "name": name,
             "cursor": "arrow",
             "x": -999,
             "y": -999,
@@ -58,9 +58,11 @@ class SkVisual(Layout, EventHanding):
             "width": size[0],
             "height": size[1],
             "style": style,
-            "id": str(id) or ("sk_visual." + str(self.get_instance_count())),
             "visible": False,
         }
+
+        if not id:
+            self.visual_attr["id"] = name + "." + str(self.get_instance_count())
 
         self.evts = {
             "mouse_motion": [],

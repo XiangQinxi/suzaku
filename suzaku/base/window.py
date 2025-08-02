@@ -148,13 +148,32 @@ class Window(EventHanding):
         Returns:
 
         """
-        from glfw import PRESS, RELEASE
+        from glfw import PRESS, RELEASE, REPEAT, MOD_CONTROL, MOD_ALT, MOD_SHIFT, MOD_SUPER, MOD_NUM_LOCK, MOD_CAPS_LOCK
         from .event import Event
-        evt = Event(key=key)
-        if action == PRESS:
-            self.event_generate("key_pressed", evt)
-        elif action == RELEASE:
-            self.event_generate("key_released", evt)
+        from glfw import get_key_name
+        keyname: str = get_key_name(key, scancode)
+
+        mods_dict = {
+            MOD_CONTROL: "control",
+            MOD_ALT: "alt",
+            MOD_SHIFT: "shift",
+            MOD_SUPER: "super",
+            MOD_NUM_LOCK: "num_lock",
+            MOD_CAPS_LOCK: "caps_qlock",
+        }
+
+        if keyname:
+            if mods:
+                m = mods_dict[mods]
+            else:
+                m = "none"
+            evt = Event(key=keyname, mods=m)
+            if action == PRESS:
+                self.event_generate("key_pressed", evt)
+            elif action == RELEASE:
+                self.event_generate("key_released", evt)
+            elif action == REPEAT:
+                self.event_generate("key_repeated", evt)
 
     def _on_focus(self, window, focused):
         from .event import Event

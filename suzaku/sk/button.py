@@ -1,8 +1,6 @@
 from .visual import SkVisual
 
 from typing import Union
-from typing import Any
-
 
 class SkButton(SkVisual):
 
@@ -57,10 +55,9 @@ class SkButton(SkVisual):
             None
         """
 
-        super().__init__(*args, size=size, style=style, **kwargs)
+        super().__init__(*args, size=size, style=style, name="sk_button", **kwargs)
 
         self.evts["click"] = []
-        self.visual_attr["name"] = "sk_button"
         self.visual_attr["text"] = text
 
         self.visual_attr["cursor"] = cursor
@@ -96,11 +93,6 @@ class SkButton(SkVisual):
         :param rect: 给出的矩形
         :return:
         """
-        import skia
-        rect_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStrokeAndFill_Style,
-        )
 
         from ..style.color import color
 
@@ -116,31 +108,34 @@ class SkButton(SkVisual):
                 sheets = self.theme.get_theme()[self.winfo_style()]["rest"]
 
         radius = self.theme.get_theme()[self.winfo_style()]["radius"]
+
+        # 绘制背景
+        import skia
+        rect_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStrokeAndFill_Style,
+        )
+
         rect_paint.setColor(color(sheets["bg"]))
         rect_paint.setStrokeWidth(sheets["width"])
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
+        # 绘制边框
         rect_paint.setStyle(skia.Paint.kStroke_Style)
-        rect_paint.setColor(color(sheets["border"]))
+
+        rect_paint.setColor(color(sheets["bd"]))
+
+        if "bd_shader" in sheets:
+            if sheets["bd_shader"] == "rainbow":
+                from .packs import set_rainbow_shader
+                set_rainbow_shader(rect_paint, rect)
+
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
-        text_paint = skia.Paint(
-            AntiAlias=True,
-            Color=color(sheets["fg"])
-        )
+        # 绘制文本
+        from .packs import central_text
 
-        from ..base.font import default_font
-        font = default_font()
+        central_text(canvas, self.cget("text"), color(sheets["fg"]), self.winfo_x(), self.winfo_y(), self.winfo_width(), self.winfo_height())
 
-        #canvas.drawTextBlob(text, self.winfo_x(), self.winfo_y()+self.winfo_height()/2, paint2)
-
-        # 计算位置，绘制文本居中
-        text_width = font.measureText(self.visual_attr["text"])
-        metrics = font.getMetrics()
-
-        draw_x = self.winfo_x() + self.winfo_width() / 2 - text_width / 2
-        draw_y = self.winfo_y() + self.winfo_height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
-
-        canvas.drawSimpleText(self.visual_attr["text"], draw_x, draw_y, font, text_paint)

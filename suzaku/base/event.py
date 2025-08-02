@@ -123,7 +123,7 @@ class Event:
     用于传递事件的参数。
     """
 
-    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: int = None):
+    def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: str = None, mods: str = None):
         """
         Used to pass event via arguments.
 
@@ -150,9 +150,20 @@ class Event:
 
                 鼠标的/组件的y坐标(相对于荧幕)。
 
+            key:
+                Key name.
+
+                按键名称。
+
+            mods:
+                Modifier keys.
+
+                修饰键。
+
         """
         self.x = x
         self.y = y
         self.rootx = rootx
         self.rooty = rooty
         self.key = key
+        self.mods = mods

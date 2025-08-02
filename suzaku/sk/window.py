@@ -36,8 +36,14 @@ class SkWindow(Window):
 
         self.bind("key_pressed", self._key_pressed)
 
+        self.bind("update", self._update)
+
         #self.bind("window_mouse_enter", self._motion, add=True)
         #self.bind("window_mouse_leave", self._motion, add=True)
+
+    def _update(self):
+        for visual in self.visuals:
+            visual.event_generate("update")
 
     def _key_pressed(self, evt):
         #print(self.cget("focus_visual"))
@@ -66,7 +72,7 @@ class SkWindow(Window):
             if (visual.winfo_x() <= event.x <= visual.winfo_x() + visual.winfo_width() and
                     visual.winfo_y() <= event.y <= visual.winfo_y() + visual.winfo_height()):
                 visual.focus_set()
-                print(visual)
+                #print(visual)
                 visual.event_generate("mouse_pressed", event)
                 break
 
