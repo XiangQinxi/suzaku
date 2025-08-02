@@ -3,27 +3,23 @@ from .widget import SkWidget
 
 class SkEmpty(SkWidget):
     """
-    空元素
-    仅作布局中占位使用
+    Empty element, used only as a placeholder in layouts.
     """
 
     def __init__(self, *args, size=(0, 0), **kwargs) -> None:
-        """
-        初始化
+        """Initialize empty element.
 
-        :param args: SkVisual参数
-        :param size: 默认大小
-        :param kwargs: SkVisual参数
+        * *args: SkVisual arguments
+        * size: Default size
+        * **kwargs: SkVisual arguments
         """
         super().__init__(*args, size=size, **kwargs)
         self.visual_attr["name"] = "sk_empty"
 
     def draw(self, canvas, rect) -> None:
-        """
-        绘制方法，不执行任何绘制操作
+        """Draw method, does nothing.
 
-        :param canvas: 传入的skia.Surface
-        :param rect: 给出的矩形
-        :return: None
+        * canvas: skia.Surface to draw on
+        * rect: Rectangle to draw in
         """
         pass

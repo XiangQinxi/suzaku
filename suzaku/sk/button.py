@@ -1,63 +1,29 @@
-from .widget import SkWidget
+from .visual import SkVisual
 
 from typing import Union
 
-class SkButton(SkWidget):
+class SkButton(SkVisual):
 
     def __init__(self, *args, text: str = "SkButton", size: tuple[int, int] = (105, 35),
                  cursor: Union[str, None] = "hand", style="SkButton",
                  command: Union[callable, None] = None, id: Union[str, None] = None, **kwargs) -> None:
+        """Button Component.
 
-        """
-        Button Component.
+        **Will be re-written in future.**
 
-        按钮组件。
-
-        **Will be re-written in future. 将被重写。**
-
-        Args:
-            *args:
-                Passed to `SkWidget`.
-
-                `SkWidget`参数。
-
-            text (str):
-                Button text.
-
-                标签文本。
-
-            size (tuple[int, int]):
-                Default size.
-
-                默认大小。
-
-            cursor (str | None):
-                Cursor style when floating.
-
-                鼠标放上去的光标样式。
-
-            command (function | None):
-                Function to run when clicked
-
-                触发点击按钮时，执行的函数（无回调）。
-
-            id (str | None):
-                Identification code (Optional).
-
-                可选ID标识码
-
-            **kwargs:
-                Passed to `SkWidget`
-
-                `SkWidget`参数。
-
-        Returns:
-            None
+        * *args: Passed to SkVisual
+        * text: Button text
+        * size: Default size
+        * cursor: Cursor style when hovering
+        * style: Style name
+        * command: Function to run when clicked
+        * id: Identification code (optional)
+        * **kwargs: Passed to SkVisual
         """
 
         super().__init__(*args, size=size, style=style, name="sk_button", **kwargs)
 
-        self.events["click"] = []
+        self.evts["click"] = []
         self.visual_attr["text"] = text
 
         self.visual_attr["cursor"] = cursor
@@ -75,8 +41,7 @@ class SkButton(SkWidget):
         self.bind("mouse_released", self._click)
 
     def _click(self, evt) -> None:
-        """
-        Check click event (not pressed).
+        """Check click event (not pressed).
 
         判断点击事件，而非按下事件。
 
@@ -86,12 +51,10 @@ class SkButton(SkWidget):
             self.event_generate("click", evt)
 
     def draw(self, canvas, rect) -> None:
-        """
-        绘制按钮方法。
+        """Draw button.
 
-        :param canvas: 传入的skia.Surface
-        :param rect: 给出的矩形
-        :return:
+        * canvas: skia.Surface to draw on
+        * rect: Rectangle to draw in
         """
 
         from ..style.color import color
