@@ -10,15 +10,16 @@ class SkEntry(SkVisual):
     from ..base.var import Var
 
     def __init__(self, *args, placeholder: str = "", size=(105, 35), cursor="ibeam", style="SkEntry", id=None, textvariable: Var = None, **kwargs) -> None:
+        """Entry box component.
 
-        """
-        :param args: SkVisual参数
-        :param placeholder: 占位的提示文本
-        :param size: 默认大小
-        :param cursor: 鼠标放上去的光标样式
-        :param id: 可选ID标识码
-        :param textvariable: 可选的变量，用于绑定文本内容
-        :param kwargs: SkVisual参数
+        * *args: SkVisual arguments
+        * placeholder: Placeholder text
+        * size: Default size
+        * cursor: Cursor style when hovering
+        * style: Style name
+        * id: Optional ID code
+        * textvariable: Optional variable for binding text content
+        * **kwargs: SkVisual arguments
         """
 
         super().__init__(*args, size=size, style=style, name="sk_entry", id=id, **kwargs)
@@ -102,9 +103,7 @@ class SkEntry(SkVisual):
         self._update_scroll_offset()
 
     def _on_focus(self, evt=None):
-        """
-        处理焦点获得事件，重置显示状态
-        """
+        """Handle focus in event and reset display state."""
         # 重置滚动偏移
         self.visual_attr["scroll_offset"] = 0
         # 重置光标位置到文本开头

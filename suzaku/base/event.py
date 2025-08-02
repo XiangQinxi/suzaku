@@ -5,49 +5,21 @@ from typing import Union, Any
 
 class EventHanding(After):
 
-    """
-    Event binding manager.
-
-    事件绑定管理器。
-
-    """
+    """Event binding manager."""
 
     def __init__(self):
 
-        """
-        Initialize all bindable events.
-
-        初始化所有可绑定的事件。
-
-        """
+        """Initialize all bindable events."""
 
         self.evts = {}
 
     def event_generate(self, name: str, *args, **kwargs) -> Union[bool, Any]:
-        """
-        Send event signal.
+        """Send event signal.
 
-        发出事件信号。
-
-        Args:
-            name (str): 
-                Event name, create if not existed.
-
-                事件名称，没有则创建。
-
-            *args: 
-                Passed to `evt`.
-
-                传参。
-
-            **kwargs: 
-                Passed to `evt`.
-
-                传参。
-
-        Returns:
-            function_return (Any): Return value from the function, or False for failed. 函数返回值，出错则False。
-
+        * name: Event name, create if not existed
+        * *args: Passed to `evt`
+        * **kwargs: Passed to `evt`
+        * return: Return value from the function, or False for failed
         """
 
         if not name in self.evts:
@@ -58,30 +30,11 @@ class EventHanding(After):
 
 
     def bind(self, name: str, func: callable, add: bool=True) -> "EventHanding":
-        """
-        Bind event.
+        """Bind event.
 
-        绑定事件。
-
-        Args:
-            name (str): 
-                Event name, create if not existed.
-
-                事件名称，没有则创建。
-
-            func (callable): 
-                Function to bind.
-                
-                绑定函数。
-
-            add (bool): 
-                Whether to add after existed events, otherwise clean other and add itself.
-
-                是否在绑定的事件后添加，而不是清除其他事件只保留自己。
-
-        Returns:
-            self
-
+        * name: Event name, create if not existed.
+        * func: Function to bind.
+        * add: If do append, otherwise replace.
         """
         if name not in self.evts:
             self.evts[name] = [func]
@@ -92,74 +45,29 @@ class EventHanding(After):
         return self
 
     def unbind(self, name: str, func: callable) -> None:
-        """
-        Unbind event.
+        """Unbind event.
 
-        解绑事件。
-
-        -> 后续事件将以ID作为识别码来解绑
-
-        Args:
-            name (str): 
-                Name of the event.
-                
-                事件名称。
-
-            func (callable): 
-                Function to unbind.
-                
-                要解绑函数。
-        Returns:
-            None
+        * name: Event name
+        * func: Function to unbind
         """
         self.evts[name].remove(func)
 
 
 class Event:
 
-    """
-    Used to pass event via arguments.
-
-    用于传递事件的参数。
-    """
+    """Used to pass event via arguments."""
 
     def __init__(self, x: int = None, y: int = None, rootx: int = None, rooty: int = None, key: int = None, keyname: str = None, mods: str = None, char: str = None):
-        """
-        Used to pass event via arguments.
+        """Used to pass event via arguments.
 
-        用于传递事件的参数。
-
-        Args:
-            x: 
-                x position of cursor / component (Relative to window).
-
-                鼠标的/组件的x坐标(相对于窗口)。
-
-            y: 
-                y position of cursor / component (Relative to window).
-
-                鼠标的/组件的y坐标(相对于窗口)。
-
-            rootx: 
-                x position of cursor / component (Relative to screen).
-
-                鼠标的/组件的x坐标(相对于荧幕)。
-
-            rooty: 
-                y position of cursor / component (Relative to screen).
-
-                鼠标的/组件的y坐标(相对于荧幕)。
-
-            key:
-                Key name.
-
-                按键名称。
-
-            mods:
-                Modifier keys.
-
-                修饰键。
-
+        * x: x position of cursor / component (Relative to window)
+        * y: y position of cursor / component (Relative to window)
+        * rootx: x position of cursor / component (Relative to screen)
+        * rooty: y position of cursor / component (Relative to screen)
+        * key: Key name
+        * keyname: Key name string
+        * mods: Modifier keys
+        * char: Character
         """
         self.x = x
         self.y = y

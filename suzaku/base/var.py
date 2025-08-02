@@ -3,11 +3,9 @@ from .event import EventHanding
 
 class Var(EventHanding):
     def __init__(self, default_value, typ: type = any):
-        """
-        存储、共享数值。
+        """Store and share values.
 
-        Args:
-            default_value: 初始值
+        * default_value: Initial value
         """
 
         super().__init__()
@@ -18,14 +16,9 @@ class Var(EventHanding):
         self.type = typ
 
     def set(self, value: any) -> None:
-        """
-        设置值，并创建change事件。
+        """Set the value and generate a 'change' event.
 
-        Args:
-            value: 新值
-
-        Returns:
-
+        * value: New value
         """
         if not type(value) is self.type:
             raise ValueError(f"Value must be {self.type}")
@@ -34,12 +27,7 @@ class Var(EventHanding):
         return None
 
     def get(self) -> any:
-        """
-        获取值。
-
-        Returns:
-            any: 值
-        """
+        """Get the value."""
         return self.value
 
 

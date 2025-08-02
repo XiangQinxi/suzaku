@@ -1,7 +1,7 @@
 class Application:
 
     """
-    应用程序
+    Application
     """
 
     _instance = None
@@ -23,29 +23,13 @@ class Application:
     # 这里用这个可以使`Window`的初始化更加简单，可以不选择填`parent=App`
     @classmethod
     def get_instance(self) -> int:
-        """
-        Get instance count.
-
-        获取实例的数量。
-
-        Returns:
-            self._instance (int): 实例数量
-        """
-
+        """Get instance count."""
         if self._instance is None:
             raise RuntimeError("App not initialized")
         return self._instance
 
     def init_glfw(self) -> None:
-        """
-        Initialize GLFW module.
-
-        初始化glfw库。
-
-        Returns:
-            None
-        """
-
+        """Initialize GLFW module."""
         import glfw
         if not glfw.init():
             raise RuntimeError('glfw.init() failed')
@@ -55,20 +39,11 @@ class Application:
     from .window import Window
 
     def add_window(self, window: Window) -> "Application":
+        """Add a window.
+
+        * `window`: The window
         """
-        Add a window.
 
-        添加窗口。
-
-        Args:
-            window (Window): 
-                The window.
-
-                窗口
-
-        Returns:
-            self
-        """
         self.windows.append(window)
         # 将窗口的GLFW初始化委托给Application
         window.set_application(self)
@@ -113,14 +88,7 @@ class Application:
         self.cleanup()
 
     def cleanup(self) -> None:
-        """
-        Clean up resources.
-
-        清理资源。
-
-        Returns:
-            None
-        """
+        """Clean up resources."""
         import glfw
         for window in self.windows:
             glfw.destroy_window(window.winfo_glfw_window())
@@ -128,13 +96,6 @@ class Application:
         self.running = False
 
     def quit(self) -> None:
-        """
-        Quit application.
-
-        退出应用程序。
-
-        Returns:
-            None
-        """
+        """Quit application."""
         self.running = False
         self.running = False
