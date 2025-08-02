@@ -1,7 +1,7 @@
-from .visual import SkVisual
+from .widget import SkWidget
 
 
-class SkLabel(SkVisual):
+class SkLabel(SkWidget):
 
     from ..base.var import Var
 

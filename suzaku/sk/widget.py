@@ -4,7 +4,7 @@ from ..base.event import EventHanding
 from typing import Union, Any
 
 
-class SkVisual(Layout, EventHanding):
+class SkWidget(Layout, EventHanding):
 
     _instance_count = 0
 
@@ -16,7 +16,7 @@ class SkVisual(Layout, EventHanding):
 
     theme = theme
 
-    def __init__(self, parent: Union[SkWindow, "SkVisual"], size: tuple[int, int]=(100, 30), style="", id: str = None, name="sk_visual") -> None:
+    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="", id: str = None, name="sk_visual") -> None:
 
         """
         Basic visual component, telling SkWindow how to draw.
@@ -45,7 +45,7 @@ class SkVisual(Layout, EventHanding):
 
         super().__init__()
 
-        SkVisual._instance_count += 1
+        SkWidget._instance_count += 1
 
         self.visual_attr = {
             "parent": parent,
@@ -81,7 +81,7 @@ class SkVisual(Layout, EventHanding):
         try:
             self.winfo_parent().add(self)
         except AttributeError:
-            raise AttributeError("Parent component is not SkWindow or SkVisual.")
+            raise AttributeError("Parent component is not SkWindow or SkWidget.")
 
         self.is_mouse_enter = False
         self.is_mouse_pressed = False
@@ -244,14 +244,14 @@ class SkVisual(Layout, EventHanding):
         """
         return self.visual_attr
 
-    def winfo_parent(self) -> Union[SkWindow, "SkVisual"]:
+    def winfo_parent(self) -> Union[SkWindow, "SkWidget"]:
         """
         Get parent component.
 
         获取组件父组件。
 
         Returns:
-            self.visual_attr["parent"] (SkWindow | SkVisual): Parent component. 父级控件。
+            self.visual_attr["parent"] (SkWindow | SkWidget): Parent component. 父级控件。
         """
         return self.visual_attr["parent"]
 
@@ -380,7 +380,7 @@ class SkVisual(Layout, EventHanding):
         :return: None
         """
         self.is_focus = True
-        if isinstance(self.winfo_master_window().window_attr["focus_visual"], SkVisual):
+        if isinstance(self.winfo_master_window().window_attr["focus_visual"], SkWidget):
             self.winfo_master_window().window_attr["focus_visual"].focus_forget()
         self.winfo_master_window().window_attr["focus_visual"] = self
         from ..base.event import Event

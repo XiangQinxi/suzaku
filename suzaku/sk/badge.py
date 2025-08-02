@@ -1,6 +1,6 @@
-from .visual import SkVisual
+from .widget import SkWidget
 
-class SkBadge(SkVisual):
+class SkBadge(SkWidget):
     def __init__(self, *args, text: str = "SkBadge", style = "SkBadge", **kwargs) -> None:
         super().__init__(*args, style=style, name="sk_badge", **kwargs)
 

@@ -1,7 +1,7 @@
-from .visual import SkVisual
+from .widget import SkWidget
 
 
-class SkEmpty(SkVisual):
+class SkEmpty(SkWidget):
     """
     空元素
     仅作布局中占位使用

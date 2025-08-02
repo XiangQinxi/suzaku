@@ -1,7 +1,7 @@
-from .visual import SkVisual
+from .widget import SkWidget
 
 
-class SkEntry(SkVisual):
+class SkEntry(SkWidget):
 
     """
     输入框组件

@@ -12,7 +12,7 @@ from .entry import SkEntry
 from .hynix import SkHynix
 from .label import SkLabel
 from .layout import Layout as SkLayout
-from .visual import SkVisual
+from .widget import SkWidget
 from .window import SkWindow
 from .hynix import SkHynix # Hello from rgzz666
 

@@ -1,8 +1,8 @@
-from .visual import SkVisual
+from .widget import SkWidget
 
 from typing import Union
 
-class SkButton(SkVisual):
+class SkButton(SkWidget):
 
     def __init__(self, *args, text: str = "SkButton", size: tuple[int, int] = (105, 35),
                  cursor: Union[str, None] = "hand", style="SkButton",
@@ -17,9 +17,9 @@ class SkButton(SkVisual):
 
         Args:
             *args:
-                Passed to `SkVisual`.
+                Passed to `SkWidget`.
 
-                `SkVisual`参数。
+                `SkWidget`参数。
 
             text (str):
                 Button text.
@@ -47,9 +47,9 @@ class SkButton(SkVisual):
                 可选ID标识码
 
             **kwargs:
-                Passed to `SkVisual`
+                Passed to `SkWidget`
 
-                `SkVisual`参数。
+                `SkWidget`参数。
 
         Returns:
             None

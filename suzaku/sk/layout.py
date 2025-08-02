@@ -5,7 +5,7 @@ class Boxes:
 
     from .window import SkWindow
 
-    def __init__(self, parent: Union[SkWindow, "SkVisual"], direction: str="h") -> None:
+    def __init__(self, parent: Union[SkWindow, "SkWidget"], direction: str="h") -> None:
 
         """
 
@@ -14,7 +14,7 @@ class Boxes:
         Box布局管理器。
 
         Args:
-            parent (SkWindow | SkVisual): 
+            parent (SkWindow | SkWidget):
                 Container that accepts the layout.
 
                 接受布局的容器。
@@ -29,14 +29,14 @@ class Boxes:
         self.children = []
         self.direction = direction
 
-    def add_child(self, child: "SkVisual", padx: int=5, pady: int=5, expand: bool=False) -> None:
+    def add_child(self, child: "SkWidget", padx: int=5, pady: int=5, expand: bool=False) -> None:
         """
         Add a component to the layout.
 
         添加组件至该布局。
 
         Args:
-            child (SkVisual): 
+            child (SkWidget):
                 Conponent.
 
                 组件。
@@ -365,14 +365,14 @@ class Puts:
 
     from .window import SkWindow
 
-    def __init__(self, parent: Union[SkWindow, "SkVisual"]) -> None:
+    def __init__(self, parent: Union[SkWindow, "SkWidget"]) -> None:
         """
         Rerlative layout manager.
 
         相对位置布局管理器。
 
         Args:
-            parent (SkWindow | SkVisual): 
+            parent (SkWindow | SkWidget):
                 Parent component
                 父组件
         
@@ -383,14 +383,14 @@ class Puts:
         self.parent = parent
         self.children = []
 
-    def add_child(self, child: "SkVisual", margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
+    def add_child(self, child: "SkWidget", margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
         """
         Add child component.
 
         添加组件。
 
         Args:
-            child (SkVisual): 
+            child (SkWidget):
                 The child component.
 
                 组件。
