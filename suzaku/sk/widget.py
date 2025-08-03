@@ -6,7 +6,7 @@ from .layout import Layout
 from ..base.event import EventHanding
 
 
-class SkWidget(Layout, EventHanding):
+class SkWidget(EventHanding):
 
     _instance_count = 0
 
@@ -144,7 +144,10 @@ class SkWidget(Layout, EventHanding):
         return None
 
     def _show(self):
-        self.attributes["visible"] = True
+        self.visible = True
+
+    def _hide(self):
+        self.visible = False
 
     def add_child(self, child: "SkWidget"):
         self.children.append(child)
@@ -177,3 +180,55 @@ class SkWidget(Layout, EventHanding):
 
     def focus_get(self):
         return self.parent.focus_get()
+
+    def place_configure(self, x: int, y: int, width: int = None, height: int = None):
+        """
+        Absolute positioning layout.
+
+        绝对位置布局。
+
+        Args:
+            x:
+                x position of the component.
+
+                组件的x坐标。
+
+            y:
+                y position of the component.
+
+                组件的y坐标。
+
+            width:
+                Width of the component, `dwidth` by default.
+
+                组件的宽度（不填则为`dwidth`）。
+
+            height:
+                Height of the component, `dheight` by default.
+
+                组件的高度（不填则为`dheight`）。
+
+        Returns:
+            None
+        """
+        self.parent.set_layout_name("place")
+
+        self.x = x
+        self.y = y
+        if width is not None:
+            self.width = width
+        if height is not None:
+            self.height = height
+        self._show()
+
+    place = place_configure
+
+    def place_forget(self) -> None:
+        """
+        Remove layout.
+        移除组件布局。
+
+        Returns:
+            None
+        """
+        self._hide()

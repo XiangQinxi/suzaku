@@ -5,9 +5,6 @@ app = SkAppWindow()
 app.title("Test")
 
 frame = SkFrame(app)
-frame.put(margin=(20, 20, 20, 20))
-
-frame2 = SkFrame(frame)
-frame2.put(margin=(20, 20, 20, 20))
+frame.place(x=100, y=100, width=200, height=200)
 
 app.run()

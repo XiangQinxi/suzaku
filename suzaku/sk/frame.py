@@ -1,8 +1,9 @@
 from .widget import SkWidget
+from .container import SkContainer
 from typing import Union
 
 
-class SkFrame(SkWidget):
+class SkFrame(SkWidget, SkContainer):
     def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame") -> None:
         super().__init__(parent, style=style)
 
