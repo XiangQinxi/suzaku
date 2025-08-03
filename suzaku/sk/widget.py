@@ -1,6 +1,7 @@
 from typing import Union, Any
+import skia
 
-from .theme import default_theme
+from .theme import default_theme, SkTheme
 from .window import SkWindow
 from .layout import Layout
 from ..base.event import EventHanding
@@ -126,33 +127,17 @@ class SkWidget(EventHanding):
     def remove_draw(self, draw_func) -> None:
         self.draws.remove(draw_func)
 
-    import skia
-
     def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         pass
 
-    def _draw(self, canvas: skia.Surfaces) -> None:
-        import skia
-        rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
-        self.draw(canvas, rect)  # Give draw() the canvas and the rect.
-
-        for i, f in enumerate(self.draws):
-            #print(i, f)
-            if self.children[i].visible:
-                f(canvas)
-
-        return None
-
-    def _show(self):
+    def show(self):
         self.visible = True
 
-    def _hide(self):
+    def hide(self):
         self.visible = False
 
     def add_child(self, child: "SkWidget"):
-        self.children.append(child)
-    
-    from .theme import SkTheme
+        self.attributes["children"].append(child)
 
     def apply_theme(self, new_theme: SkTheme):
         self.attributes["theme"] = new_theme
@@ -168,86 +153,30 @@ class SkWidget(EventHanding):
         """
         return self.attributes[attribute_name]
 
-    cget = get_attribute
-
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
 
-    configure = config = set_attribute
+    # def place_forget(self) -> None:
+    #     """
+    #     Remove layout.
+    #     移除组件布局。
 
-    def focus_set(self):
-        self.window.focus_widget = self
+    #     Returns:
+    #         None
+    #     """
+    #     self._hide()
 
-    def focus_get(self):
-        return self.parent.focus_get()
+    # def flow(self, padx=5, pady=5, align="left"):
+    #     self.set_parent_layout("flow")
 
-    def set_parent_layout(self, name):
-        if self.parent.layout_name != name and not self.parent.layout_name:
-            raise Exception(f"Layout name not match. Now layout is {self.parent.layout_name}!")
-        else:
-            self.parent.set_layout_name(name)
+    #     self.parent.add_child_with_layout(
+    #         {
+    #             "widget": self,
+    #             "padx": padx,
+    #             "pady": pady,
+    #             "align": align  # left/center/right
+    #         }
+    #     )
 
-    def place_configure(self, x: int, y: int, width: int = None, height: int = None):
-        """
-        Absolute positioning layout.
-
-        绝对位置布局。
-
-        Args:
-            x:
-                x position of the component.
-
-                组件的x坐标。
-
-            y:
-                y position of the component.
-
-                组件的y坐标。
-
-            width:
-                Width of the component, `dwidth` by default.
-
-                组件的宽度（不填则为`dwidth`）。
-
-            height:
-                Height of the component, `dheight` by default.
-
-                组件的高度（不填则为`dheight`）。
-
-        Returns:
-            None
-        """
-        self.set_parent_layout("place")
-
-        self.x = x
-        self.y = y
-        if width is not None:
-            self.width = width
-        if height is not None:
-            self.height = height
-        self._show()
-
-    place = place_configure
-
-    def place_forget(self) -> None:
-        """
-        Remove layout.
-        移除组件布局。
-
-        Returns:
-            None
-        """
-        self._hide()
-
-    def flow(self, padx=5, pady=5, align="left"):
-        self.set_parent_layout("flow")
-
-        self.parent.add_child_with_layout(
-            {
-                "widget": self,
-                "padx": padx,
-                "pady": pady,
-                "align": align  # left/center/right
-            }
-        )
-
+    # Aliases
+    config = set_attribute
