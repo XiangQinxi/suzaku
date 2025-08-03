@@ -3,6 +3,6 @@ from ..base.application import Application
 
 class SkApp(Application):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """SkApp, inherited from Application"""
-        super().__init__(*args, **kwargs)
+        super().__init__()

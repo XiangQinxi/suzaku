@@ -59,7 +59,7 @@ class SkWindow(Window):
             widget.event_generate("update", Event(event_type="update"))
 
     def _key_pressed(self, event):
-        #print(self.cget("focus_widget"))
+        #print(cls.cget("focus_widget"))
         if self.focus_get() is not self:
             self.focus_get().event_generate("key_press", event)
 

@@ -231,7 +231,7 @@ class Window(EventHanding):
         self.height = height
         from .event import Event
         self.event_generate("resize", Event(event_type="resize", width=width, height=height))
-        #self.update()
+        #cls.update()
 
     def _on_window_pos(self, window, x, y) -> None:
         """
@@ -355,7 +355,7 @@ class Window(EventHanding):
         配置attributes中的属性
 
         :param kwargs: 需要设置的属性
-        :return: self
+        :return: cls
         """
         self.attributes.update(kwargs)
         if "opacity" in kwargs:
@@ -384,7 +384,7 @@ class Window(EventHanding):
           其他 -> 设置当前光标样式
 
         :param cursorname: 光标样式名
-        :return: 光标样式名 或者 self
+        :return: 光标样式名 或者 cls
         """
 
         from glfw import (set_cursor, create_standard_cursor, ARROW_CURSOR, HAND_CURSOR, VRESIZE_CURSOR,
@@ -432,7 +432,7 @@ class Window(EventHanding):
           False -> 隐藏窗口
 
         :param is_visible:
-        :return: self
+        :return: cls
         """
         if is_visible is None:
             return self.visible
@@ -445,7 +445,7 @@ class Window(EventHanding):
     def show(self) -> "Window":
         """
         显示窗口
-        :return: self
+        :return: cls
         """
         from glfw import show_window
         show_window(self.glfw_window)
@@ -455,7 +455,7 @@ class Window(EventHanding):
     def hide(self) -> "Window":
         """
         隐藏窗口
-        :return: self
+        :return: cls
         """
         from glfw import hide_window
         hide_window(self.glfw_window)
@@ -465,7 +465,7 @@ class Window(EventHanding):
     def maximize(self) -> "Window":
         """
         最大化窗口
-        :return: self
+        :return: cls
         """
         from glfw import maximize_window
         maximize_window(self.glfw_window)
@@ -474,7 +474,7 @@ class Window(EventHanding):
     def restore(self) -> "Window":
         """
         恢复窗口(取消窗口最大化)
-        :return: self
+        :return: cls
         """
         from glfw import restore_window
         restore_window(self.glfw_window)
@@ -484,7 +484,7 @@ class Window(EventHanding):
         """
         添加子元素
         :param visual: 子元素
-        :return: self
+        :return: cls
         """
         self.visuals.append(visual)
         return self
@@ -505,7 +505,7 @@ class Window(EventHanding):
         其他 -> 设置窗口标题
 
         :param text: 标题
-        :return: self
+        :return: cls
         """
         if text is None:
             return self.attributes["title"]
@@ -521,7 +521,7 @@ class Window(EventHanding):
         :param width: 宽度
         :param height: 高度
         :param animation_s: 动画持续时间(秒)，0表示无动画
-        :return: self
+        :return: cls
         """
         if width is None:
             width = self.width
@@ -543,7 +543,7 @@ class Window(EventHanding):
         移动窗口
         :param x: x坐标
         :param y: y坐标
-        :return: self
+        :return: cls
         """
         if x is None:
             x = self.x
@@ -563,7 +563,7 @@ class Window(EventHanding):
         配置窗口属性
 
         :param kw: 属性名-属性值对
-        :return: self
+        :return: cls
         """
         pass
         return self
@@ -593,7 +593,7 @@ class Window(EventHanding):
         """
         处理Skia绘制事件
         param func: 绘制函数
-        return: self
+        return: cls
         """
         self.draw_func = func
         return self

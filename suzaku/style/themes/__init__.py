@@ -24,7 +24,7 @@ class SkTheme():
         加载主题
 
         :param path: 主题文件 (.json)
-        :return: self
+        :return: cls
         """
         from os.path import exists
         if not exists(path):
@@ -40,7 +40,7 @@ class SkTheme():
         启用主题
 
         :param name: 主题名称
-        :return: self
+        :return: cls
         """
         if not name in self.themes:
             raise ValueError(f"主题 {name} 不存在！请使用 {self.themes.keys()} 中的主题，或者使用load_theme导入主题")

@@ -17,7 +17,7 @@ def default_font() -> "Font":
 
 
 def font(*args, **kwargs):
-    return Font(*args, **kwargs).get_font()
+    return Font(*args, **kwargs).font
 
 
 class Font:
@@ -58,28 +58,14 @@ class Font:
 
         self.size = size
 
-        try:
-            if name:
-                self.name = name
-                self.font = skia.Font(skia.Typeface(name), size)
-            elif path:
-                if not os.path.exists(path):
-                    raise FileNotFoundError
-                self.path = path
-                self.font = skia.Font(skia.Typeface.MakeFromFile(self.path), size)
-            else:
-                raise ValueError
-        except:
-            warnings.warn("Invalid font arguments or font! Falling back to default")
-
-
-    def get_font(self):
-        """
-        Get the skia font object.
-
-        获取skia字体对象。
-
-        Returns:
-            self.font (Font): skia font object. skia字体对象。
-        """
-        return self.font
+        if name:
+            self.name = name
+            self.font = skia.Font(skia.Typeface(name), size)
+        elif path:
+            if not os.path.exists(path):
+                raise FileNotFoundError
+            self.path = path
+            self.font = skia.Font(skia.Typeface.MakeFromFile(self.path), size)
+        else:
+            raise ValueError
+        self.font = default_font()

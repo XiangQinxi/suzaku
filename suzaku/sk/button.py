@@ -33,11 +33,11 @@ class SkButton(SkVisual):
         if command:
             self.bind("click", lambda evt: command())
 
-        """self.bind("mouse_enter", lambda evt: print("enter"))
-        self.bind("mouse_leave", lambda evt: print("leave"))
-        self.bind("mouse_motion", lambda evt: print("motion"))"""
+        """cls.bind("mouse_enter", lambda evt: print("enter"))
+        cls.bind("mouse_leave", lambda evt: print("leave"))
+        cls.bind("mouse_motion", lambda evt: print("motion"))"""
 
-        #self.bind("mouse_pressed", lambda evt: print("pressed"))
+        #cls.bind("mouse_pressed", lambda evt: print("pressed"))
         self.bind("mouse_released", self._click)
 
     def _click(self, evt) -> None:

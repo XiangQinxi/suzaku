@@ -25,7 +25,10 @@ class SkWidget(Layout, EventHanding):
             size (tuple[int, int]):
                 Default size (not the final drawn size).
 
-            widey_id (str):
+            style (str):
+                Style of the widget.
+
+            widget_id (str):
                 Identification code.
 
         Returns:
@@ -46,13 +49,21 @@ class SkWidget(Layout, EventHanding):
             "name": name,
             "cursor": "arrow",
             "visible": False,
-            "id": widget_id
+            "id": widget_id,
+            "theme": None,
+            "dwidth": size[0],  # default width
+            "dheight": size[1],  # default height
         }
 
         self.style = style
 
         self.x = 0
         self.y = 0
+
+        self.width = size[0]
+        self.height = size[1]
+
+        self.layout = None
 
         if not widget_id:
             self.attributes["id"] = name + "." + str(self.__class__._instance_count)
@@ -109,7 +120,10 @@ class SkWidget(Layout, EventHanding):
     
     def _draw(self, canvas):
         pass
-    
+
+    def _show(self):
+        self.attributes["visible"] = True
+
     def add_child(self, child: "SkWidget"):
         self.children.append(child)
     
@@ -119,10 +133,15 @@ class SkWidget(Layout, EventHanding):
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
-        
-        :param name: Name of the attribute to get
+
+        Args:
+            attribute_name: attribute name
         """
         return self.attributes[attribute_name]
-    
+
+    cget = get_attribute
+
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
+
+    configure = config = set_attribute

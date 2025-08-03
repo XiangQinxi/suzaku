@@ -8,7 +8,7 @@ class Var(EventHanding):
 
         Args:
             default_value: The initial value of the variable.
-            typ: The type of the variable.
+            value_type: The type of the variable.
         """
 
         super().__init__()

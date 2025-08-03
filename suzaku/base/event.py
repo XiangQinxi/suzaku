@@ -57,7 +57,7 @@ class EventHanding(After):
             evt(*args, **kwargs)
 
 
-    def bind(self, name: str, func: function, add: bool=True) -> "EventHanding":
+    def bind(self, name: str, func: callable, add: bool=True) -> "EventHanding":
         """
         Bind event.
 
@@ -80,7 +80,7 @@ class EventHanding(After):
                 是否在绑定的事件后添加，而不是清除其他事件只保留自己。
 
         Returns:
-            self
+            cls
 
         """
         if name not in self.events:
@@ -91,7 +91,7 @@ class EventHanding(After):
             self.events[name] = [func]
         return self
 
-    def unbind(self, name: str, func: function) -> None:
+    def unbind(self, name: str, func: callable) -> None:
         """
         Unbind event.
 
@@ -125,8 +125,7 @@ class Event:
 
     def __init__(self, event_type: str, x: Union[int, None] = None, y: Union[int, None] = None, 
                  rootx: Union[int, None] = None, rooty: Union[int, None] = None, key: Union[int, None] = None, 
-                 keyname: Union[str, None] = None, mods: Union[str, None] = None, char: Union[int, None] = None,
-                 width: Union[int, None] = None, height: Union[int, None] = None):
+                 keyname: Union[str, None] = None, mods: Union[str, None] = None, char: Union[int, None] = None,):
         """
         Used to pass event via arguments.
 

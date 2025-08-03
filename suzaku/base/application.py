@@ -1,3 +1,12 @@
+def init_glfw() -> None:
+    """Initialize GLFW module."""
+    import glfw
+    if not glfw.init():
+        raise RuntimeError('glfw.init() failed')
+    # 设置全局GLFW配置
+    glfw.window_hint(glfw.STENCIL_BITS, 8)
+
+
 class Application:
 
     """
@@ -15,26 +24,18 @@ class Application:
 
         self.windows = []
         self.running = False
-        self.init_glfw()
+        init_glfw()
         if Application._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
         Application._instance = self
 
     # 这里用这个可以使`Window`的初始化更加简单，可以不选择填`parent=App`
     @classmethod
-    def get_instance(self) -> int:
+    def get_instance(cls) -> int:
         """Get instance count."""
-        if self._instance is None:
+        if cls._instance is None:
             raise RuntimeError("App not initialized")
-        return self._instance
-
-    def init_glfw(self) -> None:
-        """Initialize GLFW module."""
-        import glfw
-        if not glfw.init():
-            raise RuntimeError('glfw.init() failed')
-        # 设置全局GLFW配置
-        glfw.window_hint(glfw.STENCIL_BITS, 8)
+        return cls._instance
 
     from .window import Window
 
