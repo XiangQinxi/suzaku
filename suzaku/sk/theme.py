@@ -5,11 +5,17 @@ import os
 import json
 import re
 
+from .widget import SkWidget
+
+class SkStyleNotFoundError(NameError):
+    pass
+
 class SkTheme():
-    def __init__(self, style: dict={}):
+    def __init__(self, style: dict={}, parent: Union["SkTheme", None] = None):
         """Theme for SkWindow and SkWidgets.
 
-        :param styles: styles of the theme
+        :param styles: Styles of the theme
+        :param parent: Parent theme
         """
         self.styles = style
     
@@ -32,7 +38,7 @@ class SkTheme():
         self.styles = style_json
         return self
     
-    def select(self, selector: str) -> list:
+    def select(self, selector: str, create_if_not_existed: bool=False) -> list:
         """Parse style selector.
 
         ## Selector
@@ -45,6 +51,7 @@ class SkTheme():
         Note that this is not available everywhere.
 
         :param selector: The selector string
+        :param create_if_not_existed: Create the style if not existed.
         """
         # Validation
         if not re.match("[a-zA-Z0-9-_.:]", selector):
@@ -58,11 +65,17 @@ class SkTheme():
                 result = [result[0]]
         else:
             result = [selector, "rest"]
-        # Validation
+        # Validation / Create if not existed
         level_dict = self.styles
+        if create_if_not_existed:
+            checking = self.styles
         for selector_level in result:
             if selector_level not in level_dict.keys():
-                raise ValueError(f"Cannot find style with selector [{selector}]")
+                if create_if_not_existed:
+                    checking[selector_level] = {}
+                raise SkStyleNotFoundError(f"Cannot find style with selector [{selector}]")
+            if create_if_not_existed:
+                checking = checking[selector_level]
         return result
     
     def get_style(self, selector: str, copy: bool=True) -> dict:
@@ -72,7 +85,11 @@ class SkTheme():
         :param copy: Whether to copy a new style json, otherwise returns the style itself
         """
         result = self.styles
-        for selector_level in self.select(selector):
+        try:
+            selector_parsed = self.select(selector)
+        except SkStyleNotFoundError:
+            return default_theme.get_style(selector, copy=True)
+        for selector_level in selector_parsed:
             result = result[selector_level]
         if copy:
             return result.copy()
@@ -105,11 +122,19 @@ class SkTheme():
         :param **kwargs: Styles to change
         """
         if "ITSELF" in selector:
-            raise ValueError("<SkWidget.ITSELF> is not supported by SkTheme.special()!")
+            warnings.warn("<SkWidget.ITSELF> is not supported by SkTheme.special()! "+\
+                          "It will be regarded as <SkWidget.rest>")
+            selector = selector.replace("ITSELF", "rest")
         new_theme = SkTheme(self.styles)
         style_operate = new_theme.get_style(selector, copy=False)
         style_operate.update(kwargs)
         return new_theme
-    NotImplemented
+    
+    def apply_on(self, widget: "SkWidget"):
+        """Apply theme on a widget.
+        
+        :param widget: The widget to apply theme to.
+        """
+        widget.apply_theme(self)
 
 default_theme = light_theme =  SkTheme({}).load_from_file(os.path.join(os.path.split(__file__)[0], "themes", "light.json"))
