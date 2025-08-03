@@ -9,7 +9,7 @@ class SkTheme():
     def __init__(self, style: dict={}):
         """Theme for SkWindow and SkWidgets.
 
-        :param style: Style of the theme
+        :param styles: styles of the theme
         """
         self.styles = style
     
@@ -106,5 +106,4 @@ class SkTheme():
         return new_theme
     NotImplemented
 
-default_theme = SkTheme({}).load_from_file(os.path.join(os.path.split(__file__)[0], 
-                                                        "../styles/light.json"))
+default_theme = light_theme =  SkTheme({}).load_from_file(os.path.join(os.path.split(__file__)[0], "themes", "light.json"))

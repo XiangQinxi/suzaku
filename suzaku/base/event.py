@@ -125,7 +125,9 @@ class Event:
 
     def __init__(self, event_type: str, x: Union[int, None] = None, y: Union[int, None] = None, 
                  rootx: Union[int, None] = None, rooty: Union[int, None] = None, key: Union[int, None] = None, 
-                 keyname: Union[str, None] = None, mods: Union[str, None] = None, char: Union[int, None] = None,):
+                 keyname: Union[str, None] = None, mods: Union[str, None] = None, char: Union[int, None] = None,
+                 width: Union[int, None] = None, height: Union[int, None] = None,
+                 ):
         """
         Used to pass event via arguments.
 
@@ -158,3 +160,5 @@ class Event:
         self.keyname = keyname
         self.mods = mods
         self.char = char
+        self.width = width
+        self.height = height

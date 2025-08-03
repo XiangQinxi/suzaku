@@ -1,6 +1,6 @@
 class SkStyle():
     def __init__(self):
-        from .themes import theme
+        from suzaku.sk.themes import theme
         self.theme = theme
 
     def configure(self, style_name, *args, **kwargs):

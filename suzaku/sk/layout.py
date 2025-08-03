@@ -26,7 +26,7 @@ class Boxes:
         """
 
         self.parent = parent
-        self.children = []
+        self.boxes_children = []
         self.direction = direction
 
     def add_child(self, child: "SkWidget", padx: int=5, pady: int=5, expand: bool=False) -> None:
@@ -59,7 +59,7 @@ class Boxes:
         Returns:
             None
         """
-        self.children.append(
+        self.boxes_children.append(
             {
                 "child": child,
                 "padx": padx,
@@ -90,105 +90,95 @@ class Boxes:
             warnings.warn(f"Invalid direction '{direction}', ingnored and kept old layout direction.")
             return
         self.direction = direction
-        self.update(self.parent.winfo_width(), self.parent.winfo_height())
-        self.update(self.parent.winfo_width(), self.parent.winfo_height())
+        self.update(self.parent.width, self.parent.height)
+        self.update(self.parent.width, self.parent.height)
         # Don't ask why to update twice here, idk how but it gets the layout finally correct.
         # 别问我为什么要放两个update，我也不知道为什么，这样做布局意外的正常改变了
 
-    def update(self, width: int, height: int) -> None:
+    def update(self, evt) -> None:
         """
         Update layout.
 
-        更新布局。
-
         Args:
-            width (int): 
-                Container width.
-
-                容器宽度。
-
-            height (int): 
-                Container height.
-            
-                容器高度。
 
         Returns: 
             None
         """
+        width = evt.width
+        height = evt.height
         if self.direction == "h":
             # Horizontal Layout
 
-            width -= self.children[-1]["padx"]
+            width -= self.boxes_children[-1]["padx"]
 
             fixed_width = 0
             expand_count = 0
             total_padx = 0
 
             # Calculate total width of fixed elements, and number of available extended elements.
-            for child in self.children:
+            for child in self.boxes_children:
                 total_padx += child["padx"]
                 if child["expand"]:
                     expand_count += 1
                 else:
-                    fixed_width += child["child"].visual_attr["width"]
+                    fixed_width += child["child"].width
 
             # Calculate available width (minus all padx)
             remaining_width = max(0, width - fixed_width - total_padx)
             expand_width = remaining_width // expand_count if expand_count > 0 else 0
 
             current_x = 0
-            for child in self.children:
+            for child in self.boxes_children:
                 c = child["child"]
                 current_x += child["padx"]  # Add padx of current element
 
                 if child["expand"]:
-                    c.visual_attr["x"] = current_x
-                    c.visual_attr["y"] = child["pady"]
-                    c.visual_attr["width"] = expand_width
-                    c.visual_attr["height"] = height - child["pady"] * 2
+                    c.x = current_x
+                    c.y = child["pady"]
+                    c.width = expand_width
+                    c.height = height - child["pady"] * 2
                 else:
-                    c.visual_attr["x"] = current_x
-                    c.visual_attr["y"] = child["pady"]
-                    c.visual_attr["width"] = c.visual_attr["d_height"]
-                    c.visual_attr["height"] = height - child["pady"] * 2
+                    c.x = current_x
+                    c.y = child["pady"]
+                    c.width = c.attributes["dheight"]
+                    c.height = height - child["pady"] * 2
 
-                current_x += c.visual_attr["width"]  # Move to next element
+                current_x += c.width  # Move to next element
         else:
             # Vertival Layout
-
-            height -= self.children[-1]["pady"]
+            height -= self.boxes_children[-1]["pady"]
 
             fixed_height = 0
             expand_count = 0
             total_pady = 0
 
-            for child in self.children:
+            for child in self.boxes_children:
                 total_pady += child["pady"]
                 if child["expand"]:
                     expand_count += 1
                 else:
-                    fixed_height += child["child"].visual_attr["height"]
+                    fixed_height += child["child"].height
 
             remaining_height = max(0, height - fixed_height - total_pady)
             expand_height = remaining_height // expand_count if expand_count > 0 else 0
 
             current_y = 0
-            for child in self.children:
+            for child in self.boxes_children:
                 c = child["child"]
                 current_y += child["pady"]
 
                 if child["expand"]:
-                    c.visual_attr["x"] = child["padx"]
-                    c.visual_attr["y"] = current_y
-                    c.visual_attr["width"] = width - child["padx"] * 2
-                    c.visual_attr["height"] = expand_height
+                    c.x = child["padx"]
+                    c.y = current_y
+                    c.width = width - child["padx"] * 2
+                    c.height = expand_height
                 else:
-                    c.visual_attr["x"] = child["padx"]
-                    c.visual_attr["y"] = current_y
-                    c.visual_attr["width"] = width - child["padx"] * 2
-                    c.visual_attr["height"] = c.visual_attr["d_height"]
+                    c.x = child["padx"]
+                    c.y = current_y
+                    c.width = width - child["padx"] * 2
+                    c.height = c.attributes["dwidth"]
 
-                current_y += c.visual_attr["height"]
+                current_y += c.height
 
 class Box:
     def box_configure(self, padx: int=5, pady: int=5, expand: bool=False, direction=None) -> "Box":
@@ -221,18 +211,19 @@ class Box:
         Returns:
             Box: The box itself.
         """
-        parent = self.winfo_parent()
-        layout = parent.winfo_layout()
+        parent = self.parent
+        layout = parent.layout
         if not layout:
             if direction is None:
                 direction = "h"
             l = Boxes(parent, direction)
-            parent.set_layout(l)
+            parent.layout = l
         else:
             l = layout
-        if not self in l.children:
+        if not self in l.boxes_children:
             l.add_child(self, padx=padx, pady=pady, expand=expand)
-            l.update(parent.winfo_width(), parent.winfo_height())
+            from ..base.event import Event
+            l.update(Event(parent.width, parent.height))
             self._show()
         return self
 
@@ -295,13 +286,13 @@ class Box:
         Returns:
             None
         """
-        layout = self.winfo_parent().winfo_layout()
+        layout = self.parent.layout
         if layout:
             for child in layout.children:
                 if self is child["child"]:
                     layout.children.remove(child)
                     self._hide()
-                    layout.update(layout.parent.winfo_width(), layout.parent.winfo_height())
+                    layout.update(layout.parent.width, layout.parent.height)
         return self
 
 
@@ -337,14 +328,14 @@ class Place:
         Returns:
             None
         """
-        self.winfo_parent().set_layout("place")
+        self.parent.layout = "place"
 
-        self.visual_attr["x"] = x
-        self.visual_attr["y"] = y
+        self.x = x
+        self.y = y
         if width is not None:
-            self.visual_attr["width"] = width
+            self.width = width
         if height is not None:
-            self.visual_attr["height"] = height
+            self.height = height
 
         self._show()
 
@@ -381,7 +372,7 @@ class Puts:
         """
 
         self.parent = parent
-        self.children = []
+        self.puts_children = []
 
     def add_child(self, child: "SkWidget", margin: tuple[int, int, int, int] = (5, 5, 5, 5)):
         """
@@ -403,7 +394,7 @@ class Puts:
         Returns:
             None
         """
-        self.children.append(
+        self.puts_children.append(
             {
                 "child": child,
                 "margin": margin,
@@ -412,7 +403,7 @@ class Puts:
 
         self.parent.bind("resize", self.update)
 
-    def update(self, width, height):
+    def update(self, evt):
         """
         Update layout.
 
@@ -432,12 +423,14 @@ class Puts:
         Returns: 
             None
         """
-        for child in self.children:
+        width = evt.width
+        height = evt.height
+        for child in self.puts_children:
             c = child["child"]
-            c.visual_attr["x"] = child["margin"][0]
-            c.visual_attr["y"] = child["margin"][1]
-            c.visual_attr["width"] = width - child["margin"][2] - child["margin"][3]
-            c.visual_attr["height"] = height - child["margin"][1] - child["margin"][3]
+            c.x = child["margin"][0]
+            c.y = child["margin"][1]
+            c.width = width - child["margin"][2] - child["margin"][3]
+            c.height = height - child["margin"][1] - child["margin"][3]
 
 
 class Put:
@@ -462,16 +455,17 @@ class Put:
         Returns:
             None
         """
-        parent = self.winfo_parent()
-        layout = parent.winfo_layout()
+        parent = self.parent
+        layout = parent.layout
         if not layout:
             l = Puts(parent)
-            parent.set_layout(l)
+            parent.layout = l
         else:
             l = layout
-        if not self in l.children:
+        if not self in l.puts_children:
             l.add_child(self, margin=margin)
-            l.update(parent.winfo_dwidth(), parent.winfo_dheight())
+            from ..base.event import Event
+            l.update(Event(event_type="update", width=parent.width, height=parent.height))
             self._show()
         return None
 
@@ -486,12 +480,12 @@ class Put:
         Returns:
             None
         """
-        parent = self.winfo_parent()
-        layout = parent.winfo_layout()
+        parent = self.parent
+        layout = parent.layout
         if layout:
             l = layout
-            if self in l.children:
-                l.children.remove(self)
+            if self in l.puts_children:
+                l.puts_children.remove(self)
                 l.update(parent.winfo_dwidth(), parent.winfo_dheight())
                 self._hide()
 

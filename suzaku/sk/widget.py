@@ -1,18 +1,18 @@
 from typing import Union, Any
 
+from .theme import default_theme
 from .window import SkWindow
 from .layout import Layout
-from ..base.event import EventHanding, Event
-from ..style.themes import theme, SkTheme
+from ..base.event import EventHanding
 
 
 class SkWidget(Layout, EventHanding):
 
     _instance_count = 0
 
-    theme = theme
+    theme = default_theme
 
-    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="",
+    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="SkWidget",
                  widget_id: Union[str, None] = None, name="sk_visual") -> None:
 
         """
@@ -48,7 +48,6 @@ class SkWidget(Layout, EventHanding):
         self.attributes = {
             "name": name,
             "cursor": "arrow",
-            "visible": False,
             "id": widget_id,
             "theme": None,
             "dwidth": size[0],  # default width
@@ -64,6 +63,7 @@ class SkWidget(Layout, EventHanding):
         self.height = size[1]
 
         self.layout = None
+        self.visible = False
 
         if not widget_id:
             self.attributes["id"] = name + "." + str(self.__class__._instance_count)
@@ -117,9 +117,14 @@ class SkWidget(Layout, EventHanding):
         self.bind("mouse_released", _on_event)
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
-    
-    def _draw(self, canvas):
+
+    def draw(self, canvas, rect):
         pass
+
+    def _draw(self, canvas):
+        import skia
+        rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
+        self.draw(canvas, rect)  # Give draw() the canvas and the rect.
 
     def _show(self):
         self.attributes["visible"] = True
@@ -127,8 +132,12 @@ class SkWidget(Layout, EventHanding):
     def add_child(self, child: "SkWidget"):
         self.children.append(child)
     
+    from .theme import SkTheme
+
     def apply_theme(self, new_theme: SkTheme):
         self.attributes["theme"] = new_theme
+        for child in self.children:
+            child.apply_theme(new_theme)
 
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
@@ -145,3 +154,9 @@ class SkWidget(Layout, EventHanding):
         self.attributes.update(**kwargs)
 
     configure = config = set_attribute
+
+    def focus_set(self):
+        self.window.focus_widget = self
+
+    def focus_get(self):
+        return self.parent.focus_get()
