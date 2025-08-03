@@ -6,6 +6,8 @@ from .app import SkApp
 from .appwindow import SkAppWindow
 from .appwindow import SkAppWindow as Sk
 from .frame import SkFrame
+from .text import SkText
+from .theme import SkTheme, light_theme, default_theme
 from .widget import SkWidget
 from .window import SkWindow
 from .hynix import SkHynix # Hello from rgzz666

@@ -43,7 +43,7 @@ class SkWidget(EventHanding):
 
         self.window = self.parent if isinstance(self.parent, SkWindow) else self.parent.window
 
-        self.children = []
+
 
         self.attributes = {
             "name": name,
@@ -181,6 +181,12 @@ class SkWidget(EventHanding):
     def focus_get(self):
         return self.parent.focus_get()
 
+    def set_parent_layout(self, name):
+        if self.parent.layout_name != name and not self.parent.layout_name:
+            raise Exception(f"Layout name not match. Now layout is {self.parent.layout_name}!")
+        else:
+            self.parent.set_layout_name(name)
+
     def place_configure(self, x: int, y: int, width: int = None, height: int = None):
         """
         Absolute positioning layout.
@@ -211,7 +217,7 @@ class SkWidget(EventHanding):
         Returns:
             None
         """
-        self.parent.set_layout_name("place")
+        self.set_parent_layout("place")
 
         self.x = x
         self.y = y
@@ -232,3 +238,16 @@ class SkWidget(EventHanding):
             None
         """
         self._hide()
+
+    def flow(self, padx=5, pady=5, align="left"):
+        self.set_parent_layout("flow")
+
+        self.parent.add_child_with_layout(
+            {
+                "widget": self,
+                "padx": padx,
+                "pady": pady,
+                "align": align  # left/center/right
+            }
+        )
+

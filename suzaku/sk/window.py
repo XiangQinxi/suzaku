@@ -12,7 +12,8 @@ class SkWindow(Window, SkContainer):
         :param themename: Theme name
         :param kwargs: Window Kwargs
         """
-        super().__init__(*args, name=name, **kwargs)
+        Window.__init__(self, *args, name=name, **kwargs)
+        SkContainer.__init__(self)
 
         from .theme import default_theme
 
@@ -21,7 +22,6 @@ class SkWindow(Window, SkContainer):
         self.attributes["style"] = style
         self.focus_widget = self
         self.draws = []
-        self.children = []
 
         self.window = self
 

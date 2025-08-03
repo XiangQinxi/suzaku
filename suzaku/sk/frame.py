@@ -4,8 +4,8 @@ from typing import Union
 
 
 class SkFrame(SkWidget, SkContainer):
-    def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame") -> None:
-        super().__init__(parent, style=style)
+    def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame", **kwargs) -> None:
+        super().__init__(parent, style=style, **kwargs)
 
     def draw(self, canvas, rect):
         from ..style.color import color
@@ -44,3 +44,7 @@ class SkFrame(SkWidget, SkContainer):
         rect_paint.setColor(color(sheets["bd"]))
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
+
+    def put(self, margin=(0,0,0,0)):
+        """相对布局快捷方法"""
+        self.put_configure(margin)
