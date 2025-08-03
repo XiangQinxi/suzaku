@@ -6,6 +6,7 @@ from .app import SkApp
 from .appwindow import SkAppWindow
 from .appwindow import SkAppWindow as Sk
 from .frame import SkFrame
+from .widget import SkWidget
 from .window import SkWindow
 from .hynix import SkHynix # Hello from rgzz666
 

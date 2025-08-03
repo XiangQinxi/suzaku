@@ -1,0 +1,2 @@
+class ElText:
+    pass

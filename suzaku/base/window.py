@@ -11,14 +11,14 @@ class Window(EventHanding):
     def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0, force_hardware_acceleration: bool = False, name="window"):
 
         """
-        初始化窗口
+        Base Window
 
-        :param parent: 父类 一般为"Application"
-        :param title: 窗口标题
-        :param size: 窗口大小
-        :param id: 窗口ID，如果为None将自动设置ID
-        :param fullscreen: 窗口是否全屏(有点问题，暂时不要使用)
-        :param opacity: 窗口透明度
+        :param parent: window parent
+        :param title: window title
+        :param size: window size
+        :param id: window id
+        :param fullscreen: window fullscreen
+        :param opacity: window opacity
         """
 
         from .application import Application
@@ -54,7 +54,7 @@ class Window(EventHanding):
 
         self.attributes = {
             "title": title,
-            "opacity": 1.0,
+            "opacity": opacity,
             "cursor": "arrow",  # default cursor
             "force_hardware_acceleration": force_hardware_acceleration
         }
@@ -65,8 +65,8 @@ class Window(EventHanding):
             "update": [],
 
             "mouse_motion": [],
-            "mouse_pressed": [],
-            "mouse_released": [],
+            "mouse_press": [],
+            "mouse_release": [],
             "mouse_enter": [],
             "mouse_leave": [],
 
@@ -89,15 +89,15 @@ class Window(EventHanding):
         self.attributes["fullscreen"] = fullscreen
 
         if self.width <= 0 or self.height <= 0:
-            raise ValueError("窗口宽度和高度必须为正数")
-
-        self.attributes["opacity"] = opacity
+            raise ValueError("The window size must be positive")
 
         ####################
 
         self.is_mouse_pressed = False
 
-        self.create()
+        self.glfw_window = self.create()
+
+        self.cursor(self.default_cursor())
 
     @classmethod
     def get_instance_count(cls):
@@ -350,30 +350,6 @@ class Window(EventHanding):
         """
         return self.id
 
-    def configure(self, **kwargs) -> "Window":
-        """
-        配置attributes中的属性
-
-        :param kwargs: 需要设置的属性
-        :return: cls
-        """
-        self.attributes.update(kwargs)
-        if "opacity" in kwargs:
-            from glfw import set_window_opacity
-            set_window_opacity(self.glfw_window, kwargs.pop("opacity"))
-        return self
-
-    config = configure  # 别名
-
-    def cget(self, name: str) -> any:
-        """
-        获取attributes中的属性
-
-        :param name: 需要获取属性的名称
-        :return: any
-        """
-        return self.windowattr[name]
-
     def cursor(self, cursorname: str = None) -> str | type:
 
         """
@@ -403,7 +379,8 @@ class Window(EventHanding):
             return self.new_cursor
 
         self.new_cursor = name
-        set_cursor(self.glfw_window, c)
+        if self.glfw_window:
+            set_cursor(self.glfw_window, c)
         return self
 
     def default_cursor(self, cursorname: str = None) -> str | type:
@@ -558,14 +535,31 @@ class Window(EventHanding):
 
         return self
 
-    def configure(self, **kw) -> "Window":
+    def configure(self, **kwargs) -> "Window":
         """
-        配置窗口属性
 
-        :param kw: 属性名-属性值对
-        :return: cls
+        Args:
+            **kwargs: opacity
+
+        Returns:
+            self
         """
-        pass
+        if "opacity" in kwargs:
+
+            if not hasattr(self, "glfw_window") or not self.glfw_window:
+                return self
+
+            opacity = kwargs.pop("opacity")
+            if not isinstance(opacity, (float, int)) or not 0.0 <= opacity <= 1.0:
+                raise ValueError("Opacity must be a float between 0.0 and 1.0")
+
+            try:
+                from glfw import set_window_opacity
+                set_window_opacity(self.glfw_window, float(opacity))
+            except Exception as e:
+                print(f"[ERROR] Failed to set opacity: {e}")
+
+        self.attributes.update(kwargs)
         return self
 
     config = configure
@@ -635,14 +629,10 @@ class Window(EventHanding):
 
             self.visible = True
 
-            self.glfw_window = window
-
             pos = glfw.get_window_pos(window)
 
             self.x = pos[0]
             self.y = pos[1]
-
-            self.cursor(self.default_cursor())
 
             if self.attributes["force_hardware_acceleration"]:
                 glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
@@ -650,6 +640,8 @@ class Window(EventHanding):
                 glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
                 glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
                 glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
+            glfw.set_window_opacity(window, self.cget("opacity"))
 
             return window
         else:

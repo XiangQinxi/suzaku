@@ -12,7 +12,7 @@ class SkWidget(Layout, EventHanding):
 
     theme = theme
 
-    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="",
+    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="SkWidget",
                  widget_id: Union[str, None] = None, name="sk_visual") -> None:
 
         """
@@ -44,11 +44,11 @@ class SkWidget(Layout, EventHanding):
         self.window = self.parent if isinstance(self.parent, SkWindow) else self.parent.window
 
         self.children = []
+        self.elements = []
 
         self.attributes = {
             "name": name,
             "cursor": "arrow",
-            "visible": False,
             "id": widget_id,
             "theme": None,
             "dwidth": size[0],  # default width
@@ -64,6 +64,7 @@ class SkWidget(Layout, EventHanding):
         self.height = size[1]
 
         self.layout = None
+        self.visible = False
 
         if not widget_id:
             self.attributes["id"] = name + "." + str(self.__class__._instance_count)
@@ -117,9 +118,12 @@ class SkWidget(Layout, EventHanding):
         self.bind("mouse_released", _on_event)
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
-    
+
     def _draw(self, canvas):
-        pass
+        import skia
+        rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
+        for element in self.elements:
+            element.draw(canvas, rect, self.attributes["theme"])
 
     def _show(self):
         self.attributes["visible"] = True
@@ -145,3 +149,9 @@ class SkWidget(Layout, EventHanding):
         self.attributes.update(**kwargs)
 
     configure = config = set_attribute
+
+    def focus_set(self):
+        self.window.focus_widget = self
+
+    def focus_get(self):
+        return self.parent.focus_get()
