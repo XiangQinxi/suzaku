@@ -44,7 +44,6 @@ class SkWidget(Layout, EventHanding):
         self.window = self.parent if isinstance(self.parent, SkWindow) else self.parent.window
 
         self.children = []
-        self.elements = []
 
         self.attributes = {
             "name": name,
@@ -119,11 +118,13 @@ class SkWidget(Layout, EventHanding):
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
 
+    def draw(self, canvas, rect):
+        pass
+
     def _draw(self, canvas):
         import skia
         rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
-        for element in self.elements:
-            element.draw(canvas, rect, self.attributes["theme"])
+        self.draw(canvas, rect)  # Give draw() the canvas and the rect.
 
     def _show(self):
         self.attributes["visible"] = True
