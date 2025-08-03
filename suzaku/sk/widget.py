@@ -6,7 +6,7 @@ from .layout import Layout
 from ..base.event import EventHanding
 
 
-class SkWidget(Layout, EventHanding):
+class SkWidget(EventHanding):
 
     _instance_count = 0
 
@@ -43,7 +43,7 @@ class SkWidget(Layout, EventHanding):
 
         self.window = self.parent if isinstance(self.parent, SkWindow) else self.parent.window
 
-        self.children = []
+
 
         self.attributes = {
             "name": name,
@@ -91,8 +91,10 @@ class SkWidget(Layout, EventHanding):
         self.is_mouse_pressed = False
         self.is_focus = False
 
+        self.draws = []
+
         self.draw_func = lambda canvas: self._draw(canvas)
-        self.window.add_draw(self.draw_func)
+        self.parent.add_draw(self.draw_func)
 
         # Events-related
         self.is_mouse_enter = False
@@ -118,16 +120,34 @@ class SkWidget(Layout, EventHanding):
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
 
-    def draw(self, canvas, rect):
+    def add_draw(self, draw_func) -> None:
+        self.draws.append(draw_func)
+
+    def remove_draw(self, draw_func) -> None:
+        self.draws.remove(draw_func)
+
+    import skia
+
+    def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         pass
 
-    def _draw(self, canvas):
+    def _draw(self, canvas: skia.Surfaces) -> None:
         import skia
         rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
         self.draw(canvas, rect)  # Give draw() the canvas and the rect.
 
+        for i, f in enumerate(self.draws):
+            #print(i, f)
+            if self.children[i].visible:
+                f(canvas)
+
+        return None
+
     def _show(self):
-        self.attributes["visible"] = True
+        self.visible = True
+
+    def _hide(self):
+        self.visible = False
 
     def add_child(self, child: "SkWidget"):
         self.children.append(child)
@@ -160,3 +180,74 @@ class SkWidget(Layout, EventHanding):
 
     def focus_get(self):
         return self.parent.focus_get()
+
+    def set_parent_layout(self, name):
+        if self.parent.layout_name != name and not self.parent.layout_name:
+            raise Exception(f"Layout name not match. Now layout is {self.parent.layout_name}!")
+        else:
+            self.parent.set_layout_name(name)
+
+    def place_configure(self, x: int, y: int, width: int = None, height: int = None):
+        """
+        Absolute positioning layout.
+
+        绝对位置布局。
+
+        Args:
+            x:
+                x position of the component.
+
+                组件的x坐标。
+
+            y:
+                y position of the component.
+
+                组件的y坐标。
+
+            width:
+                Width of the component, `dwidth` by default.
+
+                组件的宽度（不填则为`dwidth`）。
+
+            height:
+                Height of the component, `dheight` by default.
+
+                组件的高度（不填则为`dheight`）。
+
+        Returns:
+            None
+        """
+        self.set_parent_layout("place")
+
+        self.x = x
+        self.y = y
+        if width is not None:
+            self.width = width
+        if height is not None:
+            self.height = height
+        self._show()
+
+    place = place_configure
+
+    def place_forget(self) -> None:
+        """
+        Remove layout.
+        移除组件布局。
+
+        Returns:
+            None
+        """
+        self._hide()
+
+    def flow(self, padx=5, pady=5, align="left"):
+        self.set_parent_layout("flow")
+
+        self.parent.add_child_with_layout(
+            {
+                "widget": self,
+                "padx": padx,
+                "pady": pady,
+                "align": align  # left/center/right
+            }
+        )
+

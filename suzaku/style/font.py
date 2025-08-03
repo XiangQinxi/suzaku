@@ -68,4 +68,4 @@ class Font:
             self.font = skia.Font(skia.Typeface.MakeFromFile(self.path), size)
         else:
             raise ValueError
-        self.font = default_font()
+            self.font = default_font()

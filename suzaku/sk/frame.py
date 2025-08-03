@@ -1,10 +1,11 @@
 from .widget import SkWidget
+from .container import SkContainer
 from typing import Union
 
 
-class SkFrame(SkWidget):
-    def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame") -> None:
-        super().__init__(parent, style=style)
+class SkFrame(SkWidget, SkContainer):
+    def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame", **kwargs) -> None:
+        super().__init__(parent, style=style, **kwargs)
 
     def draw(self, canvas, rect):
         from ..style.color import color
@@ -36,10 +37,14 @@ class SkFrame(SkWidget):
 
         # Rainbow Border Effect
         if "bd_shader" in sheets:
-            if sheets["bd_shader"] == "rainbow":
+            if sheets["bd_shader"].lower() == "rainbow":
                 from .packs import set_rainbow_shader
                 set_rainbow_shader(rect_paint, rect)
 
         rect_paint.setColor(color(sheets["bd"]))
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
+
+    def put(self, margin=(0,0,0,0)):
+        """相对布局快捷方法"""
+        self.put_configure(margin)

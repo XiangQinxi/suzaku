@@ -427,8 +427,20 @@ class Puts:
         height = evt.height
         for child in self.puts_children:
             c = child["child"]
+
             c.x = child["margin"][0]
             c.y = child["margin"][1]
+
+            if c.width != width or c.height != height:
+                from ..base.event import Event
+                c.event_generate(
+                    "resize",
+                    Event(
+                        event_type="resize", width=width - child["margin"][2] - child["margin"][3],
+                        height=height - child["margin"][1] - child["margin"][3],
+                    )
+                )
+
             c.width = width - child["margin"][2] - child["margin"][3]
             c.height = height - child["margin"][1] - child["margin"][3]
 
@@ -457,6 +469,7 @@ class Put:
         """
         parent = self.parent
         layout = parent.layout
+        self.visible = True
         if not layout:
             l = Puts(parent)
             parent.layout = l

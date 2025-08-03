@@ -1,8 +1,9 @@
 from ..base.window import Window
+from .container import SkContainer
 import skia
 
 
-class SkWindow(Window):
+class SkWindow(Window, SkContainer):
     def __init__(self, *args, themename="light", style="SkWindow", name="sk_window", **kwargs) -> None:
         """
         SkWindow, inherited from Window
@@ -11,18 +12,16 @@ class SkWindow(Window):
         :param themename: Theme name
         :param kwargs: Window Kwargs
         """
-        super().__init__(*args, name=name, **kwargs)
+        Window.__init__(self, *args, name=name, **kwargs)
+        SkContainer.__init__(self)
 
-        from suzaku.sk.themes import theme
+        from .theme import default_theme
 
-        self.theme = theme
-        self.theme.use_theme(themename)
+        self.theme = default_theme
 
-        self.layout = None
         self.attributes["style"] = style
         self.focus_widget = self
         self.draws = []
-        self.children = []
 
         self.window = self
 
@@ -160,7 +159,7 @@ class SkWindow(Window):
 
     def draw(self, canvas: skia.Surfaces) -> None:
         from ..style.color import color
-        canvas.clear(color(self.theme.get_theme()[self.winfo_style()]["bg"]))
+        canvas.clear(color(self.theme.styles[self.winfo_style()]["bg"]))
 
         for i, f in enumerate(self.draws):
             #print(i, f)

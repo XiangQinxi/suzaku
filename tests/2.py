@@ -5,7 +5,9 @@ app = SkAppWindow()
 app.title("Test")
 
 frame = SkFrame(app)
-frame.visible = True
-frame.put(margin=(20, 20, 20, 20))
+frame.place(x=100, y=100)
+
+text = SkText(app, text="SkLabel")
+text.place(x=100, y=200)
 
 app.run()
