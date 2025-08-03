@@ -5,8 +5,6 @@ import os
 import json
 import re
 
-from .widget import SkWidget
-
 class SkStyleNotFoundError(NameError):
     pass
 
