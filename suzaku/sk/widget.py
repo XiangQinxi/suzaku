@@ -91,8 +91,10 @@ class SkWidget(Layout, EventHanding):
         self.is_mouse_pressed = False
         self.is_focus = False
 
+        self.draws = []
+
         self.draw_func = lambda canvas: self._draw(canvas)
-        self.window.add_draw(self.draw_func)
+        self.parent.add_draw(self.draw_func)
 
         # Events-related
         self.is_mouse_enter = False
@@ -118,13 +120,28 @@ class SkWidget(Layout, EventHanding):
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
 
-    def draw(self, canvas, rect):
+    def add_draw(self, draw_func) -> None:
+        self.draws.append(draw_func)
+
+    def remove_draw(self, draw_func) -> None:
+        self.draws.remove(draw_func)
+
+    import skia
+
+    def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         pass
 
-    def _draw(self, canvas):
+    def _draw(self, canvas: skia.Surfaces) -> None:
         import skia
         rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
         self.draw(canvas, rect)  # Give draw() the canvas and the rect.
+
+        for i, f in enumerate(self.draws):
+            #print(i, f)
+            if self.children[i].visible:
+                f(canvas)
+
+        return None
 
     def _show(self):
         self.attributes["visible"] = True

@@ -1,8 +1,9 @@
 from ..base.window import Window
+from .container import SkContainer
 import skia
 
 
-class SkWindow(Window):
+class SkWindow(Window, SkContainer):
     def __init__(self, *args, themename="light", style="SkWindow", name="sk_window", **kwargs) -> None:
         """
         SkWindow, inherited from Window

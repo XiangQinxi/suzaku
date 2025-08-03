@@ -36,7 +36,7 @@ class SkFrame(SkWidget):
 
         # Rainbow Border Effect
         if "bd_shader" in sheets:
-            if sheets["bd_shader"] == "rainbow":
+            if sheets["bd_shader"].lower() == "rainbow":
                 from .packs import set_rainbow_shader
                 set_rainbow_shader(rect_paint, rect)
 
