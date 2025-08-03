@@ -37,9 +37,12 @@ class SkTheme():
 
         ## Selector
 
-        `<Widget>` indicates the style of Widget, e.g. `SkButton`.
+        `<Widget>` indicates the style of Widget at rest state, e.g. `SkButton`.
 
         `<Widget>:<state>` indicates the style of the state of Widget, e.g. `SkButton:hover`.
+
+        `<Widget>:ITSELF` indecates the style of the widget, e.g. `SkButton.ITSELF`.
+        Note that this is not available everywhere.
 
         :param selector: The selector string
         """
@@ -49,11 +52,12 @@ class SkTheme():
         # Handling
         if ":" in selector:
             result = selector.split(":")
-            # Validation
-            if len(result) >= 2:
+            if len(result) >= 2: # Validation
                 raise ValueError(f"Invalid style selector [{selector}].")
+            if result[1] == "ITSELF":
+                result = [result[0]]
         else:
-            result = [selector]
+            result = [selector, "rest"]
         # Validation
         level_dict = self.styles
         for selector_level in result:
@@ -100,6 +104,8 @@ class SkTheme():
         :param selector: The selector string, indicates where to mix in
         :param **kwargs: Styles to change
         """
+        if "ITSELF" in selector:
+            raise ValueError("<SkWidget.ITSELF> is not supported by SkTheme.special()!")
         new_theme = SkTheme(self.styles)
         style_operate = new_theme.get_style(selector, copy=False)
         style_operate.update(kwargs)
