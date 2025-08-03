@@ -13,7 +13,7 @@ class SkWindow(Window):
         """
         super().__init__(*args, name=name, **kwargs)
 
-        from suzaku.style.themes import theme
+        from suzaku.sk.themes import theme
 
         self.theme = theme
         self.theme.use_theme(themename)
@@ -43,6 +43,13 @@ class SkWindow(Window):
         self.bind("key_release", self._key_release)
 
         self.bind("update", self._update)
+
+    from .theme import SkTheme
+
+    def apply_theme(self, new_theme: SkTheme):
+        self.attributes["theme"] = new_theme
+        for child in self.children:
+            child.apply_theme(new_theme)
 
     def _update(self, event):
         """

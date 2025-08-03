@@ -1,16 +1,16 @@
 from typing import Union, Any
 
+from .theme import default_theme
 from .window import SkWindow
 from .layout import Layout
-from ..base.event import EventHanding, Event
-from ..style.themes import theme, SkTheme
+from ..base.event import EventHanding
 
 
 class SkWidget(Layout, EventHanding):
 
     _instance_count = 0
 
-    theme = theme
+    theme = default_theme
 
     def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="SkWidget",
                  widget_id: Union[str, None] = None, name="sk_visual") -> None:
@@ -132,8 +132,12 @@ class SkWidget(Layout, EventHanding):
     def add_child(self, child: "SkWidget"):
         self.children.append(child)
     
+    from .theme import SkTheme
+
     def apply_theme(self, new_theme: SkTheme):
         self.attributes["theme"] = new_theme
+        for child in self.children:
+            child.apply_theme(new_theme)
 
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
