@@ -102,4 +102,3 @@ class SkAppBase:
     def quit(self) -> None:
         """Quit application."""
         self.running = False
-        self.running = False

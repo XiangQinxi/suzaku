@@ -23,7 +23,7 @@ class SkWindowBase(SkEventHanding):
         :param opacity: window opacity
         """
 
-        from suzaku.base.appbase import SkAppBase
+        from .appbase import SkAppBase
         parent = parent if parent is not None else SkAppBase.get_instance()
         self.parent = parent
         if isinstance(parent, SkAppBase):

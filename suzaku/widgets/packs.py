@@ -10,7 +10,7 @@ def central_text(canvas, text, fg, x, y, width, height):
         y: 文本框上边界
         width: 文本框宽度
         height: 文本框高度
-    Returns：
+    Returns:
         None
     Examples:
         >>> central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)

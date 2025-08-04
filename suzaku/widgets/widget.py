@@ -3,7 +3,7 @@ import skia
 
 from ..styles.theme import default_theme, SkTheme
 from .window import SkWindow
-from .event import SkEventHanding
+from ..event import SkEventHanding
 
 
 class SkWidget(SkEventHanding):

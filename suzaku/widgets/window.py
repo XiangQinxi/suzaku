@@ -1,5 +1,5 @@
-from ..base.windowbase import SkWindowBase
-from ..base.container import SkContainer
+from ..windowbase import SkWindowBase
+from ..container import SkContainer
 import skia
 
 
@@ -97,7 +97,7 @@ class SkWindow(SkWindowBase, SkContainer):
                 widget.event_generate("mouse_press", event)
                 break
 
-    from .event import SkEvent
+    from ..event import SkEvent
 
     def _motion(self, event: SkEvent) -> None:
         """
