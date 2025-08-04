@@ -1,13 +1,16 @@
 from .visual import SkVisual
-
-
+from time import time
+import skia
+from suzaku.base import Var
+from suzaku.base import Event
+from glfw import KEY_BACKSPACE, KEY_DELETE, KEY_LEFT, KEY_RIGHT
+from suzaku.styles.font import default_font
+from ..styles.color import color
 class SkEntry(SkVisual):
 
     """
     输入框组件
     """
-
-    from suzaku.base import Var
 
     def __init__(self, *args, placeholder: str = "", size=(105, 35), cursor="ibeam", style="SkEntry", id=None, textvariable: Var = None, **kwargs) -> None:
         """Entry box component.
@@ -51,9 +54,7 @@ class SkEntry(SkVisual):
     def _textvariable(self, evt):
         self.visual_attr["text"] = self.visual_attr["textvariable"].get()
 
-    from suzaku.base import Event
     def _key(self, evt: Event):
-        from glfw import KEY_BACKSPACE, KEY_LEFT, KEY_RIGHT, KEY_DELETE
         if self.visual_attr["textvariable"] is not None:
             text = self.visual_attr["textvariable"].get()
         else:
@@ -110,12 +111,10 @@ class SkEntry(SkVisual):
         self.visual_attr["cursor_pos"] = 0
         # 重置光标闪烁状态
         self.visual_attr["cursor_visible"] = True
-        import time
-        self.visual_attr["last_blink_time"] = time.time() * 1000
+        self.visual_attr["last_blink_time"] = time() * 1000
 
     def _update_scroll_offset(self):
         """更新滚动偏移量，确保光标可见"""
-        from suzaku.styles.font import default_font
         font = default_font()
         if self.visual_attr["textvariable"] is not None:
             text = self.visual_attr["textvariable"].get()
@@ -139,8 +138,7 @@ class SkEntry(SkVisual):
         # 确保光标可见
         self.visual_attr["cursor_visible"] = True
         # 重置闪烁时间
-        import time
-        self.visual_attr["last_blink_time"] = time.time() * 1000
+        self.visual_attr["last_blink_time"] = time() * 1000
 
     def draw(self, canvas, rect) -> None:
         """
@@ -150,13 +148,11 @@ class SkEntry(SkVisual):
         :param rect: 给出的矩形
         :return:
         """
-        import skia
         rect_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
-        from ..styles.color import color
 
         if self.is_mouse_enter:
             if self.is_focus:
@@ -200,7 +196,6 @@ class SkEntry(SkVisual):
             Color=color(sheets["fg"])
         )
 
-        from suzaku.styles.font import default_font
         font = default_font()
 
         metrics = font.getMetrics()
@@ -254,8 +249,7 @@ class SkEntry(SkVisual):
                 scroll_offset = self.visual_attr["scroll_offset"]
 
             # 更新光标闪烁状态
-            import time
-            current_time = time.time() * 1000
+            current_time = time() * 1000
             if current_time - self.visual_attr["last_blink_time"] >= self.visual_attr["blink_interval"]:
                 # 切换光标可见性
                 self.visual_attr["cursor_visible"] = not self.visual_attr["cursor_visible"]

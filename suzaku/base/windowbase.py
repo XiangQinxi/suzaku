@@ -1,8 +1,13 @@
-from typing import Union, Any
+from typing import Any, Union
 
 from ..event import SkEventHanding
-
-
+from suzaku.base.appbase import SkAppBase
+import contextlib
+from suzaku.event import SkEvent
+import glfw
+import skia
+from OpenGL import GL
+import sys
 
 class SkWindowBase(SkEventHanding):
 
@@ -23,9 +28,8 @@ class SkWindowBase(SkEventHanding):
         """
 
         super().__init__()
-        from suzaku.base.appbase import SkAppBase
-        parent = parent if parent is not None else SkAppBase.get_instance()
-        self.parent = parent
+
+        self.parent = parent if parent is not None else SkAppBase.get_instance()
         if isinstance(parent, SkAppBase):
             self.application = parent
         else:
@@ -109,14 +113,11 @@ class SkWindowBase(SkEventHanding):
         """
         return cls._instance_count
 
-    import contextlib
+    
 
     # 修改窗口类的skia_surface方法
     @contextlib.contextmanager
-    def skia_surface(self, window):
-        import skia, glfw
-        from OpenGL import GL
-
+    def skia_surface(self, window: any):
         # 添加窗口有效性检查
         if not glfw.get_current_context() or glfw.window_should_close(window):
             yield None
@@ -138,7 +139,7 @@ class SkWindowBase(SkEventHanding):
             if 'context' in locals():
                 context.releaseResourcesAndAbandonContext()
 
-    def _on_char(self, window, char) -> None:
+    def _on_char(self, window: any, char: str) -> None:
         """
         触发字符事件
 
@@ -149,10 +150,10 @@ class SkWindowBase(SkEventHanding):
         Returns:
             None
         """
-        from suzaku.event import SkEvent
+
         self.event_generate("char", SkEvent(event_type="char", char=chr(char)))
 
-    def _on_key(self, window, key, scancode, action, mods) -> None:
+    def _on_key(self, window: any, key: str, scancode: str, action: str, mods: str) -> None:
         """
         触发键盘事件
 
@@ -166,9 +167,9 @@ class SkWindowBase(SkEventHanding):
         Returns:
 
         """
-        from glfw import PRESS, RELEASE, REPEAT, MOD_CONTROL, MOD_ALT, MOD_SHIFT, MOD_SUPER, MOD_NUM_LOCK, MOD_CAPS_LOCK
-        from suzaku.event import SkEvent
-        from glfw import get_key_name
+        from glfw import (MOD_ALT, MOD_CAPS_LOCK, MOD_CONTROL, MOD_NUM_LOCK,
+                          MOD_SHIFT, MOD_SUPER, PRESS, RELEASE, REPEAT,
+                          get_key_name)
 
         keyname: str = get_key_name(key, scancode)  # 获取对应的键名，不同平台scancode不同，因此需要输入scancode来正确转换。有些按键不具备键名
         mods_dict = {
@@ -198,7 +199,6 @@ class SkWindowBase(SkEventHanding):
             self.event_generate("key_repeat", SkEvent(event_type="key_repeat", key=key, keyname=keyname, mods=m))
 
     def _on_focus(self, window, focused) -> None:
-        from suzaku.event import SkEvent
         if focused:
             self.attributes["focus"] = True
             self.event_generate("focus_in", SkEvent(event_type="focus_in"))
@@ -206,10 +206,9 @@ class SkWindowBase(SkEventHanding):
             self.attributes["focus"] = False
             self.event_generate("focus_out", SkEvent(event_type="focus_out"))
 
-    def _on_framebuffer_size(self, window, width, height, ) -> None:
+    def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
         if self.draw_func:
             # 确保设置当前窗口上下文
-            import glfw
             glfw.make_context_current(window)
             with self.skia_surface(window) as surface:
                 with surface as canvas:
@@ -226,12 +225,10 @@ class SkWindowBase(SkEventHanding):
         :param height: 高度
         :return: None
         """
-        from OpenGL import GL
         GL.glViewport(0, 0, width, height)
         self._on_framebuffer_size(window, width, height)
         self.width = width
         self.height = height
-        from suzaku.event import SkEvent
         self.event_generate("resize", SkEvent(event_type="resize", width=width, height=height))
         #cls.update()
 
@@ -246,7 +243,6 @@ class SkWindowBase(SkEventHanding):
         """
         self.x = x
         self.y = y
-        from suzaku.event import SkEvent
         self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
 
     def _on_closed(self, window) -> None:
@@ -256,12 +252,9 @@ class SkWindowBase(SkEventHanding):
         :param window: GLFW窗口
         :return: None
         """
-        #from glfw import terminate
-        from suzaku.event import SkEvent
         self.event_generate("closed", SkEvent(event_type="closed"))
-        #terminate()
 
-    def _on_mouse_button(self, window, arg1, is_press: bool, arg2) -> None:
+    def _on_mouse_button(self, window: any, arg1: any, is_press: bool, arg2: any) -> None:
         """
         触发mouse_pressed事件(鼠标按下时触发)或mouser_released事件(鼠标松开时触发)
 
@@ -277,8 +270,8 @@ class SkWindowBase(SkEventHanding):
         """
         #print(arg1, arg2)
 
-        from suzaku.event import SkEvent
         from glfw import get_cursor_pos
+
         pos = get_cursor_pos(window)
         self.mouse_x = pos[0]
         self.mouse_y = pos[1]
@@ -296,7 +289,7 @@ class SkWindowBase(SkEventHanding):
                                                          rootx=self.mouse_rootx, 
                                                          rooty=self.mouse_rooty))
 
-    def _on_cursor_enter(self, window, is_enter: bool) -> None:
+    def _on_cursor_enter(self, window: any, is_enter: bool) -> None:
         """
         触发mouse_enter事件(鼠标进入窗口时触发)或mouser_leave事件(鼠标离开窗口时触发)
 
@@ -308,8 +301,8 @@ class SkWindowBase(SkEventHanding):
         :return: None
         """
 
-        from suzaku.event import SkEvent
         from glfw import get_cursor_pos
+
         pos = get_cursor_pos(window)
         self.mouse_x = pos[0]
         self.mouse_y = pos[1]
@@ -327,7 +320,7 @@ class SkWindowBase(SkEventHanding):
                                                        rootx=self.mouse_rootx, 
                                                        rooty=self.mouse_rooty))
 
-    def _on_cursor_pos(self, window, x, y) -> None:
+    def _on_cursor_pos(self, window: any, x: int, y: int) -> None:
         """
         触发mouse_motion事件(鼠标进入窗口并移动时触发)
 
@@ -336,8 +329,6 @@ class SkWindowBase(SkEventHanding):
         :param y: 鼠标y坐标
         :return: None
         """
-
-        from suzaku.event import SkEvent
 
         self.mouse_x = x
         self.mouse_y = y
@@ -355,10 +346,8 @@ class SkWindowBase(SkEventHanding):
         :return: None
         """
         if self.visible:
-            from suzaku.event import SkEvent
             self.event_generate("update", SkEvent(event_type="update"))
-            from glfw import swap_buffers
-            swap_buffers(self.glfw_window)
+            glfw.swap_buffers(self.glfw_window)
 
     def __str__(self):
         """
@@ -380,23 +369,21 @@ class SkWindowBase(SkEventHanding):
         :return: 光标样式名 或者 cls
         """
 
-        from glfw import (set_cursor, create_standard_cursor)
+        from glfw import create_standard_cursor, set_cursor
         if cursorname is None:
             return self
 
-        name = cursorname.lower()
+        name = cursorname.upper()
 
         # cursorget = vars()[f"{name.upper()}_CURSOR"] # e.g. crosschair -> CROSSHAIR_CURSOR
-        cursorget = getattr(__import__("glfw", fromlist=[f"{name.upper()}_CURSOR"]), 
-                                       f"{name.upper()}_CURSOR")
-        if cursorget:
-            c = create_standard_cursor(cursorget)
-        else:
+        cursorget = getattr(__import__("glfw", fromlist=[f"{name}_CURSOR"]), 
+                                       f"{name}_CURSOR")
+        if cursorget is None:
             return self
 
         self.new_cursor = name
         if self.glfw_window:
-            set_cursor(self.glfw_window, c)
+            set_cursor(self.glfw_window, create_standard_cursor(cursorget))
         return self
 
     def default_cursor(self, cursorname: str = None) -> str | type:
@@ -433,6 +420,8 @@ class SkWindowBase(SkEventHanding):
             self.show()
         else:
             self.hide()
+
+        self.visible = is_visible
         return self
 
     def show(self) -> "SkWindowBase":
@@ -483,9 +472,8 @@ class SkWindowBase(SkEventHanding):
         return self
 
     def destroy(self) -> None:
-        """Proper window destruction"""
+        """关闭窗口"""
         if self.glfw_window:
-            import glfw
             glfw.destroy_window(self.glfw_window)
             self.glfw_window = None  # Clear the reference
 
@@ -513,7 +501,7 @@ class SkWindowBase(SkEventHanding):
         调整窗口大小
         :param width: 宽度
         :param height: 高度
-        :param animation_s: 动画持续时间(秒)，0表示无动画
+        :param animation_s: 动画持续时间(秒), 0表示无动画
         :return: cls
         """
         if width is None:
@@ -526,7 +514,6 @@ class SkWindowBase(SkEventHanding):
 
         from glfw import set_window_size
         set_window_size(self.glfw_window, width, height)
-        from suzaku.event import SkEvent
         self.event_generate("resize", SkEvent(event_type="resize", width=width, height=height))
 
         return self
@@ -546,7 +533,6 @@ class SkWindowBase(SkEventHanding):
         self.y = y
         from glfw import set_window_pos
         set_window_pos(self.glfw_window, x, y)
-        from suzaku.event import SkEvent
         self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
 
         return self
@@ -617,16 +603,12 @@ class SkWindowBase(SkEventHanding):
         Returns:
             any: GLFW窗口
         """
-
-        import glfw
-
         if hasattr(self, 'application') and self.application:
             if self.attributes["fullscreen"]:
                 monitor = glfw.get_primary_monitor()
             else:
                 monitor = None
 
-            import sys
             glfw.window_hint(glfw.STENCIL_BITS, 8)
             # see https://www.glfw.org/faq#macos
             if sys.platform.startswith("darwin"):
@@ -639,7 +621,7 @@ class SkWindowBase(SkEventHanding):
             window = glfw.create_window(
                 self.width,
                 self.height,
-                self.title(),
+                self.attributes["title"],
                 monitor, None
             )
             if not window:
@@ -673,7 +655,6 @@ class SkWindowBase(SkEventHanding):
             None
         """
         window =  self.glfw_window
-        import glfw
         glfw.make_context_current(window)
         glfw.set_window_size_callback(window, self._on_resizing)
         glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)

@@ -1,3 +1,6 @@
+import skia
+from suzaku.styles.font import default_font
+
 def central_text(canvas, text, fg, x, y, width, height):
     """
     绘制居中文本
@@ -10,19 +13,18 @@ def central_text(canvas, text, fg, x, y, width, height):
         y: 文本框上边界
         width: 文本框宽度
         height: 文本框高度
-    Returns：
+    Returns:
         None
     Examples:
         >>> central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
     """
-    import skia
+
     # 绘制字体
     text_paint = skia.Paint(
         AntiAlias=True,
         Color=fg
     )
 
-    from suzaku.styles.font import default_font
     font = default_font()
 
     text_width = font.measureText(text)
@@ -35,7 +37,6 @@ def central_text(canvas, text, fg, x, y, width, height):
 
 
 def set_rainbow_shader(rect_paint, rect):
-    import skia
     rect_paint.setShader(
         skia.GradientShader.MakeSweep(
             cx=rect.centerX(),
@@ -50,7 +51,6 @@ def set_rainbow_shader(rect_paint, rect):
     )
 
 def set_drop_shadow(rect_paint, color):
-    import skia
     rect_paint.setImageFilter(
         skia.ImageFilters.DropShadow(dx=2, dy=2, sigmaX=4, sigmaY=4, color=color)
     )
