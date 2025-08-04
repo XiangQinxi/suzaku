@@ -1,4 +1,7 @@
-class SkContainer():
+import skia
+
+
+class SkContainer:
 
     def __init__(self):
         """A SkContainer represents a widget that has the ability to contain other widgets inside.
@@ -30,11 +33,11 @@ class SkContainer():
 
     def draw_children(self, canvas):
         for item in self.draw_list:
-            for index, draw_func in enumerate(item):
+            for child_dict in item:
                 #print(i, f)
-                if self.children[index].visible:
-                    #draw_func(canvas)
-                    pass
+                if child_dict["child"].visible:
+                    rect = skia.Rect(child_dict["x"], child_dict["y"], child_dict["x"] + child_dict["width"], child_dict["y"] + child_dict["height"])
+                    child_dict["child"].draw(canvas, rect)
 
     def add_child(self, child):
         """

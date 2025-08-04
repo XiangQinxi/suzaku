@@ -122,8 +122,12 @@ class SkWidget(SkEventHanding):
         """
         return self.attributes[attribute_name]
 
+    cget = get_attribute
+
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
+
+    configure = config = set_attribute
 
     def apply_theme(self, new_theme: SkTheme):
         self.theme = new_theme
@@ -142,10 +146,10 @@ class SkWidget(SkEventHanding):
             self,
             {
                 "child": self,
-                "x": x,
-                "y": y,
-                "width": width,
-                "height": height
+                "x": self.x,
+                "y": self.y,
+                "width": self.width,
+                "height": self.height
             }
         )
         self.visible = True
@@ -157,5 +161,8 @@ class SkWidget(SkEventHanding):
     def pack(self, padx: int=0, pady: int=0, expand: bool=False):
         pass
 
-    # Aliases
-    config = set_attribute
+    def focus_set(self):
+        self.window.focus_widget = self
+
+    def focus_get(self):
+        return self.window.focus_get()
