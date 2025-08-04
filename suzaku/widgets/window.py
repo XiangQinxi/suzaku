@@ -61,7 +61,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         """
         for widget in self.children:
-            from .event import SkEvent
+            from suzaku.event import SkEvent
             widget.event_generate("update", SkEvent(event_type="update"))
 
     def _key_press(self, event):
@@ -83,7 +83,7 @@ class SkWindow(SkWindowBase, SkContainer):
             self.focus_get().event_generate("char", event)
 
     def _leave(self, event):
-        from .event import SkEvent
+        from suzaku.event import SkEvent
         event = SkEvent(event_type="mouse_leave", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
         for widget in self.children:
             widget.event_generate("mouse_leave", event)
@@ -97,7 +97,7 @@ class SkWindow(SkWindowBase, SkContainer):
                 widget.event_generate("mouse_press", event)
                 break
 
-    from .event import SkEvent
+    from suzaku.event import SkEvent
 
     def _motion(self, event: SkEvent) -> None:
         """
@@ -109,7 +109,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         """
         current_widget = None
-        from .event import SkEvent
+        from suzaku.event import SkEvent
         event = SkEvent(event_type="mouse_motion", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
 
         # 找到当前鼠标所在的视觉元素
@@ -171,7 +171,7 @@ class SkWindow(SkWindowBase, SkContainer):
         return self.attributes["styles"]
 
     def _mouse_release(self, event) -> None:
-        from .event import SkEvent
+        from suzaku.event import SkEvent
         event = SkEvent(
             event_type="mouse_release",
             x=event.x,

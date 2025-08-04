@@ -1,7 +1,6 @@
 import warnings
 from typing import Union, Any
 
-
 def default_font() -> "SkFont":
     """
     Default font (Harmony Sans SC).

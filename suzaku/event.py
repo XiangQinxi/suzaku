@@ -1,4 +1,4 @@
-from .after import SkAfter
+from suzaku.after import SkAfter
 
 from typing import Union, Any
 

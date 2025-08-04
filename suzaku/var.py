@@ -1,4 +1,4 @@
-from .event import SkEventHanding
+from suzaku.event import SkEventHanding
 
 
 class SkVar(SkEventHanding):

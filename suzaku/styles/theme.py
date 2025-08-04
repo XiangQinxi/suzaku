@@ -218,9 +218,11 @@ class SkTheme():
         """
         widget.apply_theme(self)
 
-
 for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
+    print(file)
     SkTheme.INTERNAL_THEMES[file.split(".")[0]] = (SkTheme({}).load_from_file(\
         SkTheme.INTERNAL_THEME_DIR / file))
 
-SkTheme.DEFAULT_THEME = default_theme = SkTheme.INTERNAL_THEMES["default.light"]
+print(SkTheme.INTERNAL_THEMES)
+
+SkTheme.DEFAULT_THEME = default_theme = SkTheme.INTERNAL_THEMES["light"]

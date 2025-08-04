@@ -3,7 +3,7 @@ import skia
 
 from ..styles.theme import default_theme, SkTheme
 from .window import SkWindow
-from .event import SkEventHanding
+from suzaku.event import SkEventHanding
 
 
 class SkWidget(SkEventHanding):
@@ -39,6 +39,7 @@ class SkWidget(SkEventHanding):
             "dheight": size[1],  # default height
         }
 
+        self.theme = self.parent.theme
         self.style = style
 
         self.x = 0
@@ -108,11 +109,6 @@ class SkWidget(SkEventHanding):
     def add_child(self, child: "SkWidget"):
         self.attributes["children"].append(child)
 
-    def apply_theme(self, new_theme: SkTheme):
-        self.attributes["theme"] = new_theme
-        for child in self.attributes["children"]:
-            child.apply_theme(new_theme)
-
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
@@ -123,6 +119,12 @@ class SkWidget(SkEventHanding):
 
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
+
+    def apply_theme(self, new_theme: SkTheme):
+        self.theme = new_theme
+        if hasattr(self, "children"):
+            for child in self.children:
+                child.apply_theme(new_theme)
 
     def place(self, x: int, y: int, width: int = None, height: int = None):
         self.x = x
@@ -138,7 +140,7 @@ class SkWidget(SkEventHanding):
 
     # Layout related
     def pack(self, padx: int=0, pady: int=0, expand: bool=False):
-        NotImplemented
+        pass
 
     # Aliases
     config = set_attribute
