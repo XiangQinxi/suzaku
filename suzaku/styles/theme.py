@@ -44,6 +44,7 @@ class SkTheme():
         self.styles: dict = style
         self.name: str = f"Untitled theme {len(SkTheme.loaded_themes) + 1}"
         self.parent: Union["SkTheme", None] = parent
+        SkTheme.loaded_themes.append(self)
         return
     
     def load_from_file(self, file_path: Union[str, pathlib.Path]) -> "SkTheme":
