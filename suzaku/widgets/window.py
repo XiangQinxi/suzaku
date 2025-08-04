@@ -1,5 +1,5 @@
-from .windowbase import SkWindowBase
-from .container import SkContainer
+from ..base.windowbase import SkWindowBase
+from ..base.container import SkContainer
 import skia
 
 

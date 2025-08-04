@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Union, Any
 
 from .event import SkEventHanding
 
@@ -8,7 +8,9 @@ class SkWindowBase(SkEventHanding):
 
     _instance_count = 0
 
-    def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0, force_hardware_acceleration: bool = False, name="window"):
+    def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), 
+                 id=None, fullscreen=False, opacity: float = 1.0, 
+                 force_hardware_acceleration: bool = False, name="window"):
 
         """
         Base SkWindowBase
@@ -21,7 +23,7 @@ class SkWindowBase(SkEventHanding):
         :param opacity: window opacity
         """
 
-        from suzaku.widgets.appbase import SkAppBase
+        from suzaku.base.appbase import SkAppBase
         parent = parent if parent is not None else SkAppBase.get_instance()
         self.parent = parent
         if isinstance(parent, SkAppBase):
@@ -284,9 +286,15 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rooty = pos[1] + self.y
 
         if is_press:
-            self.event_generate("mouse_press", SkEvent(event_type="mouse_press", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_press", SkEvent(event_type="mouse_press", 
+                                                       x=pos[0], y=pos[1], 
+                                                       rootx=self.mouse_rootx, 
+                                                       rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_release", SkEvent(event_type="mouse_release", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_release", SkEvent(event_type="mouse_release", 
+                                                         x=pos[0], y=pos[1], 
+                                                         rootx=self.mouse_rootx, 
+                                                         rooty=self.mouse_rooty))
 
     def _on_cursor_enter(self, window, is_enter: bool) -> None:
         """
@@ -309,9 +317,15 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rooty = pos[1] + self.y
 
         if is_enter:
-            self.event_generate("mouse_enter", SkEvent(event_type="mouse_enter", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_enter", SkEvent(event_type="mouse_enter", 
+                                                       x=pos[0], y=pos[1], 
+                                                       rootx=self.mouse_rootx, 
+                                                       rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_leave", SkEvent(event_type="mouse_leave", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_leave", SkEvent(event_type="mouse_leave", 
+                                                       x=pos[0], y=pos[1], 
+                                                       rootx=self.mouse_rootx, 
+                                                       rooty=self.mouse_rooty))
 
     def _on_cursor_pos(self, window, x, y) -> None:
         """
@@ -330,7 +344,10 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rootx = x
         self.mouse_rooty = y
 
-        self.event_generate("mouse_motion", SkEvent(event_type="mouse_motion", x=x, y=y, rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+        self.event_generate("mouse_motion", SkEvent(event_type="mouse_motion", 
+                                                    x=x, y=y, 
+                                                    rootx=self.mouse_rootx, 
+                                                    rooty=self.mouse_rooty))
 
     def update(self) -> None:
         """
@@ -350,7 +367,7 @@ class SkWindowBase(SkEventHanding):
         """
         return self.id
 
-    def cursor(self, cursorname: str = None) -> str | type:
+    def cursor(self, cursorname: Union[str, None] = None) -> "SkWindowBase":
 
         """
         设置窗口当前的鼠标指针样式
@@ -363,20 +380,19 @@ class SkWindowBase(SkEventHanding):
         :return: 光标样式名 或者 cls
         """
 
-        from glfw import (set_cursor, create_standard_cursor, ARROW_CURSOR, HAND_CURSOR, VRESIZE_CURSOR,
-                          RESIZE_NWSE_CURSOR, RESIZE_NS_CURSOR, RESIZE_NESW_CURSOR, RESIZE_EW_CURSOR, RESIZE_ALL_CURSOR,
-                          POINTING_HAND_CURSOR, NOT_ALLOWED_CURSOR, NO_CURRENT_CONTEXT, IBEAM_CURSOR, HRESIZE_CURSOR,
-                          CROSSHAIR_CURSOR, CENTER_CURSOR)
+        from glfw import (set_cursor, create_standard_cursor)
         if cursorname is None:
-            return self.new_cursor
+            return self
 
         name = cursorname.lower()
 
-        cursorget = vars()[f"{name.upper()}_CURSOR"] # e.g. crosschair -> CROSSHAIR_CURSOR
+        # cursorget = vars()[f"{name.upper()}_CURSOR"] # e.g. crosschair -> CROSSHAIR_CURSOR
+        cursorget = getattr(__import__("glfw", fromlist=[f"{name.upper()}_CURSOR"]), 
+                                       f"{name.upper()}_CURSOR")
         if cursorget:
             c = create_standard_cursor(cursorget)
         else:
-            return self.new_cursor
+            return self
 
         self.new_cursor = name
         if self.glfw_window:

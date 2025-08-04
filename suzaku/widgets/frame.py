@@ -1,5 +1,5 @@
 from .widget import SkWidget
-from .container import SkContainer
+from ..base.container import SkContainer
 from typing import Union
 
 

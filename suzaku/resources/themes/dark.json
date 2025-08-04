@@ -1,101 +1,85 @@
 {
-  "name": "dark",
-  "base": "default",
+  "name": "default.dark",
+  "base": "default.light",
+  "friendly_name": "Default Dark",
 
-  "SkWindow": {
-    "bg": [255, 255, 255, 20]
+  "color_palette": {
+    "default_bg": [255, 255, 255, 20],
+    "default_fg": [255, 255, 255, 255]
   },
 
-  "SkBadge": {
-    "radius": 99,
-    "bg": [25, 145, 225, 240],
-    "fg": [0, 0, 0, 235],
-    "bd": "transparent",
-    "width": 0
-  },
+  "styles": {
+    "SkWindow": {
+      "bg": {"color_palette": "default_bg"}
+    },
 
-  "SkButton": {
-    "radius": 8,
-    "rest": {
-      "bg": [255, 255, 255, 20],
-      "fg": [255, 255, 255, 235],
-      "bd": [255, 255, 255, 10],
-      "width": 2
-    },
-    "hover": {
-      "bg": [255, 255, 255, 40],
-      "fg": [255, 255, 255, 235],
-      "bd": [25, 145, 225, 180],
-      "width": 2,
-      "bd_shadow": true
-    },
-    "focus": {
-      "bg": [255, 255, 255, 20],
-      "fg": [255, 255, 255, 235],
-      "bd": [255, 255, 255, 200],
-      "width": 3,
-      "bd_shader": "rainbow"
-    },
-    "pressed": {
-      "bg": [255, 255, 255, 60],
-      "fg": [255, 255, 255, 155],
-      "bd": [255, 255, 255, 10],
-      "width": 3
-    }
-  },
-
-  "Close.SkButton": {
-    "radius": 8,
-    "rest": {
-      "bg": "transparent",
-      "fg": [255, 255, 255, 235],
-      "bd": "transparent",
+    "SkBadge": {
+      "radius": 99,
+      "bg": [25, 145, 225, 240],
+      "fg": [0, 0, 0, 255],
+      "bd": {"textures": "transparent"},
       "width": 0
     },
-    "hover": {
-      "bg": [195, 45, 30, 255],
-      "fg": [255, 255, 255, 235],
-      "bd": "transparent",
-      "width": 0,
-      "bd_shadow": true
-    },
-    "pressed": {
-      "bg": [195, 45, 30, 185],
-      "fg": [255, 255, 255, 235],
-      "bd": "transparent",
-      "width": 0,
-      "bd_shadow": true
-    }
-  },
 
-  "SkEntry": {
-    "radius": 8,
-    "rest": {
-      "bg": [255, 255, 255, 0],
-      "fg": [255, 255, 255, 235],
-      "bd": [255, 255, 255, 10],
-      "width": 2,
-      "placeholder": [255, 255, 255, 165]
+    "SkButton": {
+      "rest": {
+        "bg": {"color_palette": "default_bg"},
+        "fg": {"color_palette": "default_fg"},
+        "bd": [255, 255, 255, 10],
+        "width": 2,
+        "radius": 2
+      },
+      "hover": {
+        "bg": [40, 40, 40, 255],
+        "fg": [255, 255, 255, 255],
+        "bd": [25, 145, 225, 180],
+        "width": 2,
+        "bd_shadow": true
+      },
+      "focus": {
+        "bg": {"color_palette": "default_bg"},
+        "fg": [255, 255, 255, 255],
+        "bd": [255, 255, 255, 200],
+        "width": 3,
+        "bd_shader": {"texture": "rainbow"}
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 60],
+        "fg": [255, 255, 255, 155],
+        "bd": [255, 255, 255, 10],
+        "width": 3
+      }
     },
-    "hover": {
-      "bg": [255, 255, 255, 10],
-      "fg": [255, 255, 255, 235],
-      "bd": [25, 145, 225, 180],
-      "width": 2,
-      "bd_shadow": true,
-      "placeholder": [255, 255, 255, 165]
-    },
-    "focus": {
-      "bg": [255, 255, 255, 20],
-      "fg": [255, 255, 255, 235],
-      "bd": [25, 145, 225, 180],
-      "width": 2,
-      "bd_shader": "rainbow"
-    }
-  },
 
-  "SkLabel": {
-    "bg": "transparent",
-    "fg": [255, 255, 255, 245]
+    "SkEntry": {
+      "radius": 8,
+      "rest": {
+        "bg": [255, 255, 255, 0],
+        "fg": [255, 255, 255, 255],
+        "bd": [255, 255, 255, 10],
+        "width": 2,
+        "placeholder": [255, 255, 255, 165]
+      },
+      "hover": {
+        "bg": [255, 255, 255, 10],
+        "fg": [255, 255, 255, 255],
+        "bd": [25, 145, 225, 180],
+        "width": 2,
+        "bd_shadow": true,
+        "placeholder": [255, 255, 255, 165]
+      },
+      "focus": {
+        "bg": {"color_palette": "default_bg"},
+        "fg": [255, 255, 255, 255],
+        "bd": [25, 145, 225, 180],
+        "width": 2,
+        "bd_shader": {"texture": "rainbow"}
+      }
+    },
+
+    "SkLabel": {
+      "bg": {"textures": "transparent"},
+      "fg": [255, 255, 255, 245]
+    }
   }
 }
