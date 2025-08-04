@@ -133,6 +133,7 @@ class SkWidget(SkEventHanding):
         if height:
             self.height = height
         self.parent.add_floating_child(
+            self,
             {
                 "child": self,
                 "x": x,
