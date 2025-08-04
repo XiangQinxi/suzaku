@@ -13,8 +13,8 @@ class SkWidget(EventHanding):
 
     theme = default_theme
 
-    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="SkWidget",
-                 widget_id: Union[str, None] = None, name="SkWidget") -> None:
+    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), 
+                 style="SkWidget", widget_id: Union[str, None] = None, name="SkWidget") -> None:
         """Basic visual component, telling SkWindow how to draw.
 
         parent: Parent component (Usually a SkWindow)
@@ -75,9 +75,6 @@ class SkWidget(EventHanding):
         except TypeError:
             raise TypeError("Parent component is not SkWindow or SkWidget.")
 
-        self.draws = []
-        self.parent.add_draw(lambda canvas: self._draw(canvas))
-
         # Events-related
         self.is_mouse_floating = False
         self.is_mouse_pressed = False
@@ -122,7 +119,7 @@ class SkWidget(EventHanding):
 
     def apply_theme(self, new_theme: SkTheme):
         self.attributes["theme"] = new_theme
-        for child in self.children:
+        for child in self.attributes["children"]:
             child.apply_theme(new_theme)
 
     # Attributes related
