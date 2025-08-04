@@ -28,37 +28,6 @@ class SkContainer():
         self.children = []
         self.draw_list = [[], []]
 
-    def draw(self):
-        for l in self.draw_list:
-            pass
-
-    def add_child(self, child):
-        """Add child widget to window.
-
-        :param child: The child to add
-        """
-        self.children.append(child)
-
-    def add_layout_child(self, child, draw_dict):
-        """Add layout child widget to window.
-
-        :arg child: SkWidget
-        :arg draw_dict: dict
-        :return: None
-        """
-        self.add_child(child)
-        self.draw_list[0].append(draw_dict)
-
-    def add_floating_child(self, child, draw_dict):
-        """Add floating child widget to window.
-
-        :arg child: SkWidget
-        :arg draw_dict: dict
-        :return: None
-        """
-        self.add_child(child)
-        self.draw_list[1].append(draw_dict)
-
     def _handle_layout(self):
         NotImplemented
 

@@ -1,6 +1,7 @@
+from typing import Union
+
 from .frame import SkFrame
 
-from typing import Union
 
 class SkButton(SkFrame):
 
@@ -51,5 +52,5 @@ class SkButton(SkFrame):
         * canvas: skia.Surface to draw on
         * rect: Rectangle to draw in
         """
-
+        NotImplemented
 

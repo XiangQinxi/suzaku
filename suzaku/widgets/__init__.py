@@ -1,5 +1,5 @@
 from .app import SkApp
-from .appwindow import SkAppWindow, Sk
+from .appwindow import Sk, SkAppWindow
 from .button import SkButton
 from .empty import SkEmpty
 from .frame import SkFrame

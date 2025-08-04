@@ -1,9 +1,11 @@
-from typing import Union, Any
+from typing import Any, Union
+
 import skia
 
-from ..styles.theme import default_theme, SkTheme
-from .window import SkWindow
 from suzaku.event import SkEventHanding
+
+from ..styles.theme import SkTheme, default_theme
+from .window import SkWindow
 
 
 class SkWidget(SkEventHanding):
@@ -48,6 +50,7 @@ class SkWidget(SkEventHanding):
         self.width = size[0]
         self.height = size[1]
 
+        self.layout = None
         self.visible = False
 
         if not widget_id:
@@ -96,9 +99,6 @@ class SkWidget(SkEventHanding):
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
 
-    def _draw(self, canvas: skia.Surfaces):
-        pass
-
     def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         pass
 
@@ -107,6 +107,9 @@ class SkWidget(SkEventHanding):
 
     def hide(self):
         self.visible = False
+
+    def add_child(self, child: "SkWidget"):
+        self.attributes["children"].append(child)
 
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
@@ -132,16 +135,6 @@ class SkWidget(SkEventHanding):
             self.width = width
         if height:
             self.height = height
-        self.parent.add_floating_child(
-            self,
-            {
-                "child": self,
-                "x": x,
-                "y": y,
-                "width": width,
-                "height": height
-            }
-        )
         self.visible = True
 
     def place_forget(self):

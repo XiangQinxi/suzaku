@@ -1,6 +1,11 @@
-from ..base.windowbase import SkWindowBase
-from ..base.container import SkContainer
 import skia
+
+from suzaku.event import SkEvent
+from suzaku.styles.theme import SkTheme, default_theme
+
+from ..base.container import SkContainer
+from ..base.windowbase import SkWindowBase
+from ..styles.color import color
 
 
 class SkWindow(SkWindowBase, SkContainer):
@@ -14,8 +19,6 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         SkWindowBase.__init__(self, *args, name=name, **kwargs)
         SkContainer.__init__(self)
-
-        from suzaku.styles.theme import default_theme
 
         self.theme = default_theme
 
@@ -42,8 +45,6 @@ class SkWindow(SkWindowBase, SkContainer):
         self.bind("key_release", self._key_release)
 
         self.bind("update", self._update)
-
-    from suzaku.styles.theme import SkTheme
 
     def apply_theme(self, new_theme: SkTheme):
         self.attributes["theme"] = new_theme
@@ -83,7 +84,6 @@ class SkWindow(SkWindowBase, SkContainer):
             self.focus_get().event_generate("char", event)
 
     def _leave(self, event):
-        from suzaku.event import SkEvent
         event = SkEvent(event_type="mouse_leave", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
         for widget in self.children:
             widget.event_generate("mouse_leave", event)
@@ -97,8 +97,6 @@ class SkWindow(SkWindowBase, SkContainer):
                 widget.event_generate("mouse_press", event)
                 break
 
-    from suzaku.event import SkEvent
-
     def _motion(self, event: SkEvent) -> None:
         """
 
@@ -109,7 +107,6 @@ class SkWindow(SkWindowBase, SkContainer):
 
         """
         current_widget = None
-        from suzaku.event import SkEvent
         event = SkEvent(event_type="mouse_motion", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
 
         # 找到当前鼠标所在的视觉元素
@@ -139,6 +136,18 @@ class SkWindow(SkWindowBase, SkContainer):
         else:
             self.previous_widget = None
 
+    def add_child(self, child: "SkWidget"):
+        """
+        Add child widget to window.
+
+        Args:
+            child: SkWidget
+
+        Returns:
+            None
+        """
+        self.children.append(child)
+
     def add_draw(self, draw_func) -> None:
         self.draws.append(draw_func)
 
@@ -146,7 +155,6 @@ class SkWindow(SkWindowBase, SkContainer):
         self.draws.remove(draw_func)
 
     def draw(self, canvas: skia.Surfaces) -> None:
-        from ..styles.color import color
         canvas.clear(color(self.theme.styles[self.winfo_style()]["bg"]))
 
         for i, f in enumerate(self.draws):
@@ -159,7 +167,6 @@ class SkWindow(SkWindowBase, SkContainer):
         return self.attributes["styles"]
 
     def _mouse_release(self, event) -> None:
-        from suzaku.event import SkEvent
         event = SkEvent(
             event_type="mouse_release",
             x=event.x,
