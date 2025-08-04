@@ -221,7 +221,6 @@ class SkTheme:
         widget.apply_theme(self)
 
 for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
-    print(file)
     SkTheme.INTERNAL_THEMES[file.split(".")[0]] = (SkTheme({}).load_from_file(\
         SkTheme.INTERNAL_THEME_DIR / file))
 
