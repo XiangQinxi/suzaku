@@ -1,5 +1,5 @@
 from suzaku import *
-import glfw
+# import glfw
 
 app = SkAppWindow()
 app.title("Test")
