@@ -574,10 +574,6 @@ class SkWindowBase(SkEventHanding):
         return self.attributes[key]
     
     def get_attribute(self, attribute_name: str) -> Any:
-        """
-        获取窗口的全部属性
-        :return: 窗口属性
-        """
         return self.attributes[attribute_name]
 
     def set_attribute(self, **kwargs):
@@ -660,7 +656,6 @@ class SkWindowBase(SkEventHanding):
         glfw.set_window_size_callback(window, self._on_resizing)
         glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
         glfw.set_window_close_callback(window, self._on_closed)
-        glfw.set_window_opacity(window, self.attributes["opacity"])
         glfw.set_mouse_button_callback(window, self._on_mouse_button)
         glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
         glfw.set_cursor_pos_callback(window, self._on_cursor_pos)

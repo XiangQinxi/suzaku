@@ -30,8 +30,6 @@ class SkWidget(SkEventHanding):
 
         self.window = self.parent if isinstance(self.parent, SkWindow) else self.parent.window
 
-
-
         self.attributes = {
             "name": name,
             "cursor": "arrow",
@@ -97,12 +95,6 @@ class SkWidget(SkEventHanding):
         self.bind("mouse_released", _on_event)
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
-
-    def add_draw(self, draw_func) -> None:
-        self.draws.append(draw_func)
-
-    def remove_draw(self, draw_func) -> None:
-        self.draws.remove(draw_func)
 
     def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         pass
