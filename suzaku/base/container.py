@@ -33,20 +33,14 @@ class SkContainer():
             pass
 
     def add_child(self, child):
-        """
-        Add child widget to window.
+        """Add child widget to window.
 
-        Args:
-            child: SkWidget
-
-        Returns:
-            None
+        :param child: The child to add
         """
         self.children.append(child)
 
     def add_layout_child(self, child, draw_dict):
-        """
-        Add layout child widget to window.
+        """Add layout child widget to window.
 
         :arg child: SkWidget
         :arg draw_dict: dict
@@ -56,8 +50,7 @@ class SkContainer():
         self.draw_list[0].append(draw_dict)
 
     def add_floating_child(self, child, draw_dict):
-        """
-        Add floating child widget to window.
+        """Add floating child widget to window.
 
         :arg child: SkWidget
         :arg draw_dict: dict
