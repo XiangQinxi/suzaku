@@ -42,7 +42,8 @@ class SkTheme():
         :param parent: Parent theme
         """
         self.styles: dict = style
-        self.name: str = f"Untitled theme {len(SkTheme.loaded_themes) + 1}"
+        self.name: str = f"untitled.{len(SkTheme.loaded_themes) + 1}"
+        self.friendly_name = f"Untitled theme {len(SkTheme.loaded_themes) + 1}"
         self.parent: Union["SkTheme", None] = parent
         SkTheme.loaded_themes.append(self)
         return
@@ -66,7 +67,8 @@ class SkTheme():
         :param theme_data: dict that contains the theme data
         """
         self.styles = theme_data["styles"]
-        self.name = theme_data["name"]
+        self.rename(theme_data["name"])
+        self.friendly_name = theme_data["friendly_name"]
         self.set_parent(theme_data["base"])
         return self
 
