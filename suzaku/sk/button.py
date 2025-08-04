@@ -42,7 +42,7 @@ class SkButton(SkFrame):
 
         :return: None
         """
-        if self.is_mouse_enter:
+        if self.is_mouse_floating:
             self.event_generate("click", evt)
 
     def draw(self, canvas, rect) -> None:

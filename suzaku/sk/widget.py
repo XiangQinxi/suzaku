@@ -14,26 +14,13 @@ class SkWidget(EventHanding):
     theme = default_theme
 
     def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), style="SkWidget",
-                 widget_id: Union[str, None] = None, name="sk_visual") -> None:
+                 widget_id: Union[str, None] = None, name="SkWidget") -> None:
+        """Basic visual component, telling SkWindow how to draw.
 
-        """
-        Basic visual component, telling SkWindow how to draw.
-
-        Args:
-            parent (SkWindow):
-                Parent component (Usually a SkWindow).
-
-            size (tuple[int, int]):
-                Default size (not the final drawn size).
-
-            style (str):
-                Style of the widget.
-
-            widget_id (str):
-                Identification code.
-
-        Returns:
-            None
+        parent: Parent component (Usually a SkWindow)
+        size: Default size (not the final drawn size)
+        style: Style of the widget
+        widget_id: Identification code
         """
 
         super().__init__()
@@ -88,26 +75,20 @@ class SkWidget(EventHanding):
         except TypeError:
             raise TypeError("Parent component is not SkWindow or SkWidget.")
 
-        self.is_mouse_enter = False
-        self.is_mouse_pressed = False
-        self.is_focus = False
-
         self.draws = []
-
-        self.draw_func = lambda canvas: self._draw(canvas)
-        self.parent.add_draw(self.draw_func)
+        self.parent.add_draw(lambda canvas: self._draw(canvas))
 
         # Events-related
-        self.is_mouse_enter = False
+        self.is_mouse_floating = False
+        self.is_mouse_pressed = False
         self.is_focus = False
-
 
         def _on_event(event):
             match event.event_type:
                 case "mouse_enter":
-                    self.is_mouse_enter = True
+                    self.is_mouse_floating = True
                 case "mouse_leave":
-                    self.is_mouse_enter = False
+                    self.is_mouse_floating = False
                 case "focus_gain":
                     self.is_focus = True
                 case "focus_loss":
@@ -148,35 +129,16 @@ class SkWidget(EventHanding):
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
 
-        Args:
-            attribute_name: attribute name
+        :param attribute_name: attribute name
         """
         return self.attributes[attribute_name]
 
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
 
-    # def place_forget(self) -> None:
-    #     """
-    #     Remove layout.
-    #     移除组件布局。
-
-    #     Returns:
-    #         None
-    #     """
-    #     self._hide()
-
-    # def flow(self, padx=5, pady=5, align="left"):
-    #     self.set_parent_layout("flow")
-
-    #     self.parent.add_child_with_layout(
-    #         {
-    #             "widget": self,
-    #             "padx": padx,
-    #             "pady": pady,
-    #             "align": align  # left/center/right
-    #         }
-    #     )
+    # Layout related
+    def pack(self, padx: int=0, pady: int=0, expand: bool=False):
+        NotImplemented
 
     # Aliases
     config = set_attribute
