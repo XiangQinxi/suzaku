@@ -1,11 +1,12 @@
 import skia
 
+from suzaku.event import SkEvent
+from suzaku.styles.theme import SkTheme, default_theme
+
 from ..base.container import SkContainer
 from ..base.windowbase import SkWindowBase
-from suzaku.styles.theme import SkTheme
-from suzaku.event import SkEvent
 from ..styles.color import color
-from suzaku.styles.theme import default_theme
+
 
 class SkWindow(SkWindowBase, SkContainer):
     def __init__(self, *args, themename="light", style="SkWindow", name="sk_window", **kwargs) -> None:

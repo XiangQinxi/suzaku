@@ -1,5 +1,7 @@
 import skia
+
 from suzaku.styles.font import default_font
+
 
 def central_text(canvas, text, fg, x, y, width, height):
     """

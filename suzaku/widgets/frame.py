@@ -1,12 +1,13 @@
 from typing import Union
 
-from ..base.container import SkContainer
-from .widget import SkWidget
 import skia
-from ..styles.color import color
 
-from suzaku.widgets.packs import set_drop_shadow
-from suzaku.widgets.packs import set_rainbow_shader
+from suzaku.widgets.packs import set_drop_shadow, set_rainbow_shader
+
+from ..base.container import SkContainer
+from ..styles.color import color
+from .widget import SkWidget
+
 
 class SkFrame(SkWidget, SkContainer):
     def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame", **kwargs) -> None:

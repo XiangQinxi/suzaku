@@ -1,13 +1,16 @@
+import contextlib
+import sys
 from typing import Any, Union
 
-from ..event import SkEventHanding
-from suzaku.base.appbase import SkAppBase
-import contextlib
-from suzaku.event import SkEvent
 import glfw
 import skia
 from OpenGL import GL
-import sys
+
+from suzaku.base.appbase import SkAppBase
+from suzaku.event import SkEvent
+
+from ..event import SkEventHanding
+
 
 class SkWindowBase(SkEventHanding):
 

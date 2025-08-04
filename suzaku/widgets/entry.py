@@ -1,11 +1,15 @@
-from .visual import SkVisual
 from time import time
+
 import skia
-from suzaku.base import Var
-from suzaku.base import Event
 from glfw import KEY_BACKSPACE, KEY_DELETE, KEY_LEFT, KEY_RIGHT
+
+from suzaku.base import Event, Var
 from suzaku.styles.font import default_font
+
 from ..styles.color import color
+from .visual import SkVisual
+
+
 class SkEntry(SkVisual):
 
     """

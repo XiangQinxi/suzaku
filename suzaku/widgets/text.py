@@ -2,10 +2,11 @@ from typing import Union
 
 import skia
 
-from .widget import SkWidget
-from .window import SkWindow
 from ..styles.color import color
 from .packs import central_text
+from .widget import SkWidget
+from .window import SkWindow
+
 
 class SkText(SkWidget):
     def __init__(self, parent: Union[SkWindow, "SkWidget"], text: str = "", style: str = "SkText"):

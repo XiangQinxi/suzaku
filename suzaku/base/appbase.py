@@ -1,5 +1,7 @@
 import glfw
+
 from .windowbase import SkWindowBase
+
 
 def init_glfw() -> None:
     """Initialize GLFW module."""

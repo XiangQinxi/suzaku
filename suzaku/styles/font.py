@@ -1,8 +1,10 @@
-import warnings
-from typing import Any, Union
 import os
-import skia
+import warnings
 from pathlib import Path
+from typing import Any, Union
+
+import skia
+
 
 def default_font() -> "SkFont":
     """

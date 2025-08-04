@@ -1,6 +1,8 @@
 import warnings
 from typing import Union
+
 from suzaku.base import Event
+
 
 class Boxes:
 

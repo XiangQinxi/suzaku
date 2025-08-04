@@ -1,5 +1,7 @@
-from .window import SkWindow
 from suzaku.widgets.app import SkApp
+
+from .window import SkWindow
+
 
 class SkAppWindow(SkWindow):
 
