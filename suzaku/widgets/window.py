@@ -139,18 +139,6 @@ class SkWindow(SkWindowBase, SkContainer):
         else:
             self.previous_widget = None
 
-    def add_child(self, child: "SkWidget"):
-        """
-        Add child widget to window.
-
-        Args:
-            child: SkWidget
-
-        Returns:
-            None
-        """
-        self.children.append(child)
-
     def add_draw(self, draw_func) -> None:
         self.draws.append(draw_func)
 
