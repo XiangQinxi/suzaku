@@ -97,7 +97,10 @@ class SkWidget(SkEventHanding):
         self.bind("focus_out", _on_event)
 
     def _draw(self, canvas: skia.Surfaces):
-        pass
+        with skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height) as rect:
+            self.draw(canvas, rect)
+        if hasattr(self, "draw_children"):
+            self.draw_children(canvas)
 
     def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         pass

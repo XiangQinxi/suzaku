@@ -28,9 +28,12 @@ class SkContainer():
         self.children = []
         self.draw_list = [[], []]
 
-    def draw(self):
-        for l in self.draw_list:
-            pass
+    def draw_children(self, canvas):
+        for item in self.draw_list:
+            for index, draw_func in enumerate(item):
+                #print(i, f)
+                if self.children[index].visible:
+                    draw_func(canvas)
 
     def add_child(self, child):
         """

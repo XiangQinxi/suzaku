@@ -149,10 +149,8 @@ class SkWindow(SkWindowBase, SkContainer):
         from ..styles.color import color
         canvas.clear(color(self.theme.styles[self.winfo_style()]["bg"]))
 
-        for i, f in enumerate(self.draws):
-            #print(i, f)
-            if self.children[i].visible:
-                f(canvas)
+        self.draw_children(canvas)
+
         return None
 
     def winfo_style(self) -> str:
