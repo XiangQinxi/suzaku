@@ -1,4 +1,4 @@
-from .appbase import SkAppBase
+from ..base.appbase import SkAppBase
 
 
 class SkApp(SkAppBase):

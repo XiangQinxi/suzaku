@@ -28,27 +28,17 @@ class SkContainer():
         self.children = []
         self.draw_list = [[], []]
 
-    def bind_layout(self):
-        self.bind("resize", self._handle_layout)
-
-    def add_child_with_layout(self, child_config):
-        self.children_with_layout.append(child_config)
-        self._handle_layout()
-
-    def set_layout_name(self, name: str):
-        self.layout_name = name
-
     def _handle_layout(self):
-        self._handle_flow()
+        NotImplemented
 
     def _handle_pack(self):
-        pass
+        NotImplemented
 
     def _handle_place(self):
-        pass
+        NotImplemented
 
     def _handle_grid(self):
-        pass
+        NotImplemented
 
 
 
