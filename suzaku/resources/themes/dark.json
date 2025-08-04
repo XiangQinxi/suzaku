@@ -1,6 +1,6 @@
 {
-  "name": "dark",
-  "base": "default",
+  "name": "Default Dark",
+  "base": "Default Light",
 
   "SkWindow": {
     "bg": [255, 255, 255, 20]
