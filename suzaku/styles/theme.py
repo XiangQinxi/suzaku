@@ -15,6 +15,7 @@ class SkTheme():
     INTERNAL_THEME_DIR = pathlib.Path(__file__).parent.parent / "resources" / "themes"
     INTERNAL_THEMES: dict[str, "SkTheme"] = {}
     DEFAULT_THEME: Union["SkTheme", None] = None
+    DEFAULT_THEME_NAME: str = "light"
 
     @classmethod
     def find_loaded_theme(cls, theme_name: str) -> Union["SkTheme", bool]:
@@ -33,7 +34,7 @@ class SkTheme():
         
         :param theme_name: Name of the theme to validate
         """
-        return SkTheme.find_loaded_theme(theme_name) == False # ☝🤓
+        return SkTheme.find_loaded_theme(theme_name) != False # ☝🤓
 
     def __init__(self, style: dict={}, parent: Union["SkTheme", None] = None) -> None:
         """Theme for SkWindow and SkWidgets.
@@ -119,7 +120,7 @@ class SkTheme():
         if not SkTheme.validate_theme_existed(new_name):
             self.name = new_name
         else:
-            warnings.warn(f"Theme name occupied. Rename for <{self.name}> is canceled")
+            warnings.warn(f"Theme name <{new_name}> occupied. Rename for <{self.name}> is canceled")
         return self
 
     def select(self, selector: str, create_if_not_existed: bool=False) -> list:
@@ -221,11 +222,12 @@ class SkTheme():
         """
         widget.apply_theme(self)
 
+SkTheme.DEFAULT_THEME = default_theme = SkTheme({}).load_from_file(\
+    SkTheme.INTERNAL_THEME_DIR / f"{SkTheme.DEFAULT_THEME_NAME}.json")
+
 for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
-    print(file)
+    if file == f"{SkTheme.DEFAULT_THEME_NAME}.json": # For default theme, no need to reload it
+        SkTheme.INTERNAL_THEMES[SkTheme.DEFAULT_THEME_NAME] = SkTheme.DEFAULT_THEME
+        continue
     SkTheme.INTERNAL_THEMES[file.split(".")[0]] = (SkTheme({}).load_from_file(\
         SkTheme.INTERNAL_THEME_DIR / file))
-
-print(SkTheme.INTERNAL_THEMES)
-
-SkTheme.DEFAULT_THEME = default_theme = SkTheme.INTERNAL_THEMES["light"]
