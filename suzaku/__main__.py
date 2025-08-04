@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # 修改主窗口创建代码
     appwindow = Sk(
         title="Suzaku GUI",
-        themename="light",
+        themename="default.light",
         size=(280, 360),
         #force_hardware_acceleration=True
     )

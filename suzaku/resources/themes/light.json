@@ -1,6 +1,7 @@
 {
-  "name": "Default Light",
+  "name": "default.light",
   "base": "ROOT",
+  "friendly_name": "Default Light",
 
   "styles":{
 

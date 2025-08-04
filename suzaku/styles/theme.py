@@ -4,6 +4,7 @@ import warnings
 import os
 import json
 import re
+import pathlib
 
 class SkStyleNotFoundError(NameError):
     pass
@@ -11,8 +12,8 @@ class SkStyleNotFoundError(NameError):
 class SkTheme():
 
     loaded_themes: list["SkTheme"] = []
-    INTERNAL_THEME_DIR = os.path.join(__file__, "../themes/")
-    INTERNAL_THEMES: list["SkTheme"] = []
+    INTERNAL_THEME_DIR = pathlib.Path(__file__).parent.parent / "resources" / "themes"
+    INTERNAL_THEMES: dict[str, "SkTheme"] = {}
     DEFAULT_THEME: Union["SkTheme", None] = None
 
     @classmethod
@@ -45,7 +46,7 @@ class SkTheme():
         self.parent: Union["SkTheme", None] = parent
         return
     
-    def load_from_file(self, file_path: str) -> "SkTheme":
+    def load_from_file(self, file_path: Union[str, pathlib.Path]) -> "SkTheme":
         """Load styles to theme from a file.
         
         :param file_path: Path to the theme file
@@ -53,6 +54,9 @@ class SkTheme():
         f = open(file_path, mode="r", encoding="utf-8")
         style_raw = f.read()
         theme_data = json.loads(style_raw)
+        if search_result := SkTheme.find_loaded_theme(theme_data["name"]) != False:
+            warnings.warn(f"Theme <{theme_data["name"]}> already loaded or existed.")
+            return search_result
         return self.load_from_json(theme_data)
 
     def load_from_json(self, theme_data: dict) -> "SkTheme":
@@ -62,7 +66,7 @@ class SkTheme():
         """
         self.styles = theme_data["styles"]
         self.name = theme_data["name"]
-        self.set_parent(theme_data["parent"])
+        self.set_parent(theme_data["base"])
         return self
 
     def load_styles_from_json(self, style_json: dict) -> "SkTheme":
@@ -109,7 +113,10 @@ class SkTheme():
         
         :param new_name: The new name for the theme
         """
-        self.name = new_name
+        if not SkTheme.validate_theme_existed(new_name):
+            self.name = new_name
+        else:
+            warnings.warn(f"Theme name occupied. Rename for <{self.name}> is canceled")
         return self
 
     def select(self, selector: str, create_if_not_existed: bool=False) -> list:
@@ -212,5 +219,8 @@ class SkTheme():
         widget.apply_theme(self)
 
 
-SkTheme.DEFAULT_THEME = default_theme = \
-    SkTheme({}).load_from_file(os.path.join(SkTheme.INTERNAL_THEME_DIR, "light.json"))
+for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
+    SkTheme.INTERNAL_THEMES[file.split(".")[0]] = (SkTheme({}).load_from_file(\
+        SkTheme.INTERNAL_THEME_DIR / file))
+
+SkTheme.DEFAULT_THEME = default_theme = SkTheme.INTERNAL_THEMES["default.light"]
