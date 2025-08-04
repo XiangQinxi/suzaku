@@ -11,7 +11,8 @@ from .widget import SkWidget
 
 class SkFrame(SkWidget, SkContainer):
     def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame", **kwargs) -> None:
-        super().__init__(parent, style=style, **kwargs)
+        SkWidget.__init__(self, parent, style=style, **kwargs)
+        SkContainer.__init__(self)
 
     def draw(self, canvas, rect):
         sheets = self.theme.styles[self.style]
