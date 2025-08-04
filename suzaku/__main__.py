@@ -13,7 +13,7 @@ if __name__ == "__main__":
         size=(280, 360),
         #force_hardware_acceleration=True
     )
-    appwindow.bind("close", lambda: print("Window closed"))
+    appwindow.bind("close", lambda: print("SkWindowBase closed"))
 
     SkButton(appwindow, text=f"Light Theme / 切换至Light主题", command=lambda: appwindow.theme.use_theme("light")).vbox(padx=10, pady=10)
     SkButton(appwindow, text=f"Dark Theme / 切换至Dark主题", command=lambda: appwindow.theme.use_theme("dark")).vbox(padx=10, pady=10)
@@ -31,10 +31,10 @@ if __name__ == "__main__":
     style = SkStyle()
     style.configure("Close.SkButton", radius=99)  # 更改当前主题Close.SkButton的样式
 
-    SkButton(appwindow, text=f"Close Window / 关闭窗口", command=appwindow.destroy, style="Close.SkButton").vbox(padx=10, pady=10)
+    SkButton(appwindow, text=f"Close SkWindowBase / 关闭窗口", command=appwindow.destroy, style="Close.SkButton").vbox(padx=10, pady=10)
 
     """
     toplevel = SkWindow()
-    SkButton(toplevel, text=f"关闭窗口", command=toplevel.destroy, style="Close.SkButton").vbox(padx=10, pady=10)
+    SkButton(toplevel, text=f"关闭窗口", command=toplevel.destroy, styles="Close.SkButton").vbox(padx=10, pady=10)
     """
     appwindow.run()

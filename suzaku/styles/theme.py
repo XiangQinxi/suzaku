@@ -37,28 +37,28 @@ class SkTheme():
         return self
     
     def select(self, selector: str, create_if_not_existed: bool=False) -> list:
-        """Parse style selector.
+        """Parse styles selector.
 
         ## Selector
 
-        `<Widget>` indicates the style of Widget at rest state, e.g. `SkButton`.
+        `<Widget>` indicates the styles of Widget at rest state, e.g. `SkButton`.
 
-        `<Widget>:<state>` indicates the style of the state of Widget, e.g. `SkButton:hover`.
+        `<Widget>:<state>` indicates the styles of the state of Widget, e.g. `SkButton:hover`.
 
-        `<Widget>:ITSELF` indecates the style of the widget, e.g. `SkButton.ITSELF`.
+        `<Widget>:ITSELF` indecates the styles of the widget, e.g. `SkButton.ITSELF`.
         Note that this is not available everywhere.
 
         :param selector: The selector string
-        :param create_if_not_existed: Create the style if not existed.
+        :param create_if_not_existed: Create the styles if not existed.
         """
         # Validation
         if not re.match("[a-zA-Z0-9-_.:]", selector):
-            raise ValueError(f"Invalid style selector [{selector}].")
+            raise ValueError(f"Invalid styles selector [{selector}].")
         # Handling
         if ":" in selector:
             result = selector.split(":")
             if len(result) >= 2: # Validation
-                raise ValueError(f"Invalid style selector [{selector}].")
+                raise ValueError(f"Invalid styles selector [{selector}].")
             if result[1] == "ITSELF":
                 result = [result[0]]
         else:
@@ -71,16 +71,16 @@ class SkTheme():
             if selector_level not in level_dict.keys():
                 if create_if_not_existed:
                     checking[selector_level] = {}
-                raise SkStyleNotFoundError(f"Cannot find style with selector [{selector}]")
+                raise SkStyleNotFoundError(f"Cannot find styles with selector [{selector}]")
             if create_if_not_existed:
                 checking = checking[selector_level]
         return result
     
     def get_style(self, selector: str, copy: bool=True) -> dict:
-        """Get style config using a selector.
+        """Get styles config using a selector.
 
-        :param selector: The selector string, indicating which style to get
-        :param copy: Whether to copy a new style json, otherwise returns the style itself
+        :param selector: The selector string, indicating which styles to get
+        :param copy: Whether to copy a new styles json, otherwise returns the styles itself
         """
         result = self.styles
         try:
@@ -95,10 +95,10 @@ class SkTheme():
             return result
     
     def mixin(self, selector: str, new_style: dict, copy: bool=False):
-        """Mix a custom style into the theme.
+        """Mix a custom styles into the theme.
         
         :param selector: The selector string, indicates where to mix in
-        :param new_style: A style json, to be mixed in
+        :param new_style: A styles json, to be mixed in
         :param copy: Whether to copy a new theme, otherwise modify the current object
         """
         if copy:
@@ -114,7 +114,7 @@ class SkTheme():
 
         Can be used when applying custom styles on a specific widget. 
 
-        e.g. `SkButton(window, style=style.special(background=(255, 0, 0, 0)))`
+        e.g. `SkButton(window, styles=styles.special(background=(255, 0, 0, 0)))`
         
         :param selector: The selector string, indicates where to mix in
         :param **kwargs: Styles to change
@@ -135,4 +135,26 @@ class SkTheme():
         """
         widget.apply_theme(self)
 
-default_theme = light_theme =  SkTheme({}).load_from_file(os.path.join(os.path.split(__file__)[0], "themes", "light.json"))
+
+light_path = os.path.normpath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "resources",
+        "themes",
+        "light.json"
+    )
+)
+
+dark_path = os.path.normpath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "resources",
+        "themes",
+        "dark.json"
+    )
+)
+
+default_theme = light_theme =  SkTheme({}).load_from_file(light_path)
+dark_theme = SkTheme({}).load_from_file(dark_path)

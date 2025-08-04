@@ -22,7 +22,7 @@ def central_text(canvas, text, fg, x, y, width, height):
         Color=fg
     )
 
-    from suzaku.style.font import default_font
+    from suzaku.styles.font import default_font
     font = default_font()
 
     text_width = font.measureText(text)

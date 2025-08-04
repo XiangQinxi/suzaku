@@ -2,14 +2,14 @@ import warnings
 from typing import Union, Any
 
 
-def default_font() -> "Font":
+def default_font() -> "SkFont":
     """
     Default font (Harmony Sans SC).
 
     默认字体 (鸿蒙SC字体)。
 
     Returns:
-        font (Font): The default font.
+        font (SkFont): The default font.
     """
     import os
     font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'HarmonyOS_Sans_SC_Regular.ttf')
@@ -17,13 +17,13 @@ def default_font() -> "Font":
 
 
 def font(*args, **kwargs):
-    return Font(*args, **kwargs).font
+    return SkFont(*args, **kwargs).font
 
 
-class Font:
+class SkFont:
 
     """
-    Font
+    SkFont
     
     字体
     """
@@ -32,7 +32,7 @@ class Font:
 
     def __init__(self, name: str = None, path: Union[Path, str] = None, size: int = 14):
         """
-        Font object. For customizing fonts in your UI
+        SkFont object. For customizing fonts in your UI
     
         字体对象。用于自定义您界面上的字体
 
@@ -48,7 +48,7 @@ class Font:
                 字体文件路径。
 
             size (int): 
-                Font size.
+                SkFont size.
 
                 字体大小。
 

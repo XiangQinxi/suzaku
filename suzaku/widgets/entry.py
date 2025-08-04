@@ -7,7 +7,7 @@ class SkEntry(SkVisual):
     输入框组件
     """
 
-    from ..base.var import Var
+    from suzaku.base import Var
 
     def __init__(self, *args, placeholder: str = "", size=(105, 35), cursor="ibeam", style="SkEntry", id=None, textvariable: Var = None, **kwargs) -> None:
         """Entry box component.
@@ -15,8 +15,8 @@ class SkEntry(SkVisual):
         * *args: SkVisual arguments
         * placeholder: Placeholder text
         * size: Default size
-        * cursor: Cursor style when hovering
-        * style: Style name
+        * cursor: Cursor styles when hovering
+        * styles: Style name
         * id: Optional ID code
         * textvariable: Optional variable for binding text content
         * **kwargs: SkVisual arguments
@@ -51,9 +51,9 @@ class SkEntry(SkVisual):
     def _textvariable(self, evt):
         self.visual_attr["text"] = self.visual_attr["textvariable"].get()
 
-    from ..base.event import Event
+    from suzaku.base import Event
     def _key(self, evt: Event):
-        from glfw import KEY_BACKSPACE, KEY_LEFT, KEY_RIGHT, KEY_DELETE, get_key_name
+        from glfw import KEY_BACKSPACE, KEY_LEFT, KEY_RIGHT, KEY_DELETE
         if self.visual_attr["textvariable"] is not None:
             text = self.visual_attr["textvariable"].get()
         else:
@@ -115,7 +115,7 @@ class SkEntry(SkVisual):
 
     def _update_scroll_offset(self):
         """更新滚动偏移量，确保光标可见"""
-        from suzaku.style.font import default_font
+        from suzaku.styles.font import default_font
         font = default_font()
         if self.visual_attr["textvariable"] is not None:
             text = self.visual_attr["textvariable"].get()
@@ -156,7 +156,7 @@ class SkEntry(SkVisual):
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
-        from ..style.color import color
+        from ..styles.color import color
 
         if self.is_mouse_enter:
             if self.is_focus:
@@ -181,13 +181,13 @@ class SkEntry(SkVisual):
         # 绘制阴影
         if "bd_shadow" in sheets:
             if "bd_shadw":
-                from .packs import set_drop_shadow
+                from suzaku.widgets.packs import set_drop_shadow
                 set_drop_shadow(rect_paint, color(sheets["bd"]))
 
         # Rainbow Border Effect
         if "bd_shader" in sheets:
             if sheets["bd_shader"] == "rainbow":
-                from .packs import set_rainbow_shader
+                from suzaku.widgets.packs import set_rainbow_shader
                 set_rainbow_shader(rect_paint, rect)
 
         rect_paint.setColor(color(sheets["bd"]))
@@ -200,7 +200,7 @@ class SkEntry(SkVisual):
             Color=color(sheets["fg"])
         )
 
-        from suzaku.style.font import default_font
+        from suzaku.styles.font import default_font
         font = default_font()
 
         metrics = font.getMetrics()

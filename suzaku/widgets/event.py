@@ -1,12 +1,12 @@
-from .after import After
+from .after import SkAfter
 
 from typing import Union, Any
 
 
-class EventHanding(After):
+class SkEventHanding(SkAfter):
 
     """
-    Event binding manager.
+    SkEvent binding manager.
 
     事件绑定管理器。
 
@@ -31,7 +31,7 @@ class EventHanding(After):
 
         Args:
             name (str): 
-                Event name, create if not existed.
+                SkEvent name, create if not existed.
 
                 事件名称，没有则创建。
 
@@ -57,7 +57,7 @@ class EventHanding(After):
             evt(*args, **kwargs)
 
 
-    def bind(self, name: str, func: callable, add: bool=True) -> "EventHanding":
+    def bind(self, name: str, func: callable, add: bool=True) -> "SkEventHanding":
         """
         Bind event.
 
@@ -65,7 +65,7 @@ class EventHanding(After):
 
         Args:
             name (str): 
-                Event name, create if not existed.
+                SkEvent name, create if not existed.
 
                 事件名称，没有则创建。
 
@@ -115,7 +115,7 @@ class EventHanding(After):
         self.events[name].remove(func)
 
 
-class Event:
+class SkEvent:
 
     """
     Used to pass event via arguments.

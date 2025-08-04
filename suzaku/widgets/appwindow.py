@@ -5,7 +5,7 @@ class SkAppWindow(SkWindow):
 
     def __init__(self, *args, **kwargs) -> None:
         """Main window that connects SkApp with SkWindow."""
-        from .app import SkApp
+        from suzaku.widgets.app import SkApp
         self.app = SkApp()
         super().__init__(parent=self.app, *args, **kwargs)
         self.attributes["name"] = "sk_appwindow"
@@ -20,8 +20,11 @@ class SkAppWindow(SkWindow):
         """Exit application."""
         self.app.quit(*args, **kwargs)
 
-    from .app import SkApp
+    from suzaku.widgets.app import SkApp
 
     def winfo_app(self) -> SkApp:
         """Get SkApp class."""
         return self.app
+
+
+Sk = SkAppWindow

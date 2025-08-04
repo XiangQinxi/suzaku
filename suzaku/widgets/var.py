@@ -1,7 +1,7 @@
-from .event import EventHanding
+from .event import SkEventHanding
 
 
-class Var(EventHanding):
+class SkVar(SkEventHanding):
     def __init__(self, default_value, value_type: type = any):
         """
         Save a variable.
@@ -44,21 +44,21 @@ class Var(EventHanding):
         return self.value
 
 
-class StringVar(Var):
+class SkStringVar(SkVar):
     def __init__(self, default_value: str = ""):
         super().__init__(default_value, str)
 
 
-class IntVar(Var):
+class SkIntVar(SkVar):
     def __init__(self, default_value: int = 0):
         super().__init__(default_value, int)
 
 
-class BooleanVar(Var):
+class SkBooleanVar(SkVar):
     def __init__(self, default_value: bool = False):
         super().__init__(default_value, bool)
 
 
-class FloatVar(Var):
+class SkFloatVar(SkVar):
     def __init__(self, default_value: float = 0.0):
         super().__init__(default_value, float)

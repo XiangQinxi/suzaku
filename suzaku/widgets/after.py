@@ -1,4 +1,4 @@
-class After:
+class SkAfter:
     def after(self, ms: int, func: callable):
         """Execute a function after a delay (an ID will be provided in the future for unbinding).
 

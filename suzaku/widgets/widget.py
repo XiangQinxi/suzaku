@@ -1,13 +1,12 @@
 from typing import Union, Any
 import skia
 
-from .theme import default_theme, SkTheme
+from ..styles.theme import default_theme, SkTheme
 from .window import SkWindow
-from .layout import Layout
-from ..base.event import EventHanding
+from .event import SkEventHanding
 
 
-class SkWidget(EventHanding):
+class SkWidget(SkEventHanding):
 
     _instance_count = 0
 
@@ -19,7 +18,7 @@ class SkWidget(EventHanding):
 
         parent: Parent component (Usually a SkWindow)
         size: Default size (not the final drawn size)
-        style: Style of the widget
+        styles: Style of the widget
         widget_id: Identification code
         """
 
@@ -132,6 +131,18 @@ class SkWidget(EventHanding):
 
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
+
+    def place(self, x: int, y: int, width: int = None, height: int = None):
+        self.x = x
+        self.y = y
+        if width:
+            self.width = width
+        if height:
+            self.height = height
+        self.visible = True
+
+    def place_forget(self):
+        self.visible = False
 
     # Layout related
     def pack(self, padx: int=0, pady: int=0, expand: bool=False):

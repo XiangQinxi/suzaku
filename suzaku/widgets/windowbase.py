@@ -1,17 +1,17 @@
 from typing import Any
 
-from .event import EventHanding
+from suzaku.widgets.event import SkEventHanding
 
 
 
-class Window(EventHanding):
+class SkWindowBase(SkEventHanding):
 
     _instance_count = 0
 
     def __init__(self, parent=None, *, title: str = "suzaku", size: tuple[int, int] = (300, 300), id=None, fullscreen=False, opacity: float = 1.0, force_hardware_acceleration: bool = False, name="window"):
 
         """
-        Base Window
+        Base SkWindowBase
 
         :param parent: window parent
         :param title: window title
@@ -21,14 +21,14 @@ class Window(EventHanding):
         :param opacity: window opacity
         """
 
-        from .application import Application
-        parent = parent if parent is not None else Application.get_instance()
+        from suzaku.widgets.appbase import SkAppBase
+        parent = parent if parent is not None else SkAppBase.get_instance()
         self.parent = parent
-        if isinstance(parent, Application):
+        if isinstance(parent, SkAppBase):
             self.application = parent
         else:
             self.application = parent.application
-        if isinstance(parent, Application):
+        if isinstance(parent, SkAppBase):
             parent.add_window(self)
 
         self.name = name
@@ -81,7 +81,7 @@ class Window(EventHanding):
             "resize": [],
         }
 
-        Window._instance_count += 1
+        SkWindowBase._instance_count += 1
 
         self.width = size[0]
         self.height = size[1]
@@ -147,8 +147,8 @@ class Window(EventHanding):
         Returns:
             None
         """
-        from .event import Event
-        self.event_generate("char", Event(event_type="char", char=chr(char)))
+        from suzaku.widgets.event import SkEvent
+        self.event_generate("char", SkEvent(event_type="char", char=chr(char)))
 
     def _on_key(self, window, key, scancode, action, mods) -> None:
         """
@@ -165,7 +165,7 @@ class Window(EventHanding):
 
         """
         from glfw import PRESS, RELEASE, REPEAT, MOD_CONTROL, MOD_ALT, MOD_SHIFT, MOD_SUPER, MOD_NUM_LOCK, MOD_CAPS_LOCK
-        from .event import Event
+        from suzaku.widgets.event import SkEvent
         from glfw import get_key_name
 
         keyname: str = get_key_name(key, scancode)  # 获取对应的键名，不同平台scancode不同，因此需要输入scancode来正确转换。有些按键不具备键名
@@ -189,20 +189,20 @@ class Window(EventHanding):
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
-            self.event_generate("key_press", Event(event_type="key_press", key=key, keyname=keyname, mods=m))
+            self.event_generate("key_press", SkEvent(event_type="key_press", key=key, keyname=keyname, mods=m))
         elif action == RELEASE:
-            self.event_generate("key_release", Event(event_type="key_release", key=key, keyname=keyname, mods=m))
+            self.event_generate("key_release", SkEvent(event_type="key_release", key=key, keyname=keyname, mods=m))
         elif action == REPEAT:
-            self.event_generate("key_repeat", Event(event_type="key_repeat", key=key, keyname=keyname, mods=m))
+            self.event_generate("key_repeat", SkEvent(event_type="key_repeat", key=key, keyname=keyname, mods=m))
 
     def _on_focus(self, window, focused) -> None:
-        from .event import Event
+        from suzaku.widgets.event import SkEvent
         if focused:
             self.attributes["focus"] = True
-            self.event_generate("focus_in", Event(event_type="focus_in"))
+            self.event_generate("focus_in", SkEvent(event_type="focus_in"))
         else:
             self.attributes["focus"] = False
-            self.event_generate("focus_out", Event(event_type="focus_out"))
+            self.event_generate("focus_out", SkEvent(event_type="focus_out"))
 
     def _on_framebuffer_size(self, window, width, height, ) -> None:
         if self.draw_func:
@@ -229,8 +229,8 @@ class Window(EventHanding):
         self._on_framebuffer_size(window, width, height)
         self.width = width
         self.height = height
-        from .event import Event
-        self.event_generate("resize", Event(event_type="resize", width=width, height=height))
+        from suzaku.widgets.event import SkEvent
+        self.event_generate("resize", SkEvent(event_type="resize", width=width, height=height))
         #cls.update()
 
     def _on_window_pos(self, window, x, y) -> None:
@@ -244,8 +244,8 @@ class Window(EventHanding):
         """
         self.x = x
         self.y = y
-        from .event import Event
-        self.event_generate("move", Event(event_type="move", x=x, y=y))
+        from suzaku.widgets.event import SkEvent
+        self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
 
     def _on_closed(self, window) -> None:
         """
@@ -255,8 +255,8 @@ class Window(EventHanding):
         :return: None
         """
         #from glfw import terminate
-        from .event import Event
-        self.event_generate("closed", Event(event_type="closed"))
+        from suzaku.widgets.event import SkEvent
+        self.event_generate("closed", SkEvent(event_type="closed"))
         #terminate()
 
     def _on_mouse_button(self, window, arg1, is_press: bool, arg2) -> None:
@@ -275,7 +275,7 @@ class Window(EventHanding):
         """
         #print(arg1, arg2)
 
-        from .event import Event
+        from suzaku.widgets.event import SkEvent
         from glfw import get_cursor_pos
         pos = get_cursor_pos(window)
         self.mouse_x = pos[0]
@@ -284,9 +284,9 @@ class Window(EventHanding):
         self.mouse_rooty = pos[1] + self.y
 
         if is_press:
-            self.event_generate("mouse_press", Event(event_type="mouse_press", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_press", SkEvent(event_type="mouse_press", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_release", Event(event_type="mouse_release", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_release", SkEvent(event_type="mouse_release", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
 
     def _on_cursor_enter(self, window, is_enter: bool) -> None:
         """
@@ -300,7 +300,7 @@ class Window(EventHanding):
         :return: None
         """
 
-        from .event import Event
+        from suzaku.widgets.event import SkEvent
         from glfw import get_cursor_pos
         pos = get_cursor_pos(window)
         self.mouse_x = pos[0]
@@ -309,9 +309,9 @@ class Window(EventHanding):
         self.mouse_rooty = pos[1] + self.y
 
         if is_enter:
-            self.event_generate("mouse_enter", Event(event_type="mouse_enter", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_enter", SkEvent(event_type="mouse_enter", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_leave", Event(event_type="mouse_leave", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+            self.event_generate("mouse_leave", SkEvent(event_type="mouse_leave", x=pos[0], y=pos[1], rootx=self.mouse_rootx, rooty=self.mouse_rooty))
 
     def _on_cursor_pos(self, window, x, y) -> None:
         """
@@ -323,14 +323,14 @@ class Window(EventHanding):
         :return: None
         """
 
-        from .event import Event
+        from suzaku.widgets.event import SkEvent
 
         self.mouse_x = x
         self.mouse_y = y
         self.mouse_rootx = x
         self.mouse_rooty = y
 
-        self.event_generate("mouse_motion", Event(event_type="mouse_motion", x=x, y=y, rootx=self.mouse_rootx, rooty=self.mouse_rooty))
+        self.event_generate("mouse_motion", SkEvent(event_type="mouse_motion", x=x, y=y, rootx=self.mouse_rootx, rooty=self.mouse_rooty))
 
     def update(self) -> None:
         """
@@ -338,8 +338,8 @@ class Window(EventHanding):
         :return: None
         """
         if self.visible:
-            from .event import Event
-            self.event_generate("update", Event(event_type="update"))
+            from suzaku.widgets.event import SkEvent
+            self.event_generate("update", SkEvent(event_type="update"))
             from glfw import swap_buffers
             swap_buffers(self.glfw_window)
 
@@ -419,7 +419,7 @@ class Window(EventHanding):
             self.hide()
         return self
 
-    def show(self) -> "Window":
+    def show(self) -> "SkWindowBase":
         """
         显示窗口
         :return: cls
@@ -429,7 +429,7 @@ class Window(EventHanding):
         self.visible = True
         return self
 
-    def hide(self) -> "Window":
+    def hide(self) -> "SkWindowBase":
         """
         隐藏窗口
         :return: cls
@@ -439,7 +439,7 @@ class Window(EventHanding):
         self.visible = False
         return self
 
-    def maximize(self) -> "Window":
+    def maximize(self) -> "SkWindowBase":
         """
         最大化窗口
         :return: cls
@@ -448,7 +448,7 @@ class Window(EventHanding):
         maximize_window(self.glfw_window)
         return self
 
-    def restore(self) -> "Window":
+    def restore(self) -> "SkWindowBase":
         """
         恢复窗口(取消窗口最大化)
         :return: cls
@@ -457,7 +457,7 @@ class Window(EventHanding):
         restore_window(self.glfw_window)
         return self
 
-    def add(self, visual) -> "Window":
+    def add(self, visual) -> "SkWindowBase":
         """
         添加子元素
         :param visual: 子元素
@@ -492,7 +492,7 @@ class Window(EventHanding):
             set_window_title(self.glfw_window, text)
             return self
 
-    def resize(self, width: int = None, height: int = None) -> "Window":
+    def resize(self, width: int = None, height: int = None) -> "SkWindowBase":
         """
         调整窗口大小
         :param width: 宽度
@@ -510,12 +510,12 @@ class Window(EventHanding):
 
         from glfw import set_window_size
         set_window_size(self.glfw_window, width, height)
-        from .event import Event
-        self.event_generate("resize", Event(event_type="resize", width=width, height=height))
+        from suzaku.widgets.event import SkEvent
+        self.event_generate("resize", SkEvent(event_type="resize", width=width, height=height))
 
         return self
 
-    def move(self, x: int = None, y: int = None) -> "Window":
+    def move(self, x: int = None, y: int = None) -> "SkWindowBase":
         """
         移动窗口
         :param x: x坐标
@@ -530,12 +530,12 @@ class Window(EventHanding):
         self.y = y
         from glfw import set_window_pos
         set_window_pos(self.glfw_window, x, y)
-        from .event import Event
-        self.event_generate("move", Event(event_type="move", x=x, y=y))
+        from suzaku.widgets.event import SkEvent
+        self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
 
         return self
 
-    def configure(self, **kwargs) -> "Window":
+    def configure(self, **kwargs) -> "SkWindowBase":
         """
 
         Args:
@@ -583,7 +583,7 @@ class Window(EventHanding):
     def set_attribute(self, **kwargs):
         self.attributes.update(**kwargs)
 
-    def set_draw_func(self, func: callable) -> "Window":
+    def set_draw_func(self, func: callable) -> "SkWindowBase":
         """
         处理Skia绘制事件
         param func: 绘制函数

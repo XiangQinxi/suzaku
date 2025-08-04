@@ -7,17 +7,17 @@ def init_glfw() -> None:
     glfw.window_hint(glfw.STENCIL_BITS, 8)
 
 
-class Application:
+class SkAppBase:
 
     """
-    Application
+    SkAppBase
     """
 
     _instance = None
 
     def __init__(self) -> None:
         """
-        Application.
+        SkAppBase.
 
         应用程式。
         """
@@ -25,11 +25,11 @@ class Application:
         self.windows = []
         self.running = False
         init_glfw()
-        if Application._instance is not None:
+        if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
-        Application._instance = self
+        SkAppBase._instance = self
 
-    # 这里用这个可以使`Window`的初始化更加简单，可以不选择填`parent=App`
+    # 这里用这个可以使`SkWindowBase`的初始化更加简单，可以不选择填`parent=App`
     @classmethod
     def get_instance(cls) -> int:
         """Get instance count."""
@@ -37,9 +37,9 @@ class Application:
             raise RuntimeError("App not initialized")
         return cls._instance
 
-    from .window import Window
+    from .windowbase import SkWindowBase
 
-    def add_window(self, window: Window) -> "Application":
+    def add_window(self, window: SkWindowBase) -> "SkAppBase":
         """Add a window.
 
         * `window`: The window

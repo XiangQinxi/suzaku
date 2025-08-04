@@ -8,7 +8,7 @@ class SkFrame(SkWidget, SkContainer):
         super().__init__(parent, style=style, **kwargs)
 
     def draw(self, canvas, rect):
-        from ..style.color import color
+        from ..styles.color import color
 
         sheets = self.theme.styles[self.style]
 
@@ -32,19 +32,15 @@ class SkFrame(SkWidget, SkContainer):
         # 绘制阴影
         if "bd_shadow" in sheets:
             if "bd_shadw":
-                from .packs import set_drop_shadow
+                from suzaku.widgets.packs import set_drop_shadow
                 set_drop_shadow(rect_paint, color(sheets["bd"]))
 
         # Rainbow Border Effect
         if "bd_shader" in sheets:
             if sheets["bd_shader"].lower() == "rainbow":
-                from .packs import set_rainbow_shader
+                from suzaku.widgets.packs import set_rainbow_shader
                 set_rainbow_shader(rect_paint, rect)
 
         rect_paint.setColor(color(sheets["bd"]))
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
-
-    def put(self, margin=(0,0,0,0)):
-        """相对布局快捷方法"""
-        self.put_configure(margin)

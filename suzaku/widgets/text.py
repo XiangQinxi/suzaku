@@ -11,6 +11,13 @@ class SkText(SkWidget):
         self.attributes["text"] = text
 
     def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
+        """
+
+        
+        :param canvas:
+        :param rect:
+        :return:
+        """
         from .packs import central_text
-        from ..style.color import color
+        from ..styles.color import color
         central_text(canvas, self.cget("text"), color(self.theme.styles[self.style]["fg"]), self.x, self.y, self.width, self.height)

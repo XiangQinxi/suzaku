@@ -14,8 +14,8 @@ class SkButton(SkFrame):
         * *args: Passed to SkVisual
         * text: Button text
         * size: Default size
-        * cursor: Cursor style when hovering
-        * style: Style name
+        * cursor: Cursor styles when hovering
+        * styles: Style name
         * command: Function to run when clicked
         * id: Identification code (optional)
         * **kwargs: Passed to SkVisual
