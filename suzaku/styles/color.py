@@ -3,9 +3,9 @@ def color(color):
     颜色对象工厂函数
 
     根据输入参数类型自动转换颜色格式，支持以下格式：
-    - 颜色名称字符串（如 'RED'）
-    - 十六进制字符串（如 '#RRGGBB' 或 '#AARRGGBB'）
-    - RGB/RGBA 元组或列表（3或4个元素）
+    - 颜色名称字符串(如 'RED')
+    - 十六进制字符串(如 '#RRGGBB' 或 '#AARRGGBB')
+    - RGB/RGBA 元组或列表(3或4个元素)
 
     Args:
         color: 颜色参数，支持多种格式的输入
@@ -37,7 +37,7 @@ def get_color_name(name: str):
     """转换颜色名称字符串为Skia颜色
 
     Args:
-        name: 颜色名称（如 'RED'）
+        name: 颜色名称(如 'RED')
 
     Returns:
         skia.Color: 对应的预定义颜色对象
@@ -62,7 +62,7 @@ def get_color_rgba(r, g, b, a=255):
         r: 红色通道 (0-255)
         g: 绿色通道 (0-255)
         b: 蓝色通道 (0-255)
-        a: 透明度通道 (0-255，默认255)
+        a: 透明度通道 (0-255, 默认255)
 
     Returns:
         skia.Color: 对应的RGBA颜色对象
@@ -76,7 +76,7 @@ def get_color_hex(hex: str):
     转换十六进制颜色字符串为Skia颜色
 
     Args:
-        hex: 十六进制颜色字符串（支持 #RRGGBB 和 #AARRGGBB 格式）
+        hex: 十六进制颜色字符串(支持 #RRGGBB 和 #AARRGGBB 格式)
 
     Returns:
         skia.Color: 对应的RGBA颜色对象

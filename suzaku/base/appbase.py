@@ -1,6 +1,10 @@
+import glfw
+
+from .windowbase import SkWindowBase
+
+
 def init_glfw() -> None:
     """Initialize GLFW module."""
-    import glfw
     if not glfw.init():
         raise RuntimeError('glfw.init() failed')
     # 设置全局GLFW配置
@@ -17,9 +21,8 @@ class SkAppBase:
 
     def __init__(self, window_event_wait: bool = False) -> None:
         """
-        SkAppBase.
-
-        应用程式。
+        SkAppBase
+        应用基础
         """
 
         self.windows = []
@@ -38,8 +41,6 @@ class SkAppBase:
             raise RuntimeError("App not initialized")
         return cls._instance
 
-    from .windowbase import SkWindowBase
-
     def add_window(self, window: SkWindowBase) -> "SkAppBase":
         """Add a window.
 
@@ -52,7 +53,6 @@ class SkAppBase:
 
     # 修改Application类的run方法
     def run(self) -> None:
-        import glfw
         if not self.windows:
             raise RuntimeError('At least one window is required to run application!')
 
@@ -93,7 +93,6 @@ class SkAppBase:
 
     def cleanup(self) -> None:
         """Clean up resources."""
-        import glfw
         for window in self.windows:
             glfw.destroy_window(window.glfw_window)
         glfw.terminate()
@@ -101,5 +100,4 @@ class SkAppBase:
 
     def quit(self) -> None:
         """Quit application."""
-        self.running = False
         self.running = False

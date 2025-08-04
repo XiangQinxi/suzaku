@@ -1,6 +1,8 @@
 import warnings
 from typing import Union
 
+from suzaku.base import Event
+
 
 class Boxes:
 
@@ -223,7 +225,6 @@ class Box:
             l = layout
         if not self in l.boxes_children:
             l.add_child(self, padx=padx, pady=pady, expand=expand)
-            from suzaku.base import Event
             l.update(Event(parent.width, parent.height))
             self._show()
         return self
@@ -433,7 +434,6 @@ class Puts:
             c.y = child["margin"][1]
 
             if c.width != width or c.height != height:
-                from suzaku.base import Event
                 c.event_generate(
                     "resize",
                     Event(
@@ -478,7 +478,6 @@ class Put:
             l = layout
         if not self in l.puts_children:
             l.add_child(self, margin=margin)
-            from suzaku.base import Event
             l.update(Event(event_type="update", width=parent.width, height=parent.height))
             self._show()
         return None

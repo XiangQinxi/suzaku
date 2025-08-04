@@ -1,12 +1,13 @@
+import os
 import warnings
-from typing import Union, Any
+from pathlib import Path
+from typing import Any, Union
+
+import skia
+
 
 def default_font() -> "SkFont":
     """
-    Default font (Harmony Sans SC).
-
-    默认字体 (鸿蒙SC字体)。
-
     Returns:
         font (SkFont): The default font.
     """
@@ -27,8 +28,6 @@ class SkFont:
     
     字体
     """
-
-    from pathlib import Path
 
     def __init__(self, name: str = None, path: Union[Path, str] = None, size: int = 14):
         """
@@ -53,8 +52,7 @@ class SkFont:
                 字体大小。
 
         """
-        import skia
-        import os
+
 
         self.size = size
 

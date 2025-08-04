@@ -1,9 +1,11 @@
-from typing import Union, Any
+from typing import Any, Union
+
 import skia
 
-from ..styles.theme import default_theme, SkTheme
-from .window import SkWindow
 from suzaku.event import SkEventHanding
+
+from ..styles.theme import SkTheme, default_theme
+from .window import SkWindow
 
 
 class SkWidget(SkEventHanding):
@@ -48,6 +50,7 @@ class SkWidget(SkEventHanding):
         self.width = size[0]
         self.height = size[1]
 
+        self.layout = None
         self.visible = False
 
         if not widget_id:

@@ -22,4 +22,4 @@ class SkEmpty(SkWidget):
         * canvas: skia.Surface to draw on
         * rect: Rectangle to draw in
         """
-        pass
+        ...

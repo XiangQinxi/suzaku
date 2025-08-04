@@ -1,16 +1,15 @@
-from typing import Union, Any
-
-import warnings
-import os
 import json
-import re
+import os
 import pathlib
+import re
+import warnings
+from typing import Any, Union
 
 
 class SkStyleNotFoundError(NameError):
     pass
 
-class SkTheme:
+class SkTheme():
 
     loaded_themes: list["SkTheme"] = []
     INTERNAL_THEME_DIR = pathlib.Path(__file__).parent.parent / "resources" / "themes"
@@ -221,7 +220,10 @@ class SkTheme:
         widget.apply_theme(self)
 
 for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
+    print(file)
     SkTheme.INTERNAL_THEMES[file.split(".")[0]] = (SkTheme({}).load_from_file(\
         SkTheme.INTERNAL_THEME_DIR / file))
+
+print(SkTheme.INTERNAL_THEMES)
 
 SkTheme.DEFAULT_THEME = default_theme = SkTheme.INTERNAL_THEMES["light"]
