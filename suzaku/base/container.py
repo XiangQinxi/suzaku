@@ -33,7 +33,8 @@ class SkContainer():
             for index, draw_func in enumerate(item):
                 #print(i, f)
                 if self.children[index].visible:
-                    draw_func(canvas)
+                    #draw_func(canvas)
+                    pass
 
     def add_child(self, child):
         """

@@ -1,7 +1,5 @@
 import glfw
 
-from .windowbase import SkWindowBase
-
 
 def init_glfw() -> None:
     """Initialize GLFW module."""
@@ -41,7 +39,7 @@ class SkAppBase:
             raise RuntimeError("App not initialized")
         return cls._instance
 
-    def add_window(self, window: SkWindowBase) -> "SkAppBase":
+    def add_window(self, window) -> "SkAppBase":
         """Add a window.
 
         * `window`: The window

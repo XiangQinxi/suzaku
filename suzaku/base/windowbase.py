@@ -6,10 +6,8 @@ import glfw
 import skia
 from OpenGL import GL
 
-from suzaku.base.appbase import SkAppBase
-from suzaku.event import SkEvent
-
-from ..event import SkEventHanding
+from .appbase import SkAppBase
+from ..event import SkEvent, SkEventHanding
 
 
 class SkWindowBase(SkEventHanding):
