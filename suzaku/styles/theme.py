@@ -8,7 +8,7 @@ import re
 class SkStyleNotFoundError(NameError):
     pass
 
-class SkTheme():
+class SkTheme:
     def __init__(self, style: dict={}, parent: Union["SkTheme", None] = None):
         """Theme for SkWindow and SkWidgets.
 

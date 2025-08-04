@@ -1,6 +1,6 @@
 from typing import Any
 
-from suzaku.widgets.event import SkEventHanding
+from .event import SkEventHanding
 
 
 
@@ -473,7 +473,7 @@ class SkWindowBase(SkEventHanding):
             glfw.destroy_window(self.glfw_window)
             self.glfw_window = None  # Clear the reference
 
-    def title(self, text: str = None) -> str | type:
+    def title(self, text: str = None) -> str:
         """
         获取或设置窗口标题
 
@@ -574,6 +574,12 @@ class SkWindowBase(SkEventHanding):
         return self.attributes[key]
     
     def get_attribute(self, attribute_name: str) -> Any:
+        """
+        获取窗口属性
+
+        :param attribute_name: 属性名
+        :return: attribute name
+        """
         return self.attributes[attribute_name]
 
     def set_attribute(self, **kwargs):

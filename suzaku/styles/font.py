@@ -11,9 +11,10 @@ def default_font() -> "SkFont":
     Returns:
         font (SkFont): The default font.
     """
-    import os
-    font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'HarmonyOS_Sans_SC_Regular.ttf')
-    return font(path=font_path, size=14.5)
+    from sys import platform
+    if platform == "win32":
+        f = "Microsoft YaHei"
+    return font(name=f, size=14.5)
 
 
 def font(*args, **kwargs):

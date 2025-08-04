@@ -29,13 +29,28 @@ class SkContainer():
         self.draw_list = [[], []]
 
     def bind_layout(self):
+        """
+        Bind layout event to container.
+
+        :return: None
+        """
         self.bind("resize", self._handle_layout)
 
     def add_child_with_layout(self, child_config):
+        """
+
+        :param child_config:
+        :return: None
+        """
         self.children_with_layout.append(child_config)
         self._handle_layout()
 
     def set_layout_name(self, name: str):
+        """
+        Set the container layout name
+
+        :param name:
+        """
         self.layout_name = name
 
     def _handle_layout(self):
