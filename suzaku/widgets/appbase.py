@@ -15,7 +15,7 @@ class SkAppBase:
 
     _instance = None
 
-    def __init__(self) -> None:
+    def __init__(self, window_event_wait: bool = False) -> None:
         """
         SkAppBase.
 
@@ -23,6 +23,7 @@ class SkAppBase:
         """
 
         self.windows = []
+        self.window_event_wait = window_event_wait
         self.running = False
         init_glfw()
         if SkAppBase._instance is not None:
@@ -61,7 +62,10 @@ class SkAppBase:
 
         # 主事件循环
         while self.running and self.windows:
-            glfw.poll_events()
+            if self.window_event_wait:
+                glfw.wait_events()
+            else:
+                glfw.poll_events()
 
             # 创建窗口列表副本避免迭代时修改
             current_windows = list(self.windows)

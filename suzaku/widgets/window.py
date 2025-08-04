@@ -123,15 +123,15 @@ class SkWindow(SkWindowBase, SkContainer):
         if self.previous_widget and self.previous_widget != current_widget:
             self.cursor(self.default_cursor())
             self.previous_widget.event_generate("mouse_leave", event)
-            self.previous_widget.is_mouse_enter = False
+            self.previous_widget.is_mouse_floating = False
 
         # 处理当前元素的进入和移动事件
         if current_widget:
             if current_widget.visible:
-                if not current_widget.is_mouse_enter:
+                if not current_widget.is_mouse_floating:
                     self.cursor(current_widget.attributes["cursor"])
                     current_widget.event_generate("mouse_enter", event)
-                    current_widget.is_mouse_enter = True
+                    current_widget.is_mouse_floating = True
                 else:
                     self.cursor(current_widget.attributes["cursor"])
                     current_widget.event_generate("mouse_motion", event)
