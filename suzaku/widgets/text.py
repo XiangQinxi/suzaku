@@ -4,7 +4,7 @@ import skia
 
 from ..styles.color import SkColor
 from ..styles.color_old import color
-from .packs import central_text
+from ..base.drawbase import central_text
 from .widget import SkWidget
 from .window import SkWindow
 
