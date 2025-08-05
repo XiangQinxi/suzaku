@@ -14,7 +14,7 @@ class SkWidget(SkEventHanding):
 
     theme = default_theme
 
-    def __init__(self, parent: Union[SkWindow, "SkWidget"], size: tuple[int, int]=(100, 30), 
+    def __init__(self, parent: "SkContainer", size: tuple[int, int]=(100, 30), 
                  style="SkWidget", widget_id: Union[str, None] = None, name="SkWidget") -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -70,10 +70,12 @@ class SkWidget(SkEventHanding):
             "char": [],
         }
 
+        self.layout_config = None
+
         try:
             self.parent.add_child(self)
         except TypeError:
-            raise TypeError("Parent component is not SkWindow or SkWidget.")
+            raise TypeError("Parent component is not a SkContainer-based object.")
 
         # Events-related
         self.is_mouse_floating = False
@@ -86,6 +88,10 @@ class SkWidget(SkEventHanding):
                     self.is_mouse_floating = True
                 case "mouse_leave":
                     self.is_mouse_floating = False
+                case "mouse_pressed":
+                    self.is_mouse_pressed = True
+                case "mouse_released":
+                    self.is_mouse_pressed = False
                 case "focus_gain":
                     self.is_focus = True
                 case "focus_loss":
@@ -99,6 +105,8 @@ class SkWidget(SkEventHanding):
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
 
+        self.parent.add_child(self)
+
     def draw(self, canvas: skia.Surfaces) -> None:
         """Execute the widget rendering and subwidget rendering
 
@@ -107,7 +115,7 @@ class SkWidget(SkEventHanding):
         """
         rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
         self._draw(canvas, rect)
-        if hasattr(self, "draw_children"):
+        if hasattr(self, "children"):
             self.draw_children(canvas)
 
     def _draw(self, canvas: skia.Surfaces, rect: skia.Rect) -> None:
@@ -179,8 +187,17 @@ class SkWidget(SkEventHanding):
 
     # Layout related
 
+    def layout_forget(self):
+        """Remove widget from parent layout.
+
+        :return: self
+        """
+        self.visible = False
+        self.layout_config = {"none": None}
+        return self
+
     def fixed(self, x: int | float, y: int | float,
-              width: int | float = None, height: int | float = None):
+              width: int | float | None = None, height: int | float | None = None):
         """Fix the widget at a specific position.
 
         :param x:
@@ -195,80 +212,74 @@ class SkWidget(SkEventHanding):
             self.width = width
         if height:
             self.height = height
-        self.parent.add_floating_child(
-            {
-                "child": self,
-                "layout": "fixed",
-                "x": self.x,
-                "y": self.y,
-                "width": self.width,
-                "height": self.height
-            }
-        )
+        self.layout_cojnfig = {"fixed": {
+            "layout": "fixed",
+            "x": self.x,
+            "y": self.y,
+            "width": self.width,
+            "height": self.height
+        }}
         self.visible = True
         return self
 
-    def fixed_forget(self):
-        """Remove widget layout
-
-        :return: self
-        """
-        self.visible = False
-        return self
-
-    def place(self, anchor: str = "nw",
-              top: int | float = 0, bottom: int | float = 0,
-              left: int | float = 0, right: int | float = 0):
+    def place(self, anchor: str = "nw", x: int = 0, y: int = 0):
         """Place widget at a specific position.
 
         :param anchor:
-        :param top:
-        :param bottom:
-        :param left:
-        :param right:
+        :param
         :return: self
         """
-        self.parent.add_floating_child(
-            {
-                "child": self,
-                "layout": "place",
-                "anchor": anchor,
-                "top": top,
-                "bottom": bottom,
-                "left": left,
-                "right": right
-            }
-        )
+        self.layout_config = {"place": {
+            "anchor": anchor,
+            "x": x,
+            "y": y,
+        }}
         self.visible = True
         return self
 
-    def pack(self, padx: int=0, pady: int=0, expand: bool=False):
-        pass
+    def pack(self, direction: str="n", 
+             padx: int | float | tuple[int | float, int | float]=0, 
+             pady: int | float | tuple[int | float, int | float]=0, 
+             expand: bool | tuple[bool, bool]=False):
+        """Position the widget with box layout.
 
-    def box(self, side="top",
-            padx: int | float | tuple[int, int] | tuple[float, float] | tuple[int, float] | tuple[float, int] = 10,
-            pady: int | float | tuple[int, int] | tuple[float, float] | tuple[int, float] | tuple[float, int] = 10,
-            expand: bool = False):
+        :param direction: Direction of the layout
+        :param padx: Paddings on x direction
+        :param pady: Paddings on y direction
+        :param expand: Whether to expand the widget
+        :return: self
         """
+        self.layout_config = {"pack": {
+            "direction": direction,
+            "padx": padx,
+            "pady": pady,
+            "expand": expand,
+        }}
+        self.visible = True
+        return self
 
-        :param side:
-        :param padx:
-        :param pady:
+    def box(self, direction: str="n",
+            padx: int | float | tuple[int | float, int | float]=0,
+            pady: int | float | tuple[int | float, int | float]=0,
+            expand: bool | tuple[bool, bool] = False):
+        """Position the widget with box layout.
+
+        :param direction: Direction of the layout
+        :param padx: Paddings on x direction
+        :param pady: Paddings on y direction
         :param expand:
         :return: self
         """
-        self.parent.add_layout_child(
-            {
-                "child": self,
-                "layout": "box",
-                "side": side,
-                "padx": padx,
-                "pady": pady,
-                "expand": expand,
-            }
-        )
+        self.layout_config = {"box": {
+            "direction": direction,
+            "padx": padx,
+            "pady": pady,
+            "expand": expand,
+        }}
         self.visible = True
         return self
+    
+    # Focus Related
 
     def focus_set(self):
         self.window.focus_widget = self

@@ -4,6 +4,6 @@ from suzaku import *
 app = SkAppWindow(size=(100, 100))
 app.title("Test")
 
-SkButton(app).box(side="top")
+SkButton(app).box()
 
 app.run()
