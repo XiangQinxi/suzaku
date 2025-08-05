@@ -47,7 +47,7 @@ class SkEntry(SkVisual):
 
         # 光标闪烁相关属性
         self.visual_attr["cursor_visible"] = True  # 光标是否可见
-        self.visual_attr["blink_interval"] = 500  # 闪烁间隔（毫秒）
+        self.visual_attr["blink_interval"] = 500  # 闪烁间隔 (毫秒)
         self.visual_attr["last_blink_time"] = 0  # 上次闪烁时间戳
 
         self.bind("key_press", self._key)
