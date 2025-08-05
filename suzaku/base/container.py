@@ -60,6 +60,10 @@ class SkContainer:
                            "SkWindow or SkWidget in normal cases.")
 
     def draw_children(self, canvas):
+        """Draw all visibled children
+
+        :param canvas: Skia.Canvas
+        """
         for item in self.draw_list:
             for child in item:
                 if child.visible:

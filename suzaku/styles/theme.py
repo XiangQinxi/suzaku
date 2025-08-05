@@ -170,7 +170,7 @@ class SkTheme():
         :param copy: Whether to copy a new styles json, otherwise returns the styles itself
         """
         result = self.styles
-        try:
+        try: # Style fallback machanism
             selector_parsed = self.select(selector)
         except SkStyleNotFoundError:
             return default_theme.get_style(selector, copy=True)
