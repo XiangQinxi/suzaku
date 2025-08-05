@@ -1,6 +1,7 @@
 from typing import Union
 
 from .frame import SkFrame
+from .text import SkText
 
 
 class SkButton(SkFrame):
@@ -24,6 +25,9 @@ class SkButton(SkFrame):
 
         super().__init__(*args, size=size, style=style, name="sk_button", **kwargs)
 
+        self.text_widget = SkText(self, text=text)
+        self.text_widget.box(expand=True)
+
         self.events["click"] = []
         self.attributes["text"] = text
 
@@ -46,11 +50,11 @@ class SkButton(SkFrame):
         if self.is_mouse_floating:
             self.event_generate("click", evt)
 
-    def draw(self, canvas, rect) -> None:
+    def _draw(self, canvas, rect) -> None:
         """Draw button.
 
         * canvas: skia.Surface to draw on
         * rect: Rectangle to draw in
         """
-        NotImplemented
+        pass
 

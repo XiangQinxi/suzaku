@@ -15,9 +15,12 @@ class SkFrame(SkWidget, SkContainer):
         SkWidget.__init__(self, parent, style=style, **kwargs)
         SkContainer.__init__(self)
 
+    def sheet(self):
+        return self.theme.styles[self.style]
+
     def _draw(self, canvas, rect):
         #print(self.children, self.draw_list)
-        sheets = self.theme.styles[self.style]
+        sheets = self.sheet()
 
         radius = sheets["radius"]
 

@@ -1,13 +1,19 @@
 from suzaku import *
 # import glfw
 
-app = SkAppWindow()
+app = SkAppWindow(size=(1000, 100))
 app.title("Test")
 
-frame = SkFrame(app)
-frame.place(x=100, y=100, width=40, height=40)
+for i in range(2):
+    SkFrame(app).box(side="left")
 
-text = SkText(frame, text="SkLabel")
-text.place(x=10, y=100)
+for i in range(2):
+    SkFrame(app).box(side="left", expand=True)
+
+for i in range(2):
+    SkFrame(app).box(side="right", expand=True)
+
+for i in range(2):
+    SkFrame(app).box(side="right")
 
 app.run()

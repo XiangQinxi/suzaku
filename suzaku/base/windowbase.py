@@ -230,7 +230,10 @@ class SkWindowBase(SkEventHanding):
         self._on_framebuffer_size(window, width, height)
         self.width = width
         self.height = height
-        self.event_generate("resize", SkEvent(event_type="resize", width=width, height=height))
+        event = SkEvent(event_type="resize", width=width, height=height)
+        self.event_generate("resize", event)
+        for child in self.children:
+            child.event_generate("resize", event)
         #cls.update()
 
     def _on_window_pos(self, window, x, y) -> None:

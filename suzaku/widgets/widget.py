@@ -135,6 +135,13 @@ class SkWidget(SkEventHanding):
         self.visible = False
         return self
 
+    def sheet(self):
+        """Get the style sheet of the widget.
+
+        :return:
+        """
+        return self.theme.styles[self.style]
+
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
@@ -167,8 +174,11 @@ class SkWidget(SkEventHanding):
             for child in self.children:
                 child.apply_theme(new_theme)
 
-    def place(self, x: int, y: int, width: int = None, height: int = None):
-        """Place the widget at a specific position.
+    # Layout related
+
+    def fixed(self, x: int | float, y: int | float,
+              width: int | float = None, height: int | float = None):
+        """Fix the widget at a specific position.
 
         :param x:
         :param y:
@@ -185,6 +195,7 @@ class SkWidget(SkEventHanding):
         self.parent.add_floating_child(
             {
                 "child": self,
+                "layout": "fixed",
                 "x": self.x,
                 "y": self.y,
                 "width": self.width,
@@ -194,7 +205,7 @@ class SkWidget(SkEventHanding):
         self.visible = True
         return self
 
-    def place_forget(self):
+    def fixed_forget(self):
         """Remove widget layout
 
         :return: self
@@ -202,9 +213,59 @@ class SkWidget(SkEventHanding):
         self.visible = False
         return self
 
-    # Layout related
+    def place(self, anchor: str = "nw",
+              top: int | float = 0, bottom: int | float = 0,
+              left: int | float = 0, right: int | float = 0):
+        """Place widget at a specific position.
+
+        :param anchor:
+        :param top:
+        :param bottom:
+        :param left:
+        :param right:
+        :return: self
+        """
+        self.parent.add_floating_child(
+            {
+                "child": self,
+                "layout": "place",
+                "anchor": anchor,
+                "top": top,
+                "bottom": bottom,
+                "left": left,
+                "right": right
+            }
+        )
+        self.visible = True
+        return self
+
     def pack(self, padx: int=0, pady: int=0, expand: bool=False):
         pass
+
+    def box(self, side="top",
+            padx: int | float | tuple[int, int] | tuple[float, float] | tuple[int, float] | tuple[float, int] = 10,
+            pady: int | float | tuple[int, int] | tuple[float, float] | tuple[int, float] | tuple[float, int] = 10,
+            expand: bool = False):
+        """
+
+        :param side:
+        :param padx:
+        :param pady:
+        :param expand:
+        :return: self
+        """
+        self.parent.add_layout_child(
+            {
+                "child": self,
+                "layout": "box",
+                "side": side,
+                "padx": padx,
+                "pady": pady,
+                "expand": expand,
+            }
+        )
+        self.visible = True
+        return self
 
     def focus_set(self):
         self.window.focus_widget = self
