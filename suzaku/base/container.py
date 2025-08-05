@@ -1,4 +1,5 @@
 import warnings
+import skia
 
 from ..event import SkEvent
 
@@ -6,32 +7,33 @@ from ..event import SkEvent
 class SkLayoutError(TypeError):
     pass
 
+
 class SkContainer:
 
-    def __init__(self, pos: tuple[int, int]=(0, 0), size: tuple[int, int]=(0, 0)):
+    def __init__(self, pos: tuple[int, int] = (0, 0), size: tuple[int, int] = (0, 0)):
         """A SkContainer represents a widget that has the ability to contain other widgets inside.
 
         SkContainer is only for internal use. If any user would like to create a widget from 
         several of existed ones, they should use SkComboWidget instead. The authors will not 
         guarantee the stability of inheriting SkContainer for third-party widgets.
-        
-        SkContainer class contains code for widget embedding, and layout handling, providing the 
-        ability of containing `children` to widgets inerit from it. All other classes with such 
+
+        SkContainer class contains code for widget embedding, and layout handling, providing the
+        ability of containing `children` to widgets inerit from it. All other classes with such
         abilities should be inherited from SkContainer.
 
-        SkContainer has a `children` list, each item is a `SkWidget`, called `child`. This helps 
+        SkContainer has a `children` list, each item is a `SkWidget`, called `child`. This helps
         the SkContainer knows which `SkWidget`s it should handle.
-        
-        SkContainer has a `draw_list` that stores all widgets contained in it that should be drawn. 
-        They are separated into a few layers which are listed below, in the order of from behind to 
-        the top: 
+
+        SkContainer has a `draw_list` that stores all widgets contained in it that should be drawn.
+        They are separated into a few layers which are listed below, in the order of from behind to
+        the top:
 
         1. `Layout layer`: The layer for widgets using pack or grid layout.
         2. `Floating layer`: The layer for widgets using place layout.
         3. `Fixed layer`: The layer for widgets using fixed layout.
 
-        In each layer, items will be drawn in the order of index. Meaning that those with lower 
-        index will be drawn first, and may get covered by those with higher index. Same for layers, 
+        In each layer, items will be drawn in the order of index. Meaning that those with lower
+        index will be drawn first, and may get covered by those with higher index. Same for layers,
         layers with higher index cover those with lower index.
 
         :param pos: The coordinates of the container in tuple (x, y), default is (0, 0)
@@ -53,13 +55,13 @@ class SkContainer:
         self.y = pos[1]
         self.width = size[0]
         self.height = size[1]
-    
+
     def bind(self, *args, **kwargs):
         raise RuntimeError("Anything inherited from SkContainer should support binding events!" + \
                            "This error should be overrode by the actual bind function of " + \
                            "SkWindow or SkWidget in normal cases.")
 
-    def draw_children(self, canvas):
+    def draw_children(self, canvas: skia.Surfaces):
         for item in self.draw_list:
             for child in item:
                 if child.visible:
@@ -131,7 +133,7 @@ class SkContainer:
                 match layout_type:
                     case "none":
                         continue
-                    case "pack" | "box" | "grid": # -> Layout layer
+                    case "pack" | "box" | "grid":  # -> Layout layer
                         if self.layers_layout_type[0] == "none":
                             self.layers_layout_type[0] = layout_type
                         elif self.layers_layout_type[0] != layout_type:
@@ -139,11 +141,11 @@ class SkContainer:
                                                 f"one layout type. Not {layout_type} with " + \
                                                 f"{self.layers_layout_type[0]} which is existed.")
                         self.draw_list[0].append(draw_item)
-                    case "place": # -> Floating layer
+                    case "place":  # -> Floating layer
                         if self.layers_layout_type[1] != "place":
                             self.layers_layout_type[1] = layout_type
                         self.draw_list[1].append(draw_item)
-                    case "fixed": # -> Fixed layer
+                    case "fixed":  # -> Fixed layer
                         if self.layers_layout_type[2] != "fixed":
                             self.layers_layout_type[2] = layout_type
                         self.draw_list[2].append(draw_item)
@@ -163,7 +165,7 @@ class SkContainer:
 
     def _handle_box(self, event: SkEvent):
         """Process box layout.
-        
+
         :param event: The resize event
         """
         width = self.width
@@ -173,6 +175,7 @@ class SkContainer:
         expanded_children = []
         fixed_children = []
         boxes_children = self.draw_list[0]
+        print(boxes_children)
 
         for child in boxes_children:
             layout_config = child["widget"].layout_config
@@ -311,7 +314,7 @@ class SkContainer:
 
     def _handle_fixed(self, event: SkEvent):
         """Process fixed layout.
-        
+
         :param event: The resize event
         """
         for item in self.draw_list[1]:

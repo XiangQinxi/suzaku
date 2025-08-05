@@ -212,7 +212,7 @@ class SkWidget(SkEventHanding):
             self.width = width
         if height:
             self.height = height
-        self.layout_cojnfig = {"fixed": {
+        self.layout_config = {"fixed": {
             "layout": "fixed",
             "x": self.x,
             "y": self.y,
