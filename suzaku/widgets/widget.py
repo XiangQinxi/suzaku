@@ -94,7 +94,6 @@ class SkWidget(SkEventHanding):
                     self.is_mouse_pressed = False
                 case "focus_gain":
                     self.is_focus = True
-                    print(123)
                 case "focus_loss":
                     self.is_focus = False
             pass
