@@ -56,5 +56,29 @@ class SkButton(SkFrame):
         * canvas: skia.Surface to draw on
         * rect: Rectangle to draw in
         """
-        pass
+        sheets = None
+        if self.is_mouse_floating:
+            if self.is_mouse_pressed:
+                sheets = self.sheets()["pressed"]
+            else:
+                sheets = self.sheets()["hover"]
+        else:
+            if self.is_focus:
+                sheets = self.sheets()["focus"]
+            else:
+                sheets = self.sheets()["rest"]
+
+        if "bd_shadow" in sheets:
+            bd_shadow = sheets["bd_shadow"]
+        else:
+            bd_shadow = False
+        if "bd_shader" in sheets:
+            bd_shader = sheets["bd_shader"]
+        else:
+            bd_shader = None
+
+        self._draw_skframe(
+            canvas, rect, radius=self.sheets()["radius"], bg=sheets["bg"], width=sheets["width"],
+            bd=sheets["bd"], bd_shadow=bd_shadow, bd_shader=bd_shader
+        )
 

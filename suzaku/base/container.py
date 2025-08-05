@@ -116,7 +116,7 @@ class SkContainer:
     def _handle_layout(self, event):
         for child in self.children:
             if child.visible:
-                layout_type = child.layout_config.keys()[0]
+                layout_type = list(child.layout_config.keys())[0]
                 # Build draw_item dict
                 draw_item = {
                     "widget": child,
