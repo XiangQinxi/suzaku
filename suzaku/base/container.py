@@ -60,7 +60,6 @@ class SkContainer:
         """
         Add layout child widget to window.
 
-        :arg child: SkWidget
         :arg draw_dict: dict
         :return: None
         """
@@ -90,7 +89,6 @@ class SkContainer:
         """
         Add floating child widget to window.
 
-        :arg child: SkWidget
         :arg draw_dict: dict
         :return: None
         """
@@ -194,7 +192,7 @@ class SkContainer:
                 else:
                     child["child"].width = expanded_width - left - right
                 child["child"].height = self.height - top - bottom
-                child["child"].x = last_child_left_x + child["child"].width - right
+                child["child"].x = last_child_right_x - child["child"].width - right
                 child["child"].y = top
                 last_child_right_x = last_child_right_x - child["child"].width - left * 2
         else:

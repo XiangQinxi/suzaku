@@ -174,6 +174,9 @@ class SkWidget(SkEventHanding):
             for child in self.children:
                 child.apply_theme(new_theme)
 
+    def sheets(self):
+        return self.theme.styles[self.style]
+
     # Layout related
 
     def fixed(self, x: int | float, y: int | float,
