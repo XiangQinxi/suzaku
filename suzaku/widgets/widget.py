@@ -99,20 +99,41 @@ class SkWidget(SkEventHanding):
         self.bind("focus_in", _on_event)
         self.bind("focus_out", _on_event)
 
-    def _draw(self, canvas: skia.Surfaces):
-        with skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height) as rect:
-            self.draw(canvas, rect)
+    def draw(self, canvas: skia.Surfaces) -> None:
+        """Execute the widget rendering and subwidget rendering
+
+        :param canvas:
+        :return: None
+        """
+        rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
+        self._draw(canvas, rect)
         if hasattr(self, "draw_children"):
             self.draw_children(canvas)
 
-    def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
+    def _draw(self, canvas: skia.Surfaces, rect: skia.Rect) -> None:
+        """Execute the widget rendering
+
+        :param canvas: skia.Surfaces
+        :param rect: skia.Rect
+        :return:
+        """
         pass
 
     def show(self):
+        """Make the component visible
+
+        :return: self
+        """
         self.visible = True
+        return self
 
     def hide(self):
+        """Make the component invisible
+
+        :return: self
+        """
         self.visible = False
+        return self
 
     # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
@@ -125,17 +146,36 @@ class SkWidget(SkEventHanding):
     cget = get_attribute
 
     def set_attribute(self, **kwargs):
+        """Set attribute of a widget by name.
+
+        :param kwargs: attribute name and value
+        :return: self
+        """
         self.attributes.update(**kwargs)
+        return self
 
     configure = config = set_attribute
 
     def apply_theme(self, new_theme: SkTheme):
+        """Apply theme to the widget and its children.`
+
+        :param new_theme:
+        :return:
+        """
         self.theme = new_theme
         if hasattr(self, "children"):
             for child in self.children:
                 child.apply_theme(new_theme)
 
     def place(self, x: int, y: int, width: int = None, height: int = None):
+        """Place the widget at a specific position.
+
+        :param x:
+        :param y:
+        :param width:
+        :param height:
+        :return: self
+        """
         self.x = x
         self.y = y
         if width:
@@ -143,7 +183,6 @@ class SkWidget(SkEventHanding):
         if height:
             self.height = height
         self.parent.add_floating_child(
-            self,
             {
                 "child": self,
                 "x": self.x,
@@ -153,9 +192,15 @@ class SkWidget(SkEventHanding):
             }
         )
         self.visible = True
+        return self
 
     def place_forget(self):
+        """Remove widget layout
+
+        :return: self
+        """
         self.visible = False
+        return self
 
     # Layout related
     def pack(self, padx: int=0, pady: int=0, expand: bool=False):

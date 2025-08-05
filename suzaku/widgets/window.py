@@ -5,13 +5,13 @@ from suzaku.styles.theme import SkTheme, default_theme
 
 from ..base.container import SkContainer
 from ..base.windowbase import SkWindowBase
-from ..styles.color import color
+from ..styles.color import SkColor
+from ..styles.color_old import color
 
 
 class SkWindow(SkWindowBase, SkContainer):
     def __init__(self, *args, themename="light", style="SkWindow", name="sk_window", **kwargs) -> None:
-        """
-        SkWindow, inherited from SkWindowBase
+        """SkWindow, inherited from SkWindowBase
 
         :param args: SkWindowBase Args
         :param themename: Theme name
@@ -19,6 +19,8 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         SkWindowBase.__init__(self, *args, name=name, **kwargs)
         SkContainer.__init__(self)
+
+        self.attributes["style"] = style
 
         self.theme = default_theme
 
@@ -30,7 +32,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.previous_widget = None
 
-        self.set_draw_func(self.draw)
+        self.set_draw_func(self._draw)
         self.bind("mouse_motion", self._motion, add=True)
         self.bind("mouse_press", self._mouse)
         self.bind("mouse_release", self._mouse_release)
@@ -46,26 +48,33 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.bind("update", self._update)
 
+
     def apply_theme(self, new_theme: SkTheme):
+        """Apply theme to the window and its children.
+
+        :param new_theme:
+        :return:
+        """
         self.attributes["theme"] = new_theme
         for child in self.children:
             child.apply_theme(new_theme)
 
     def _update(self, event):
-        """
-        Update event for SkWindow.
+        """Update event for SkWindow.
 
-        Args:
-            event: Update event.
-
-        Returns:
-
+        :param event: SkEvent
+        :return:
         """
         for widget in self.children:
             from suzaku.event import SkEvent
             widget.event_generate("update", SkEvent(event_type="update"))
 
     def _key_press(self, event):
+        """Key press event for SkWindow.
+
+        :param event: SkEvent
+        :return:
+        """
         #print(cls.cget("focus_widget"))
         if self.focus_get() is not self:
             self.focus_get().event_generate("key_press", event)
@@ -98,13 +107,10 @@ class SkWindow(SkWindowBase, SkContainer):
                 break
 
     def _motion(self, event: SkEvent) -> None:
-        """
+        """Mouse motion event for SkWindow.
 
-        Args:
-            event:
-
-        Returns:
-
+        :param event: SkEvent
+        :return:
         """
         current_widget = None
         event = SkEvent(event_type="mouse_motion", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
@@ -136,23 +142,19 @@ class SkWindow(SkWindowBase, SkContainer):
         else:
             self.previous_widget = None
 
-    def add_draw(self, draw_func) -> None:
-        self.draws.append(draw_func)
-
-    def remove_draw(self, draw_func) -> None:
-        self.draws.remove(draw_func)
-
-    def draw(self, canvas: skia.Surfaces) -> None:
-        canvas.clear(color(self.theme.styles[self.winfo_style()]["bg"]))
+    def _draw(self, canvas: skia.Surfaces) -> None:
+        canvas.clear(color(self.theme.styles[self.attributes["style"]]["bg"]))
 
         self.draw_children(canvas)
 
         return None
 
-    def winfo_style(self) -> str:
-        return self.attributes["styles"]
-
     def _mouse_release(self, event) -> None:
+        """Mouse release event for SkWindow.
+
+        :param event:
+        :return:
+        """
         event = SkEvent(
             event_type="mouse_release",
             x=event.x,
@@ -167,7 +169,16 @@ class SkWindow(SkWindowBase, SkContainer):
         return None
 
     def focus_get(self):
+        """Get the current widget as the focus
+
+        :return:
+        """
         return self.focus_widget
 
     def focus_set(self, widget):
+        """Set the current widget as the focus
+
+        :param widget:
+        :return:
+        """
         self.focus_widget = widget

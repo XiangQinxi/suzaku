@@ -36,8 +36,7 @@ class SkContainer:
             for child_dict in item:
                 #print(i, f)
                 if child_dict["child"].visible:
-                    rect = skia.Rect(child_dict["x"], child_dict["y"], child_dict["x"] + child_dict["width"], child_dict["y"] + child_dict["height"])
-                    child_dict["child"].draw(canvas, rect)
+                    child_dict["child"].draw(canvas)
 
     def add_child(self, child):
         """
@@ -59,10 +58,9 @@ class SkContainer:
         :arg draw_dict: dict
         :return: None
         """
-        self.add_child(child)
         self.draw_list[0].append(draw_dict)
 
-    def add_floating_child(self, child, draw_dict):
+    def add_floating_child(self, draw_dict):
         """
         Add floating child widget to window.
 
@@ -70,7 +68,6 @@ class SkContainer:
         :arg draw_dict: dict
         :return: None
         """
-        self.add_child(child)
         self.draw_list[1].append(draw_dict)
 
     def _handle_layout(self):

@@ -2,7 +2,8 @@ from typing import Union
 
 import skia
 
-from ..styles.color import color
+from ..styles.color import SkColor
+from ..styles.color_old import color
 from .packs import central_text
 from .widget import SkWidget
 from .window import SkWindow
@@ -13,7 +14,7 @@ class SkText(SkWidget):
         super().__init__(parent, style=style)
         self.attributes["text"] = text
 
-    def draw(self, canvas: skia.Surfaces, rect: skia.Rect):
+    def _draw(self, canvas: skia.Surfaces, rect: skia.Rect):
         """
         :param canvas:
         :param rect:

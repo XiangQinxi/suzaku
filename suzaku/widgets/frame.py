@@ -5,7 +5,8 @@ import skia
 from suzaku.widgets.packs import set_drop_shadow, set_rainbow_shader
 
 from ..base.container import SkContainer
-from ..styles.color import color
+from ..styles.color import SkColor
+from ..styles.color_old import color
 from .widget import SkWidget
 
 
@@ -14,7 +15,8 @@ class SkFrame(SkWidget, SkContainer):
         SkWidget.__init__(self, parent, style=style, **kwargs)
         SkContainer.__init__(self)
 
-    def draw(self, canvas, rect):
+    def _draw(self, canvas, rect):
+        #print(self.children, self.draw_list)
         sheets = self.theme.styles[self.style]
 
         radius = sheets["radius"]
