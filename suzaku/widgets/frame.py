@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Literal
 
 import skia
 
@@ -15,14 +15,26 @@ class SkFrame(SkWidget, SkContainer):
         SkWidget.__init__(self, parent, style=style, **kwargs)
         SkContainer.__init__(self)
 
-    def sheet(self):
-        return self.theme.styles[self.style]
-
     def _draw(self, canvas, rect):
-        #print(self.children, self.draw_list)
-        sheets = self.sheet()
+        sheets = self.theme.styles[self.style]
+        if "bd_shadow" in sheets:
+            bd_shadow = sheets["bd_shadow"]
+        else:
+            bd_shadow = False
+        if "bd_shader" in sheets:
+            bd_shader = sheets["bd_shader"]
+        else:
+            bd_shader = None
+        self._draw_skframe(
+            canvas, rect, radius=sheets["radius"],
+            bg=sheets["bg"], width=sheets["width"],
+            bd=sheets["bd"], bd_shadow=bd_shadow, bd_shader=bd_shader
+        )
 
-        radius = sheets["radius"]
+    def _draw_skframe(self, canvas, rect, radius, bg, width, bd, bd_shadow: bool = True, bd_shader: None | Literal["rainbow"] = "rainbow"):
+        #print(self.children, self.draw_list)
+
+        radius = radius
 
         # 绘制背景
 
@@ -31,8 +43,8 @@ class SkFrame(SkWidget, SkContainer):
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
-        rect_paint.setColor(color(sheets["bg"]))
-        rect_paint.setStrokeWidth(sheets["width"])
+        rect_paint.setColor(color(bg))
+        rect_paint.setStrokeWidth(width)
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
@@ -40,15 +52,14 @@ class SkFrame(SkWidget, SkContainer):
         rect_paint.setStyle(skia.Paint.kStroke_Style)
 
         # 绘制阴影
-        if "bd_shadow" in sheets:
-            if "bd_shadw":
-                set_drop_shadow(rect_paint, color(sheets["bd"]))
+        if bd_shadow:
+            set_drop_shadow(rect_paint, color(bd))
 
         # Rainbow Border Effect
-        if "bd_shader" in sheets:
-            if sheets["bd_shader"].lower() == "rainbow":
+        if bd_shader:
+            if bd_shader.lower() == "rainbow":
                 set_rainbow_shader(rect_paint, rect)
 
-        rect_paint.setColor(color(sheets["bd"]))
+        rect_paint.setColor(color(bd))
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)

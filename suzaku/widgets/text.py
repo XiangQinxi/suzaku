@@ -15,9 +15,12 @@ class SkText(SkWidget):
         self.attributes["text"] = text
 
     def _draw(self, canvas: skia.Surfaces, rect: skia.Rect):
+        self._draw_sklabel(canvas, rect, fg=self.theme.styles[self.style]["fg"])
+
+    def _draw_sklabel(self, canvas: skia.Surfaces, rect: skia.Rect, fg):
         """
         :param canvas:
         :param rect:
         :return:
         """
-        central_text(canvas, self.cget("text"), color(self.theme.styles[self.style]["fg"]), self.x, self.y, self.width, self.height)
+        central_text(canvas, self.cget("text"), color(fg), self.x, self.y, self.width, self.height)

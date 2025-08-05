@@ -1,10 +1,14 @@
-import skia
+import warnings
+
 from ..event import SkEvent
 
 
+class SkLayoutError(TypeError):
+    pass
+
 class SkContainer:
 
-    def __init__(self):
+    def __init__(self, pos: tuple[int, int]=(0, 0), size: tuple[int, int]=(0, 0)):
         """A SkContainer represents a widget that has the ability to contain other widgets inside.
 
         SkContainer is only for internal use. If any user would like to create a widget from 
@@ -24,48 +28,58 @@ class SkContainer:
 
         1. `Layout layer`: The layer for widgets using pack or grid layout.
         2. `Floating layer`: The layer for widgets using place layout.
+        3. `Fixed layer`: The layer for widgets using fixed layout.
 
         In each layer, items will be drawn in the order of index. Meaning that those with lower 
         index will be drawn first, and may get covered by those with higher index. Same for layers, 
         layers with higher index cover those with lower index.
+
+        :param pos: The coordinates of the container in tuple (x, y), default is (0, 0)
+        :param size: Size of the container, in tuple (width, height), default is (0, 0)
         """
         self.children = []  # Children
         self.draw_list = [
-            [],  # Layout layer
-            []  # Floating layer
+            [],  # Layout layer [SkWidget1, SkWidegt2, ...]
+            [],  # Floating layer [SkWidget1, SkWidget2, ...]
+            [],  # Fixed layer [SkWidget1, SkWidget2, ...]
         ]
+        self.layers_layout_type = ["none" for i in range(len(self.draw_list))]
         self._box_direction = None  # h(horizontal) or v(vertical)
         self.bind("resize", self._handle_layout)
 
+        self.x = pos[0]
+        self.y = pos[1]
+        self.width = size[0]
+        self.height = size[1]
+    
+    def bind(self, *args, **kwargs):
+        raise RuntimeError("Anything inherited from SkContainer should support binding events!" + \
+                           "This error should be overrode by the actual bind function of " + \
+                           "SkWindow or SkWidget in normal cases.")
+
     def draw_children(self, canvas):
         for item in self.draw_list:
-            for child_dict in item:
-                #print(i, f)
-                if child_dict["child"].visible:
-                    child_dict["child"].draw(canvas)
+            for child in item:
+                if child.visible:
+                    child.draw(canvas)
 
     def add_child(self, child):
-        """
-        Add child widget to window.
+        """Add child widget to window.
 
-        Args:
-            child: SkWidget
-
-        Returns:
-            None
+        :param child: The child to add
         """
         self.children.append(child)
 
-    def add_layout_child(self, draw_dict):
-        """
-        Add layout child widget to window.
+    def add_layout_child(self, child):
+        """Add layout child widget to window.
 
-        :arg child: SkWidget
         :arg draw_dict: dict
         :return: None
         """
-        if draw_dict["layout"] == "box":
-            side = draw_dict["side"]
+        layout_config = child.layout_config
+
+        if layout_config["layout"] == "box":
+            side = layout_config["side"]
             if side == "left" or side == "right":
                 direction = "h"
             elif side == "top" or side == "bottom":
@@ -82,38 +96,68 @@ class SkContainer:
             else:
                 self._box_direction = direction
 
-        self.draw_list[0].append(draw_dict)
+        self.draw_list[0].append(child)
         event = SkEvent(event_type="resize", width=self.width, height=self.height)
         self._handle_layout(event)
 
-    def add_floating_child(self, draw_dict):
+    def add_floating_child(self, child):
         """
         Add floating child widget to window.
 
-        :arg child: SkWidget
         :arg draw_dict: dict
         :return: None
         """
-        self.draw_list[1].append(draw_dict)
+        self.draw_list[1].append(child)
         event = SkEvent(event_type="resize", width=self.width, height=self.height)
         self._handle_layout(event)
 
-    def _handle_layout(self, evt):
-        self._handle_box(evt)
-        self._handle_fixed(evt)
+    # Processing Layouts
 
-    def _handle_pack(self, evt):
+    def _handle_layout(self, event):
+        for child in self.children:
+            if child.visible:
+                layout_type = child.layout_type.keys()[0]
+                draw_item = {
+                    "widget": child,
+                    "x": 0,
+                    "y": 0,
+                    "width": 0,
+                    "height": 0,
+                }
+                match layout_type:
+                    case "none":
+                        continue
+                    case "pack" | "box" | "grid": # -> Layout layer
+                        if self.layers_layout_type[0] == "none":
+                            self.layers_layout_type[0] = layout_type
+                        elif self.layers_layout_type[0] != layout_type:
+                            raise SkLayoutError("Layout layer can only contain no more than " + \
+                                                f"one layout type. Not {layout_type} with " + \
+                                                f"{self.layers_layout_type[0]} which is existed.")
+                        self.draw_list[0].append(draw_item)
+                    case "place": # -> Floating layer
+                        if self.layers_layout_type[1] != "place":
+                            self.layers_layout_type[1] = layout_type
+                        self.draw_list[1].append(draw_item)
+                    case "fixed": # -> Fixed layer
+                        if self.layers_layout_type[2] != "fixed":
+                            self.layers_layout_type[2] = layout_type
+                        self.draw_list[2].append(draw_item)
+        self._handle_box()
+        # self._handle_fixed()
+
+    def _handle_pack(self, child: "SkWidget"):
         pass
 
-    def _handle_place(self, evt):
+    def _handle_place(self):
         pass
 
-    def _handle_grid(self, evt):
+    def _handle_grid(self):
         pass
 
-    def _handle_box(self, evt):
-        width = evt.width
-        height = evt.height
+    def _handle_box(self):
+        width = self.width
+        height = self.height
         start_children = []
         end_children = []
         expanded_children = []
@@ -121,15 +165,13 @@ class SkContainer:
         boxes_children = self.draw_list[0]
 
         for child in boxes_children:
-            if child["side"] == "left":
-                start_children.append(child)
-            elif child["side"] == "right":
-                end_children.append(child)
-            if child["side"] == "top":
-                start_children.append(child)
-            elif child["side"] == "bottom":
-                end_children.append(child)
-            if child["expand"]:
+            layout_config = child.layout_config
+            match layout_config["direction"].lower():
+                case "n" | "w":
+                    start_children.append(child)
+                case "s" | "e":
+                    end_children.append(child)
+            if layout_config["expand"]:
                 expanded_children.append(child)
             else:
                 fixed_children.append(child)
@@ -194,7 +236,7 @@ class SkContainer:
                 else:
                     child["child"].width = expanded_width - left - right
                 child["child"].height = self.height - top - bottom
-                child["child"].x = last_child_left_x + child["child"].width - right
+                child["child"].x = last_child_right_x - child["child"].width - right
                 child["child"].y = top
                 last_child_right_x = last_child_right_x - child["child"].width - left * 2
         else:
@@ -257,7 +299,7 @@ class SkContainer:
                 child["child"].y = last_child_top_y - child["child"].height - bottom
                 last_child_top_y = last_child_top_y - child["child"].height - top * 2
 
-    def _handle_fixed(self, evt):
+    def _handle_fixed(self, event):
         for item in self.draw_list[1]:
             if item["layout"] == "fixed":
                 from ..widgets.window import SkWindow
