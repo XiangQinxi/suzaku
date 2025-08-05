@@ -38,13 +38,15 @@ class SkContainer:
         :param size: Size of the container, in tuple (width, height), default is (0, 0)
         """
         self.children = []  # Children
-        self.draw_list = [
+        self.draw_list: list[list[dict]] = [
             [],  # Layout layer [SkWidget1, SkWidegt2, ...]
             [],  # Floating layer [SkWidget1, SkWidget2, ...]
             [],  # Fixed layer [SkWidget1, SkWidget2, ...]
         ]
         self.layers_layout_type = ["none" for i in range(len(self.draw_list))]
+
         self._box_direction = None  # h(horizontal) or v(vertical)
+
         self.bind("resize", self._handle_layout)
 
         self.x = pos[0]
@@ -146,12 +148,8 @@ class SkContainer:
                             self.layers_layout_type[2] = layout_type
                         self.draw_list[2].append(draw_item)
         # Process layouts
-        self._handle_box(event)
-        self._handle_pack(event)
-        self._handle_grid(event)
-        self._handle_place(event)
-        self._handle_fixed(event)
-        self._handle_box(event)
+        for layout_type in self.layers_layout_type:
+            vars(self)[f"_handle_{layout_type}"]()
         # self._handle_fixed()
 
     def _handle_pack(self, event: SkEvent):
@@ -177,16 +175,16 @@ class SkContainer:
         boxes_children = self.draw_list[0]
 
         for child in boxes_children:
-            layout_config = child.layout_config
+            layout_config = child["widget"].layout_config
             match layout_config["direction"].lower():
                 case "n" | "w":
-                    start_children.append(child)
+                    start_children.append(child["widget"])
                 case "s" | "e":
-                    end_children.append(child)
+                    end_children.append(child["widget"])
             if layout_config["expand"]:
-                expanded_children.append(child)
+                expanded_children.append(child["widget"])
             else:
-                fixed_children.append(child)
+                fixed_children.append(child["widget"])
 
         if self._box_direction == "h":
             # Horizontal Layout
