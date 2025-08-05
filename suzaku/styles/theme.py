@@ -164,14 +164,16 @@ class SkTheme():
         level_dict = self.styles
         if create_if_not_existed:
             checking = self.styles
-        for selector_level in result:
-            if selector
-            if selector_level not in level_dict.values():
-                if create_if_not_existed:
-                    checking[selector_level] = {}
-                raise SkStyleNotFoundError(f"Cannot find styles with selector [{selector}]")
+
+        # check if the widget is not in the widgets list
+        # also check if the state is not in the widget's states
+        if result[0] not in level_dict.keys() or result[1] not in level_dict[result[0]].keys():
             if create_if_not_existed:
-                checking = checking[selector_level]
+                checking[selector_level] = {}
+            raise SkStyleNotFoundError(f"Cannot find styles with selector [{selector}]")
+
+        if create_if_not_existed:
+            checking = checking[selector_level]
         return result
 
     def get_style(self, selector: str, copy: bool=True) -> dict:
