@@ -2,7 +2,7 @@ from typing import Union
 
 import skia
 
-from suzaku.widgets.packs import set_drop_shadow, set_rainbow_shader
+from suzaku.base.drawbase import set_drop_shadow, set_rainbow_shader
 
 from ..base.container import SkContainer
 from ..styles.color import SkColor
