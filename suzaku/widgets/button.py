@@ -8,7 +8,7 @@ class SkButton(SkFrame):
 
     def __init__(self, *args, text: str = "SkButton", size: tuple[int, int] = (105, 35),
                  cursor: Union[str, None] = "hand", style="SkButton",
-                 command: Union[callable, None] = None, **kwargs) -> None:
+                 command: Union[callable, None] = None, id: Union[str, None] = None, **kwargs) -> None:
         """Button Component.
 
         **Will be re-written in future.**
@@ -36,37 +36,30 @@ class SkButton(SkFrame):
         self.command = command
 
         if command:
-            self.bind("click", lambda evt: command())
+            self.bind("click", lambda _: command())
 
-        #cls.bind("mouse_pressed", lambda evt: print("pressed"))
         self.bind("mouse_released", self._click)
 
-    def _click(self, evt) -> None:
+    def _click(self, event) -> None:
         """
-        Check click event (not pressed).
+        Check click event (not pressed)
 
         :return: None
         """
         if self.is_mouse_floating:
-            self.event_generate("click", evt)
+            self.event_generate("click", event)
 
     def _draw(self, canvas, rect) -> None:
-        """Draw button.
+        """Draw button
 
         * canvas: skia.Surface to draw on
         * rect: Rectangle to draw in
         """
         sheets = None
         if self.is_mouse_floating:
-            if self.is_mouse_pressed:
-                sheets = self.sheets()["pressed"]
-            else:
-                sheets = self.sheets()["hover"]
+            sheets = self.sheets()[f"{"pressed" if self.is_mouse_pressed else "hover"}"]
         else:
-            if self.is_focus:
-                sheets = self.sheets()["focus"]
-            else:
-                sheets = self.sheets()["rest"]
+            sheets = self.sheets()[f"{"focus" if self.is_focus else "unfocus"}"]
 
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]

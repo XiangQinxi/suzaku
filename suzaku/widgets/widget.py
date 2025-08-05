@@ -125,7 +125,7 @@ class SkWidget(SkEventHanding):
         :param rect: skia.Rect
         :return:
         """
-        pass
+        ...
 
     def show(self):
         """Make the component visible

@@ -31,13 +31,8 @@ class SkFrame(SkWidget, SkContainer):
             bd=sheets["bd"], bd_shadow=bd_shadow, bd_shader=bd_shader
         )
 
-    def _draw_skframe(self, canvas, rect, radius, bg, width, bd, bd_shadow: bool = True, bd_shader: None | Literal["rainbow"] = "rainbow"):
-        #print(self.children, self.draw_list)
-
-        radius = radius
-
+    def _draw_skframe(self, canvas: any, rect: any, radius: int, bg: str, width: int, bd: str, bd_shadow: bool = True, bd_shader: None | Literal["rainbow"] = "rainbow"):
         # 绘制背景
-
         rect_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStrokeAndFill_Style,
@@ -49,17 +44,16 @@ class SkFrame(SkWidget, SkContainer):
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
         # 绘制边框
-        rect_paint.setStyle(skia.Paint.kStroke_Style)
-
         # 绘制阴影
         if bd_shadow:
-            set_drop_shadow(rect_paint, color(bd))
+            set_drop_shadow(rect_paint, color(bd)) # TODO: color is deprecated
 
-        # Rainbow Border Effect
+        # 彩虹边框效果
         if bd_shader:
             if bd_shader.lower() == "rainbow":
                 set_rainbow_shader(rect_paint, rect)
 
         rect_paint.setColor(color(bd))
+        rect_paint.setStyle(skia.Paint.kStroke_Style)
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
