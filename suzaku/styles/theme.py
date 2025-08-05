@@ -19,9 +19,9 @@ class SkTheme():
 
     @classmethod
     def find_loaded_theme(cls, theme_name: str) -> Union["SkTheme", bool]:
-        """Search for a loaded theme by name, returns the SkTheme object if found, or False is not.
-        
-        :param theme_name: The name of the theme to search
+        """
+        Search for a loaded theme by name, returns the SkTheme object if found, or False is not.
+        :param theme_name: Name of the theme to load
         """
         for theme in cls.loaded_themes:
             if theme.name == theme_name:
@@ -30,8 +30,9 @@ class SkTheme():
     
     @classmethod
     def validate_theme_existed(cls, theme_name: str) -> bool:
-        """Validate if the theme with given name existed and loaded.
-        
+        """
+        Validate if the theme with given name existed and loaded.
+
         :param theme_name: Name of the theme to validate
         """
         return SkTheme.find_loaded_theme(theme_name) != False # ☝🤓
@@ -43,23 +44,29 @@ class SkTheme():
         :param parent: Parent theme
         """
         self.styles: dict = style
+
         self.name: str = f"untitled.{len(SkTheme.loaded_themes) + 1}"
-        self.friendly_name = f"Untitled theme {len(SkTheme.loaded_themes) + 1}"
+        self.friendly_name = f"Untitled theme {len(SkTheme.loaded_themes) + 1}" # friendly_name感觉有点多余?
         self.parent: Union["SkTheme", None] = parent
-        SkTheme.loaded_themes.append(self)
+
+        SkTheme.loaded_themes.append(self) # TODO: figure out.
         return
     
     def load_from_file(self, file_path: Union[str, pathlib.Path]) -> "SkTheme":
-        """Load styles to theme from a file.
-        
+        """
+        Load styles to theme from a file.
+
         :param file_path: Path to the theme file
         """
+
         f = open(file_path, mode="r", encoding="utf-8")
+    
         style_raw = f.read()
         theme_data = json.loads(style_raw)
         if search_result := SkTheme.find_loaded_theme(theme_data["name"]) != False:
             warnings.warn(f"Theme <{theme_data["name"]}> already loaded or existed.")
             return search_result
+
         return self.load_from_json(theme_data)
 
     def load_from_json(self, theme_data: dict) -> "SkTheme":
@@ -68,9 +75,10 @@ class SkTheme():
         :param theme_data: dict that contains the theme data
         """
         self.styles = theme_data["styles"]
+
         self.rename(theme_data["name"])
-        self.friendly_name = theme_data["friendly_name"]
         self.set_parent(theme_data["base"])
+
         return self
 
     def load_styles_from_json(self, style_json: dict) -> "SkTheme":
@@ -82,8 +90,9 @@ class SkTheme():
         return self
     
     def set_parent(self, parent_name: str) -> Union["SkTheme", None]:
-        """Set the parent for the theme via string stored in theme json. Returns the SkTheme object 
-        of the parent theme.
+        """
+        Set the parent for the theme via string stored in theme json. 
+        Returns the SkTheme object of the parent theme.
 
         ## Parent Name
 
@@ -94,7 +103,7 @@ class SkTheme():
         If the parent name is none of above, it should be the theme of the name and will be set as 
         parent directly. However, if the theme specified is not yet loaded, parent will fall back 
         to `DEFAULT`.
-        
+
         :param parent_name: Name of the parent
         """
         match parent_name:
@@ -119,6 +128,7 @@ class SkTheme():
         """
         if not SkTheme.validate_theme_existed(new_name):
             self.name = new_name
+            self.friendly_name = theme_data["friendly_name"] #🤔
         else:
             warnings.warn(f"Theme name <{new_name}> occupied. Rename for <{self.name}> is canceled")
         return self
@@ -173,6 +183,8 @@ class SkTheme():
         try:
             selector_parsed = self.select(selector)
         except SkStyleNotFoundError:
+            if self.parent:
+                return self.parent.get_style(selector, copy=True)
             return default_theme.get_style(selector, copy=True)
         for selector_level in selector_parsed:
             result = result[selector_level]
@@ -180,7 +192,7 @@ class SkTheme():
             return result.copy()
         else:
             return result
-    
+
     def mixin(self, selector: str, new_style: dict, copy: bool=False):
         """Mix custom styles into the theme.
         
