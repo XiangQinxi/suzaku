@@ -88,6 +88,10 @@ class SkWidget(SkEventHanding):
                     self.is_mouse_floating = True
                 case "mouse_leave":
                     self.is_mouse_floating = False
+                case "mouse_pressed":
+                    self.is_mouse_pressed = True
+                case "mouse_released": 
+                    self.is_mouse_pressed = False
                 case "focus_gain":
                     self.is_focus = True
                 case "focus_loss":

@@ -116,7 +116,8 @@ class SkContainer:
     def _handle_layout(self, event):
         for child in self.children:
             if child.visible:
-                layout_type = child.layout_type.keys()[0]
+                layout_type = child.layout_config.keys()[0]
+                # Build draw_item dict
                 draw_item = {
                     "widget": child,
                     "x": 0,
@@ -124,6 +125,7 @@ class SkContainer:
                     "width": 0,
                     "height": 0,
                 }
+                # Sort children
                 match layout_type:
                     case "none":
                         continue
@@ -143,19 +145,29 @@ class SkContainer:
                         if self.layers_layout_type[2] != "fixed":
                             self.layers_layout_type[2] = layout_type
                         self.draw_list[2].append(draw_item)
-        self._handle_box()
+        # Process layouts
+        self._handle_box(event)
+        self._handle_pack(event)
+        self._handle_grid(event)
+        self._handle_place(event)
+        self._handle_fixed(event)
+        self._handle_box(event)
         # self._handle_fixed()
 
-    def _handle_pack(self, child: "SkWidget"):
+    def _handle_pack(self, event: SkEvent):
         pass
 
-    def _handle_place(self):
+    def _handle_place(self, event: SkEvent):
         pass
 
-    def _handle_grid(self):
+    def _handle_grid(self, event: SkEvent):
         pass
 
-    def _handle_box(self):
+    def _handle_box(self, event: SkEvent):
+        """Process box layout.
+        
+        :param event: The resize event
+        """
         width = self.width
         height = self.height
         start_children = []
@@ -299,7 +311,11 @@ class SkContainer:
                 child["child"].y = last_child_top_y - child["child"].height - bottom
                 last_child_top_y = last_child_top_y - child["child"].height - top * 2
 
-    def _handle_fixed(self, event):
+    def _handle_fixed(self, event: SkEvent):
+        """Process fixed layout.
+        
+        :param event: The resize event
+        """
         for item in self.draw_list[1]:
             if item["layout"] == "fixed":
                 from ..widgets.window import SkWindow

@@ -8,7 +8,7 @@ class SkButton(SkFrame):
 
     def __init__(self, *args, text: str = "SkButton", size: tuple[int, int] = (105, 35),
                  cursor: Union[str, None] = "hand", style="SkButton",
-                 command: Union[callable, None] = None, id: Union[str, None] = None, **kwargs) -> None:
+                 command: Union[function, None] = None, id: Union[str, None] = None, **kwargs) -> None:
         """Button Component.
 
         **Will be re-written in future.**
