@@ -36,12 +36,12 @@ class SkEventHanding(SkAfter):
                 事件名称，没有则创建。
 
             *args: 
-                Passed to `evt`.
+                Passed to `event`.
 
                 传参。
 
             **kwargs: 
-                Passed to `evt`.
+                Passed to `event`.
 
                 传参。
 
@@ -53,8 +53,8 @@ class SkEventHanding(SkAfter):
         if not name in self.events:
             self.events[name] = []
 
-        for evt in self.events[name]:
-            evt(*args, **kwargs)
+        for event in self.events[name]:
+            event(*args, **kwargs)
 
 
     def bind(self, name: str, func: callable, add: bool=True) -> "SkEventHanding":
