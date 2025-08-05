@@ -34,17 +34,17 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.set_draw_func(self._draw)
         self.bind("mouse_motion", self._motion, add=True)
-        self.bind("mouse_press", self._mouse)
-        self.bind("mouse_release", self._mouse_release)
+        self.bind("mouse_pressed", self._mouse)
+        self.bind("mouse_released", self._mouse_release)
 
-        self.bind("focus_out", self._leave)
+        self.bind("focus_loss", self._leave)
         self.bind("mouse_leave", self._leave)
 
         self.bind("char", self._char)
 
-        self.bind("key_press", self._key_press)
-        self.bind("key_repeat", self._key_repect)
-        self.bind("key_release", self._key_release)
+        self.bind("key_pressed", self._key_press)
+        self.bind("key_repeated", self._key_repect)
+        self.bind("key_released", self._key_release)
 
         self.bind("update", self._update)
 
@@ -77,15 +77,15 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         #print(cls.cget("focus_widget"))
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_press", event)
+            self.focus_get().event_generate("key_pressed", event)
 
     def _key_repect(self, event):
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_repeat", event)
+            self.focus_get().event_generate("key_repeated", event)
 
     def _key_release(self, event):
         if self.focus_get() is not self:
-            self.focus_get().event_generate("key_release", event)
+            self.focus_get().event_generate("key_released", event)
 
     def _char(self, event):
         #print(12)
@@ -103,7 +103,7 @@ class SkWindow(SkWindowBase, SkContainer):
                     widget.y <= event.y <= widget.y + widget.height):
                 widget.focus_set()
                 #print(widget)
-                widget.event_generate("mouse_press", event)
+                widget.event_generate("mouse_pressed", event)
                 break
 
     def _motion(self, event: SkEvent) -> None:
@@ -156,7 +156,7 @@ class SkWindow(SkWindowBase, SkContainer):
         :return:
         """
         event = SkEvent(
-            event_type="mouse_release",
+            event_type="mouse_released",
             x=event.x,
             y=event.y,
             rootx=self.mouse_rootx,
@@ -164,7 +164,7 @@ class SkWindow(SkWindowBase, SkContainer):
         )
         for widget in self.children:
             if widget.is_mouse_pressed:
-                widget.event_generate("mouse_release", event)
+                widget.event_generate("mouse_released", event)
                 widget.is_mouse_pressed = False
         return None
 

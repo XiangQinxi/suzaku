@@ -2,7 +2,7 @@ from typing import Any, Union
 
 import skia
 
-from suzaku.event import SkEventHanding
+from ..event import SkEventHanding, SkEvent
 
 from ..styles.theme import SkTheme, default_theme
 from .window import SkWindow
@@ -14,7 +14,7 @@ class SkWidget(SkEventHanding):
 
     theme = default_theme
 
-    def __init__(self, parent: "SkContainer", size: tuple[int, int]=(100, 30), 
+    def __init__(self, parent: "SkContainer", size: tuple[int, int]=(100, 30), cursor: str = "arrow",
                  style="SkWidget", widget_id: Union[str, None] = None, name="SkWidget") -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -34,7 +34,7 @@ class SkWidget(SkEventHanding):
 
         self.attributes = {
             "name": name,
-            "cursor": "arrow",
+            "cursor": cursor,
             "id": widget_id,
             "theme": None,
             "dwidth": size[0],  # default width
@@ -64,9 +64,9 @@ class SkWidget(SkEventHanding):
             "mouse_released": [],
             "focus_gain": [],
             "focus_loss": [],
-            "key_press": [],
-            "key_release": [],
-            "key_repeat": [],
+            "key_pressed": [],
+            "key_released": [],
+            "key_repeated": [],
             "char": [],
         }
 
@@ -94,6 +94,7 @@ class SkWidget(SkEventHanding):
                     self.is_mouse_pressed = False
                 case "focus_gain":
                     self.is_focus = True
+                    print(123)
                 case "focus_loss":
                     self.is_focus = False
             pass
@@ -102,8 +103,8 @@ class SkWidget(SkEventHanding):
         self.bind("mouse_leave", _on_event)
         self.bind("mouse_pressed", _on_event)
         self.bind("mouse_released", _on_event)
-        self.bind("focus_in", _on_event)
-        self.bind("focus_out", _on_event)
+        self.bind("focus_gain", _on_event)
+        self.bind("focus_loss", _on_event)
 
         self.parent.add_child(self)
 
@@ -212,6 +213,7 @@ class SkWidget(SkEventHanding):
             self.width = width
         if height:
             self.height = height
+        self.visible = True
         self.layout_config = {"fixed": {
             "layout": "fixed",
             "x": self.x,
@@ -219,7 +221,7 @@ class SkWidget(SkEventHanding):
             "width": self.width,
             "height": self.height
         }}
-        self.visible = True
+        self.parent.add_fixed_child(self)
         return self
 
     def place(self, anchor: str = "nw", x: int = 0, y: int = 0):
@@ -229,12 +231,12 @@ class SkWidget(SkEventHanding):
         :param
         :return: self
         """
+        self.visible = True
         self.layout_config = {"place": {
             "anchor": anchor,
             "x": x,
             "y": y,
         }}
-        self.visible = True
         return self
 
     def pack(self, direction: str="n", 
@@ -249,40 +251,41 @@ class SkWidget(SkEventHanding):
         :param expand: Whether to expand the widget
         :return: self
         """
+        self.visible = True
         self.layout_config = {"pack": {
             "direction": direction,
             "padx": padx,
             "pady": pady,
             "expand": expand,
         }}
-        self.visible = True
         return self
 
-    def box(self, direction: str="n",
+    def box(self, anchor: str="n",
             padx: int | float | tuple[int | float, int | float]=0,
             pady: int | float | tuple[int | float, int | float]=0,
             expand: bool | tuple[bool, bool] = False):
         """Position the widget with box layout.
 
-        :param direction: Direction of the layout
+        :param anchor: Anchor of the layout
         :param padx: Paddings on x direction
         :param pady: Paddings on y direction
         :param expand:
         :return: self
         """
+        self.visible = True
         self.layout_config = {"box": {
-            "direction": direction,
+            "anchor": anchor,
             "padx": padx,
             "pady": pady,
             "expand": expand,
         }}
-        self.visible = True
         return self
     
     # Focus Related
 
     def focus_set(self):
         self.window.focus_widget = self
+        self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self):
         return self.window.focus_get()

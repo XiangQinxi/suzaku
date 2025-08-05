@@ -124,8 +124,9 @@ class SkEvent:
     """
 
     def __init__(self, event_type: str, x: Union[int, None] = None, y: Union[int, None] = None, 
-                 rootx: Union[int, None] = None, rooty: Union[int, None] = None, key: Union[int, None] = None, 
-                 keyname: Union[str, None] = None, mods: Union[str, None] = None, char: Union[int, None] = None,
+                 rootx: Union[int, None] = None, rooty: Union[int, None] = None,
+                 key: Union[int, None, str] = None, keyname: Union[str, None] = None,
+                 mods: Union[str, None] = None, char: Union[int, None] = None,
                  width: Union[int, None] = None, height: Union[int, None] = None,
                  ):
         """

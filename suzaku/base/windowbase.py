@@ -72,18 +72,18 @@ class SkWindowBase(SkEventHanding):
             "update": [],
 
             "mouse_motion": [],
-            "mouse_press": [],
-            "mouse_release": [],
+            "mouse_pressed": [],
+            "mouse_released": [],
             "mouse_enter": [],
             "mouse_leave": [],
 
-            "key_press": [],
-            "key_release": [],
-            "key_repeat": [],
+            "key_pressed": [],
+            "key_released": [],
+            "key_repeated": [],
             "char": [],
 
-            "focus_in": [],
-            "focus_out": [],
+            "focus_gain": [],
+            "focus_loss": [],
 
             "resize": [],
         }
@@ -113,8 +113,6 @@ class SkWindowBase(SkEventHanding):
         :return: 窗口实例数量
         """
         return cls._instance_count
-
-    
 
     # 修改窗口类的skia_surface方法
     @contextlib.contextmanager
@@ -193,19 +191,19 @@ class SkWindowBase(SkEventHanding):
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
-            self.event_generate("key_press", SkEvent(event_type="key_press", key=key, keyname=keyname, mods=m))
+            self.event_generate("key_pressed", SkEvent(event_type="key_pressed", key=key, keyname=keyname, mods=m))
         elif action == RELEASE:
-            self.event_generate("key_release", SkEvent(event_type="key_release", key=key, keyname=keyname, mods=m))
+            self.event_generate("key_released", SkEvent(event_type="key_released", key=key, keyname=keyname, mods=m))
         elif action == REPEAT:
-            self.event_generate("key_repeat", SkEvent(event_type="key_repeat", key=key, keyname=keyname, mods=m))
+            self.event_generate("key_repeated", SkEvent(event_type="key_repeated", key=key, keyname=keyname, mods=m))
 
     def _on_focus(self, window, focused) -> None:
         if focused:
             self.attributes["focus"] = True
-            self.event_generate("focus_in", SkEvent(event_type="focus_in"))
+            self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
         else:
             self.attributes["focus"] = False
-            self.event_generate("focus_out", SkEvent(event_type="focus_out"))
+            self.event_generate("focus_loss", SkEvent(event_type="focus_loss"))
 
     def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
         if self.draw_func:
@@ -258,17 +256,17 @@ class SkWindowBase(SkEventHanding):
         """
         self.event_generate("closed", SkEvent(event_type="closed"))
 
-    def _on_mouse_button(self, window: any, arg1: any, is_press: bool, arg2: any) -> None:
+    def _on_mouse_button(self, window: any, arg1: any, is_pressed: bool, arg2: any) -> None:
         """
         触发mouse_pressed事件(鼠标按下时触发)或mouser_released事件(鼠标松开时触发)
 
         is_pressed:
-          True  -> 鼠标按键按下时触发`window_mouse_press`事件
+          True  -> 鼠标按键按下时触发`window_mouse_pressed`事件
           False -> 鼠标按键松开时触发`window_mouse_release`事件
 
         :param window: GLFW窗口
         :param arg1: 按键
-        :param is_press: 是否按下
+        :param is_pressed: 是否按下
         :param arg2: 修饰键
         :return: None
         """
@@ -282,13 +280,13 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rootx = pos[0] + self.x
         self.mouse_rooty = pos[1] + self.y
 
-        if is_press:
-            self.event_generate("mouse_press", SkEvent(event_type="mouse_press", 
+        if is_pressed:
+            self.event_generate("mouse_pressed", SkEvent(event_type="mouse_pressed",
                                                        x=pos[0], y=pos[1], 
                                                        rootx=self.mouse_rootx, 
                                                        rooty=self.mouse_rooty))
         else:
-            self.event_generate("mouse_release", SkEvent(event_type="mouse_release", 
+            self.event_generate("mouse_released", SkEvent(event_type="mouse_released",
                                                          x=pos[0], y=pos[1], 
                                                          rootx=self.mouse_rootx, 
                                                          rooty=self.mouse_rooty))
@@ -375,7 +373,7 @@ class SkWindowBase(SkEventHanding):
 
         from glfw import create_standard_cursor, set_cursor
         if cursorname is None:
-            return self
+            return self.new_cursor
 
         name = cursorname.upper()
 
@@ -383,7 +381,7 @@ class SkWindowBase(SkEventHanding):
         cursorget = getattr(__import__("glfw", fromlist=[f"{name}_CURSOR"]), 
                                        f"{name}_CURSOR")
         if cursorget is None:
-            return self
+            raise ValueError(f"Cursor {name} not found")
 
         self.new_cursor = name
         if self.glfw_window:
@@ -402,8 +400,8 @@ class SkWindowBase(SkEventHanding):
         :return: 光标吗
         """
         if cursorname is None:
-            return self.new_cursor
-        self.new_cursor = cursorname
+            return self.attributes["cursor"]
+        self.attributes["cursor"] = cursorname
         return self
 
     def visible(self, is_visible: bool = None) -> bool | type:

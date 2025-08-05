@@ -59,7 +59,7 @@ class SkButton(SkFrame):
         if self.is_mouse_floating:
             sheets = self.sheets()[f"{"pressed" if self.is_mouse_pressed else "hover"}"]
         else:
-            sheets = self.sheets()[f"{"focus" if self.is_focus else "unfocus"}"]
+            sheets = self.sheets()[f"{"focus" if self.is_focus else "rest"}"]
 
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
