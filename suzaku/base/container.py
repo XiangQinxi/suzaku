@@ -149,7 +149,7 @@ class SkContainer:
                         self.draw_list[2].append(draw_item)
         # Process layouts
         for layout_type in self.layers_layout_type:
-            vars(self)[f"_handle_{layout_type}"]()
+            getattr(self, f"_handle_{layout_type}")(event)
         # self._handle_fixed()
 
     def _handle_pack(self, event: SkEvent):
@@ -176,7 +176,7 @@ class SkContainer:
 
         for child in boxes_children:
             layout_config = child["widget"].layout_config
-            match layout_config["direction"].lower():
+            match layout_config["box"]["direction"].lower():
                 case "n" | "w":
                     start_children.append(child["widget"])
                 case "s" | "e":
