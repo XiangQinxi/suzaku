@@ -127,6 +127,12 @@ class SkTheme:
                     self.set_parent("DEFAULT")
         return self.parent
 
+    def check_parent(self) -> None:
+        if self.name == f"default.{SkTheme.DEFAULT_THEME_NAME}":
+            raise SkStyleNotFoundError(
+                "Style is not exsited in the default theme. Check your selector!"
+            )
+
     def rename(self, new_name: str, friendly_name: str) -> "SkTheme":
         """Rename the theme.
 
@@ -141,7 +147,7 @@ class SkTheme:
             )
         return self
 
-    def select(self, selector: str, create_if_not_existed: bool = False) -> list:
+    def select(self, selector: str) -> list:
         """Parse styles selector.
 
         ## Selector
@@ -154,7 +160,6 @@ class SkTheme:
         Note that this is not available everywhere.
 
         :param selector: The selector string
-        :param create_if_not_existed: Create the styles if not existed.
         """
         # Validation
         if not re.match("[a-zA-Z0-9-_.:]", selector):
@@ -168,23 +173,16 @@ class SkTheme:
                 result = [result[0]]
         else:
             result = [selector, "rest"]
+
         # Validation / Create if not existed
-        level_dict = self.styles
-        if create_if_not_existed:
-            checking = self.styles
 
         # check if the widget is not in the widgets list
         # also check if the state is not in the widget's states
         if (
-            result[0] not in level_dict.keys()
-            or result[1] not in level_dict[result[0]].keys()
+            result[0] not in self.styles.keys()
+            or result[1] not in self.styles[result[0]].keys()
         ):
-            if create_if_not_existed:
-                checking[selector_level] = {}
             raise SkStyleNotFoundError(f"Cannot find styles with selector [{selector}]")
-
-        if create_if_not_existed:
-            checking = checking[selector_level]
         return result
 
     def get_style(self, selector: str, copy: bool = True) -> dict:
@@ -200,14 +198,14 @@ class SkTheme:
         try:
             selector_parsed = self.select(selector)
         except SkStyleNotFoundError:
-            # print("?")
-            if self.name == f"default.{SkTheme.DEFAULT_THEME_NAME}":
-                raise SkStyleNotFoundError(
-                    "Style is not exsited in the default theme. Check your selector!"
-                )
+            self.check_parent()
             return default_theme.get_style(selector, copy=True)
+
         for selector_level in selector_parsed:
+            # e.g. result = stlyes["SkButton"]
+            # result = styles["SkButton"]["hover"]
             result = result[selector_level]
+
         if copy:
             return result.copy()
         else:
@@ -219,7 +217,13 @@ class SkTheme:
         :param selector: The selector to the style
         :attr_name: The attribute
         """
-        pass
+        style = self.get_style(selector, copy=False)
+        if attr_name not in style:
+            # fallback to the parent's rest
+            self.check_parent()
+            self.parent.get_style_attr(selector, "rest")
+
+        return style[attr_name]
 
     def mixin(self, selector: str, new_style: dict, copy: bool = False):
         """Mix custom styles into the theme.
@@ -280,4 +284,4 @@ for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
     )
 
 
-# print(SkTheme.INTERNAL_THEMES["light"].get_style("SkButton:hover"))
+#print(SkTheme.INTERNAL_THEMES["dark"].get_style_attr("SkButton:pressed", "bg"))
