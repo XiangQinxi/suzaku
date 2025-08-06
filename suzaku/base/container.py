@@ -55,12 +55,12 @@ class SkContainer:
         self.bind("resize", self._handle_layout)
 
         if isinstance(self, SkWidget):
+
             def children_resize(event: SkEvent):
                 for child in self.children:
                     child.event_generate("resize", event)
 
             self.bind("resize", children_resize)
-
 
         self.x = pos[0]
         self.y = pos[1]
