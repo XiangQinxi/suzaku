@@ -40,7 +40,9 @@ class SkContainer:
         :param pos: The coordinates of the container in tuple (x, y), default is (0, 0)
         :param size: Size of the container, in tuple (width, height), default is (0, 0)
         """
+        #self.parent = None
         self.children = []  # Children
+
         from ..widgets.widget import SkWidget
 
         self.draw_list: list[list[SkWidget]] = [
@@ -75,6 +77,9 @@ class SkContainer:
 
         :param child: The child to add
         """
+        from .appbase import SkAppBase
+        if not isinstance(self.parent, SkAppBase):
+            self.parent.add_child(child)
         self.children.append(child)
 
     def add_layout_child(self, child):
@@ -218,6 +223,12 @@ class SkContainer:
 
         from ..widgets.widget import SkWidget
 
+        if isinstance(self, SkWidget):
+            x = self.x
+            y = self.y
+        else:
+            x = 0
+            y = 0
         width = self.width  # container width
         height = self.height  # container height
         start_children: list[SkWidget] = []  # side="top" or "left" children
@@ -250,7 +261,7 @@ class SkContainer:
                     fixed_width += fixed_child_layout_config["padx"][0]
                 else:
                     fixed_width += fixed_child_layout_config["padx"]
-                fixed_width += fixed_child_layout_config["child"].width
+                fixed_width += fixed_child.width
                 if fixed_child_layout_config["padx"] is tuple:
                     fixed_width += fixed_child_layout_config["padx"][1]
                 else:
@@ -344,8 +355,8 @@ class SkContainer:
                     child.height = child.cget("dheight")
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = left
-                child.y = last_child_bottom_y + top
+                child.x = x + left
+                child.y = y + last_child_bottom_y + top
                 last_child_bottom_y = child.y + child.height + bottom
 
             last_child_top_y = height  # Last top y position of the child component
@@ -366,8 +377,8 @@ class SkContainer:
                     child.height = child.cget("dheight")
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = left
-                child.y = last_child_top_y - child.height - bottom
+                child.x = x + left
+                child.y = y + last_child_top_y - child.height - bottom
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
     def _handle_fixed(self, child):

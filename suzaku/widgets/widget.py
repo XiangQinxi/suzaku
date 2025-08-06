@@ -69,6 +69,7 @@ class SkWidget(SkEventHanding):
         self.width: int | float = size[0]
         self.height: int | float = size[1]
 
+        self.focusable: bool = False
         self.visible: bool = False
 
         if not widget_id:
@@ -112,6 +113,8 @@ class SkWidget(SkEventHanding):
         :param canvas:
         :return: None
         """
+        if self.width <= 0 or self.height <= 0:
+            return
         rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
         self._draw(canvas, rect)
         if hasattr(self, "draw_children"):
@@ -423,13 +426,14 @@ class SkWidget(SkEventHanding):
     # region Focus Related 焦点相关
 
     def focus_set(self):
-        self.window.focus_get().event_generate(
-            "focus_loss", SkEvent(event_type="focus_loss")
-        )
-        self.window.focus_get().is_focus = False
-        self.window.focus_widget = self
-        self.is_focus = True
-        self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
+        if self.focusable:
+            self.window.focus_get().event_generate(
+                "focus_loss", SkEvent(event_type="focus_loss")
+            )
+            self.window.focus_get().is_focus = False
+            self.window.focus_widget = self
+            self.is_focus = True
+            self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self):
         return self.window.focus_get()

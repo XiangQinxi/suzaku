@@ -6,8 +6,12 @@ app = Sk(
 )
 app.resize(200, 200)
 
-#SkButton(window).fixed(x=10, y=10, width=100, height=100)
-SkButton(app).box()
-SkButton(app).box()
+frame = SkFrame(app).box(expand=True)
+SkButton(frame).box()
+SkButton(frame).box()
+
+"""SkButton(app, command=lambda: SkButton(app).box(side="left", expand=True)).box(side="left")
+
+SkButton(app).box(side="right", expand=True)"""
 
 app.run()

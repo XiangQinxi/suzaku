@@ -37,16 +37,16 @@ class SkWindow(SkWindowBase, SkContainer):
         self.set_draw_func(self._draw)
         self.bind("mouse_motion", self._motion, add=True)
         self.bind("mouse_pressed", self._mouse)
-        self.bind("mouse_released", self._mouse_release)
+        self.bind("mouse_released", self._mouse_released)
 
         self.bind("focus_loss", self._leave)
         self.bind("mouse_leave", self._leave)
 
         self.bind("char", self._char)
 
-        self.bind("key_pressed", self._key_press)
-        self.bind("key_repeated", self._key_repect)
-        self.bind("key_released", self._key_release)
+        self.bind("key_pressed", self._key_pressed)
+        self.bind("key_repeated", self._key_repected)
+        self.bind("key_released", self._key_released)
 
         self.bind("update", self._update)
 
@@ -79,7 +79,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
             widget.event_generate("update", SkEvent(event_type="update"))
 
-    def _key_press(self, event):
+    def _key_pressed(self, event):
         """Key press event for SkWindow.
 
         :param event: SkEvent
@@ -89,11 +89,11 @@ class SkWindow(SkWindowBase, SkContainer):
         if self.focus_get() is not self:
             self.focus_get().event_generate("key_pressed", event)
 
-    def _key_repect(self, event):
+    def _key_repected(self, event):
         if self.focus_get() is not self:
             self.focus_get().event_generate("key_repeated", event)
 
-    def _key_release(self, event):
+    def _key_released(self, event):
         if self.focus_get() is not self:
             self.focus_get().event_generate("key_released", event)
 
@@ -121,10 +121,10 @@ class SkWindow(SkWindowBase, SkContainer):
                 and widget.y <= event.y <= widget.y + widget.height
             ):
                 widget.is_mouse_floating = True
-                widget.focus_set()
+                if widget.focusable:
+                    widget.focus_set()
                 widget.is_mouse_pressed = True
                 widget.event_generate("mouse_pressed", event)
-                break
 
     def _motion(self, event: SkEvent) -> None:
         """Mouse motion event for SkWindow.
@@ -182,7 +182,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         return None
 
-    def _mouse_release(self, event) -> None:
+    def _mouse_released(self, event) -> None:
         """Mouse release event for SkWindow.
 
         :param event:
