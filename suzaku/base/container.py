@@ -52,13 +52,15 @@ class SkContainer:
 
         self._box_direction = None  # h(horizontal) or v(vertical)
 
-        self.bind("resize", lambda _: self._handle_layout)
+        self.bind("resize", self._handle_layout)
 
-        def children_resize(event: SkEvent):
-            for child in self.children:
-                child.event_generate("resize", event)
+        if isinstance(self, SkWidget):
+            def children_resize(event: SkEvent):
+                for child in self.children:
+                    child.event_generate("resize", event)
 
-        self.bind("resize", children_resize)
+            self.bind("resize", children_resize)
+
 
         self.x = pos[0]
         self.y = pos[1]
@@ -145,7 +147,7 @@ class SkContainer:
 
     # region layout 布局
 
-    def _handle_layout(self):
+    def _handle_layout(self, evt=None):
         """Handle layout of the container.
 
         :return: None

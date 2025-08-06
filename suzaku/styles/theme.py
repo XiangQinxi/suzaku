@@ -284,4 +284,4 @@ for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
     )
 
 
-#print(SkTheme.INTERNAL_THEMES["dark"].get_style_attr("SkButton:pressed", "bg"))
+# print(SkTheme.INTERNAL_THEMES["dark"].get_style_attr("SkButton:pressed", "bg"))
