@@ -205,7 +205,7 @@ class SkTheme():
         :param selector: The selector to the style
         :attr_name: The attribute
         """
-        NotImplemented
+        pass
 
     def mixin(self, selector: str, new_style: dict, copy: bool=False):
         """Mix custom styles into the theme.
@@ -259,4 +259,4 @@ for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
         SkTheme.INTERNAL_THEME_DIR / file))
 
 
-print(SkTheme.INTERNAL_THEMES["light"].get_style("SkButton:hover"))
+#print(SkTheme.INTERNAL_THEMES["light"].get_style("SkButton:hover"))

@@ -27,6 +27,7 @@ class SkButton(SkFrame):
 
         self.text_widget = SkText(self, text=text)
         self.text_widget.box(expand=True)
+        self._handle_layout(None)
 
         self.events["click"] = []
         self.attributes["text"] = text

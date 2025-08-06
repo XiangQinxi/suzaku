@@ -1,31 +1,40 @@
 import glfw
+import warnings
+
+
+class SkAppInitError(Exception):
+    """Exception when GLFW initialization fails."""
+    pass
+
+
+class SkAppNotFoundWindow(Warning):
+    """Warning when no window is found."""
+    pass
 
 
 def init_glfw() -> None:
     """Initialize GLFW module."""
     if not glfw.init():
-        raise RuntimeError('glfw.init() failed')
+        raise SkAppInitError('glfw.init() failed')
     # 设置全局GLFW配置
     glfw.window_hint(glfw.STENCIL_BITS, 8)
 
 
 class SkAppBase:
 
-    """
-    SkAppBase
-    """
-
     _instance = None
 
     def __init__(self, window_event_wait: bool = False) -> None:
-        """
-        SkAppBase
-        应用基础
+        """Base Application class.
+
+        :param window_event_wait: Whether to wait for window events
         """
 
-        self.windows = []
-        self.window_event_wait = window_event_wait
-        self.running = False
+        from .windowbase import SkWindowBase
+
+        self.windows: list[SkWindowBase] = []
+        self.window_event_wait: bool = window_event_wait
+        self.running: bool = False
         init_glfw()
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -36,13 +45,13 @@ class SkAppBase:
     def get_instance(cls) -> int:
         """Get instance count."""
         if cls._instance is None:
-            raise RuntimeError("App not initialized")
+            raise SkAppInitError("App not initialized")
         return cls._instance
 
-    def add_window(self, window) -> "SkAppBase":
+    def add_window(self, window: "SkWindowBase") -> "SkAppBase":
         """Add a window.
 
-        * `window`: The window
+        :param window: The window
         """
 
         self.windows.append(window)
@@ -52,32 +61,32 @@ class SkAppBase:
     # 修改Application类的run方法
     def run(self) -> None:
         if not self.windows:
-            raise RuntimeError('At least one window is required to run application!')
-
+            warnings.warn('At least one window is required to run application!', SkAppNotFoundWindow)
         self.running = True
         for window in self.windows:
             window.create_bind()
 
-        # 主事件循环
+        # Event loop
+        if self.window_event_wait:
+            deal_event = glfw.wait_events
+        else:
+            deal_event = glfw.poll_events
         while self.running and self.windows:
-            if self.window_event_wait:
-                glfw.wait_events()
-            else:
-                glfw.poll_events()
+            deal_event()
 
-            # 创建窗口列表副本避免迭代时修改
+            # Create a copy of the window list to avoid modifying it while iterating
             current_windows = list(self.windows)
 
             for window in current_windows:
-                # 检查窗口有效性
+                # Check if the window is valid
                 if not window.glfw_window or glfw.window_should_close(window.glfw_window):
                     window.destroy()
                     self.windows.remove(window)
                     continue
 
-                # 仅绘制可见窗口
+                # Only draw visible windows
                 if window.visible:
-                    # 为每个窗口设置当前上下文
+                    # Set the current context for each window
                     glfw.make_context_current(window.glfw_window)
                     with window.skia_surface(window.glfw_window) as surface:
                         if surface:
