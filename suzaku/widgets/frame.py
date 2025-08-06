@@ -15,6 +15,8 @@ class SkFrame(SkWidget, SkContainer):
         SkWidget.__init__(self, *args, **kwargs)
         SkContainer.__init__(self)
 
+    # region Draw
+
     def _draw(self, canvas, rect):
         sheets = self.theme.styles["SkFrame"]
         if "bd_shadow" in sheets:
@@ -74,3 +76,5 @@ class SkFrame(SkWidget, SkContainer):
         rect_paint.setStyle(skia.Paint.kStroke_Style)
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
+
+    # endregion

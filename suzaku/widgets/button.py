@@ -30,7 +30,7 @@ class SkButton(SkFrame):
 
         super().__init__(*args, size=size, name="sk_button", **kwargs)
 
-        self._handle_layout(None)
+        self._handle_layout()
 
         self.events["click"] = []
 

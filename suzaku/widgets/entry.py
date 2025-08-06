@@ -28,14 +28,14 @@ class SkEntry(SkVisual):
     ) -> None:
         """Entry box component.
 
-        * *args: SkVisual arguments
-        * placeholder: Placeholder text
-        * size: Default size
-        * cursor: Cursor styles when hovering
-        * styles: Style name
-        * id: Optional ID code
-        * textvariable: Optional variable for binding text content
-        * **kwargs: SkVisual arguments
+        :param args: SkVisual arguments
+        :param placeholder: Placeholder text
+        :param size: Default size
+        :param cursor: Cursor styles when hovering
+        :param style: Style name
+        :param id: Optional ID code
+        :param textvariable: Optional variable for binding text content
+        :param kwargs: SkVisual arguments
         """
 
         super().__init__(

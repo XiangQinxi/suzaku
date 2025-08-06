@@ -52,7 +52,7 @@ class SkContainer:
 
         self._box_direction = None  # h(horizontal) or v(vertical)
 
-        self.bind("resize", self._handle_layout)
+        self.bind("resize", lambda _: self._handle_layout)
 
         def children_resize(event: SkEvent):
             for child in self.children:
@@ -106,8 +106,7 @@ class SkContainer:
                 self._box_direction = direction
 
         self.draw_list[0].append(child)
-        event = SkEvent(event_type="resize", width=self.width, height=self.height)
-        self._handle_layout(event)
+        self._handle_layout()
 
     def add_floating_child(self, child):
         """Add floating child widget to window.
@@ -116,8 +115,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[1].append(child)
-        event = SkEvent(event_type="resize", width=self.width, height=self.height)
-        self._handle_layout(event)
+        self._handle_layout()
 
     def add_fixed_child(self, child):
         """Add fixed child widget to window.
@@ -126,8 +124,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[2].append(child)
-        event = SkEvent(event_type="resize", width=self.width, height=self.height)
-        self._handle_layout(event)
+        self._handle_layout()
 
     # endregion
 
@@ -148,10 +145,9 @@ class SkContainer:
 
     # region layout 布局
 
-    def _handle_layout(self, event):
+    def _handle_layout(self):
         """Handle layout of the container.
 
-        :param event: The event to handle
         :return: None
         """
         """for child in self.children:
@@ -375,7 +371,7 @@ class SkContainer:
     def _handle_fixed(self, child):
         """Process fixed layout.
 
-        :param event: The resize event
+        :param child: The child widget
         """
         from ..widgets.window import SkWindow
 

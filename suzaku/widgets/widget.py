@@ -149,26 +149,6 @@ class SkWidget(SkEventHanding):
 
     # endregion
 
-    # region Show and hide the widget 组件显示&隐藏
-
-    def show(self):
-        """Make the component visible
-
-        :return: self
-        """
-        self.visible = True
-        return self
-
-    def hide(self):
-        """Make the component invisible
-
-        :return: self
-        """
-        self.visible = False
-        return self
-
-    # endregion
-
     # region Widget attribute configs 组件属性配置
 
     def get_attribute(self, attribute_name: str) -> Any:
@@ -190,6 +170,22 @@ class SkWidget(SkEventHanding):
         return self
 
     configure = config = set_attribute
+
+    def show(self):
+        """Make the component visible
+
+        :return: self
+        """
+        self.visible = True
+        return self
+
+    def hide(self):
+        """Make the component invisible
+
+        :return: self
+        """
+        self.visible = False
+        return self
 
     # endregion
 

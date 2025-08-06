@@ -42,7 +42,9 @@ def set_drop_shadow(
     """
 
     rect_paint.setImageFilter(
-        skia.ImageFilters.DropShadow(dx, dy, sigmaX, sigmaY, color)
+        skia.ImageFilters.DropShadow(
+            dx=dx, dy=dy, sigmaX=sigmaX, sigmaY=sigmaY, color=color
+        )
     )
 
 
@@ -66,7 +68,7 @@ def central_text(canvas, text, fg, x, y, width, height):
     # 绘制字体
     text_paint = skia.Paint(AntiAlias=True, Color=fg)
 
-    font = default_font()
+    font: skia.Font = default_font()
 
     text_width = font.measureText(text)
     metrics = font.getMetrics()

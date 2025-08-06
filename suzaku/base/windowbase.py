@@ -518,7 +518,7 @@ class SkWindowBase(SkEventHanding):
             set_cursor(self.glfw_window, create_standard_cursor(cursor_get))
         return self
 
-    def default_cursor(self, cursor_name: str = None) -> str | "SkWindowBase":
+    def default_cursor(self, cursor_name: str = None) -> Union[str, "SkWindowBase"]:
         """Set the default cursor style of the window.
 
         cursor_name:
@@ -533,7 +533,7 @@ class SkWindowBase(SkEventHanding):
         self.attributes["cursor"] = cursor_name
         return self
 
-    def visible(self, is_visible: bool = None) -> bool | "SkWindowBase":
+    def visible(self, is_visible: bool = None) -> Union[bool, "SkWindowBase"]:
         """Get or set the visibility of the window.
 
         is_visible:
@@ -605,7 +605,7 @@ class SkWindowBase(SkEventHanding):
             glfw.destroy_window(self.glfw_window)
             self.glfw_window = None  # Clear the reference
 
-    def title(self, text: str = None) -> str | "SkWindowBase":
+    def title(self, text: str = None) -> Union[str, "SkWindowBase"]:
         """Get or set the window title.
 
         text:

@@ -25,10 +25,6 @@ class SkAppWindow(SkWindow):
         """Exit application."""
         self.app.quit(*args, **kwargs)
 
-    def winfo_app(self) -> SkApp:
-        """Get SkApp class."""
-        return self.app
-
     mainloop = run
 
 

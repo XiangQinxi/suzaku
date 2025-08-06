@@ -6,22 +6,6 @@ from typing import Any, Union
 import skia
 
 
-def default_font() -> "SkFont":
-    """
-    Returns:
-        font (SkFont): The default font.
-    """
-    from sys import platform
-
-    if platform == "win32":
-        f = "Microsoft YaHei"
-    return font(name=f, size=14.5)
-
-
-def font(*args, **kwargs):
-    return SkFont(*args, **kwargs).font
-
-
 class SkFont:
     """
     SkFont
@@ -53,16 +37,27 @@ class SkFont:
 
         """
 
-        self.size = size
+    def default_font(self):
+        from sys import platform
+
+        if platform == "win32":
+            f = "Microsoft YaHei"
+
+        return self.font(name=f, size=14.5)
+
+    def font(self, name: str = None, font_path: Union[Path, str] = None, size: int | float = 14):
+        size = size
 
         if name:
-            self.name = name
-            self.font = skia.Font(skia.Typeface(name), size)
-        elif path:
-            if not os.path.exists(path):
+            name = name
+            font = skia.Font(skia.Typeface(name), size)
+        elif font_path:
+            if not os.path.exists(font_path):
                 raise FileNotFoundError
-            self.path = path
-            self.font = skia.Font(skia.Typeface.MakeFromFile(self.path), size)
+            font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
         else:
-            raise ValueError
-            self.font = default_font()
+            font = self.default_font()
+        return font
+
+
+default_font = SkFont().default_font()

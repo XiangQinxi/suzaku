@@ -132,6 +132,7 @@ class SkEvent:
         char: Union[str, None] = None,
         width: Union[int, None] = None,
         height: Union[int, None] = None,
+        widget=None,
     ):
         """
         Used to pass event via arguments.
@@ -167,3 +168,4 @@ class SkEvent:
         self.char = char
         self.width = width
         self.height = height
+        self.widget = widget
