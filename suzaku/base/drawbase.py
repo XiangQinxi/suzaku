@@ -4,21 +4,20 @@ from suzaku.styles.font import default_font
 
 
 def central_text(canvas, text, fg, x, y, width, height):
-    """
-    绘制居中文本
+    """Draw central text
 
-    Args:
-        canvas: skia.Canvas
-        text: 文本内容
-        fg: 字体颜色
-        x: 文本框左边界
-        y: 文本框上边界
-        width: 文本框宽度
-        height: 文本框高度
-    Returns:
-        None
-    Examples:
+    .. note::
         >>> central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
+
+    :param canvas: The canvas
+    :param text: The text
+    :param fg: The color of the text
+    :param x: The x of the text
+    :param y: The y of the text
+    :param width: The width of the text
+    :param height: The height of the text
+    :return: None
+    :raises: None
     """
 
     # 绘制字体
@@ -39,20 +38,40 @@ def central_text(canvas, text, fg, x, y, width, height):
 
 
 def set_rainbow_shader(rect_paint, rect):
+    """Set rainbow shader of the rect
+
+    :param rect_paint: The paint of the rect
+    :param rect: The rect
+    :return: None
+    """
     rect_paint.setShader(
         skia.GradientShader.MakeSweep(
-            cx=rect.centerX(),
-            cy=rect.centerY(),
+            cx=rect.centerX(),  # Center x position of the sweep
+            cy=rect.centerY(),  # Center y position of the sweep
+            startAngle=0,  # Start angle of the sweep in degrees
+            endAngle=360,  # End angle of the sweep in degrees
             colors=[
-                skia.ColorCYAN,
-                skia.ColorMAGENTA,
-                skia.ColorYELLOW,
-                skia.ColorCYAN,
-            ]
+                skia.ColorCYAN,  # Cyan
+                skia.ColorMAGENTA,  # Magenta
+                skia.ColorYELLOW,  # Yellow
+                skia.ColorCYAN,  # Cyan
+            ],
+            localMatrix=None,  # Local matrix for the gradient
         )
     )
 
-def set_drop_shadow(rect_paint, color):
+def set_drop_shadow(rect_paint, dx=5, dy=5, sigmaX=10, sigmaY=10, color=skia.ColorBLACK):
+    """Draw drop shadow of the rect
+
+    :param rect_paint: The paint of the rect
+    :param dx: The x offset of the drop shadow
+    :param dy: The y offset of the drop shadow
+    :param sigmaX: The standard deviation of the drop shadow in the x direction
+    :param sigmaY: The standard deviation of the drop shadow in the y direction
+    :param color: The color of the drop shadow
+    :return: None
+    """
+
     rect_paint.setImageFilter(
-        skia.ImageFilters.DropShadow(dx=2, dy=2, sigmaX=4, sigmaY=4, color=color)
+        skia.ImageFilters.DropShadow(dx, dy, sigmaX, sigmaY, color)
     )

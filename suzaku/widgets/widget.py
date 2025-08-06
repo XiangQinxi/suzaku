@@ -1,6 +1,7 @@
 import skia
 from typing import Any, Union, Literal
 from .window import SkWindow
+from ..widgets.appwindow import SkAppWindow
 from ..event import SkEventHanding, SkEvent
 from ..styles.theme import SkTheme, default_theme
 
@@ -12,12 +13,11 @@ class SkWidget(SkEventHanding):
     theme = default_theme
 
     def __init__(self, parent, size: tuple[int, int]=(100, 30), cursor: str = "arrow",
-                 style="SkWidget", widget_id: Union[str, None] = None, name="SkWidget") -> None:
+                 widget_id: Union[str, None] = None, name="SkWidget") -> None:
         """Basic visual component, telling SkWindow how to draw.
 
         :param parent: Parent component (Usually a SkWindow)
         :param size: Default size (not the final drawn size)
-        :param style: Style of the widget
         :param cursor: Cursor style
         :param name: Name of the widget
         :param widget_id: Identification code
@@ -29,7 +29,10 @@ class SkWidget(SkEventHanding):
 
         self.parent = parent
 
-        self.window: SkWindow = self.parent if isinstance(self.parent, SkWindow) else self.parent.window
+        try:
+            self.window: SkWindow | SkAppWindow = self.parent if isinstance(self.parent, SkWindow | SkAppWindow) else self.parent.window
+        except AttributeError:
+            raise AttributeError(f"Parent component is not a SkWindow-based object. {self.parent}")
 
         self.attributes: dict[str, Any] = {
             "name": name,
@@ -41,7 +44,6 @@ class SkWidget(SkEventHanding):
         }
 
         self.theme: SkTheme = self.parent.theme
-        self.style: str = style
 
         self.x: int | float = 0
         self.y: int | float = 0
@@ -180,9 +182,6 @@ class SkWidget(SkEventHanding):
             for child in self.children:
                 child.apply_theme(new_theme)
 
-    def sheets(self):
-        return self.theme.styles[self.style]
-
     # Layout related
 
     def layout_forget(self):
@@ -262,13 +261,17 @@ class SkWidget(SkEventHanding):
     def box(self, side: Literal["top", "bottom", "left", "right"] = "top",
             padx: int | float | tuple[int | float, int | float]=10,
             pady: int | float | tuple[int | float, int | float]=10,
+            ipadx: int | float | tuple[int | float, int | float]=0,
+            ipady: int | float | tuple[int | float, int | float]=0,
             expand: bool | tuple[bool, bool] = False):
         """Position the widget with box layout.
 
         :param side: Side of the widget layout
         :param padx: Paddings on x direction
         :param pady: Paddings on y direction
-        :param expand:
+        :param ipadx: Internal paddings on x direction
+        :param ipady: Internal paddings on y direction
+        :param expand: Whether to expand the widget
         :return: self
         """
         self.visible = True
@@ -276,6 +279,8 @@ class SkWidget(SkEventHanding):
             "side": side,
             "padx": padx,
             "pady": pady,
+            "ipadx": ipadx,
+            "ipady": ipady,
             "expand": expand,
         }}
         self.parent.add_layout_child(self)
@@ -284,6 +289,7 @@ class SkWidget(SkEventHanding):
     # Focus Related
 
     def focus_set(self):
+        self.window.focus_get().event_generate("focus_loss", SkEvent(event_type="focus_loss"))
         self.window.focus_widget = self
         self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
 

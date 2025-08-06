@@ -1,13 +1,12 @@
 from typing import Union
 
 from .frame import SkFrame
-from .text import SkText
 
 
 class SkButton(SkFrame):
 
-    def __init__(self, *args, text: str = "SkButton", size: tuple[int, int] = (105, 35),
-                 cursor: Union[str, None] = "hand", style="SkButton",
+    def __init__(self, *args, size: tuple[int, int] = (105, 35),
+                 cursor: Union[str, None] = "hand",
                  command: Union[callable, None] = None, id: Union[str, None] = None, **kwargs) -> None:
         """Button Component.
 
@@ -23,14 +22,11 @@ class SkButton(SkFrame):
         * **kwargs: Passed to SkVisual
         """
 
-        super().__init__(*args, size=size, style=style, name="sk_button", **kwargs)
+        super().__init__(*args, size=size, name="sk_button", **kwargs)
 
-        self.text_widget = SkText(self, text=text)
-        self.text_widget.box(expand=True)
         self._handle_layout(None)
 
         self.events["click"] = []
-        self.attributes["text"] = text
 
         self.attributes["cursor"] = cursor
 
@@ -58,10 +54,9 @@ class SkButton(SkFrame):
         """
         sheets = None
         if self.is_mouse_floating:
-            sheets = self.sheets()[f"{"pressed" if self.is_mouse_pressed else "hover"}"]
+            sheets = self.theme.styles["SkButton"][f"{"pressed" if self.is_mouse_pressed else "hover"}"]
         else:
-            sheets = self.sheets()[f"{"focus" if self.is_focus else "rest"}"]
-
+            sheets = self.theme.styles["SkButton"][f"{"focus" if self.is_focus else "rest"}"]
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
@@ -72,7 +67,7 @@ class SkButton(SkFrame):
             bd_shader = None
 
         self._draw_skframe(
-            canvas, rect, radius=self.sheets()["radius"], bg=sheets["bg"], width=sheets["width"],
+            canvas, rect, radius=self.theme.styles["SkButton"]["radius"], bg=sheets["bg"], width=sheets["width"],
             bd=sheets["bd"], bd_shadow=bd_shadow, bd_shader=bd_shader
         )
 

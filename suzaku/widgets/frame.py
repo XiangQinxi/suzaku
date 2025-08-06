@@ -11,12 +11,12 @@ from .widget import SkWidget
 
 
 class SkFrame(SkWidget, SkContainer):
-    def __init__(self, parent: Union[SkWidget, "SkWindow"], style="SkFrame", **kwargs) -> None:
-        SkWidget.__init__(self, parent, style=style, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        SkWidget.__init__(self, *args, **kwargs)
         SkContainer.__init__(self)
 
     def _draw(self, canvas, rect):
-        sheets = self.theme.styles[self.style]
+        sheets = self.theme.styles["SkFrame"]
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
@@ -46,7 +46,7 @@ class SkFrame(SkWidget, SkContainer):
         # 绘制边框
         # 绘制阴影
         if bd_shadow:
-            set_drop_shadow(rect_paint, color(bd)) # TODO: color is deprecated
+            set_drop_shadow(rect_paint, dx=3, dy=3, sigmaX=10, sigmaY=10, color=color(bd)) # TODO: color is deprecated
 
         # 彩虹边框效果
         if bd_shader:

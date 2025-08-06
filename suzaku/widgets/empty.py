@@ -13,10 +13,9 @@ class SkEmpty(SkWidget):
         * size: Default size
         * **kwargs: SkVisual arguments
         """
-        super().__init__(*args, size=size, **kwargs)
-        self.visual_attr["name"] = "sk_empty"
+        super().__init__(*args, size=size, name="sk_empty", **kwargs)
 
-    def draw(self, canvas, rect) -> None:
+    def _draw(self, canvas, rect) -> None:
         """Draw method, does nothing.
 
         * canvas: skia.Surface to draw on

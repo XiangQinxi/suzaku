@@ -5,7 +5,6 @@ from typing import Any, Union
 import glfw
 import skia
 from OpenGL import GL
-
 from .appbase import SkAppBase
 from ..event import SkEvent, SkEventHanding
 

@@ -5,10 +5,16 @@ from .window import SkWindow
 
 class SkAppWindow(SkWindow):
 
-    def __init__(self, *args, **kwargs) -> None:
+    _instance_count = 0
+
+    def __init__(self, *args, window_event_wait: bool = False, **kwargs) -> None:
         """Main window that connects SkApp with SkWindow."""
-        self.app = SkApp()
+        self.app = SkApp(window_event_wait=window_event_wait)
         super().__init__(parent=self.app, *args, **kwargs)
+        if self.__class__._instance_count == 0:
+            self.__class__._instance_count += 1
+        else:
+            raise ValueError("SkAppWindow can only be instantiated once.")
         self.attributes["name"] = "sk_appwindow"
 
     def run(self, *args, **kwargs) -> None:

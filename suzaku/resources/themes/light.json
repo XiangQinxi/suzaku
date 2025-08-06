@@ -4,7 +4,6 @@
   "friendly_name": "Default Light",
 
   "styles":{
-
     "SkWindow": {
       "bg": [255, 255, 255, 235]
     },

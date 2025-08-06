@@ -10,21 +10,18 @@ from ..styles.color_old import color
 
 
 class SkWindow(SkWindowBase, SkContainer):
-    def __init__(self, *args, themename="light", style="SkWindow", name="sk_window", **kwargs) -> None:
+    def __init__(self, *args, theme: SkTheme = default_theme, name="sk_window", **kwargs) -> None:
         """SkWindow, inherited from SkWindowBase
 
         :param args: SkWindowBase Args
-        :param themename: Theme name
+        :param theme: Theme
         :param kwargs: SkWindowBase Kwargs
         """
         SkWindowBase.__init__(self, *args, name=name, **kwargs)
         SkContainer.__init__(self)
 
-        self.attributes["style"] = style
+        self.theme = theme
 
-        self.theme = default_theme
-
-        self.attributes["styles"] = style
         self.focus_widget = self
         self.draws = []
 
@@ -55,7 +52,7 @@ class SkWindow(SkWindowBase, SkContainer):
         :param new_theme:
         :return:
         """
-        self.attributes["theme"] = new_theme
+        self.theme= new_theme
         for child in self.children:
             child.apply_theme(new_theme)
 
@@ -143,7 +140,7 @@ class SkWindow(SkWindowBase, SkContainer):
             self.previous_widget = None
 
     def _draw(self, canvas: skia.Surfaces) -> None:
-        canvas.clear(color(self.theme.styles[self.attributes["style"]]["bg"]))
+        canvas.clear(color(self.theme.styles["SkWindow"]["bg"]))
 
         self.draw_children(canvas)
 

@@ -37,13 +37,13 @@ class SkTheme():
         """
         return SkTheme.find_loaded_theme(theme_name) != False # ☝🤓
 
-    def __init__(self, style: dict={}, parent: Union["SkTheme", None] = None) -> None:
+    def __init__(self, styles: dict={}, parent: Union["SkTheme", None] = None) -> None:
         """Theme for SkWindow and SkWidgets.
 
         :param styles: Styles of the theme
         :param parent: Parent theme
         """
-        self.styles: dict = style
+        self.styles: dict = styles
 
         self.name: str = f"untitled.{len(SkTheme.loaded_themes) + 1}"
         self.friendly_name = f"Untitled theme {len(SkTheme.loaded_themes) + 1}" # friendly_name感觉有点多余?
@@ -59,13 +59,12 @@ class SkTheme():
         :param file_path: Path to the theme file
         """
 
-        f = open(file_path, mode="r", encoding="utf-8")
-    
-        style_raw = f.read()
-        theme_data = json.loads(style_raw)
-        if search_result := SkTheme.find_loaded_theme(theme_data["name"]) != False:
-            warnings.warn(f"Theme <{theme_data["name"]}> already loaded or existed.")
-            return search_result
+        with open(file_path, mode="r", encoding="utf-8") as f:
+            style_raw = f.read()
+            theme_data = json.loads(style_raw)
+            if search_result := SkTheme.find_loaded_theme(theme_data["name"]) != False:
+                warnings.warn(f"Theme <{theme_data["name"]}> already loaded or existed.")
+                return search_result
 
         return self.load_from_json(theme_data)
 
