@@ -18,7 +18,9 @@ class SkColor:
             elif len(color) == 4:
                 self.set_color_rgba(color[0], color[1], color[2], color[3])
             else:
-                raise ValueError("Color tuple/list must have 3 (RGB) or 4 (RGBA) elements")
+                raise ValueError(
+                    "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
+                )
         return None
 
     def set_color_name(self, name: str) -> None:
@@ -66,7 +68,7 @@ class SkColor:
         Raises:
             ValueError: 当十六进制格式无效时抛出
         """
-        hex_color = hex.lstrip('#')
+        hex_color = hex.lstrip("#")
         if len(hex_color) == 6:  # RGB 格式，默认不透明(Alpha=255)
             r = int(hex_color[0:2], 16)
             g = int(hex_color[2:4], 16)

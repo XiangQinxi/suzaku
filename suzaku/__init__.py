@@ -1,4 +1,4 @@
-__version__ = '0.0.1alpha'
+__version__ = "0.0.1alpha"
 
 import OpenGL
 

@@ -1,7 +1,9 @@
 try:
     from suzaku import *
 except:
-    raise ModuleNotFoundError("Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir.")
+    raise ModuleNotFoundError(
+        "Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir."
+    )
 import skia
 
 if __name__ == "__main__":
@@ -10,14 +12,20 @@ if __name__ == "__main__":
         title="Suzaku GUI",
         themename="default.light",
         size=(280, 360),
-        #force_hardware_acceleration=True
+        # force_hardware_acceleration=True
     )
     appwindow.bind("close", lambda: print("SkWindowBase closed"))
 
-    SkButton(appwindow, text=f"Light Theme / 切换至Light主题", 
-             command=lambda: appwindow.theme.use_theme("light")).vbox(padx=10, pady=10)
-    SkButton(appwindow, text=f"Dark Theme / 切换至Dark主题", 
-             command=lambda: appwindow.theme.use_theme("dark")).vbox(padx=10, pady=10)
+    SkButton(
+        appwindow,
+        text=f"Light Theme / 切换至Light主题",
+        command=lambda: appwindow.theme.use_theme("light"),
+    ).vbox(padx=10, pady=10)
+    SkButton(
+        appwindow,
+        text=f"Dark Theme / 切换至Dark主题",
+        command=lambda: appwindow.theme.use_theme("dark"),
+    ).vbox(padx=10, pady=10)
     SkLabel(appwindow, text="This is a SkLabel / 这是一个标签").vbox(padx=10, pady=10)
 
     var = StringVar()
@@ -26,16 +34,20 @@ if __name__ == "__main__":
 
     SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
 
-    #SkButton(appwindow, text=f"Horizontal Layout / 水平布局", 
+    # SkButton(appwindow, text=f"Horizontal Layout / 水平布局",
     #         command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
-    #SkButton(appwindow, text=f"Vertical Layout / 垂直 布局", 
+    # SkButton(appwindow, text=f"Vertical Layout / 垂直 布局",
     #         command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
 
     style = SkStyle()
     style.configure("Close.SkButton", radius=99)  # 更改当前主题Close.SkButton的样式
 
-    SkButton(appwindow, text=f"Close SkWindowBase / 关闭窗口", 
-             command=appwindow.destroy, style="Close.SkButton").vbox(padx=10, pady=10)
+    SkButton(
+        appwindow,
+        text=f"Close SkWindowBase / 关闭窗口",
+        command=appwindow.destroy,
+        style="Close.SkButton",
+    ).vbox(padx=10, pady=10)
 
     """
     toplevel = SkWindow()

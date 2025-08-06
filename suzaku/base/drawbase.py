@@ -3,40 +3,6 @@ import skia
 from suzaku.styles.font import default_font
 
 
-def central_text(canvas, text, fg, x, y, width, height):
-    """Draw central text
-
-    .. note::
-        >>> central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
-
-    :param canvas: The canvas
-    :param text: The text
-    :param fg: The color of the text
-    :param x: The x of the text
-    :param y: The y of the text
-    :param width: The width of the text
-    :param height: The height of the text
-    :return: None
-    :raises: None
-    """
-
-    # 绘制字体
-    text_paint = skia.Paint(
-        AntiAlias=True,
-        Color=fg
-    )
-
-    font = default_font()
-
-    text_width = font.measureText(text)
-    metrics = font.getMetrics()
-
-    draw_x = x + width / 2 - text_width / 2
-    draw_y = y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
-
-    canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
-
-
 def set_rainbow_shader(rect_paint, rect):
     """Set rainbow shader of the rect
 
@@ -60,7 +26,10 @@ def set_rainbow_shader(rect_paint, rect):
         )
     )
 
-def set_drop_shadow(rect_paint, dx=5, dy=5, sigmaX=10, sigmaY=10, color=skia.ColorBLACK):
+
+def set_drop_shadow(
+    rect_paint, dx=5, dy=5, sigmaX=10, sigmaY=10, color=skia.ColorBLACK
+):
     """Draw drop shadow of the rect
 
     :param rect_paint: The paint of the rect
@@ -75,3 +44,34 @@ def set_drop_shadow(rect_paint, dx=5, dy=5, sigmaX=10, sigmaY=10, color=skia.Col
     rect_paint.setImageFilter(
         skia.ImageFilters.DropShadow(dx, dy, sigmaX, sigmaY, color)
     )
+
+
+def central_text(canvas, text, fg, x, y, width, height):
+    """Draw central text
+
+    .. note::
+        >>> central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
+
+    :param canvas: The canvas
+    :param text: The text
+    :param fg: The color of the text
+    :param x: The x of the text
+    :param y: The y of the text
+    :param width: The width of the text
+    :param height: The height of the text
+    :return: None
+    :raises: None
+    """
+
+    # 绘制字体
+    text_paint = skia.Paint(AntiAlias=True, Color=fg)
+
+    font = default_font()
+
+    text_width = font.measureText(text)
+    metrics = font.getMetrics()
+
+    draw_x = x + width / 2 - text_width / 2
+    draw_y = y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+
+    canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)

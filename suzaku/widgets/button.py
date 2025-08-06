@@ -5,9 +5,15 @@ from .frame import SkFrame
 
 class SkButton(SkFrame):
 
-    def __init__(self, *args, size: tuple[int, int] = (105, 35),
-                 cursor: Union[str, None] = "hand",
-                 command: Union[callable, None] = None, id: Union[str, None] = None, **kwargs) -> None:
+    def __init__(
+        self,
+        *args,
+        size: tuple[int, int] = (105, 35),
+        cursor: Union[str, None] = "hand",
+        command: Union[callable, None] = None,
+        id: Union[str, None] = None,
+        **kwargs,
+    ) -> None:
         """Button Component.
 
         **Will be re-written in future.**
@@ -54,9 +60,13 @@ class SkButton(SkFrame):
         """
         sheets = None
         if self.is_mouse_floating:
-            sheets = self.theme.styles["SkButton"][f"{"pressed" if self.is_mouse_pressed else "hover"}"]
+            sheets = self.theme.styles["SkButton"][
+                f"{"pressed" if self.is_mouse_pressed else "hover"}"
+            ]
         else:
-            sheets = self.theme.styles["SkButton"][f"{"focus" if self.is_focus else "rest"}"]
+            sheets = self.theme.styles["SkButton"][
+                f"{"focus" if self.is_focus else "rest"}"
+            ]
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
@@ -67,7 +77,12 @@ class SkButton(SkFrame):
             bd_shader = None
 
         self._draw_skframe(
-            canvas, rect, radius=self.theme.styles["SkButton"]["radius"], bg=sheets["bg"], width=sheets["width"],
-            bd=sheets["bd"], bd_shadow=bd_shadow, bd_shader=bd_shader
+            canvas,
+            rect,
+            radius=self.theme.styles["SkButton"]["radius"],
+            bg=sheets["bg"],
+            width=sheets["width"],
+            bd=sheets["bd"],
+            bd_shadow=bd_shadow,
+            bd_shader=bd_shader,
         )
-

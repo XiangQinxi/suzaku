@@ -1,9 +1,11 @@
+from typing import Any, Literal, Union
+
 import skia
-from typing import Any, Union, Literal
-from .window import SkWindow
-from ..widgets.appwindow import SkAppWindow
-from ..event import SkEventHanding, SkEvent
+
+from ..event import SkEvent, SkEventHanding
 from ..styles.theme import SkTheme, default_theme
+from ..widgets.appwindow import SkAppWindow
+from .window import SkWindow
 
 
 class SkWidget(SkEventHanding):
@@ -12,8 +14,16 @@ class SkWidget(SkEventHanding):
 
     theme = default_theme
 
-    def __init__(self, parent, size: tuple[int, int]=(100, 30), cursor: str = "arrow",
-                 widget_id: Union[str, None] = None, name="SkWidget") -> None:
+    # region __init__ 初始化
+
+    def __init__(
+        self,
+        parent,
+        size: tuple[int, int] = (100, 30),
+        cursor: str = "arrow",
+        widget_id: Union[str, None] = None,
+        name="SkWidget",
+    ) -> None:
         """Basic visual component, telling SkWindow how to draw.
 
         :param parent: Parent component (Usually a SkWindow)
@@ -30,9 +40,15 @@ class SkWidget(SkEventHanding):
         self.parent = parent
 
         try:
-            self.window: SkWindow | SkAppWindow = self.parent if isinstance(self.parent, SkWindow | SkAppWindow) else self.parent.window
+            self.window: SkWindow | SkAppWindow = (
+                self.parent
+                if isinstance(self.parent, SkWindow | SkAppWindow)
+                else self.parent.window
+            )
         except AttributeError:
-            raise AttributeError(f"Parent component is not a SkWindow-based object. {self.parent}")
+            raise AttributeError(
+                f"Parent component is not a SkWindow-based object. {self.parent}"
+            )
 
         self.attributes: dict[str, Any] = {
             "name": name,
@@ -107,6 +123,10 @@ class SkWidget(SkEventHanding):
 
         self.parent.add_child(self)
 
+    # endregion
+
+    # region Draw the widget 绘制组件
+
     def draw(self, canvas: skia.Surfaces) -> None:
         """Execute the widget rendering and subwidget rendering
 
@@ -115,7 +135,7 @@ class SkWidget(SkEventHanding):
         """
         rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
         self._draw(canvas, rect)
-        if hasattr(self, "children"):
+        if hasattr(self, "draw_children"):
             self.draw_children(canvas)
 
     def _draw(self, canvas: skia.Surface, rect: skia.Rect) -> None:
@@ -126,6 +146,10 @@ class SkWidget(SkEventHanding):
         :return:
         """
         ...
+
+    # endregion
+
+    # region Show and hide the widget 组件显示&隐藏
 
     def show(self):
         """Make the component visible
@@ -143,14 +167,10 @@ class SkWidget(SkEventHanding):
         self.visible = False
         return self
 
-    def sheet(self):
-        """Get the style sheet of the widget.
+    # endregion
 
-        :return:
-        """
-        return self.theme.styles[self.style]
+    # region Widget attribute configs 组件属性配置
 
-    # Attributes related
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
 
@@ -171,6 +191,10 @@ class SkWidget(SkEventHanding):
 
     configure = config = set_attribute
 
+    # endregion
+
+    # region Theme related 主题相关
+
     def apply_theme(self, new_theme: SkTheme):
         """Apply theme to the widget and its children.`
 
@@ -182,7 +206,9 @@ class SkWidget(SkEventHanding):
             for child in self.children:
                 child.apply_theme(new_theme)
 
-    # Layout related
+    # endregion
+
+    # region Layout related 布局相关
 
     def layout_forget(self):
         """Remove widget from parent layout.
@@ -193,8 +219,13 @@ class SkWidget(SkEventHanding):
         self.layout_config = {"none": None}
         return self
 
-    def fixed(self, x: int | float, y: int | float,
-              width: int | float | None = None, height: int | float | None = None):
+    def fixed(
+        self,
+        x: int | float,
+        y: int | float,
+        width: int | float | None = None,
+        height: int | float | None = None,
+    ):
         """Fix the widget at a specific position.
 
         :param x:
@@ -210,13 +241,15 @@ class SkWidget(SkEventHanding):
         if height:
             self.height = height
         self.visible = True
-        self.layout_config = {"fixed": {
-            "layout": "fixed",
-            "x": self.x,
-            "y": self.y,
-            "width": self.width,
-            "height": self.height
-        }}
+        self.layout_config = {
+            "fixed": {
+                "layout": "fixed",
+                "x": self.x,
+                "y": self.y,
+                "width": self.width,
+                "height": self.height,
+            }
+        }
         self.parent.add_fixed_child(self)
         return self
 
@@ -228,18 +261,23 @@ class SkWidget(SkEventHanding):
         :return: self
         """
         self.visible = True
-        self.layout_config = {"place": {
-            "anchor": anchor,
-            "x": x,
-            "y": y,
-        }}
+        self.layout_config = {
+            "place": {
+                "anchor": anchor,
+                "x": x,
+                "y": y,
+            }
+        }
         self.parent.add_floating_child(self)
         return self
 
-    def pack(self, direction: str="n", 
-             padx: int | float | tuple[int | float, int | float]=0, 
-             pady: int | float | tuple[int | float, int | float]=0, 
-             expand: bool | tuple[bool, bool]=False):
+    def pack(
+        self,
+        direction: str = "n",
+        padx: int | float | tuple[int | float, int | float] = 0,
+        pady: int | float | tuple[int | float, int | float] = 0,
+        expand: bool | tuple[bool, bool] = False,
+    ):
         """Position the widget with box layout.
 
         :param direction: Direction of the layout
@@ -249,21 +287,26 @@ class SkWidget(SkEventHanding):
         :return: self
         """
         self.visible = True
-        self.layout_config = {"pack": {
-            "direction": direction,
-            "padx": padx,
-            "pady": pady,
-            "expand": expand,
-        }}
+        self.layout_config = {
+            "pack": {
+                "direction": direction,
+                "padx": padx,
+                "pady": pady,
+                "expand": expand,
+            }
+        }
         self.parent.add_layout_child(self)
         return self
 
-    def box(self, side: Literal["top", "bottom", "left", "right"] = "top",
-            padx: int | float | tuple[int | float, int | float]=10,
-            pady: int | float | tuple[int | float, int | float]=10,
-            ipadx: int | float | tuple[int | float, int | float]=0,
-            ipady: int | float | tuple[int | float, int | float]=0,
-            expand: bool | tuple[bool, bool] = False):
+    def box(
+        self,
+        side: Literal["top", "bottom", "left", "right"] = "top",
+        padx: int | float | tuple[int | float, int | float] = 10,
+        pady: int | float | tuple[int | float, int | float] = 10,
+        ipadx: int | float | tuple[int | float, int | float] = 0,
+        ipady: int | float | tuple[int | float, int | float] = 0,
+        expand: bool | tuple[bool, bool] = False,
+    ):
         """Position the widget with box layout.
 
         :param side: Side of the widget layout
@@ -275,23 +318,31 @@ class SkWidget(SkEventHanding):
         :return: self
         """
         self.visible = True
-        self.layout_config = {"box": {
-            "side": side,
-            "padx": padx,
-            "pady": pady,
-            "ipadx": ipadx,
-            "ipady": ipady,
-            "expand": expand,
-        }}
+        self.layout_config = {
+            "box": {
+                "side": side,
+                "padx": padx,
+                "pady": pady,
+                "ipadx": ipadx,
+                "ipady": ipady,
+                "expand": expand,
+            }
+        }
         self.parent.add_layout_child(self)
         return self
-    
-    # Focus Related
+
+    # endregion
+
+    # region Focus Related 焦点相关
 
     def focus_set(self):
-        self.window.focus_get().event_generate("focus_loss", SkEvent(event_type="focus_loss"))
+        self.window.focus_get().event_generate(
+            "focus_loss", SkEvent(event_type="focus_loss")
+        )
         self.window.focus_widget = self
         self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self):
         return self.window.focus_get()
+
+    # endregion

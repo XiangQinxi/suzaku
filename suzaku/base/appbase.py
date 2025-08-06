@@ -1,21 +1,24 @@
-import glfw
 import warnings
+
+import glfw
 
 
 class SkAppInitError(Exception):
     """Exception when GLFW initialization fails."""
+
     pass
 
 
 class SkAppNotFoundWindow(Warning):
     """Warning when no window is found."""
+
     pass
 
 
 def init_glfw() -> None:
     """Initialize GLFW module."""
     if not glfw.init():
-        raise SkAppInitError('glfw.init() failed')
+        raise SkAppInitError("glfw.init() failed")
     # 设置全局GLFW配置
     glfw.window_hint(glfw.STENCIL_BITS, 8)
 
@@ -23,6 +26,8 @@ def init_glfw() -> None:
 class SkAppBase:
 
     _instance = None
+
+    # region __init__ 初始化
 
     def __init__(self, window_event_wait: bool = False) -> None:
         """Base Application class.
@@ -48,7 +53,10 @@ class SkAppBase:
             raise SkAppInitError("App not initialized")
         return cls._instance
 
-    def add_window(self, window: "SkWindowBase") -> "SkAppBase":
+    # endregion
+
+    # region add_window 添加窗口
+    def add_window(self, window) -> "SkAppBase":
         """Add a window.
 
         :param window: The window
@@ -58,10 +66,16 @@ class SkAppBase:
         # 将窗口的GLFW初始化委托给Application
         return self
 
-    # 修改Application类的run方法
+    # endregion
+
+    # region about mainloop 事件循环相关
     def run(self) -> None:
+        """Run the application."""
         if not self.windows:
-            warnings.warn('At least one window is required to run application!', SkAppNotFoundWindow)
+            warnings.warn(
+                "At least one window is required to run application!",
+                SkAppNotFoundWindow,
+            )
         self.running = True
         for window in self.windows:
             window.create_bind()
@@ -79,7 +93,9 @@ class SkAppBase:
 
             for window in current_windows:
                 # Check if the window is valid
-                if not window.glfw_window or glfw.window_should_close(window.glfw_window):
+                if not window.glfw_window or glfw.window_should_close(
+                    window.glfw_window
+                ):
                     window.destroy()
                     self.windows.remove(window)
                     continue
@@ -91,7 +107,7 @@ class SkAppBase:
                     with window.skia_surface(window.glfw_window) as surface:
                         if surface:
                             with surface as canvas:
-                                if hasattr(window, 'draw_func') and window.draw_func:
+                                if hasattr(window, "draw_func") and window.draw_func:
                                     window.draw_func(canvas)
                             surface.flushAndSubmit()
                             glfw.swap_buffers(window.glfw_window)
@@ -108,3 +124,5 @@ class SkAppBase:
     def quit(self) -> None:
         """Quit application."""
         self.running = False
+
+    # endregion

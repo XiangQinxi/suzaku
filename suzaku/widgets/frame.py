@@ -1,4 +1,4 @@
-from typing import Union, Literal
+from typing import Literal, Union
 
 import skia
 
@@ -26,12 +26,27 @@ class SkFrame(SkWidget, SkContainer):
         else:
             bd_shader = None
         self._draw_skframe(
-            canvas, rect, radius=sheets["radius"],
-            bg=sheets["bg"], width=sheets["width"],
-            bd=sheets["bd"], bd_shadow=bd_shadow, bd_shader=bd_shader
+            canvas,
+            rect,
+            radius=sheets["radius"],
+            bg=sheets["bg"],
+            width=sheets["width"],
+            bd=sheets["bd"],
+            bd_shadow=bd_shadow,
+            bd_shader=bd_shader,
         )
 
-    def _draw_skframe(self, canvas: any, rect: any, radius: int, bg: str, width: int, bd: str, bd_shadow: bool = True, bd_shader: None | Literal["rainbow"] = "rainbow"):
+    def _draw_skframe(
+        self,
+        canvas: any,
+        rect: any,
+        radius: int,
+        bg: str,
+        width: int,
+        bd: str,
+        bd_shadow: bool = True,
+        bd_shader: None | Literal["rainbow"] = "rainbow",
+    ):
         # 绘制背景
         rect_paint = skia.Paint(
             AntiAlias=True,
@@ -46,7 +61,9 @@ class SkFrame(SkWidget, SkContainer):
         # 绘制边框
         # 绘制阴影
         if bd_shadow:
-            set_drop_shadow(rect_paint, dx=3, dy=3, sigmaX=10, sigmaY=10, color=color(bd)) # TODO: color is deprecated
+            set_drop_shadow(
+                rect_paint, dx=3, dy=3, sigmaX=10, sigmaY=10, color=color(bd)
+            )  # TODO: color is deprecated
 
         # 彩虹边框效果
         if bd_shader:

@@ -4,7 +4,6 @@ from suzaku.after import SkAfter
 
 
 class SkEventHanding(SkAfter):
-
     """
     SkEvent binding manager.
 
@@ -13,7 +12,6 @@ class SkEventHanding(SkAfter):
     """
 
     def __init__(self):
-
         """
         Initialize all bindable events.
 
@@ -30,17 +28,17 @@ class SkEventHanding(SkAfter):
         发出事件信号。
 
         Args:
-            name (str): 
+            name (str):
                 SkEvent name, create if not existed.
 
                 事件名称，没有则创建。
 
-            *args: 
+            *args:
                 Passed to `event`.
 
                 传参。
 
-            **kwargs: 
+            **kwargs:
                 Passed to `event`.
 
                 传参。
@@ -56,25 +54,24 @@ class SkEventHanding(SkAfter):
         for event in self.events[name]:
             event(*args, **kwargs)
 
-
-    def bind(self, name: str, func: callable, add: bool=True) -> "SkEventHanding":
+    def bind(self, name: str, func: callable, add: bool = True) -> "SkEventHanding":
         """
         Bind event.
 
         绑定事件。
 
         Args:
-            name (str): 
+            name (str):
                 SkEvent name, create if not existed.
 
                 事件名称，没有则创建。
 
-            func (function): 
+            func (function):
                 Function to bind.
-                
+
                 绑定函数。
 
-            add (bool): 
+            add (bool):
                 Whether to add after existed events, otherwise clean other and add itself.
 
                 是否在绑定的事件后添加，而不是清除其他事件只保留自己。
@@ -100,14 +97,14 @@ class SkEventHanding(SkAfter):
         -> 后续事件将以ID作为识别码来解绑
 
         Args:
-            name (str): 
+            name (str):
                 Name of the event.
-                
+
                 事件名称。
 
-            func (function): 
+            func (function):
                 Function to unbind.
-                
+
                 要解绑函数。
         Returns:
             None
@@ -116,33 +113,40 @@ class SkEventHanding(SkAfter):
 
 
 class SkEvent:
-
     """
     Used to pass event via arguments.
 
     用于传递事件的参数。
     """
 
-    def __init__(self, event_type: str, x: Union[int, None] = None, y: Union[int, None] = None, 
-                 rootx: Union[int, None] = None, rooty: Union[int, None] = None,
-                 key: Union[int, None, str] = None, keyname: Union[str, None] = None,
-                 mods: Union[str, None] = None, char: Union[int, None] = None,
-                 width: Union[int, None] = None, height: Union[int, None] = None,
-                 ):
+    def __init__(
+        self,
+        event_type: str,
+        x: Union[int, None] = None,
+        y: Union[int, None] = None,
+        rootx: Union[int, None] = None,
+        rooty: Union[int, None] = None,
+        key: Union[int, None, str] = None,
+        keyname: Union[str, None] = None,
+        mods: Union[str, None] = None,
+        char: Union[str, None] = None,
+        width: Union[int, None] = None,
+        height: Union[int, None] = None,
+    ):
         """
         Used to pass event via arguments.
 
         Args:
-            x: 
+            x:
                 x position of cursor / component (Relative to window).
 
-            y: 
+            y:
                 y position of cursor / component (Relative to window).
 
-            rootx: 
+            rootx:
                 x position of cursor / component (Relative to screen).
 
-            rooty: 
+            rooty:
                 y position of cursor / component (Relative to screen).
 
             key:

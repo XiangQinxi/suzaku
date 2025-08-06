@@ -1,5 +1,6 @@
-from .widgets import (
-    SkWidget, SkTextButton as SkButton, SkText as SkLabel,
-    SkAppWindow as Sk, SkWindow as SkToplevel
-)
 from .styles import *
+from .widgets import SkAppWindow as Sk
+from .widgets import SkText as SkLabel
+from .widgets import SkTextButton as SkButton
+from .widgets import SkWidget
+from .widgets import SkWindow as SkToplevel

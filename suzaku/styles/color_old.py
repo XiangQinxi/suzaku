@@ -46,6 +46,7 @@ def get_color_name(name: str):
         ValueError: 颜色名称不存在时抛出
     """
     import skia
+
     try:
         color = getattr(skia, f"Color{name.upper()}")
     except:
@@ -68,6 +69,7 @@ def get_color_rgba(r, g, b, a=255):
         skia.Color: 对应的RGBA颜色对象
     """
     import skia
+
     return skia.Color(r, g, b, a)
 
 
@@ -85,7 +87,8 @@ def get_color_hex(hex: str):
         ValueError: 当十六进制格式无效时抛出
     """
     import skia
-    hex_color = hex.lstrip('#')
+
+    hex_color = hex.lstrip("#")
     if len(hex_color) == 6:  # RGB 格式，默认不透明(Alpha=255)
         r = int(hex_color[0:2], 16)
         g = int(hex_color[2:4], 16)
@@ -99,5 +102,3 @@ def get_color_hex(hex: str):
         return skia.ColorSetARGB(a, r, g, b)  # 返回含透明度的颜色
     else:
         raise ValueError("HEX 颜色格式应为 #RRGGBB 或 #AARRGGBB")
-
-

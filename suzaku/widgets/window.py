@@ -10,7 +10,11 @@ from ..styles.color_old import color
 
 
 class SkWindow(SkWindowBase, SkContainer):
-    def __init__(self, *args, theme: SkTheme = default_theme, name="sk_window", **kwargs) -> None:
+    # region __init__ 初始化
+
+    def __init__(
+        self, *args, theme: SkTheme = default_theme, name="sk_window", **kwargs
+    ) -> None:
         """SkWindow, inherited from SkWindowBase
 
         :param args: SkWindowBase Args
@@ -45,6 +49,9 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.bind("update", self._update)
 
+    # endregion
+
+    # region Theme related 主题相关
 
     def apply_theme(self, new_theme: SkTheme):
         """Apply theme to the window and its children.
@@ -52,9 +59,13 @@ class SkWindow(SkWindowBase, SkContainer):
         :param new_theme:
         :return:
         """
-        self.theme= new_theme
+        self.theme = new_theme
         for child in self.children:
             child.apply_theme(new_theme)
+
+    # endregion
+
+    # region Event handlers 事件处理
 
     def _update(self, event):
         """Update event for SkWindow.
@@ -64,6 +75,7 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         for widget in self.children:
             from suzaku.event import SkEvent
+
             widget.event_generate("update", SkEvent(event_type="update"))
 
     def _key_press(self, event):
@@ -72,7 +84,7 @@ class SkWindow(SkWindowBase, SkContainer):
         :param event: SkEvent
         :return:
         """
-        #print(cls.cget("focus_widget"))
+        # print(cls.cget("focus_widget"))
         if self.focus_get() is not self:
             self.focus_get().event_generate("key_pressed", event)
 
@@ -85,21 +97,29 @@ class SkWindow(SkWindowBase, SkContainer):
             self.focus_get().event_generate("key_released", event)
 
     def _char(self, event):
-        #print(12)
+        # print(12)
         if self.focus_get() is not self:
             self.focus_get().event_generate("char", event)
 
     def _leave(self, event):
-        event = SkEvent(event_type="mouse_leave", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
+        event = SkEvent(
+            event_type="mouse_leave",
+            x=event.x,
+            y=event.y,
+            rootx=event.rootx,
+            rooty=event.rooty,
+        )
         for widget in self.children:
             widget.event_generate("mouse_leave", event)
 
     def _mouse(self, event) -> None:
         for widget in self.children:
-            if (widget.x <= event.x <= widget.x + widget.width and
-                    widget.y <= event.y <= widget.y + widget.height):
+            if (
+                widget.x <= event.x <= widget.x + widget.width
+                and widget.y <= event.y <= widget.y + widget.height
+            ):
                 widget.focus_set()
-                #print(widget)
+                # print(widget)
                 widget.event_generate("mouse_pressed", event)
                 break
 
@@ -110,12 +130,20 @@ class SkWindow(SkWindowBase, SkContainer):
         :return:
         """
         current_widget = None
-        event = SkEvent(event_type="mouse_motion", x=event.x, y=event.y, rootx=event.rootx, rooty=event.rooty)
+        event = SkEvent(
+            event_type="mouse_motion",
+            x=event.x,
+            y=event.y,
+            rootx=event.rootx,
+            rooty=event.rooty,
+        )
 
         # 找到当前鼠标所在的视觉元素
         for widget in reversed(self.children):
-            if (widget.x <= event.x <= widget.x + widget.width and
-                widget.y <= event.y <= widget.y + widget.height):
+            if (
+                widget.x <= event.x <= widget.x + widget.width
+                and widget.y <= event.y <= widget.y + widget.height
+            ):
                 current_widget = widget
                 break
 
@@ -157,13 +185,17 @@ class SkWindow(SkWindowBase, SkContainer):
             x=event.x,
             y=event.y,
             rootx=self.mouse_rootx,
-            rooty=self.mouse_rooty
+            rooty=self.mouse_rooty,
         )
         for widget in self.children:
             if widget.is_mouse_pressed:
                 widget.event_generate("mouse_released", event)
                 widget.is_mouse_pressed = False
         return None
+
+    # endregion
+
+    # region Focus related 焦点相关
 
     def focus_get(self):
         """Get the current widget as the focus
@@ -172,10 +204,11 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         return self.focus_widget
 
-    def focus_set(self, widget):
+    def focus_set(self):
         """Set the current widget as the focus
 
-        :param widget:
         :return:
         """
-        self.focus_widget = widget
+        self.focus_widget = self
+
+    # endregion

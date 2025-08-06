@@ -3,18 +3,19 @@ import warnings
 from ..event import SkEvent
 
 
-
 class SkLayoutError(TypeError):
     pass
 
 
 class SkContainer:
 
+    # region __init__ 初始化
+
     def __init__(self, pos: tuple[int, int] = (0, 0), size: tuple[int, int] = (0, 0)):
         """A SkContainer represents a widget that has the ability to contain other widgets inside.
 
-        SkContainer is only for internal use. If any user would like to create a widget from 
-        several of existed ones, they should use SkComboWidget instead. The authors will not 
+        SkContainer is only for internal use. If any user would like to create a widget from
+        several of existed ones, they should use SkComboWidget instead. The authors will not
         guarantee the stability of inheriting SkContainer for third-party widgets.
 
         SkContainer class contains code for widget embedding, and layout handling, providing the
@@ -41,12 +42,13 @@ class SkContainer:
         """
         self.children = []  # Children
         from ..widgets.widget import SkWidget
+
         self.draw_list: list[list[SkWidget]] = [
             [],  # Layout layer [SkWidget1, SkWidget2, ...]
             [],  # Floating layer [SkWidget1, SkWidget2, ...]
             [],  # Fixed layer [SkWidget1, SkWidget2, ...]
         ]
-        #self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
+        # self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
 
         self._box_direction = None  # h(horizontal) or v(vertical)
 
@@ -63,22 +65,9 @@ class SkContainer:
         self.width = size[0]
         self.height = size[1]
 
-    def bind(self, *args, **kwargs):
-        raise RuntimeError("Anything inherited from SkContainer should support binding events!" + \
-                           "This error should be overrode by the actual bind function of " + \
-                           "SkWindow or SkWidget in normal cases.")
+    # endregion
 
-    def draw_children(self, canvas):
-        """Draw children widgets.
-
-        :param canvas: The canvas to draw on
-        :return: None
-        """
-        for layer in self.draw_list:
-            for child in layer:
-                if child.visible:
-                    child.draw(canvas)
-
+    # region add_child 添加子元素
     def add_child(self, child):
         """Add child widget to window.
 
@@ -105,10 +94,14 @@ class SkContainer:
 
             if self._box_direction == "v":
                 if direction == "h":
-                    raise ValueError("Box layout can only be used with vertical direction.")
+                    raise ValueError(
+                        "Box layout can only be used with vertical direction."
+                    )
             elif self._box_direction == "h":
                 if direction == "v":
-                    raise ValueError("Box layout can only be used with horizontal direction.")
+                    raise ValueError(
+                        "Box layout can only be used with horizontal direction."
+                    )
             else:
                 self._box_direction = direction
 
@@ -136,7 +129,24 @@ class SkContainer:
         event = SkEvent(event_type="resize", width=self.width, height=self.height)
         self._handle_layout(event)
 
-    # Processing Layouts
+    # endregion
+
+    # region draw 绘制
+
+    def draw_children(self, canvas):
+        """Draw children widgets.
+
+        :param canvas: The canvas to draw on
+        :return: None
+        """
+        for layer in self.draw_list:
+            for child in layer:
+                if child.visible:
+                    child.draw(canvas)
+
+    # endregion
+
+    # region layout 布局
 
     def _handle_layout(self, event):
         """Handle layout of the container.
@@ -192,7 +202,6 @@ class SkContainer:
                             break
                         case {"fixed": _}:
                             self._handle_fixed(child)
-
 
     def _handle_pack(self):
         pass
@@ -257,49 +266,49 @@ class SkContainer:
             # Left side
             last_child_left_x = 0
             for child in start_children:
-                if child["padx"] is tuple:
-                    left = child["padx"][0]
-                    right = child["padx"][1]
+                if child.layout_config["box"]["padx"] is tuple:
+                    left = child.layout_config["box"]["padx"][0]
+                    right = child.layout_config["box"]["padx"][1]
                 else:
-                    left = right = child["padx"]
-                if child["pady"] is tuple:
-                    top = child["pady"][0]
-                    bottom = child["pady"][1]
+                    left = right = child.layout_config["box"]["padx"]
+                if child.layout_config["box"]["pady"] is tuple:
+                    top = child.layout_config["box"]["pady"][0]
+                    bottom = child.layout_config["box"]["pady"][1]
                 else:
-                    top = bottom = child["pady"]
-                if not child["expand"]:
-                    child["child"].width = child["child"].cget("dheight")
+                    top = bottom = child.layout_config["box"]["pady"]
+                if not child.layout_config["box"]["expand"]:
+                    child.width = child.cget("dheight")
                 else:
-                    child["child"].width = expanded_width - left - right
-                child["child"].height = height - top - bottom
-                child["child"].x = last_child_left_x + left
-                child["child"].y = top
-                last_child_left_x = child["child"].x + child["child"].width + right
+                    child.width = expanded_width - left - right
+                child.height = height - top - bottom
+                child.x = last_child_left_x + left
+                child.y = top
+                last_child_left_x = child.x + child.width + right
 
             # Right side
             last_child_right_x = width
             for child in end_children:
-                if child["padx"] is tuple:
-                    left = child["padx"][0]
-                    right = child["padx"][1]
+                if child.layout_config["box"]["padx"] is tuple:
+                    left = child.layout_config["box"]["padx"][0]
+                    right = child.layout_config["box"]["padx"][1]
                 else:
-                    left = right = child["padx"]
-                if child["pady"] is tuple:
-                    top = child["pady"][0]
-                    bottom = child["pady"][1]
+                    left = right = child.layout_config["box"]["padx"]
+                if child.layout_config["box"]["pady"] is tuple:
+                    top = child.layout_config["box"]["pady"][0]
+                    bottom = child.layout_config["box"]["pady"][1]
                 else:
-                    top = bottom = child["pady"]
-                if not child["expand"]:
-                    child["child"].width = child["child"].cget("dheight")
+                    top = bottom = child.layout_config["box"]["pady"]
+                if not child.layout_config["box"]["expand"]:
+                    child.width = child.cget("dheight")
                 else:
-                    child["child"].width = expanded_width - left - right
-                child["child"].height = height - top - bottom
-                child["child"].x = last_child_right_x - child["child"].width - right
-                child["child"].y = top
-                last_child_right_x = last_child_right_x - child["child"].width - left * 2
+                    child.width = expanded_width - left - right
+                child.height = height - top - bottom
+                child.x = last_child_right_x - child.width - right
+                child.y = top
+                last_child_right_x = last_child_right_x - child.width - left * 2
         else:  # Vertical Layout
             # Calculate the height of the fixed children
-            fixed_height = 0   # Occupied height of all fixed widgets enabled
+            fixed_height = 0  # Occupied height of all fixed widgets enabled
             for fixed_child in fixed_children:
                 fixed_child_layout_config = fixed_child.layout_config["box"]
                 if fixed_child_layout_config["pady"] is tuple:
@@ -313,7 +322,9 @@ class SkContainer:
                     fixed_height += fixed_child_layout_config["pady"]
 
             if len(expanded_children):
-                expanded_height = (height - fixed_height) / len(expanded_children)  # Height of expanded children
+                expanded_height = (height - fixed_height) / len(
+                    expanded_children
+                )  # Height of expanded children
             else:
                 expanded_height = 0
 
@@ -367,6 +378,7 @@ class SkContainer:
         :param event: The resize event
         """
         from ..widgets.window import SkWindow
+
         if isinstance(self, SkWindow):
             x = y = 0
         else:
@@ -375,3 +387,15 @@ class SkContainer:
         child.y = child.layout_config["fixed"]["y"] + y
         child.width = child.layout_config["fixed"]["width"]
         child.height = child.layout_config["fixed"]["height"]
+
+    # endregion
+
+    # region other 其他
+    def bind(self, *args, **kwargs):
+        raise RuntimeError(
+            "Anything inherited from SkContainer should support binding events!"
+            + "This error should be overrode by the actual bind function of "
+            + "SkWindow or SkWidget in normal cases."
+        )
+
+    # endregion
