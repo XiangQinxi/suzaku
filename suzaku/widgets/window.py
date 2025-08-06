@@ -1,12 +1,13 @@
-import skia
+from typing import Callable
 
-from suzaku.event import SkEvent
-from suzaku.styles.theme import SkTheme, default_theme
+import skia
 
 from ..base.container import SkContainer
 from ..base.windowbase import SkWindowBase
+from ..event import SkEvent
 from ..styles.color import SkColor
 from ..styles.color_old import color
+from ..styles.theme import SkTheme, default_theme
 
 
 class SkWindow(SkWindowBase, SkContainer):
@@ -27,9 +28,9 @@ class SkWindow(SkWindowBase, SkContainer):
         self.theme = theme
 
         self.focus_widget = self
-        self.draws = []
+        self.draws: list[Callable] = []
 
-        self.window = self
+        self.window: SkWindow = self
 
         self.previous_widget = None
 
@@ -110,6 +111,7 @@ class SkWindow(SkWindowBase, SkContainer):
             rooty=event.rooty,
         )
         for widget in self.children:
+            widget.is_mouse_pressed = False
             widget.event_generate("mouse_leave", event)
 
     def _mouse(self, event) -> None:
@@ -118,8 +120,9 @@ class SkWindow(SkWindowBase, SkContainer):
                 widget.x <= event.x <= widget.x + widget.width
                 and widget.y <= event.y <= widget.y + widget.height
             ):
+                widget.is_mouse_floating = True
                 widget.focus_set()
-                # print(widget)
+                widget.is_mouse_pressed = True
                 widget.event_generate("mouse_pressed", event)
                 break
 
@@ -149,6 +152,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         # 处理上一个元素的离开事件
         if self.previous_widget and self.previous_widget != current_widget:
+            event.event_type = "mouse_leave"
             self.cursor(self.default_cursor())
             self.previous_widget.event_generate("mouse_leave", event)
             self.previous_widget.is_mouse_floating = False
@@ -157,11 +161,15 @@ class SkWindow(SkWindowBase, SkContainer):
         if current_widget:
             if current_widget.visible:
                 if not current_widget.is_mouse_floating:
+                    event.event_type = "mouse_enter"
                     self.cursor(current_widget.attributes["cursor"])
+                    current_widget.is_floating = True
                     current_widget.event_generate("mouse_enter", event)
                     current_widget.is_mouse_floating = True
                 else:
+                    event.event_type = "mouse_motion"
                     self.cursor(current_widget.attributes["cursor"])
+                    current_widget.is_floating = True
                     current_widget.event_generate("mouse_motion", event)
                 self.previous_widget = current_widget
         else:
@@ -189,8 +197,8 @@ class SkWindow(SkWindowBase, SkContainer):
         )
         for widget in self.children:
             if widget.is_mouse_pressed:
-                widget.event_generate("mouse_released", event)
                 widget.is_mouse_pressed = False
+                widget.event_generate("mouse_released", event)
         return None
 
     # endregion

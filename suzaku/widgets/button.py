@@ -76,7 +76,7 @@ class SkButton(SkFrame):
         else:
             bd_shader = None
 
-        self._draw_skframe(
+        self._draw_frame(
             canvas,
             rect,
             radius=self.theme.styles["SkButton"]["radius"],

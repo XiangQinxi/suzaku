@@ -45,7 +45,12 @@ class SkFont:
 
         return self.font(name=f, size=14.5)
 
-    def font(self, name: str = None, font_path: Union[Path, str] = None, size: int | float = 14):
+    def font(
+        self,
+        name: str = None,
+        font_path: Union[Path, str] = None,
+        size: int | float = 14,
+    ):
         size = size
 
         if name:

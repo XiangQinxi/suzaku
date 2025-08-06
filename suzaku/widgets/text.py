@@ -2,7 +2,6 @@ from typing import Union
 
 import skia
 
-from ..base.drawbase import central_text
 from ..styles.color import SkColor
 from ..styles.color_old import color
 from .widget import SkWidget
@@ -25,7 +24,7 @@ class SkText(SkWidget):
         :param rect:
         :return:
         """
-        central_text(
+        self._draw_central_text(
             canvas,
             self.cget("text"),
             color(fg),

@@ -3,6 +3,8 @@ from typing import Any, Literal, Union
 import skia
 
 from ..event import SkEvent, SkEventHanding
+from ..styles.color_old import color
+from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
@@ -98,29 +100,6 @@ class SkWidget(SkEventHanding):
         self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
 
-        def _on_event(event):
-            match event.event_type:
-                case "mouse_enter":
-                    self.is_mouse_floating = True
-                case "mouse_leave":
-                    self.is_mouse_floating = False
-                case "mouse_pressed":
-                    self.is_mouse_pressed = True
-                case "mouse_released":
-                    self.is_mouse_pressed = False
-                case "focus_gain":
-                    self.is_focus = True
-                case "focus_loss":
-                    self.is_focus = False
-            pass
-
-        self.bind("mouse_enter", _on_event)
-        self.bind("mouse_leave", _on_event)
-        self.bind("mouse_pressed", _on_event)
-        self.bind("mouse_released", _on_event)
-        self.bind("focus_gain", _on_event)
-        self.bind("focus_loss", _on_event)
-
         self.parent.add_child(self)
 
     # endregion
@@ -146,6 +125,118 @@ class SkWidget(SkEventHanding):
         :return:
         """
         ...
+
+    def _draw_drop_shadow(
+        self, rect_paint, dx=3, dy=3, sigmaX=2, sigmaY=2, color=skia.ColorBLACK
+    ):
+        """Draw drop shadow of the rect
+
+        :param rect_paint: The paint of the rect
+        :param dx: The x offset of the drop shadow
+        :param dy: The y offset of the drop shadow
+        :param sigmaX: The standard deviation of the drop shadow in the x direction
+        :param sigmaY: The standard deviation of the drop shadow in the y direction
+        :param color: The color of the drop shadow
+        :return: None
+        """
+
+        rect_paint.setImageFilter(
+            skia.ImageFilters.DropShadow(
+                dx=dx, dy=dy, sigmaX=sigmaX, sigmaY=sigmaY, color=color
+            )
+        )
+
+    def _draw_rainbow_shader(self, rect_paint, rect):
+        """Set rainbow shader of the rect
+
+        :param rect_paint: The paint of the rect
+        :param rect: The rect
+        :return: None
+        """
+        rect_paint.setShader(
+            skia.GradientShader.MakeSweep(
+                cx=rect.centerX(),  # Center x position of the sweep
+                cy=rect.centerY(),  # Center y position of the sweep
+                startAngle=0,  # Start angle of the sweep in degrees
+                endAngle=360,  # End angle of the sweep in degrees
+                colors=[
+                    skia.ColorCYAN,  # Cyan
+                    skia.ColorMAGENTA,  # Magenta
+                    skia.ColorYELLOW,  # Yellow
+                    skia.ColorCYAN,  # Cyan
+                ],
+                localMatrix=None,  # Local matrix for the gradient
+            )
+        )
+
+    def _draw_central_text(self, canvas, text, fg, x, y, width, height):
+        """Draw central text
+
+        .. note::
+            >>> self._draw_central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
+
+        :param canvas: The canvas
+        :param text: The text
+        :param fg: The color of the text
+        :param x: The x of the text
+        :param y: The y of the text
+        :param width: The width of the text
+        :param height: The height of the text
+        :return: None
+        :raises: None
+        """
+
+        # 绘制字体
+        text_paint = skia.Paint(AntiAlias=True, Color=fg)
+
+        font: skia.Font = default_font()
+
+        text_width = font.measureText(text)
+        metrics = font.getMetrics()
+
+        draw_x = x + width / 2 - text_width / 2
+        draw_y = y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+
+        canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
+
+    def _draw_frame(
+        self,
+        canvas: any,
+        rect: any,
+        radius: int,
+        bg: str,
+        width: int,
+        bd: str,
+        bd_shadow: bool = True,
+        bd_shader: None | Literal["rainbow"] = "rainbow",
+    ):
+        # 绘制背景
+        rect_paint = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStrokeAndFill_Style,
+        )
+
+        rect_paint.setColor(color(bg))
+        rect_paint.setStrokeWidth(width)
+
+        canvas.drawRoundRect(rect, radius, radius, rect_paint)
+
+        # 绘制边框
+        # 绘制阴影
+        if bd_shadow:
+            self._draw_drop_shadow(
+                rect_paint, dx=3, dy=3, sigmaX=10, sigmaY=10, color=color(bd)
+            )
+
+        # 彩虹边框效果
+        if bd_shader:
+            if bd_shader.lower() == "rainbow":
+                self._draw_rainbow_shader(rect_paint, rect)
+
+        rect_paint.setColor(color(bd))
+        rect_paint.setStyle(skia.Paint.kStroke_Style)
+
+        canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
     # endregion
 
@@ -335,7 +426,9 @@ class SkWidget(SkEventHanding):
         self.window.focus_get().event_generate(
             "focus_loss", SkEvent(event_type="focus_loss")
         )
+        self.window.focus_get().is_focus = False
         self.window.focus_widget = self
+        self.is_focus = True
         self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self):

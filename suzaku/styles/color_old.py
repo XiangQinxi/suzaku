@@ -1,5 +1,6 @@
-def color(color):
+def color(_):
     """
+
     颜色对象工厂函数
 
     根据输入参数类型自动转换颜色格式，支持以下格式：
@@ -7,27 +8,25 @@ def color(color):
     - 十六进制字符串(如 '#RRGGBB' 或 '#AARRGGBB')
     - RGB/RGBA 元组或列表(3或4个元素)
 
-    Args:
-        color: 颜色参数，支持多种格式的输入
+    :param _ 颜色参数，支持多种格式的输入
+    :return
 
-    Returns:
-        skia.Color: 对应的Skia颜色对象
-
-    Example:
+    .. note::
         >>> color('red')
         >>> color('#ff0000')
         >>> color((255, 0, 0))
+
     """
-    typec = type(color)
+    typec = type(_)
     if typec is str:
-        if color.startswith("#"):
-            return get_color_hex(color)
-        return get_color_name(color)
+        if _.startswith("#"):
+            return get_color_hex(_)
+        return get_color_name(_)
     elif typec is tuple or typec is list:
-        if len(color) == 3:
-            return get_color_rgba(color[0], color[1], color[2])
-        elif len(color) == 4:
-            return get_color_rgba(color[0], color[1], color[2], color[3])
+        if len(_) == 3:
+            return get_color_rgba(_[0], _[1], _[2])
+        elif len(_) == 4:
+            return get_color_rgba(_[0], _[1], _[2], _[3])
         else:
             raise ValueError("Color tuple/list must have 3 (RGB) or 4 (RGBA) elements")
     return None
@@ -48,11 +47,11 @@ def get_color_name(name: str):
     import skia
 
     try:
-        color = getattr(skia, f"Color{name.upper()}")
+        _ = getattr(skia, f"Color{name.upper()}")
     except:
         raise ValueError(f"Unknown color name: {name}")
     else:
-        return color
+        return _
 
 
 def get_color_rgba(r, g, b, a=255):
@@ -73,12 +72,12 @@ def get_color_rgba(r, g, b, a=255):
     return skia.Color(r, g, b, a)
 
 
-def get_color_hex(hex: str):
+def get_color_hex(_: str):
     """
     转换十六进制颜色字符串为Skia颜色
 
     Args:
-        hex: 十六进制颜色字符串(支持 #RRGGBB 和 #AARRGGBB 格式)
+        _: 十六进制颜色字符串(支持 #RRGGBB 和 #AARRGGBB 格式)
 
     Returns:
         skia.Color: 对应的RGBA颜色对象
@@ -88,7 +87,7 @@ def get_color_hex(hex: str):
     """
     import skia
 
-    hex_color = hex.lstrip("#")
+    hex_color = _.lstrip("#")
     if len(hex_color) == 6:  # RGB 格式，默认不透明(Alpha=255)
         r = int(hex_color[0:2], 16)
         g = int(hex_color[2:4], 16)

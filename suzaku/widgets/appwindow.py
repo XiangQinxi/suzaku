@@ -1,5 +1,4 @@
-from suzaku.widgets.app import SkApp
-
+from .app import SkApp
 from .window import SkWindow
 
 
