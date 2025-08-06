@@ -16,22 +16,14 @@ class SkText(SkWidget):
     # region Draw
 
     def _draw(self, canvas: skia.Surfaces, rect: skia.Rect):
-        self._draw_sklabel(canvas, rect, fg=self.theme.styles["SkText"]["fg"])
-
-    def _draw_sklabel(self, canvas: skia.Surfaces, rect: skia.Rect, fg: SkColor):
-        """
-        :param canvas:
-        :param rect:
-        :return:
-        """
         self._draw_central_text(
             canvas,
-            self.cget("text"),
-            color(fg),
-            self.x,
-            self.y,
-            self.width,
-            self.height,
+            text=self.attributes["text"],
+            fg=self.theme.styles["SkText"]["fg"],
+            x=self.x,
+            y=self.y,
+            width=self.width,
+            height=self.height,
         )
 
     # endregion

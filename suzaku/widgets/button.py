@@ -11,7 +11,6 @@ class SkButton(SkFrame):
         size: tuple[int, int] = (105, 35),
         cursor: Union[str, None] = "hand",
         command: Union[callable, None] = None,
-        id: Union[str, None] = None,
         **kwargs,
     ) -> None:
         """Button Component.
@@ -24,7 +23,6 @@ class SkButton(SkFrame):
         * cursor: Cursor styles when hovering
         * styles: Style name
         * command: Function to run when clicked
-        * id: Identification code (optional)
         * **kwargs: Passed to SkVisual
         """
 

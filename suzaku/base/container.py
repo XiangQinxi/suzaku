@@ -40,7 +40,7 @@ class SkContainer:
         :param pos: The coordinates of the container in tuple (x, y), default is (0, 0)
         :param size: Size of the container, in tuple (width, height), default is (0, 0)
         """
-        #self.parent = None
+        # self.parent = None
         self.children = []  # Children
 
         from ..widgets.widget import SkWidget
@@ -78,6 +78,7 @@ class SkContainer:
         :param child: The child to add
         """
         from .appbase import SkAppBase
+
         if not isinstance(self.parent, SkAppBase):
             self.parent.add_child(child)
         self.children.append(child)

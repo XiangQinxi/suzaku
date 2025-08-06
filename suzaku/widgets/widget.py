@@ -190,9 +190,9 @@ class SkWidget(SkEventHanding):
         """
 
         # 绘制字体
-        text_paint = skia.Paint(AntiAlias=True, Color=fg)
+        text_paint = skia.Paint(AntiAlias=True, Color=color(fg))
 
-        font: skia.Font = default_font()
+        font: skia.Font = default_font
 
         text_width = font.measureText(text)
         metrics = font.getMetrics()
