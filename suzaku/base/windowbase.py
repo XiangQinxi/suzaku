@@ -537,9 +537,10 @@ class SkWindowBase(SkEventHanding):
         :param is_visible: Visibility
         :return: cls
         """
-        if is_visible is None:
+        if type(is_visible) is not bool:
             return self.visible
-        elif is_visible:
+
+        if is_visible:
             self.show()
         else:
             self.hide()
