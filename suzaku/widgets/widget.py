@@ -147,6 +147,10 @@ class SkWidget(SkEventHanding):
 
     @staticmethod
     def _rainbow_shader(rect, colors: list | tuple[skia.Color] | None):
+        """Draw the raindow shader of the rect
+        
+        :param color: The color of the raindow shader
+        """
         if not colors:
             colors = (
                 skia.ColorCYAN,  # Cyan
@@ -238,6 +242,18 @@ class SkWidget(SkEventHanding):
         bd_shadow: bool = True,
         bd_shader: None | Literal["rainbow"] = "rainbow",
     ):
+        """Draw the frame
+
+        :param canvas: The skia canvas
+        :param rect: The skia rect
+        :param radius: The radius of the rect
+        :param bg: The background
+        :param width: The width
+        :param bd: The color of the border
+        :param bd_shadow: The border_shadow switcher
+        :param bd_shader: The shader of the border
+
+        """
         # Draw background
         rect_paint = skia.Paint(
             AntiAlias=True,
@@ -341,7 +357,7 @@ class SkWidget(SkEventHanding):
         y: int | float,
         width: int | float | None = None,
         height: int | float | None = None,
-    ):
+    ) -> "SkWidget":
         """Fix the widget at a specific position.
 
         :param x:
@@ -369,7 +385,7 @@ class SkWidget(SkEventHanding):
         self.parent.add_fixed_child(self)
         return self
 
-    def place(self, anchor: str = "nw", x: int = 0, y: int = 0):
+    def place(self, anchor: str = "nw", x: int = 0, y: int = 0) -> "SkWidget":
         """Place widget at a specific position.
 
         :param anchor:
@@ -451,7 +467,10 @@ class SkWidget(SkEventHanding):
 
     # region Focus Related 焦点相关
 
-    def focus_set(self):
+    def focus_set(self) -> None:
+        """
+        Set focus
+        """
         if self.focusable:
             self.window.focus_get().event_generate(
                 "focus_loss", SkEvent(event_type="focus_loss")
@@ -461,7 +480,10 @@ class SkWidget(SkEventHanding):
             self.is_focus = True
             self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
 
-    def focus_get(self):
+    def focus_get(self) -> None:
+        """
+        Get focus
+        """
         return self.window.focus_get()
 
     # endregion
