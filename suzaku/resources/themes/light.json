@@ -28,29 +28,34 @@
       "rest": {
         "bg": [0, 0, 0, 20],
         "fg": [0, 0, 0, 235],
-        "bd": [0, 0, 0, 10],
-        "width": 2
+        "bd": [0, 0, 0, 50],
+        "width": 2,
+        "bd_shader": "rainbow"
       },
       "hover": {
         "bg": [0, 0, 0, 40],
         "fg": [0, 0, 0, 235],
-        "bd": [25, 125, 225, 235],
+        "bd": [0, 0, 0, 235],
         "width": 2,
-        "bd_shadow": true
+        "bd_shadow": true,
+        "bg_shader": "rainbow:follow_cursor",
+        "bd_shader": "rainbow"
       },
       "focus": {
         "bg": [0, 0, 0, 20],
         "fg": [0, 0, 0, 235],
         "bd": [0, 0, 0, 150],
         "width": 3,
-        "bd_shader": "rainbow"
+        "bg_shader": "rainbow:follow_cursor",
+        "bg_shader": "rainbow"
       },
       "pressed": {
         "bg": [0, 0, 0, 60],
         "fg": [0, 0, 0, 155],
         "bd": [0, 0, 0, 10],
         "width": 3,
-        "bd_shadow": true
+        "bd_shadow": true,
+        "bg_shader": "rainbow"
       }
     },
 

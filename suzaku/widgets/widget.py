@@ -1,5 +1,6 @@
 from typing import Any, Literal, Union
 
+import glfw
 import skia
 
 from ..event import SkEvent, SkEventHanding
@@ -66,6 +67,8 @@ class SkWidget(SkEventHanding):
 
         self.x: int | float = 0
         self.y: int | float = 0
+        self.mouse_x = 0
+        self.mouse_y = 0
 
         self.width: int | float = size[0]
         self.height: int | float = size[1]
@@ -103,6 +106,13 @@ class SkWidget(SkEventHanding):
         self.is_focus: bool = False
 
         self.parent.add_child(self)
+
+        def _on_event(event: SkEvent):
+            self.mouse_x = event.x
+            self.mouse_y = event.y
+
+        self.bind("mouse_enter", _on_event)
+        self.bind("mouse_motion", _on_event)
 
     # endregion
 
@@ -146,7 +156,13 @@ class SkWidget(SkEventHanding):
         )
 
     @staticmethod
-    def _rainbow_shader(rect, colors: list | tuple[skia.Color] | None):
+    def _rainbow_shader(
+        rect, colors: list | tuple[skia.Color] | None, cx=None, cy=None
+    ):
+        if not cx:
+            cx = rect.centerX()
+        if not cy:
+            cy = rect.centerY()
         if not colors:
             colors = (
                 skia.ColorCYAN,  # Cyan
@@ -160,18 +176,70 @@ class SkWidget(SkEventHanding):
                 colors2.append(color(_color))
             colors = tuple(colors2)
         return skia.GradientShader.MakeSweep(
-            cx=rect.centerX(),  # Center x position of the sweep
-            cy=rect.centerY(),  # Center y position of the sweep
+            cx=cx,  # Center x position of the sweep
+            cy=cy,  # Center y position of the sweep
             startAngle=0,  # Start angle of the sweep in degrees
             endAngle=360,  # End angle of the sweep in degrees
             colors=colors,
             localMatrix=None,  # Local matrix for the gradient
         )
 
-    def _draw_drop_shadow(self, rect_paint, dx=3, dy=3, sigmaX=2, sigmaY=2, colr=None):
+    @staticmethod
+    def _linear_shader(
+        points: tuple[tuple[float | int, float | int]], colors: list | tuple[skia.Color]
+    ):
+        return skia.GradientShader.MakeLinear(
+            points=points,
+            colors=colors,  # tileMode=skia.TileMode.CLAMP
+        )
+
+    @staticmethod
+    def _radial_shader(
+        center: tuple[float | int, float | int],
+        radius: float | int,
+        colors: list | tuple[skia.Color],
+    ):
+        return skia.GradientShader.MakeRadial(
+            center=center,
+            radius=radius,
+            colors=colors,
+        )
+
+    @staticmethod
+    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
+        if not style:
+            style = skia.kNormal_BlurStyle
+        return skia.MaskFilter.MakeBlur(style, sigma)
+
+    def _draw_linear_shader(self, paint, points, colors):
+        """Draw linear shader of the rect
+
+        :param paint: The paint of the rect
+        :param rect: The rect
+        :return: None
+        """
+        paint.setShader(self._linear_shader(points, colors))
+
+    def _draw_radial_shader(self, paint, center, radius, colors):
+        """Draw radial shader of the rect
+
+        :param paint: The paint of the rect
+        :param center: The center of the radial shader
+        :param radius: The radius of the radial shader
+        :param colors: The colors of the radial shader
+        :return: None
+        """
+        paint.setShader(self._radial_shader(center, radius, colors))
+
+    def _draw_blur(self, paint: skia.Paint, style=None, sigma=None):
+        paint.setMaskFilter(self._blur(style, sigma))
+
+    def _draw_drop_shadow(
+        self, paint: skia.Paint, dx=3, dy=3, sigmaX=2, sigmaY=2, colr=None
+    ):
         """Draw drop shadow of the rect
 
-        :param rect_paint: The paint of the rect
+        :param paint: The paint of the rect
         :param dx: The x offset of the drop shadow
         :param dy: The y offset of the drop shadow
         :param sigmaX: The standard deviation of the drop shadow in the x direction
@@ -180,18 +248,23 @@ class SkWidget(SkEventHanding):
         :return: None
         """
 
-        rect_paint.setImageFilter(self._drop_shadow(dx, dy, sigmaX, sigmaY, colr))
+        paint.setImageFilter(self._drop_shadow(dx, dy, sigmaX, sigmaY, colr))
 
     def _draw_rainbow_shader(
-        self, rect_paint, rect, colors: list | tuple[skia.Color] | None = None
+        self,
+        paint,
+        rect,
+        colors: list | tuple[skia.Color] | None = None,
+        cx: float | int | None = None,
+        cy: float | int | None = None,
     ):
         """Set rainbow shader of the rect
 
-        :param rect_paint: The paint of the rect
+        :param paint: The paint of the rect
         :param rect: The rect
         :return: None
         """
-        rect_paint.setShader(self._rainbow_shader(rect, colors))
+        paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
     @staticmethod
     def _draw_central_text(
@@ -229,14 +302,15 @@ class SkWidget(SkEventHanding):
 
     def _draw_frame(
         self,
-        canvas: any,
+        canvas: skia.Canvas,
         rect: any,
         radius: int,
         bg: str,
         width: int,
         bd: str,
         bd_shadow: bool = True,
-        bd_shader: None | Literal["rainbow"] = "rainbow",
+        bd_shader: None | Literal["rainbow"] = None,
+        bg_shader: None | Literal["rainbow"] = None,
     ):
         # Draw background
         rect_paint = skia.Paint(
@@ -244,27 +318,44 @@ class SkWidget(SkEventHanding):
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
+        if bg_shader:
+            if bg_shader.lower() == "rainbow":
+                self._draw_rainbow_shader(rect_paint, rect)
+            elif bg_shader.lower() == "rainbow:follow_cursor":
+                self._draw_rainbow_shader(
+                    rect_paint, rect, cx=self.mouse_x, cy=self.mouse_y
+                )
+
         rect_paint.setColor(color(bg))
         rect_paint.setStrokeWidth(width)
+        # rect_paint.setBlendMode(skia.BlendMode.kSoftLight)
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
 
         # Draw border
         # Draw shadow
+        rect_paint2 = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStrokeAndFill_Style,
+        )
         if bd_shadow:
             self._draw_drop_shadow(
-                rect_paint, dx=3, dy=3, sigmaX=10, sigmaY=10, colr=bd
+                rect_paint2, dx=3, dy=3, sigmaX=10, sigmaY=10, colr=bd
             )
 
         # Draw border
         if bd_shader:
             if bd_shader.lower() == "rainbow":
-                self._draw_rainbow_shader(rect_paint, rect)
+                self._draw_rainbow_shader(rect_paint2, rect)
+            # elif bd_shader.lower() == "linear":
+            #    self._draw_linear_shader(rect_paint, rect)
+            # elif bd_shader.lower() == "radial":
+            #    self._draw_radial_shader(rect_paint, rect)
 
-        rect_paint.setColor(color(bd))
-        rect_paint.setStyle(skia.Paint.kStroke_Style)
+        rect_paint2.setColor(color(bd))
+        rect_paint2.setStyle(skia.Paint.kStroke_Style)
 
-        canvas.drawRoundRect(rect, radius, radius, rect_paint)
+        canvas.drawRoundRect(rect, radius, radius, rect_paint2)
 
     # endregion
 
@@ -305,6 +396,13 @@ class SkWidget(SkEventHanding):
         """
         self.visible = False
         return self
+
+    def mouse_pos(self) -> tuple[int | float, int | float]:
+        """Get the mouse pos
+
+        :return:
+        """
+        return self.window.mouse_pos()
 
     # endregion
 

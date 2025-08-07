@@ -1,0 +1,2 @@
+class SkStyle:
+    pass

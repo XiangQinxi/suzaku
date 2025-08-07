@@ -247,18 +247,9 @@ class SkWindowBase(SkEventHanding):
         :param action: Action
         :param mods: Modifiers
         """
-        from glfw import (
-            MOD_ALT,
-            MOD_CAPS_LOCK,
-            MOD_CONTROL,
-            MOD_NUM_LOCK,
-            MOD_SHIFT,
-            MOD_SUPER,
-            PRESS,
-            RELEASE,
-            REPEAT,
-            get_key_name,
-        )
+        from glfw import (MOD_ALT, MOD_CAPS_LOCK, MOD_CONTROL, MOD_NUM_LOCK,
+                          MOD_SHIFT, MOD_SUPER, PRESS, RELEASE, REPEAT,
+                          get_key_name)
 
         keyname: str = get_key_name(
             key, scancode
@@ -672,6 +663,9 @@ class SkWindowBase(SkEventHanding):
         self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
 
         return self
+
+    def mouse_pos(self):
+        return glfw.get_cursor_pos(self.glfw_window)
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get the window attribute with attribute name.

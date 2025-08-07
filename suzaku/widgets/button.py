@@ -67,6 +67,11 @@ class SkButton(SkFrame):
             sheets = self.theme.styles["SkButton"][
                 f"{"focus" if self.is_focus else "rest"}"
             ]
+        if "bg_shader" in sheets:
+            bg_shader = sheets["bg_shader"]
+        else:
+            bg_shader = None
+
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
@@ -85,4 +90,5 @@ class SkButton(SkFrame):
             bd=sheets["bd"],
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
+            bg_shader=bg_shader,
         )
