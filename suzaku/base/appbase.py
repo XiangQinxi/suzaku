@@ -89,7 +89,7 @@ class SkAppBase:
             deal_event()
 
             # Create a copy of the window list to avoid modifying it while iterating
-            current_windows = list(self.windows)
+            current_windows = self.windows
 
             for window in current_windows:
                 # Check if the window is valid

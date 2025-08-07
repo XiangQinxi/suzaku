@@ -64,10 +64,11 @@ class SkContainer:
 
             self.bind("resize", children_resize)
 
-        self.x = pos[0]
-        self.y = pos[1]
-        self.width = size[0]
-        self.height = size[1]
+        if not hasattr(self, "x"):
+            self.x = pos[0]
+            self.y = pos[1]
+            self.width = size[0]
+            self.height = size[1]
 
     # endregion
 
@@ -152,6 +153,9 @@ class SkContainer:
     # endregion
 
     # region layout 布局
+
+    def update_layout(self):
+        self._handle_layout()
 
     def _handle_layout(self, evt=None):
         """Handle layout of the container.
@@ -258,12 +262,14 @@ class SkContainer:
             fixed_width: int | float = 0  # Occupied width of all fixed widgets enabled
             for fixed_child in fixed_children:
                 fixed_child_layout_config = fixed_child.layout_config["box"]
-                if fixed_child_layout_config["padx"] is tuple:
+
+                if type(fixed_child_layout_config["padx"]) is tuple:
                     fixed_width += fixed_child_layout_config["padx"][0]
                 else:
                     fixed_width += fixed_child_layout_config["padx"]
                 fixed_width += fixed_child.width
-                if fixed_child_layout_config["padx"] is tuple:
+
+                if type(fixed_child_layout_config["padx"]) is tuple:
                     fixed_width += fixed_child_layout_config["padx"][1]
                 else:
                     fixed_width += fixed_child_layout_config["padx"]
@@ -276,16 +282,18 @@ class SkContainer:
             # Left side
             last_child_left_x = 0
             for child in start_children:
-                if child.layout_config["box"]["padx"] is tuple:
+                if type(child.layout_config["box"]["padx"]) is tuple:
                     left = child.layout_config["box"]["padx"][0]
                     right = child.layout_config["box"]["padx"][1]
                 else:
                     left = right = child.layout_config["box"]["padx"]
-                if child.layout_config["box"]["pady"] is tuple:
+
+                if type(child.layout_config["box"]["pady"]) is tuple:
                     top = child.layout_config["box"]["pady"][0]
                     bottom = child.layout_config["box"]["pady"][1]
                 else:
                     top = bottom = child.layout_config["box"]["pady"]
+
                 if not child.layout_config["box"]["expand"]:
                     child.width = child.cget("dheight")
                 else:
@@ -298,16 +306,18 @@ class SkContainer:
             # Right side
             last_child_right_x = width
             for child in end_children:
-                if child.layout_config["box"]["padx"] is tuple:
+                if type(child.layout_config["box"]["padx"]) is tuple:
                     left = child.layout_config["box"]["padx"][0]
                     right = child.layout_config["box"]["padx"][1]
                 else:
                     left = right = child.layout_config["box"]["padx"]
-                if child.layout_config["box"]["pady"] is tuple:
+
+                if type(child.layout_config["box"]["pady"]) is tuple:
                     top = child.layout_config["box"]["pady"][0]
                     bottom = child.layout_config["box"]["pady"][1]
                 else:
                     top = bottom = child.layout_config["box"]["pady"]
+
                 if not child.layout_config["box"]["expand"]:
                     child.width = child.cget("dheight")
                 else:
@@ -321,12 +331,14 @@ class SkContainer:
             fixed_height = 0  # Occupied height of all fixed widgets enabled
             for fixed_child in fixed_children:
                 fixed_child_layout_config = fixed_child.layout_config["box"]
-                if fixed_child_layout_config["pady"] is tuple:
+
+                if type(fixed_child_layout_config["pady"]) is tuple:
                     fixed_height += fixed_child_layout_config["pady"][0]
                 else:
                     fixed_height += fixed_child_layout_config["pady"]
                 fixed_height += fixed_child.height
-                if fixed_child_layout_config["pady"] is tuple:
+
+                if type(fixed_child_layout_config["pady"]) is tuple:
                     fixed_height += fixed_child_layout_config["pady"][1]
                 else:
                     fixed_height += fixed_child_layout_config["pady"]
@@ -341,16 +353,18 @@ class SkContainer:
             last_child_bottom_y = 0  # Last bottom y position of the child component
             for child in start_children:  # Top side
                 child_layout_config = child.layout_config["box"]
-                if child_layout_config["padx"] is tuple:
+                if type(child_layout_config["padx"]) is tuple:
                     left = child_layout_config["padx"][0]
                     right = child_layout_config["padx"][1]
                 else:
                     left = right = child_layout_config["padx"]
-                if child_layout_config["pady"] is tuple:
+
+                if type(child_layout_config["pady"]) is tuple:
                     top = child_layout_config["pady"][0]
                     bottom = child_layout_config["pady"][1]
                 else:
                     top = bottom = child_layout_config["pady"]
+
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
                     child.height = child.cget("dheight")
@@ -363,16 +377,18 @@ class SkContainer:
             last_child_top_y = height  # Last top y position of the child component
             for child in end_children:  # Bottom side
                 child_layout_config = child.layout_config["box"]
-                if child_layout_config["padx"] is tuple:
+                if type(child_layout_config["padx"]) is tuple:
                     left = child_layout_config["padx"][0]
                     right = child_layout_config["padx"][1]
                 else:
                     left = right = child_layout_config["padx"]
-                if child_layout_config["pady"] is tuple:
+
+                if type(child_layout_config["pady"]) is tuple:
                     top = child_layout_config["pady"][0]
                     bottom = child_layout_config["pady"][1]
                 else:
                     top = bottom = child_layout_config["pady"]
+
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
                     child.height = child.cget("dheight")
