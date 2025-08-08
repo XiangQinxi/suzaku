@@ -1,7 +1,12 @@
 from typing import Literal
 
 import skia
-from svgwrite.data.pattern import percentage
+from .color_old import color
+
+def linear_gradient(widget, paint, *args, **kwargs):
+    gradient = SkGradient(widget)
+    gradient.set_linear(*args, **kwargs)
+    gradient.set_gradient(paint=paint)
 
 
 class SkGradient:
@@ -21,7 +26,7 @@ class SkGradient:
             return
         paint.setShader(self.gradient)
 
-    def get(self):
+    def get(self) -> skia.GradientShader:
         """Get gradient shader
         :return: Gradient shader
         """
@@ -56,40 +61,55 @@ class SkGradient:
             case _:
                 return 0, 0
 
+    def set_gradient(self, paint: skia.Paint):
+        paint.setShader(self.get())
+
     def set_linear(
         self,
-        start: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"],  # n
-        end: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"],  # s
-        points_and_colors: dict[
-            str, skia.Color
-        ] = None,  # {"0%": Color1, "100%": Color2}
+        configs=None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
     ):
+        """Set linear gradient
+
+        Example:
+            >>> gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"})
+
+        :param configs: Gradient configs
+        :return: cls
         """
-        Set linear gradient
-        :param start: Start position
-        :param end: End position
-        :param points_and_colors: Points and colors
-        :return:
-        """
 
-        start_pos = self.get_anchor_pos(start)
-        end_pos = self.get_anchor_pos(end)
+        if configs:
 
-        points: list[tuple[float, float]] = []
-        colors: list[skia.Color] = []
+            if "start_anchor" in configs:
+                start_anchor = configs["start_anchor"]
+            else:
+                start_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "n"
+            if "end_anchor" in configs:
+                end_anchor = configs["end_anchor"]
+            else:
+                end_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "s"
+            if "start" in configs:
+                start = configs["start"]
+            else:
+                start = "red"
+            if "end" in configs:
+                end = configs["end"]
+            else:
+                end = "blue"
 
-        for percentage, color in points_and_colors.items():
-            p = float(percentage.strip("%")) / 100
-            points.append(
-                (
-                    start_pos[0] + (end_pos[0] - start_pos[0]) * p,  # x pos
-                    start_pos[1] + (end_pos[1] - start_pos[1]) * p,  # y pos
-                )
+            start_pos = self.get_anchor_pos(start_anchor)
+            end_pos = self.get_anchor_pos(end_anchor)
+            print(start_pos, end_pos)
+
+            self.gradient = skia.GradientShader.MakeLinear(
+                points=[
+                    tuple(start_pos),
+                    tuple(end_pos)
+                ],  # [ (x, y), (x1, y1) ]
+                colors=[
+                    color(start), color(end)
+                ],  # [ Color1, Color2, Color3 ]
+                # tileMode=skia.TileMode.CLAMP
             )
-            colors.append(color)
-
-        return skia.GradientShader.MakeLinear(
-            points=points,  # [ (x, y), (x1, y1), (x2, y2) ]
-            colors=colors,  # [ Color1, Color2, Color3 ]
-            # tileMode=skia.TileMode.CLAMP
-        )
+            return self
+        else:
+            return None

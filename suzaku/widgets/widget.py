@@ -5,9 +5,9 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..styles.color_old import color
-from ..styles.font import default_font
 from ..styles.drop_shadow import SkDropShadow
-from ..styles.gradient import SkGradient
+from ..styles.font import default_font
+from ..styles.style import style
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
@@ -265,7 +265,9 @@ class SkWidget(SkEventHanding):
         bg: str,
         width: int,
         bd: str,
-        bd_shadow: None | tuple[int | float, int | float, int | float, int | float, str] = None,
+        bd_shadow: (
+            None | tuple[int | float, int | float, int | float, int | float, str]
+        ) = None,
         bd_shader: None | Literal["rainbow"] = None,
         bg_shader: None | Literal["rainbow"] = None,
     ):
@@ -294,8 +296,7 @@ class SkWidget(SkEventHanding):
                 self._draw_rainbow_shader(
                     rect_paint, rect, cx=self.mouse_x, cy=self.mouse_y
                 )
-
-        rect_paint.setColor(color(bg))
+        style(bg, paint=rect_paint, widget=self)
         rect_paint.setStrokeWidth(width)
         # rect_paint.setBlendMode(skia.BlendMode.kSoftLight)
 
@@ -321,7 +322,7 @@ class SkWidget(SkEventHanding):
             # elif bd_shader.lower() == "radial":
             #    self._draw_radial_shader(rect_paint, rect)
 
-        rect_paint2.setColor(color(bd))
+        style(bd, paint=rect_paint2, widget=self)
         rect_paint2.setStyle(skia.Paint.kStroke_Style)
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint2)

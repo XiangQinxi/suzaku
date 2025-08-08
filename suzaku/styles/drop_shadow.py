@@ -1,4 +1,5 @@
 import skia
+
 from .color_old import color
 
 
@@ -55,5 +56,9 @@ class SkDropShadow:
         if self.colr is None:
             return None
         return skia.ImageFilters.DropShadow(
-            dx=self.dx, dy=self.dy, sigmaX=self.sigmaX, sigmaY=self.sigmaY, color=color(self.colr)
+            dx=self.dx,
+            dy=self.dy,
+            sigmaX=self.sigmaX,
+            sigmaY=self.sigmaY,
+            color=color(self.colr),
         )
