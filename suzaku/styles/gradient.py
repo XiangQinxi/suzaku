@@ -81,34 +81,25 @@ class SkGradient:
 
             if "start_anchor" in configs:
                 start_anchor = configs["start_anchor"]
+                del configs["start_anchor"]
             else:
                 start_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "n"
             if "end_anchor" in configs:
                 end_anchor = configs["end_anchor"]
+                del configs["end_anchor"]
             else:
                 end_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "s"
-            if "start" in configs:
-                start = configs["start"]
-            else:
-                start = "red"
-            if "end" in configs:
-                end = configs["end"]
-            else:
-                end = "blue"
 
-            start_pos = self.get_anchor_pos(start_anchor)
-            end_pos = self.get_anchor_pos(end_anchor)
-            print(start_pos, end_pos)
+            colors = []
+            for colr in configs["colors"]:
+                colors.append(color(colr))
 
             self.gradient = skia.GradientShader.MakeLinear(
                 points=[
-                    tuple(start_pos),
-                    tuple(end_pos)
+                    tuple(self.get_anchor_pos(start_anchor)),
+                    tuple(self.get_anchor_pos(end_anchor))
                 ],  # [ (x, y), (x1, y1) ]
-                colors=[
-                    color(start), color(end)
-                ],  # [ Color1, Color2, Color3 ]
-                # tileMode=skia.TileMode.CLAMP
+                colors=colors,  # [ Color1, Color2, Color3 ]
             )
             return self
         else:

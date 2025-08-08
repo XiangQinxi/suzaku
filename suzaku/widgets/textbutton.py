@@ -73,6 +73,14 @@ class SkTextButton(SkText):
             bd_shader=bd_shader,
             bg_shader=bg_shader,
         )
-        super()._draw(canvas, rect)
+        self._draw_central_text(
+            canvas,
+            text=self.attributes["text"],
+            fg=sheets["fg"],
+            x=self.x,
+            y=self.y,
+            width=self.width,
+            height=self.height,
+        )
 
     # endregion

@@ -7,7 +7,7 @@ from ..event import SkEvent, SkEventHanding
 from ..styles.color_old import color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
-from ..styles.style import style
+from ..styles.gradient import linear_gradient
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
@@ -283,12 +283,16 @@ class SkWidget(SkEventHanding):
         :param bd_shader: The shader of the border
 
         """
-        # Draw background
         rect_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
+        rect_paint2 = skia.Paint(
+            AntiAlias=True,
+            Style=skia.Paint.kStroke_Style,
+        )
+        # Background
         if bg_shader:
             if bg_shader.lower() == "rainbow":
                 self._draw_rainbow_shader(rect_paint, rect)
@@ -296,37 +300,30 @@ class SkWidget(SkEventHanding):
                 self._draw_rainbow_shader(
                     rect_paint, rect, cx=self.mouse_x, cy=self.mouse_y
                 )
-        style(bg, paint=rect_paint, widget=self)
-        rect_paint.setStrokeWidth(width)
-        # rect_paint.setBlendMode(skia.BlendMode.kSoftLight)
+        rect_paint.setColor(color(bg))
 
-        canvas.drawRoundRect(rect, radius, radius, rect_paint)
+        # Border
+        if bd_shader:
+            if isinstance(bd_shader, dict):
+                if "linear_gradient" in bd_shader:
+                    linear_gradient(self, paint=rect_paint2, configs=bd_shader["linear_gradient"])
+            else:
+                if bd_shader.lower() == "rainbow":
+                    self._draw_rainbow_shader(rect_paint2, rect)
 
-        # Draw border
+        rect_paint2.setColor(color(bd))
+        rect_paint2.setStyle(skia.Paint.kStroke_Style)
+        rect_paint2.setStrokeWidth(width)
         # Draw shadow
-        rect_paint2 = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStrokeAndFill_Style,
-        )
 
         if bd_shadow:
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(rect_paint2)
 
-        # Draw border
-        if bd_shader:
-            if bd_shader.lower() == "rainbow":
-                self._draw_rainbow_shader(rect_paint2, rect)
-            # elif bd_shader.lower() == "linear":
-            #    self._draw_linear_shader(rect_paint, rect)
-            # elif bd_shader.lower() == "radial":
-            #    self._draw_radial_shader(rect_paint, rect)
-
-        style(bd, paint=rect_paint2, widget=self)
-        rect_paint2.setStyle(skia.Paint.kStroke_Style)
+        # Draw all
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint2)
-
+        canvas.drawRoundRect(rect, radius, radius, rect_paint)
     # endregion
 
     # region Widget attribute configs 组件属性配置
