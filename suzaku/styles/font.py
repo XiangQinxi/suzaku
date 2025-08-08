@@ -5,6 +5,7 @@ from typing import Any, Union
 
 import skia
 
+
 class SkFont:
     """
     SkFont

@@ -56,7 +56,7 @@ class SkTextButton(SkText):
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
-            bd_shadow = False
+            bd_shadow = None
         if "bd_shader" in sheets:
             bd_shader = sheets["bd_shader"]
         else:

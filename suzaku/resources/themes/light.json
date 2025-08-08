@@ -5,7 +5,7 @@
 
   "styles":{
     "SkWindow": {
-      "bg": [255, 255, 255, 235]
+      "bg": [235, 243, 255]
     },
 
     "SkFrame": {
@@ -26,60 +26,32 @@
     "SkButton": {
       "radius": 8,
       "rest": {
-        "bg": [0, 0, 0, 20],
+        "bg": [0, 0, 0, 12],
         "fg": [0, 0, 0, 235],
-        "bd": [0, 0, 0, 50],
+        "bd": [0, 0, 0, 25],
         "width": 2,
-        "bd_shader": "rainbow"
+        "bd_shadow": [0, 2, 2, 2, [0, 0, 0, 25]]
       },
       "hover": {
-        "bg": [0, 0, 0, 40],
+        "bg": [0, 0, 0, 12],
         "fg": [0, 0, 0, 235],
-        "bd": [0, 0, 0, 235],
-        "width": 2,
-        "bd_shadow": true,
-        "bg_shader": "rainbow:follow_cursor",
-        "bd_shader": "rainbow"
+        "bd": [0, 0, 0, 25],
+        "width": 3,
+        "bd_shadow": [0, 2, 2, 2, [0, 0, 0, 25]]
       },
       "focus": {
-        "bg": [0, 0, 0, 20],
+        "bg": [0, 0, 0, 12],
         "fg": [0, 0, 0, 235],
-        "bd": [0, 0, 0, 150],
+        "bd": [0, 0, 0, 25],
         "width": 3,
-        "bg_shader": "rainbow:follow_cursor",
-        "bg_shader": "rainbow"
+        "bd_shadow": [0, 2, 2, 2, [0, 0, 0, 25]]
       },
       "pressed": {
-        "bg": [0, 0, 0, 60],
-        "fg": [0, 0, 0, 155],
-        "bd": [0, 0, 0, 10],
-        "width": 3,
-        "bd_shadow": true,
-        "bg_shader": "rainbow"
-      }
-    },
-
-    "Close.SkButton": {
-      "radius": 8,
-      "rest": {
-        "bg": "transparent",
+        "bg": [0, 0, 0, 12],
         "fg": [0, 0, 0, 235],
-        "bd": "transparent",
-        "width": 0
-      },
-      "hover": {
-        "bg": [195, 45, 30, 255],
-        "fg": [255, 255, 255, 235],
-        "bd": "transparent",
-        "width": 0,
-        "bd_shadow": true
-      },
-      "pressed": {
-        "bg": [195, 45, 30, 185],
-        "fg": [255, 255, 255, 235],
-        "bd": "transparent",
-        "width": 0,
-        "bd_shadow": true
+        "bd": [0, 0, 0, 25],
+        "width": 3,
+        "bd_shadow": [0, 2, 2, 2, [0, 0, 0, 25]]
       }
     },
 
@@ -97,15 +69,13 @@
         "fg": [0, 0, 0, 235],
         "bd": [25, 125, 225, 235],
         "width": 2,
-        "bd_shadow": true,
         "placeholder": [0, 0, 0, 165]
       },
       "focus": {
         "bg": [0, 0, 0, 15],
         "fg": [0, 0, 0, 235],
         "bd": [25, 125, 225, 235],
-        "width": 2,
-        "bd_shader": "rainbow"
+        "width": 2
       }
     },
 

@@ -6,6 +6,8 @@ import skia
 from ..event import SkEvent, SkEventHanding
 from ..styles.color_old import color
 from ..styles.font import default_font
+from ..styles.drop_shadow import SkDropShadow
+from ..styles.gradient import SkGradient
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
@@ -141,21 +143,6 @@ class SkWidget(SkEventHanding):
         ...
 
     @staticmethod
-    def _drop_shadow(dx=3, dy=3, sigmaX=2, sigmaY=2, colr: skia.Color = None):
-        """Draw drop shadow of the rect
-
-        :param dx: The x offset of the drop shadow
-        :param dy: The y offset of the drop shadow
-        :param sigmaX: The standard deviation of the drop shadow in the x direction
-        :param sigmaY: The standard deviation of the drop shadow in the y direction
-        :param colr: The color of the drop shadow
-        :return: skia.ImageFilters.DropShadow
-        """
-        return skia.ImageFilters.DropShadow(
-            dx=dx, dy=dy, sigmaX=sigmaX, sigmaY=sigmaY, color=color(colr)
-        )
-
-    @staticmethod
     def _rainbow_shader(
         rect, colors: list | tuple[skia.Color] | None, cx=None, cy=None
     ):
@@ -189,15 +176,6 @@ class SkWidget(SkEventHanding):
         )
 
     @staticmethod
-    def _linear_shader(
-        points: tuple[tuple[float | int, float | int]], colors: list | tuple[skia.Color]
-    ):
-        return skia.GradientShader.MakeLinear(
-            points=points,
-            colors=colors,  # tileMode=skia.TileMode.CLAMP
-        )
-
-    @staticmethod
     def _radial_shader(
         center: tuple[float | int, float | int],
         radius: float | int,
@@ -215,15 +193,6 @@ class SkWidget(SkEventHanding):
             style = skia.kNormal_BlurStyle
         return skia.MaskFilter.MakeBlur(style, sigma)
 
-    def _draw_linear_shader(self, paint, points, colors):
-        """Draw linear shader of the rect
-
-        :param paint: The paint of the rect
-        :param rect: The rect
-        :return: None
-        """
-        paint.setShader(self._linear_shader(points, colors))
-
     def _draw_radial_shader(self, paint, center, radius, colors):
         """Draw radial shader of the rect
 
@@ -237,22 +206,6 @@ class SkWidget(SkEventHanding):
 
     def _draw_blur(self, paint: skia.Paint, style=None, sigma=None):
         paint.setMaskFilter(self._blur(style, sigma))
-
-    def _draw_drop_shadow(
-        self, paint: skia.Paint, dx=3, dy=3, sigmaX=2, sigmaY=2, colr=None
-    ):
-        """Draw drop shadow of the rect
-
-        :param paint: The paint of the rect
-        :param dx: The x offset of the drop shadow
-        :param dy: The y offset of the drop shadow
-        :param sigmaX: The standard deviation of the drop shadow in the x direction
-        :param sigmaY: The standard deviation of the drop shadow in the y direction
-        :param colr: The color of the drop shadow
-        :return: None
-        """
-
-        paint.setImageFilter(self._drop_shadow(dx, dy, sigmaX, sigmaY, colr))
 
     def _draw_rainbow_shader(
         self,
@@ -312,7 +265,7 @@ class SkWidget(SkEventHanding):
         bg: str,
         width: int,
         bd: str,
-        bd_shadow: bool = True,
+        bd_shadow: None | tuple[int | float, int | float, int | float, int | float, str] = None,
         bd_shader: None | Literal["rainbow"] = None,
         bg_shader: None | Literal["rainbow"] = None,
     ):
@@ -354,10 +307,10 @@ class SkWidget(SkEventHanding):
             AntiAlias=True,
             Style=skia.Paint.kStrokeAndFill_Style,
         )
+
         if bd_shadow:
-            self._draw_drop_shadow(
-                rect_paint2, dx=3, dy=3, sigmaX=10, sigmaY=10, colr=bd
-            )
+            shadow = SkDropShadow(config_list=bd_shadow)
+            shadow.draw(rect_paint2)
 
         # Draw border
         if bd_shader:

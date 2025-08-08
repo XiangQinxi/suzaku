@@ -103,7 +103,9 @@ class SkAppBase:
                     continue
 
                 # Only draw visible windows
-                if window.visible and glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
+                if window.visible and glfw.get_window_attrib(
+                    window.glfw_window, glfw.FOCUSED
+                ):
                     # Set the current context for each window
                     glfw.make_context_current(window.glfw_window)
                     with window.skia_surface(window.glfw_window) as surface:
