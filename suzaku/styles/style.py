@@ -1,5 +1,5 @@
 from .color_old import color
-from .gradient import linear_gradient
+from .color import SkGradient
 
 
 def style(sheet, paint, widget=None):
@@ -9,5 +9,7 @@ def style(sheet, paint, widget=None):
         if "linear" in sheet:
             if widget is not None:
                 paint.setColor(color("white"))
-                linear_gradient(widget=widget, configs=sheet["linear"], paint=paint)
+                gradient = SkGradient()
+                gradient.set_linear(widget=widget, config=sheet["linear"])
+                gradient.draw(paint=paint)
     return None
