@@ -1,4 +1,5 @@
 import skia
+from typing import Union, Literal, Any
 
 
 class SkColor:
@@ -24,16 +25,11 @@ class SkColor:
         return None
 
     def set_color_name(self, name: str) -> None:
-        """转换颜色名称字符串为Skia颜色
+        """Convert color name string to skia color.
 
-        Args:
-            name: 颜色名称(如 'RED')
-
-        Returns:
-            skia.Color: 对应的预定义颜色对象
-
-        Raises:
-            ValueError: 颜色名称不存在时抛出
+        :param name: Color name
+        :return skia.Color: Skia color
+        :raise ValueError: When color not exists
         """
         try:
             self.color = getattr(skia, f"Color{name.upper()}")
@@ -60,7 +56,7 @@ class SkColor:
         转换十六进制颜色字符串为Skia颜色
 
         Args:
-            hex: 十六进制颜色字符串(支持 #RRGGBB 和 #AARRGGBB 格式)
+            hex: 十六进制颜色字符串(支持 #RRGGBB 和 #RRGGBBAA 格式)
 
         Returns:
             skia.Color: 对应的RGBA颜色对象
@@ -74,11 +70,117 @@ class SkColor:
             g = int(hex_color[2:4], 16)
             b = int(hex_color[4:6], 16)
             self.color = skia.ColorSetRGB(r, g, b)  # 返回不透明颜色
-        elif len(hex_color) == 8:  # ARGB 格式(含 Alpha 通道)
-            a = int(hex_color[0:2], 16)
-            r = int(hex_color[2:4], 16)
-            g = int(hex_color[4:6], 16)
-            b = int(hex_color[6:8], 16)
+        elif len(hex_color) == 8:  # RGBA 格式(含 Alpha 通道)
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            a = int(hex_color[6:8], 16)
             self.color = skia.ColorSetARGB(a, r, g, b)  # 返回含透明度的颜色
         else:
-            raise ValueError("HEX 颜色格式应为 #RRGGBB 或 #AARRGGBB")
+            raise ValueError("HEX 颜色格式应为 #RRGGBB 或 #RRGGBBAA")
+
+
+class SkGradient:
+    def __init__(self):
+        """Initialize gradient
+
+        :param widget: Widget
+        """
+        # self.widget = widget
+        self.gradient: skia.GradientShader | None = None
+
+    def draw(self, paint: skia.Paint) -> skia.Paint:
+        """Draw gradient
+
+        :param paint: Paint
+        :return: None
+        """
+        if self.gradient is None:
+            return
+        paint.setShader(self.gradient)
+
+    def get(self) -> skia.GradientShader:
+        """Get gradient shader
+
+        :return: Gradient shader
+        """
+        return self.gradient
+
+    def get_anchor_pos(self, widget: "SkWidget", anchor) -> tuple[int, int]:
+        """Get widget`s anchor position(Relative widget position, not absolute position within the 
+        window)
+
+        :param widget: The SkWidget
+        :param anchor: Anchor position
+        :return: Anchor position in widget
+        """
+        width = widget.width
+        height = widget.height
+        match anchor:
+            case "nw":
+                return 0, 0
+            case "n":
+                return width / 2, 0
+            case "ne":
+                return width, 0
+            case "w":
+                return 0, height / 2
+            case "e":
+                return width, height / 2
+            case "sw":
+                return 0, height
+            case "s":
+                return width / 2, height
+            case "se":
+                return width, height
+            case _:
+                return 0, 0
+
+    def set_gradient(self, paint: skia.Paint) -> "SkGradient":
+        paint.setShader(self.get())
+        return self
+
+    def set_linear(
+        self,
+        config: dict | None=None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
+        widget: "SkWidget" | None=None
+    ):
+        """Set linear gradient
+
+        ## Example
+        `gradient.set_linear({"start_anchor": "n", "end_anchor": "s", 
+        "start": "red", "end": "blue"})`
+
+        :param configs: Gradient configs
+        :return: cls
+        """
+
+        if config:
+
+            if "start_anchor" in config:
+                start_anchor = config["start_anchor"]
+                del config["start_anchor"]
+            else:
+                start_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "n"
+            if "end_anchor" in config:
+                end_anchor = config["end_anchor"]
+                del config["end_anchor"]
+            else:
+                end_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "s"
+
+            colors = []
+            for color in config["colors"]:
+                colors.append(color(color))
+
+            if widget:
+                self.gradient = skia.GradientShader.MakeLinear(
+                    points=[
+                        tuple(self.get_anchor_pos(widget, start_anchor)),
+                        tuple(self.get_anchor_pos(eidget, end_anchor))
+                    ],  # [ (x, y), (x1, y1) ]
+                    colors=colors,  # [ Color1, Color2, Color3 ]
+                )
+
+            return self
+        else:
+            return None
