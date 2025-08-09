@@ -36,15 +36,15 @@ class SkEntry(SkWidget):
         :param kwargs: SkVisual arguments
         """
 
-        super().__init__(*args, size=size, name="sk_entry", **kwargs)
+        super().__init__(*args, size=size, name="sk_entry", cursor=cursor, **kwargs)
 
         self.attributes["right_margin"] = 20
 
         self.events["click"] = []
+        self.bind("click", self._on_click)
         self.attributes["placeholder"] = placeholder
         self.attributes["cursor_pos"] = 0
         self.attributes["scroll_offset"] = 0
-        self.attributes["cursor"] = cursor
         self.attributes["textvariable"] = textvariable
         if textvariable is not None:
             self.attributes["text"] = textvariable.get()
@@ -121,12 +121,63 @@ class SkEntry(SkWidget):
         self.attributes["cursor_pos"] = cursor_pos + 1
         self._update_scroll_offset()
 
+    def _on_click(self, evt):
+        """Handle mouse click event to set cursor position."""
+        if not self.is_focus:
+            # 如果当前没有焦点，先获取焦点
+            self._on_focus()
+            return
+
+        # 获取当前状态的样式
+        if self.is_focus:
+            sheets = self.styles["SkEntry"]["focus"]
+        elif self.is_mouse_floating:
+            sheets = self.styles["SkEntry"]["hover"]
+        else:
+            sheets = self.styles["SkEntry"]["rest"]
+
+        # 获取点击位置相对于输入框的坐标
+        x = evt.x - self.x - sheets["width"] * 2
+        y = evt.y - self.y
+
+        # 考虑滚动偏移
+        x += self.attributes["scroll_offset"]
+
+        # 获取文本内容
+        if self.attributes["textvariable"] is not None:
+            text = self.attributes["textvariable"].get()
+        else:
+            text = self.attributes["text"]
+
+        font = default_font
+        cursor_pos = 0
+
+        # 计算点击位置对应的字符索引
+        if text:
+            # 使用二进制搜索找到最接近点击位置的字符
+            left, right = 0, len(text)
+            while left < right:
+                mid = (left + right) // 2
+                width = font.measureText(text[:mid])
+                if width < x:
+                    left = mid + 1
+                else:
+                    right = mid
+            cursor_pos = left
+        else:
+            cursor_pos = 0
+
+        # 设置光标位置
+        self.attributes["cursor_pos"] = cursor_pos
+        self._update_scroll_offset()
+
     def _on_focus(self, evt=None):
         """Handle focus in event and reset display state."""
         # 重置滚动偏移
         self.attributes["scroll_offset"] = 0
         # 重置光标位置到文本开头
-        self.attributes["cursor_pos"] = 0
+        if evt is None or not hasattr(evt, "x"):
+            self.attributes["cursor_pos"] = 0
         # 重置光标闪烁状态
         self.attributes["cursor_visible"] = True
         self.attributes["last_blink_time"] = time() * 1000

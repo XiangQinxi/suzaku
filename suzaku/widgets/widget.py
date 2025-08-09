@@ -28,6 +28,7 @@ class SkWidget(SkEventHanding):
         cursor: str = "arrow",
         widget_id: Union[str, None] = None,
         name="SkWidget",
+        font: skia.Font | None = default_font,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -62,6 +63,7 @@ class SkWidget(SkEventHanding):
             "theme": None,
             "dwidth": size[0],  # default width
             "dheight": size[1],  # default height
+            "font": font,
         }
 
         self.theme: SkTheme = self.parent.theme
@@ -243,8 +245,7 @@ class SkWidget(SkEventHanding):
         :raises: None
         """
 
-        if not font:
-            font: skia.Font = default_font
+        font = self.attributes["font"]
 
         # 绘制字体
         text_paint = skia.Paint(AntiAlias=True, Color=color(fg))
