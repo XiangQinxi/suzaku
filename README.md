@@ -1,12 +1,16 @@
 # Suzaku 朱雀
 
+> This project is experiencing a reconstruction. For latest usable versions, please see [releases](github.com/XiangQinXi/suzaku/releases). However, always note that the APIs will change frequently in this period without notifying or warning, please only use versions under development for evaluation purposes.
+>
+> 本项目正在经历重构。最新可用版本可以在[releases](github.com/XiangQinXi/suzaku/releases)中找到。请务必注意：在此期间API会经常发生变更，恕不另行通知或给出警告。请将这些开发中的版本仅用于评估用途。
+
 Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 
 基于`skia-python`、`pyopengl`与`glfw`高级界面库。
 
 > Still under developing... / 正在抓紧制作中...
 > 
-> Evaluate out current achievements by downloading this project whilt it is still under development.
+> Evaluate out current achievements by downloading this project while it is still under development.
 > 
 > 您可以下载正在开发的版本来进行评估。
 > 
