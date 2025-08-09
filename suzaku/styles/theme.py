@@ -3,7 +3,7 @@ import os
 import pathlib
 import re
 import warnings
-from typing import Any, Union, Literal
+from typing import Any, Literal, Union
 
 
 class SkStyleNotFoundError(NameError):
@@ -40,7 +40,9 @@ class SkTheme:
         """
         return SkTheme.find_loaded_theme(theme_name) != False  # ☝🤓
 
-    def __init__(self, styles: dict = {}, parent: Union["SkTheme", None] = None) -> None:
+    def __init__(
+        self, styles: dict = {}, parent: Union["SkTheme", None] = None
+    ) -> None:
         """Theme for SkWindow and SkWidgets.
 
         :param styles: Styles of the theme
@@ -68,7 +70,9 @@ class SkTheme:
         with open(file_path, mode="r", encoding="utf-8") as f:
             style_raw = f.read()
             theme_data = json.loads(style_raw)
-            if (search_result := SkTheme.find_loaded_theme(theme_data["name"])) != False:
+            if (
+                search_result := SkTheme.find_loaded_theme(theme_data["name"])
+            ) != False:
                 warnings.warn(
                     f"Theme <{theme_data["name"]}> already loaded or existed."
                 )
@@ -202,8 +206,9 @@ class SkTheme:
                 selector_parsed = self.select(selector)
             except SkStyleNotFoundError:
                 if self.name == SkTheme.DEFAULT_THEME.name:
-                    raise SkStyleNotFoundError(\
-                          "Style is not exsited in the default theme. Check your selector!")
+                    raise SkStyleNotFoundError(
+                        "Style is not exsited in the default theme. Check your selector!"
+                    )
                 return default_theme.get_style(selector, copy=True)
 
             for selector_level in selector_parsed:
@@ -227,8 +232,9 @@ class SkTheme:
         if attr_name not in style:
             # fallback to the parent's rest
             if self.name == SkTheme.DEFAULT_THEME.name:
-                raise SkStyleNotFoundError(\
-                      "Style is not exsited in the default theme. Check your selector!")
+                raise SkStyleNotFoundError(
+                    "Style is not exsited in the default theme. Check your selector!"
+                )
             if self.parent != None:
                 self.parent.get_style_attr(selector, "rest")
             else:

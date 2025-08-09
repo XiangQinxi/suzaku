@@ -80,6 +80,8 @@ class SkAppBase:
         for window in self.windows:
             window.create_bind()
 
+        glfw.swap_interval(1)
+
         # Event loop
         if self.window_event_wait:
             deal_event = glfw.wait_events
@@ -89,7 +91,7 @@ class SkAppBase:
             deal_event()
 
             # Create a copy of the window list to avoid modifying it while iterating
-            current_windows = list(self.windows)
+            current_windows = self.windows
 
             for window in current_windows:
                 # Check if the window is valid
@@ -101,7 +103,9 @@ class SkAppBase:
                     continue
 
                 # Only draw visible windows
-                if window.visible:
+                if window.visible and glfw.get_window_attrib(
+                    window.glfw_window, glfw.FOCUSED
+                ):
                     # Set the current context for each window
                     glfw.make_context_current(window.glfw_window)
                     with window.skia_surface(window.glfw_window) as surface:

@@ -48,10 +48,15 @@ class SkTextButton(SkText):
             sheets = self.theme.styles["SkButton"][
                 f"{"focus" if self.is_focus else "rest"}"
             ]
+        if "bg_shader" in sheets:
+            bg_shader = sheets["bg_shader"]
+        else:
+            bg_shader = None
+
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
-            bd_shadow = False
+            bd_shadow = None
         if "bd_shader" in sheets:
             bd_shader = sheets["bd_shader"]
         else:
@@ -66,7 +71,16 @@ class SkTextButton(SkText):
             bd=sheets["bd"],
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
+            bg_shader=bg_shader,
         )
-        super()._draw(canvas, rect)
+        self._draw_central_text(
+            canvas,
+            text=self.attributes["text"],
+            fg=sheets["fg"],
+            x=self.x,
+            y=self.y,
+            width=self.width,
+            height=self.height,
+        )
 
     # endregion

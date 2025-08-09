@@ -8,49 +8,32 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    appwindow = Sk(
-        title="Suzaku GUI",
-        themename="default.light",
-        size=(280, 360),
-        # force_hardware_acceleration=True
-    )
-    appwindow.bind("close", lambda: print("SkWindowBase closed"))
+    app = SkApp(window_event_wait=True)
 
-    SkButton(
-        appwindow,
-        text=f"Light Theme / 切换至Light主题",
-        command=lambda: appwindow.theme.use_theme("light"),
-    ).vbox(padx=10, pady=10)
-    SkButton(
-        appwindow,
-        text=f"Dark Theme / 切换至Dark主题",
-        command=lambda: appwindow.theme.use_theme("dark"),
-    ).vbox(padx=10, pady=10)
-    SkLabel(appwindow, text="This is a SkLabel / 这是一个标签").vbox(padx=10, pady=10)
+    def create1window():
+        window = SkWindow(
+            app,
+            title="Suzaku GUI",
+            size=(280, 460),
+            # force_hardware_acceleration=True
+        )
+        window.bind("closed", lambda evt: print("SkWindowBase closed"))
 
-    var = StringVar()
-    SkEntry(appwindow, placeholder="数值绑定", textvariable=var).vbox(padx=10, pady=10)
-    SkLabel(appwindow, textvariable=var).vbox(padx=10, pady=10)
+        SkTextButton(window, text="This is a SkButton / 这是一个按钮").box(
+            padx=10, pady=10
+        )
+        SkText(window, text="This is a SkLabel / 这是一个标签").box(padx=10, pady=10)
 
-    SkEmpty(appwindow).vbox(padx=0, pady=0, expand=True)
+        var = SkStringVar()
+        SkEntry(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
+        SkText(window, textvariable=var).box(padx=10, pady=10)
+        SkTextButton(window, text="Close the window", command=window.destroy).box(
+            side="bottom"
+        )
+        SkTextButton(window, text="Create 1 Window", command=create1window).box(
+            padx=10, pady=10, side="bottom"
+        )
 
-    # SkButton(appwindow, text=f"Horizontal Layout / 水平布局",
-    #         command=lambda: appwindow.winfo_layout().change_direction("h")).vbox(padx=10, pady=10)
-    # SkButton(appwindow, text=f"Vertical Layout / 垂直 布局",
-    #         command=lambda: appwindow.winfo_layout().change_direction("v")).vbox(padx=10, pady=10)
+    create1window()
 
-    style = SkStyle()
-    style.configure("Close.SkButton", radius=99)  # 更改当前主题Close.SkButton的样式
-
-    SkButton(
-        appwindow,
-        text=f"Close SkWindowBase / 关闭窗口",
-        command=appwindow.destroy,
-        style="Close.SkButton",
-    ).vbox(padx=10, pady=10)
-
-    """
-    toplevel = SkWindow()
-    SkButton(toplevel, text=f"关闭窗口", command=toplevel.destroy, styles="Close.SkButton").vbox(padx=10, pady=10)
-    """
-    appwindow.run()
+    app.run()

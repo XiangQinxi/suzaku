@@ -4,14 +4,24 @@ import skia
 
 from ..styles.color import SkColor
 from ..styles.color_old import color
+from ..styles.font import default_font
 from .widget import SkWidget
 from .window import SkWindow
 
 
 class SkText(SkWidget):
-    def __init__(self, *args, text: str = "", **kwargs):
+    def __init__(self, *args, text: str = "", textvariable=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.attributes["text"] = text
+        if textvariable is not None:
+            self.attributes["textvariable"] = textvariable
+            self.attributes["text"] = textvariable.get()
+            textvariable.bind("change", self._textvariable)
+        else:
+            self.attributes["text"] = text
+        self.attributes["font"] = default_font
+
+    def _textvariable(self, evt):
+        self.attributes["text"] = self.attributes["textvariable"].get()
 
     # region Draw
 

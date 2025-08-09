@@ -54,7 +54,7 @@ def get_color_name(name: str):
         return _
 
 
-def get_color_rgba(r, g, b, a=255):
+def get_color_rgba(r: int, g: int, b: int, a: int = 255):
     """
     转换RGB/RGBA值为Skia颜色
 

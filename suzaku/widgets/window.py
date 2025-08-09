@@ -14,7 +14,12 @@ class SkWindow(SkWindowBase, SkContainer):
     # region __init__ 初始化
 
     def __init__(
-        self, *args, theme: SkTheme = default_theme, name="sk_window", **kwargs
+        self,
+        *args,
+        theme: SkTheme = default_theme,
+        size: tuple[int, int] = (300, 300),
+        name="sk_window",
+        **kwargs,
     ) -> None:
         """SkWindow, inherited from SkWindowBase
 
@@ -26,6 +31,7 @@ class SkWindow(SkWindowBase, SkContainer):
         SkContainer.__init__(self)
 
         self.theme = theme
+        self.styles = self.theme.styles
 
         self.focus_widget = self
         self.draws: list[Callable] = []
@@ -61,6 +67,7 @@ class SkWindow(SkWindowBase, SkContainer):
         :return:
         """
         self.theme = new_theme
+        self.styles = self.theme.styles
         for child in self.children:
             child.apply_theme(new_theme)
 

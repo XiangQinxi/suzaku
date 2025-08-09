@@ -120,6 +120,51 @@ class SkWindowBase(SkEventHanding):
         """
         return cls._instance_count
 
+    def create(self) -> any:
+        """Create the glfw window.
+
+        :return: cls
+        """
+        if hasattr(self, "application") and self.application:
+            if self.attributes["fullscreen"]:
+                monitor = glfw.get_primary_monitor()
+            else:
+                monitor = None
+
+            glfw.window_hint(glfw.STENCIL_BITS, 8)
+            # see https://www.glfw.org/faq#macos
+            if sys.platform.startswith("darwin"):
+                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
+                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
+                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
+            window = glfw.create_window(
+                self.width, self.height, self.attributes["title"], monitor, None
+            )
+            if not window:
+                raise RuntimeError("无法创建GLFW窗口")
+
+            self.visible = True
+
+            pos = glfw.get_window_pos(window)
+
+            self.x = pos[0]
+            self.y = pos[1]
+
+            if self.attributes["force_hardware_acceleration"]:
+                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
+                glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
+                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
+            glfw.set_window_opacity(window, self.cget("opacity"))
+
+            return window
+        else:
+            raise RuntimeError("窗口必须先添加到Application实例")
+
     # endregion
 
     # region Draw 绘制相关
@@ -174,6 +219,8 @@ class SkWindowBase(SkEventHanding):
         if self.visible:
             self.event_generate("update", SkEvent(event_type="update"))
             glfw.swap_buffers(self.glfw_window)
+            if hasattr(self, "update_layout"):
+                self.update_layout()
 
     # endregion
 
@@ -412,51 +459,6 @@ class SkWindowBase(SkEventHanding):
             ),
         )
 
-    def create(self) -> any:
-        """Create the glfw window.
-
-        :return: cls
-        """
-        if hasattr(self, "application") and self.application:
-            if self.attributes["fullscreen"]:
-                monitor = glfw.get_primary_monitor()
-            else:
-                monitor = None
-
-            glfw.window_hint(glfw.STENCIL_BITS, 8)
-            # see https://www.glfw.org/faq#macos
-            if sys.platform.startswith("darwin"):
-                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
-                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
-                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-
-            window = glfw.create_window(
-                self.width, self.height, self.attributes["title"], monitor, None
-            )
-            if not window:
-                raise RuntimeError("无法创建GLFW窗口")
-
-            self.visible = True
-
-            pos = glfw.get_window_pos(window)
-
-            self.x = pos[0]
-            self.y = pos[1]
-
-            if self.attributes["force_hardware_acceleration"]:
-                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
-                glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
-                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
-                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-
-            glfw.set_window_opacity(window, self.cget("opacity"))
-
-            return window
-        else:
-            raise RuntimeError("窗口必须先添加到Application实例")
-
     def create_bind(self) -> None:
         """Binding glfw window events.
 
@@ -535,9 +537,10 @@ class SkWindowBase(SkEventHanding):
         :param is_visible: Visibility
         :return: cls
         """
-        if is_visible is None:
+        if type(is_visible) is not bool:
             return self.visible
-        elif is_visible:
+
+        if is_visible:
             self.show()
         else:
             self.hide()
@@ -550,10 +553,11 @@ class SkWindowBase(SkEventHanding):
 
         :return: cls
         """
-        from glfw import show_window
-
-        show_window(self.glfw_window)
         self.visible = True
+        if hasattr(self, "update_layout"):
+            self.update_layout()  # 添加初始布局更新
+        glfw.show_window(self.glfw_window)
+        self.update()  # 添加初始绘制触发
         return self
 
     def hide(self) -> "SkWindowBase":
@@ -594,6 +598,7 @@ class SkWindowBase(SkEventHanding):
         """
         if self.glfw_window:
             glfw.destroy_window(self.glfw_window)
+            self.event_generate("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
 
     def title(self, text: str = None) -> Union[str, "SkWindowBase"]:
@@ -659,6 +664,9 @@ class SkWindowBase(SkEventHanding):
         self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
 
         return self
+
+    def mouse_pos(self):
+        return glfw.get_cursor_pos(self.glfw_window)
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get the window attribute with attribute name.

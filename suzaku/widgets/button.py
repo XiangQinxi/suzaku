@@ -17,13 +17,13 @@ class SkButton(SkFrame):
 
         **Will be re-written in future.**
 
-        * *args: Passed to SkVisual
-        * text: Button text
-        * size: Default size
-        * cursor: Cursor styles when hovering
-        * styles: Style name
-        * command: Function to run when clicked
-        * **kwargs: Passed to SkVisual
+        : param args: Passed to SkVisual
+        : param text: Button text
+        : param size: Default size
+        : param cursor: Cursor styles when hovering
+        : param styles: Style name
+        : param command: Function to run when clicked
+        : param **kwargs: Passed to SkVisual
         """
 
         super().__init__(*args, size=size, name="sk_button", **kwargs)
@@ -55,8 +55,10 @@ class SkButton(SkFrame):
     def _draw(self, canvas, rect) -> None:
         """Draw button
 
-        * canvas: skia.Surface to draw on
-        * rect: Rectangle to draw in
+        :param canvas: skia.Surface to draw on
+        :param rect: Rectangle to draw in
+
+        :return: None
         """
         sheets = None
         if self.is_mouse_floating:
@@ -67,6 +69,11 @@ class SkButton(SkFrame):
             sheets = self.theme.styles["SkButton"][
                 f"{"focus" if self.is_focus else "rest"}"
             ]
+        if "bg_shader" in sheets:
+            bg_shader = sheets["bg_shader"]
+        else:
+            bg_shader = None
+
         if "bd_shadow" in sheets:
             bd_shadow = sheets["bd_shadow"]
         else:
@@ -85,4 +92,5 @@ class SkButton(SkFrame):
             bd=sheets["bd"],
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
+            bg_shader=bg_shader,
         )

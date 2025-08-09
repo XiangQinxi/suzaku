@@ -18,26 +18,11 @@ class SkFont:
         SkFont object. For customizing fonts in your UI
 
         字体对象。用于自定义您界面上的字体
-
-        Args:
-            name (str):
-                Name of the local font.
-
-                本地电脑存在的字体名称。
-
-            path (Path | str):
-                Path to a font file.
-
-                字体文件路径。
-
-            size (int):
-                SkFont size.
-
-                字体大小。
-
         """
+        ...
 
     def default_font(self):
+        """Get default font via different system"""
         from sys import platform
 
         if platform == "win32":
@@ -50,7 +35,17 @@ class SkFont:
         name: str = None,
         font_path: Union[Path, str] = None,
         size: int | float = 14,
-    ):
+    ) -> skia.Font:
+        """
+        Get font from path
+
+        :param name: Name of the local font.
+
+        :param path: Path to a font file.
+
+        :param size: SkFont size.
+        :return: skia.Font object
+        """
         size = size
 
         if name:
