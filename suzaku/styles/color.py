@@ -1,5 +1,11 @@
-import skia
+from __future__ import annotations
+
 from typing import Union, Literal, Any
+import typing
+import skia
+
+if typing.TYPE_CHECKING:
+    from ..widgets.widget import SkWidget
 
 
 class SkColor:
@@ -29,7 +35,7 @@ class SkColor:
 
         :param name: Color name
         :return skia.Color: Skia color
-        :raise ValueError: When color not exists
+        :raises ValueError: When color not exists
         """
         try:
             self.color = getattr(skia, f"Color{name.upper()}")
@@ -106,7 +112,7 @@ class SkGradient:
         """
         return self.gradient
 
-    def get_anchor_pos(self, widget: "SkWidget", anchor) -> tuple[int, int]:
+    def get_anchor_pos(self, widget: SkWidget, anchor) -> tuple[int, int]:
         """Get widget`s anchor position(Relative widget position, not absolute position within the 
         window)
 
@@ -143,16 +149,18 @@ class SkGradient:
     def set_linear(
         self,
         config: dict | None=None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
-        widget: "SkWidget" | None=None
+        widget: SkWidget | None=None
     ):
         """Set linear gradient
 
-        ## Example
-        `gradient.set_linear({"start_anchor": "n", "end_anchor": "s", 
-        "start": "red", "end": "blue"})`
+        Example
+        -------
+        .. code-block:: python
+            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red", 
+                                 "end": "blue"})
 
         :param configs: Gradient configs
-        :return: cls
+        :return: SkGradient itself
         """
 
         if config:
@@ -176,7 +184,7 @@ class SkGradient:
                 self.gradient = skia.GradientShader.MakeLinear(
                     points=[
                         tuple(self.get_anchor_pos(widget, start_anchor)),
-                        tuple(self.get_anchor_pos(eidget, end_anchor))
+                        tuple(self.get_anchor_pos(widget, end_anchor))
                     ],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )

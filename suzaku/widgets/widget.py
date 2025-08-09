@@ -7,7 +7,7 @@ from ..event import SkEvent, SkEventHanding
 from ..styles.color_old import color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
-from ..styles.gradient import linear_gradient
+from ..styles.color import linear_gradient
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
