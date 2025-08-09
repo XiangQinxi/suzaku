@@ -15,9 +15,10 @@ if __name__ == "__main__":
             app,
             title="Suzaku GUI",
             size=(280, 460),
-            # force_hardware_acceleration=True
+            force_hardware_acceleration=True
         )
         window.bind("closed", lambda evt: print("SkWindowBase closed"))
+        window.bind("drop", lambda evt: print("drop", evt))
 
         SkTextButton(window, text="This is a SkButton / 这是一个按钮").box(
             padx=10, pady=10
