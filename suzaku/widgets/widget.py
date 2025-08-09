@@ -306,7 +306,9 @@ class SkWidget(SkEventHanding):
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:
-                    linear_gradient(self, paint=rect_paint2, configs=bd_shader["linear_gradient"])
+                    linear_gradient(
+                        self, paint=rect_paint2, configs=bd_shader["linear_gradient"]
+                    )
             else:
                 if bd_shader.lower() == "rainbow":
                     self._draw_rainbow_shader(rect_paint2, rect)
@@ -324,6 +326,7 @@ class SkWidget(SkEventHanding):
 
         canvas.drawRoundRect(rect, radius, radius, rect_paint2)
         canvas.drawRoundRect(rect, radius, radius, rect_paint)
+
     # endregion
 
     # region Widget attribute configs 组件属性配置

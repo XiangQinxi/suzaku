@@ -1,7 +1,9 @@
 from typing import Literal
 
 import skia
+
 from .color_old import color
+
 
 def linear_gradient(widget, paint, *args, **kwargs):
     gradient = SkGradient(widget)
@@ -97,7 +99,7 @@ class SkGradient:
             self.gradient = skia.GradientShader.MakeLinear(
                 points=[
                     tuple(self.get_anchor_pos(start_anchor)),
-                    tuple(self.get_anchor_pos(end_anchor))
+                    tuple(self.get_anchor_pos(end_anchor)),
                 ],  # [ (x, y), (x1, y1) ]
                 colors=colors,  # [ Color1, Color2, Color3 ]
             )

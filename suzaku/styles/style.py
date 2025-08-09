@@ -9,9 +9,5 @@ def style(sheet, paint, widget=None):
         if "linear" in sheet:
             if widget is not None:
                 paint.setColor(color("white"))
-                linear_gradient(
-                    widget=widget,
-                    configs=sheet["linear"],
-                    paint=paint
-                )
+                linear_gradient(widget=widget, configs=sheet["linear"], paint=paint)
     return None

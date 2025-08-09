@@ -247,9 +247,18 @@ class SkWindowBase(SkEventHanding):
         :param action: Action
         :param mods: Modifiers
         """
-        from glfw import (MOD_ALT, MOD_CAPS_LOCK, MOD_CONTROL, MOD_NUM_LOCK,
-                          MOD_SHIFT, MOD_SUPER, PRESS, RELEASE, REPEAT,
-                          get_key_name)
+        from glfw import (
+            MOD_ALT,
+            MOD_CAPS_LOCK,
+            MOD_CONTROL,
+            MOD_NUM_LOCK,
+            MOD_SHIFT,
+            MOD_SUPER,
+            PRESS,
+            RELEASE,
+            REPEAT,
+            get_key_name,
+        )
 
         keyname: str = get_key_name(
             key, scancode
@@ -303,7 +312,7 @@ class SkWindowBase(SkEventHanding):
             self.attributes["focus"] = False
             self.event_generate("focus_loss", SkEvent(event_type="focus_loss"))
 
-    def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
+    def flush(self, window: any):
         if self.draw_func:
             # 确保设置当前窗口上下文
             glfw.make_context_current(window)
@@ -312,6 +321,9 @@ class SkWindowBase(SkEventHanding):
                     self.draw_func(canvas)
                 surface.flushAndSubmit()
                 self.update()
+
+    def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
+        pass
 
     def _on_resizing(self, window, width: int, height: int) -> None:
         """Trigger resize event (triggered when the window size changes).
@@ -459,6 +471,14 @@ class SkWindowBase(SkEventHanding):
             ),
         )
 
+    def _on_maximize(self, window, maximized: bool):
+        self.event_generate(
+            "maximize", SkEvent(event_type="maximize", maximized=maximized)
+        )
+
+    def _on_drop(self, window, paths):
+        self.event_generate("drop", SkEvent(event_type="drop", paths=paths))
+
     def create_bind(self) -> None:
         """Binding glfw window events.
 
@@ -476,6 +496,9 @@ class SkWindowBase(SkEventHanding):
         glfw.set_window_focus_callback(window, self._on_focus)
         glfw.set_key_callback(window, self._on_key)
         glfw.set_char_callback(window, self._on_char)
+        glfw.set_window_refresh_callback(window, self.flush)
+        glfw.set_window_maximize_callback(window, self._on_maximize)
+        glfw.set_drop_callback(window, self._on_drop)
 
     # endregion
 

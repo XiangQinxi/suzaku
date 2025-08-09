@@ -133,6 +133,8 @@ class SkEvent:
         width: Union[int, None] = None,
         height: Union[int, None] = None,
         widget=None,
+        maximized: Union[bool, None] = None,
+        paths: Union[list, None] = None,
     ):
         """
         Used to pass event via arguments.
@@ -168,4 +170,6 @@ class SkEvent:
         self.char = char
         self.width = width
         self.height = height
+        self.maximized = maximized
         self.widget = widget
+        self.paths = paths
