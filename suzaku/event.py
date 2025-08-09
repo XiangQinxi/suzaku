@@ -1,6 +1,7 @@
-from typing import Any, Union
+from dataclasses import dataclass
+from typing import Any, List, Optional, Union
 
-from suzaku.after import SkAfter
+from .after import SkAfter
 
 
 class SkEventHanding(SkAfter):
@@ -112,6 +113,7 @@ class SkEventHanding(SkAfter):
         self.events[name].remove(func)
 
 
+@dataclass
 class SkEvent:
     """
     Used to pass event via arguments.
@@ -119,53 +121,18 @@ class SkEvent:
     用于传递事件的参数。
     """
 
-    def __init__(
-        self,
-        event_type: str,
-        x: Union[int, None] = None,
-        y: Union[int, None] = None,
-        rootx: Union[int, None] = None,
-        rooty: Union[int, None] = None,
-        key: Union[int, None, str] = None,
-        keyname: Union[str, None] = None,
-        mods: Union[str, None] = None,
-        char: Union[str, None] = None,
-        width: Union[int, None] = None,
-        height: Union[int, None] = None,
-        widget=None,
-    ):
-        """
-        Used to pass event via arguments.
-
-        Args:
-            x:
-                x position of cursor / component (Relative to window).
-
-            y:
-                y position of cursor / component (Relative to window).
-
-            rootx:
-                x position of cursor / component (Relative to screen).
-
-            rooty:
-                y position of cursor / component (Relative to screen).
-
-            key:
-                Key name.
-
-            mods:
-                Modifier keys.
-
-        """
-        self.event_type = event_type
-        self.x = x
-        self.y = y
-        self.rootx = rootx
-        self.rooty = rooty
-        self.key = key
-        self.keyname = keyname
-        self.mods = mods
-        self.char = char
-        self.width = width
-        self.height = height
-        self.widget = widget
+    event_type: str
+    x: Optional[int] = None
+    y: Optional[int] = None
+    rootx: Optional[int] = None
+    rooty: Optional[int] = None
+    key: Union[int, str, None] = None
+    keyname: Optional[str] = None
+    mods: Optional[str] = None
+    char: Optional[str] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    widget: Any = None
+    maximized: Optional[bool] = None
+    paths: Optional[List[str]] = None
+    iconified: Optional[bool] = None

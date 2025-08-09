@@ -55,6 +55,8 @@ class SkWindowBase(SkEventHanding):
 
         self.name = name
 
+        self.event_init = False
+
         self.x: int | float = 0
         self.y: int | float = 0
         self.width: int | float = size[0]
@@ -92,6 +94,9 @@ class SkWindowBase(SkEventHanding):
             "focus_gain": [],
             "focus_loss": [],
             "resize": [],
+            "drop": [],
+            "maximize": [],
+            "iconify": [],
         }
 
         SkWindowBase._instance_count += 1
@@ -163,7 +168,9 @@ class SkWindowBase(SkEventHanding):
 
             return window
         else:
-            raise RuntimeError("窗口必须先添加到Application实例")
+            raise RuntimeError(
+                "The window must be added to the Application instance first"
+            )
 
     # endregion
 
@@ -303,7 +310,7 @@ class SkWindowBase(SkEventHanding):
             self.attributes["focus"] = False
             self.event_generate("focus_loss", SkEvent(event_type="focus_loss"))
 
-    def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
+    def flush(self, window: any):
         if self.draw_func:
             # 确保设置当前窗口上下文
             glfw.make_context_current(window)
@@ -312,6 +319,9 @@ class SkWindowBase(SkEventHanding):
                     self.draw_func(canvas)
                 surface.flushAndSubmit()
                 self.update()
+
+    def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
+        pass
 
     def _on_resizing(self, window, width: int, height: int) -> None:
         """Trigger resize event (triggered when the window size changes).
@@ -459,23 +469,42 @@ class SkWindowBase(SkEventHanding):
             ),
         )
 
+    def _on_maximize(self, window, maximized: bool):
+        self.event_generate(
+            "maximize", SkEvent(event_type="maximize", maximized=maximized)
+        )
+
+    def _on_drop(self, window, paths):
+        self.event_generate("drop", SkEvent(event_type="drop", paths=paths))
+
+    def _on_iconify(self, window, iconified: bool):
+        self.event_generate(
+            "iconify", SkEvent(event_type="iconify", iconified=iconified)
+        )
+
     def create_bind(self) -> None:
         """Binding glfw window events.
 
         :return: None
         """
-        window = self.glfw_window
-        glfw.make_context_current(window)
-        glfw.set_window_size_callback(window, self._on_resizing)
-        glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
-        glfw.set_window_close_callback(window, self._on_closed)
-        glfw.set_mouse_button_callback(window, self._on_mouse_button)
-        glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
-        glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
-        glfw.set_window_pos_callback(window, self._on_window_pos)
-        glfw.set_window_focus_callback(window, self._on_focus)
-        glfw.set_key_callback(window, self._on_key)
-        glfw.set_char_callback(window, self._on_char)
+        if not self.event_init:
+            window = self.glfw_window
+            glfw.make_context_current(window)
+            glfw.set_window_size_callback(window, self._on_resizing)
+            glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
+            glfw.set_window_close_callback(window, self._on_closed)
+            glfw.set_mouse_button_callback(window, self._on_mouse_button)
+            glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
+            glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
+            glfw.set_window_pos_callback(window, self._on_window_pos)
+            glfw.set_window_focus_callback(window, self._on_focus)
+            glfw.set_key_callback(window, self._on_key)
+            glfw.set_char_callback(window, self._on_char)
+            glfw.set_window_refresh_callback(window, self.flush)
+            glfw.set_window_maximize_callback(window, self._on_maximize)
+            glfw.set_drop_callback(window, self._on_drop)
+            glfw.set_window_iconify_callback(window, self._on_iconify)
+            self.event_init = True
 
     # endregion
 
@@ -581,6 +610,16 @@ class SkWindowBase(SkEventHanding):
         maximize_window(self.glfw_window)
         return self
 
+    def iconify(self) -> "SkWindowBase":
+        """Iconify the window.
+
+        :return: cls
+        """
+        from glfw import iconify_window
+
+        iconify_window(self.glfw_window)
+        return self
+
     def restore(self) -> "SkWindowBase":
         """Restore the window (cancel window maximization).
 
@@ -600,6 +639,7 @@ class SkWindowBase(SkEventHanding):
             glfw.destroy_window(self.glfw_window)
             self.event_generate("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
+            # self.event_init = False
 
     def title(self, text: str = None) -> Union[str, "SkWindowBase"]:
         """Get or set the window title.

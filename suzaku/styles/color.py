@@ -102,8 +102,9 @@ class SkGradient:
         :return: None
         """
         if self.gradient is None:
-            return
+            return None
         paint.setShader(self.gradient)
+        return paint
 
     def get(self) -> skia.GradientShader:
         """Get gradient shader
@@ -112,8 +113,9 @@ class SkGradient:
         """
         return self.gradient
 
-    def get_anchor_pos(self, widget: SkWidget, anchor) -> tuple[int, int]:
-        """Get widget`s anchor position(Relative widget position, not absolute position within the 
+    @staticmethod
+    def get_anchor_pos(widget: SkWidget, anchor) -> tuple[int | float, int | float]:
+        """Get widget`s anchor position(Relative widget position, not absolute position within the
         window)
 
         :param widget: The SkWidget
@@ -142,14 +144,14 @@ class SkGradient:
             case _:
                 return 0, 0
 
-    def set_gradient(self, paint: skia.Paint) -> "SkGradient":
-        paint.setShader(self.get())
-        return self
-
     def set_linear(
         self,
-        config: dict | None=None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
-        widget: SkWidget | None=None
+        config: (
+            dict | None
+        ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
+        widget=None,
+        start_pos: tuple[int | float, int | float] | None = None,
+        end_pos: tuple[int | float, int | float] | None = None,
     ):
         """Set linear gradient
 
@@ -159,26 +161,35 @@ class SkGradient:
             gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red", 
                                  "end": "blue"})
 
-        :param configs: Gradient configs
-        :return: SkGradient itself
+        :param end_pos: End position
+        :param start_pos: Start position
+        :param widget: Widget
+        :param config: Gradient configs
+        :return: cls
         """
 
         if config:
-
-            if "start_anchor" in config:
-                start_anchor = config["start_anchor"]
-                del config["start_anchor"]
-            else:
-                start_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "n"
-            if "end_anchor" in config:
-                end_anchor = config["end_anchor"]
-                del config["end_anchor"]
-            else:
-                end_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "s"
+            if start_pos is None or end_pos is None:
+                if widget:
+                    if "start_anchor" in config:
+                        start_anchor = config["start_anchor"]
+                        del config["start_anchor"]
+                    else:
+                        start_anchor: Literal[
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se"
+                        ] = "n"
+                    if "end_anchor" in config:
+                        end_anchor = config["end_anchor"]
+                        del config["end_anchor"]
+                    else:
+                        end_anchor: Literal[
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se"
+                        ] = "s"
 
             colors = []
             for color in config["colors"]:
-                colors.append(color(color))
+                raise NotImplementedError("To XiangQinXi: 这里得改")
+                colors.append(_color(color))
 
             if widget:
                 self.gradient = skia.GradientShader.MakeLinear(
@@ -186,6 +197,11 @@ class SkGradient:
                         tuple(self.get_anchor_pos(widget, start_anchor)),
                         tuple(self.get_anchor_pos(widget, end_anchor))
                     ],  # [ (x, y), (x1, y1) ]
+                    colors=colors,  # [ Color1, Color2, Color3 ]
+                )
+            else:
+                self.gradient = skia.GradientShader.MakeLinear(
+                    points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
 

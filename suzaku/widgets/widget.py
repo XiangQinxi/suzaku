@@ -4,10 +4,10 @@ import glfw
 import skia
 
 from ..event import SkEvent, SkEventHanding
+from ..styles.color import SkGradient
 from ..styles.color_old import color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
-from ..styles.color import linear_gradient
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
@@ -28,6 +28,7 @@ class SkWidget(SkEventHanding):
         cursor: str = "arrow",
         widget_id: Union[str, None] = None,
         name="SkWidget",
+        font: skia.Font | None = default_font,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -62,6 +63,7 @@ class SkWidget(SkEventHanding):
             "theme": None,
             "dwidth": size[0],  # default width
             "dheight": size[1],  # default height
+            "font": font,
         }
 
         self.theme: SkTheme = self.parent.theme
@@ -243,8 +245,7 @@ class SkWidget(SkEventHanding):
         :raises: None
         """
 
-        if not font:
-            font: skia.Font = default_font
+        font = self.attributes["font"]
 
         # 绘制字体
         text_paint = skia.Paint(AntiAlias=True, Color=color(fg))
@@ -283,47 +284,62 @@ class SkWidget(SkEventHanding):
         :param bd_shader: The shader of the border
 
         """
-        rect_paint = skia.Paint(
+
+        drop_shadow_rect = skia.Rect(
+            self.x, self.y, self.x + self.width, self.y + self.height
+        )
+        drop_shadow_paint = skia.Paint(
+            AntiAlias=True, Style=skia.Paint.kStrokeAndFill_Style, Color=skia.ColorWHITE
+        )
+
+        if bd_shadow:
+            shadow = SkDropShadow(config_list=bd_shadow)
+            shadow.draw(drop_shadow_paint)
+
+        canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
+
+        bg_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
-        rect_paint2 = skia.Paint(
+        bd_paint = skia.Paint(
             AntiAlias=True,
             Style=skia.Paint.kStroke_Style,
         )
+
         # Background
+        bg_paint.setColor(color(bg))
         if bg_shader:
             if bg_shader.lower() == "rainbow":
-                self._draw_rainbow_shader(rect_paint, rect)
+                self._draw_rainbow_shader(bg_paint, rect)
             elif bg_shader.lower() == "rainbow:follow_cursor":
                 self._draw_rainbow_shader(
-                    rect_paint, rect, cx=self.mouse_x, cy=self.mouse_y
+                    bg_paint, rect, cx=self.mouse_x, cy=self.mouse_y
                 )
-        rect_paint.setColor(color(bg))
 
         # Border
+        bd_paint.setStrokeWidth(width)
+        bd_paint.setColor(color(bd))
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:
-                    linear_gradient(self, paint=rect_paint2, configs=bd_shader["linear_gradient"])
+                    gradient = SkGradient()
+                    gradient.set_linear(
+                        widget=self, config=bd_shader["linear_gradient"]
+                    )
+                    gradient.draw(
+                        paint=bd_paint,
+                    )
             else:
                 if bd_shader.lower() == "rainbow":
-                    self._draw_rainbow_shader(rect_paint2, rect)
+                    self._draw_rainbow_shader(bd_paint, rect)
 
-        rect_paint2.setColor(color(bd))
-        rect_paint2.setStyle(skia.Paint.kStroke_Style)
-        rect_paint2.setStrokeWidth(width)
-        # Draw shadow
+        # Draw background first
+        canvas.drawRoundRect(rect, radius, radius, bg_paint)
 
-        if bd_shadow:
-            shadow = SkDropShadow(config_list=bd_shadow)
-            shadow.draw(rect_paint2)
+        canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
-        # Draw all
-
-        canvas.drawRoundRect(rect, radius, radius, rect_paint2)
-        canvas.drawRoundRect(rect, radius, radius, rect_paint)
     # endregion
 
     # region Widget attribute configs 组件属性配置
@@ -450,6 +466,25 @@ class SkWidget(SkEventHanding):
             }
         }
         self.parent.add_floating_child(self)
+        return self
+
+    def grid(
+        self,
+        row: int,
+        column: int,
+        rowspan: int = 1,
+        columnspan: int = 1,
+    ):
+        self.visible = True
+        self.layout_config = {
+            "grid": {
+                "row": row,
+                "column": column,
+                "rowspan": rowspan,
+                "columnspan": columnspan,
+            }
+        }
+        self.parent.add_layout_child(self)
         return self
 
     def pack(

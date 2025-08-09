@@ -7,5 +7,6 @@ from .frame import SkFrame
 from .hynix import SkHynix
 from .text import SkText
 from .textbutton import SkTextButton
+from .textinput import SkTextInput
 from .widget import SkWidget
 from .window import SkWindow
