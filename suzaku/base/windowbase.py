@@ -644,7 +644,7 @@ class SkWindowBase(SkEventHanding):
             glfw.destroy_window(self.glfw_window)
             self.event_generate("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
-            self.event_init = False
+            #self.event_init = False
 
     def title(self, text: str = None) -> Union[str, "SkWindowBase"]:
         """Get or set the window title.

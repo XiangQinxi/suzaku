@@ -95,7 +95,7 @@ class SkAppBase:
             # Create a copy of the window list to avoid modifying it while iterating
             current_windows = self.windows
             for window in self.windows:
-                window.create_bind()
+                window.create_bind()  # make sure the window is created and bound
 
             for window in current_windows:
                 # Check if the window is valid
