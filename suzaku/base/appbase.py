@@ -29,10 +29,11 @@ class SkAppBase:
 
     # region __init__ 初始化
 
-    def __init__(self, window_event_wait: bool = False) -> None:
+    def __init__(self, window_event_wait: bool = False, draw_on_focus: bool = True) -> None:
         """Base Application class.
 
         :param window_event_wait: Whether to wait for window events
+        :param draw_on_focus: Whether to draw on focus
         """
 
         from .windowbase import SkWindowBase
@@ -40,6 +41,8 @@ class SkAppBase:
         self.windows: list[SkWindowBase] = []
         self.window_event_wait: bool = window_event_wait
         self.running: bool = False
+        self.draw_on_focus = draw_on_focus
+
         init_glfw()
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -79,7 +82,6 @@ class SkAppBase:
         self.running = True
         for window in self.windows:
             window.create_bind()
-
         glfw.swap_interval(1)
 
         # Event loop
@@ -92,6 +94,8 @@ class SkAppBase:
 
             # Create a copy of the window list to avoid modifying it while iterating
             current_windows = self.windows
+            for window in self.windows:
+                window.create_bind()
 
             for window in current_windows:
                 # Check if the window is valid
@@ -102,19 +106,25 @@ class SkAppBase:
                     self.windows.remove(window)
                     continue
 
+                def draw(window=window):
+                    if window.visible:
+                        # Set the current context for each window
+                        glfw.make_context_current(window.glfw_window)
+                        with window.skia_surface(window.glfw_window) as surface:
+                            if surface:
+                                with surface as canvas:
+                                    if hasattr(window, "draw_func") and window.draw_func:
+                                        window.draw_func(canvas)
+                                surface.flushAndSubmit()
+                                glfw.swap_buffers(window.glfw_window)
+
                 # Only draw visible windows
-                if window.visible and glfw.get_window_attrib(
-                    window.glfw_window, glfw.FOCUSED
-                ):
-                    # Set the current context for each window
-                    glfw.make_context_current(window.glfw_window)
-                    with window.skia_surface(window.glfw_window) as surface:
-                        if surface:
-                            with surface as canvas:
-                                if hasattr(window, "draw_func") and window.draw_func:
-                                    window.draw_func(canvas)
-                            surface.flushAndSubmit()
-                            glfw.swap_buffers(window.glfw_window)
+                if self.draw_on_focus:
+                    if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
+                        draw()
+                else:
+                    draw()
+
 
         self.cleanup()
 

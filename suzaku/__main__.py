@@ -4,7 +4,7 @@ except:
     raise ModuleNotFoundError(
         "Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir."
     )
-import skia
+import skia, glfw
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
@@ -17,10 +17,11 @@ if __name__ == "__main__":
             size=(280, 460),
             force_hardware_acceleration=True
         )
+        #print(glfw.default_window_hints())
         window.bind("closed", lambda evt: print("SkWindowBase closed"))
         window.bind("drop", lambda evt: print("drop", evt))
 
-        SkTextButton(window, text="This is a SkButton / 这是一个按钮").box(
+        SkTextButton(window, text="This is a SkButton / 这是一个按钮", command=window.restore).box(
             padx=10, pady=10
         )
         SkText(window, text="This is a SkLabel / 这是一个标签").box(padx=10, pady=10)
@@ -36,5 +37,7 @@ if __name__ == "__main__":
         )
 
     create1window()
+    create1window()
+
 
     app.run()

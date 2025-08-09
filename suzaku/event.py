@@ -134,3 +134,4 @@ class SkEvent:
     widget: Any = None
     maximized: Optional[bool] = None
     paths: Optional[List[str]] = None
+    iconified: Optional[bool] = None
