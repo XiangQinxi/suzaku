@@ -1,6 +1,8 @@
+from typing import Any, Literal, Union
+
 import skia
+
 from ..styles.color_old import color as _color
-from typing import Union, Literal, Any
 
 
 class SkColor:
@@ -110,7 +112,7 @@ class SkGradient:
 
     @staticmethod
     def get_anchor_pos(widget: "SkWidget", anchor) -> tuple[int, int]:
-        """Get widget`s anchor position(Relative widget position, not absolute position within the 
+        """Get widget`s anchor position(Relative widget position, not absolute position within the
         window)
 
         :param widget: The SkWidget
@@ -141,13 +143,17 @@ class SkGradient:
 
     def set_linear(
         self,
-        config: dict | None=None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
-        widget=None, start_pos: tuple[int, int] = None, end_pos: tuple[int, int] = None
+        config: (
+            dict | None
+        ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
+        widget=None,
+        start_pos: tuple[int, int] = None,
+        end_pos: tuple[int, int] = None,
     ):
         """Set linear gradient
 
         ## Example
-        `gradient.set_linear({"start_anchor": "n", "end_anchor": "s", 
+        `gradient.set_linear({"start_anchor": "n", "end_anchor": "s",
         "start": "red", "end": "blue"})`
 
         :param end_pos: End position
@@ -164,12 +170,16 @@ class SkGradient:
                         start_anchor = config["start_anchor"]
                         del config["start_anchor"]
                     else:
-                        start_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "n"
+                        start_anchor: Literal[
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se"
+                        ] = "n"
                     if "end_anchor" in config:
                         end_anchor = config["end_anchor"]
                         del config["end_anchor"]
                     else:
-                        end_anchor: Literal["nw", "n", "ne", "w", "e", "sw", "s", "se"] = "s"
+                        end_anchor: Literal[
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se"
+                        ] = "s"
 
             colors = []
             for color in config["colors"]:
@@ -179,16 +189,13 @@ class SkGradient:
                 self.gradient = skia.GradientShader.MakeLinear(
                     points=[
                         tuple(self.get_anchor_pos(widget, start_anchor)),
-                        tuple(self.get_anchor_pos(widget, end_anchor))
+                        tuple(self.get_anchor_pos(widget, end_anchor)),
                     ],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
             else:
                 self.gradient = skia.GradientShader.MakeLinear(
-                    points=[
-                        start_pos,
-                        end_pos
-                    ],  # [ (x, y), (x1, y1) ]
+                    points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
 

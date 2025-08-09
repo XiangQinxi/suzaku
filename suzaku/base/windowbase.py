@@ -96,7 +96,7 @@ class SkWindowBase(SkEventHanding):
             "resize": [],
             "drop": [],
             "maximize": [],
-            "iconify": []
+            "iconify": [],
         }
 
         SkWindowBase._instance_count += 1
@@ -168,7 +168,9 @@ class SkWindowBase(SkEventHanding):
 
             return window
         else:
-            raise RuntimeError("The window must be added to the Application instance first")
+            raise RuntimeError(
+                "The window must be added to the Application instance first"
+            )
 
     # endregion
 
@@ -485,7 +487,9 @@ class SkWindowBase(SkEventHanding):
         self.event_generate("drop", SkEvent(event_type="drop", paths=paths))
 
     def _on_iconify(self, window, iconified: bool):
-        self.event_generate("iconify", SkEvent(event_type="iconify", iconified=iconified))
+        self.event_generate(
+            "iconify", SkEvent(event_type="iconify", iconified=iconified)
+        )
 
     def create_bind(self) -> None:
         """Binding glfw window events.
@@ -644,7 +648,7 @@ class SkWindowBase(SkEventHanding):
             glfw.destroy_window(self.glfw_window)
             self.event_generate("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
-            #self.event_init = False
+            # self.event_init = False
 
     def title(self, text: str = None) -> Union[str, "SkWindowBase"]:
         """Get or set the window title.

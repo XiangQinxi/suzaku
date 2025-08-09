@@ -1,6 +1,6 @@
-from typing import Any, Union, Optional, List
-
 from dataclasses import dataclass
+from typing import Any, List, Optional, Union
+
 from .after import SkAfter
 
 
@@ -120,6 +120,7 @@ class SkEvent:
 
     用于传递事件的参数。
     """
+
     event_type: str
     x: Optional[int] = None
     y: Optional[int] = None

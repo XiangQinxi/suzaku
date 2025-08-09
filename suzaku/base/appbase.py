@@ -29,7 +29,9 @@ class SkAppBase:
 
     # region __init__ 初始化
 
-    def __init__(self, window_event_wait: bool = False, draw_on_focus: bool = True) -> None:
+    def __init__(
+        self, window_event_wait: bool = False, draw_on_focus: bool = True
+    ) -> None:
         """Base Application class.
 
         :param window_event_wait: Whether to wait for window events
@@ -113,7 +115,10 @@ class SkAppBase:
                         with window.skia_surface(window.glfw_window) as surface:
                             if surface:
                                 with surface as canvas:
-                                    if hasattr(window, "draw_func") and window.draw_func:
+                                    if (
+                                        hasattr(window, "draw_func")
+                                        and window.draw_func
+                                    ):
                                         window.draw_func(canvas)
                                 surface.flushAndSubmit()
                                 glfw.swap_buffers(window.glfw_window)
@@ -124,7 +129,6 @@ class SkAppBase:
                         draw()
                 else:
                     draw()
-
 
         self.cleanup()
 

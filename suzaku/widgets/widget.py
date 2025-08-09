@@ -4,8 +4,8 @@ import glfw
 import skia
 
 from ..event import SkEvent, SkEventHanding
-from ..styles.color_old import color
 from ..styles.color import SkGradient
+from ..styles.color_old import color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
@@ -284,11 +284,11 @@ class SkWidget(SkEventHanding):
 
         """
 
-        drop_shadow_rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
+        drop_shadow_rect = skia.Rect(
+            self.x, self.y, self.x + self.width, self.y + self.height
+        )
         drop_shadow_paint = skia.Paint(
-            AntiAlias=True,
-            Style=skia.Paint.kStrokeAndFill_Style,
-            Color=skia.ColorWHITE
+            AntiAlias=True, Style=skia.Paint.kStrokeAndFill_Style, Color=skia.ColorWHITE
         )
 
         if bd_shadow:
@@ -327,7 +327,9 @@ class SkWidget(SkEventHanding):
                     gradient.set_linear(
                         widget=self, config=bd_shader["linear_gradient"]
                     )
-                    gradient.draw(paint=bd_paint,)
+                    gradient.draw(
+                        paint=bd_paint,
+                    )
             else:
                 if bd_shader.lower() == "rainbow":
                     self._draw_rainbow_shader(bd_paint, rect)
@@ -463,6 +465,25 @@ class SkWidget(SkEventHanding):
             }
         }
         self.parent.add_floating_child(self)
+        return self
+
+    def grid(
+        self,
+        row: int,
+        column: int,
+        rowspan: int = 1,
+        columnspan: int = 1,
+    ):
+        self.visible = True
+        self.layout_config = {
+            "grid": {
+                "row": row,
+                "column": column,
+                "rowspan": rowspan,
+                "columnspan": columnspan,
+            }
+        }
+        self.parent.add_layout_child(self)
         return self
 
     def pack(
