@@ -24,16 +24,11 @@ class SkColor:
         return None
 
     def set_color_name(self, name: str) -> None:
-        """转换颜色名称字符串为Skia颜色
+        """Convert color name string to skia color.
 
-        Args:
-            name: 颜色名称(如 'RED')
-
-        Returns:
-            skia.Color: 对应的预定义颜色对象
-
-        Raises:
-            ValueError: 颜色名称不存在时抛出
+        :param name: Color name
+        :return skia.Color: Skia color
+        :raise ValueError: When color not exists
         """
         try:
             self.color = getattr(skia, f"Color{name.upper()}")
