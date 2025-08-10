@@ -37,7 +37,8 @@ class SkEventHanding(SkAfter):
         """
         if name not in self.events:  # Create a new event
             self.events[name] = {}
-        _id = func.__name__ + "." + str(len(self.events[name]) + 1)
+        _id = name + "." + str(len(self.events[name]) + 1)
+
         if add:
             self.events[name][_id] = func
         else:
