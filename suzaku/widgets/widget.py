@@ -50,7 +50,12 @@ class SkWidget(SkEventHanding):
                 f"Parent component is not a SkWindow-based object. {self.parent}"
             )
 
-        self.id = self.window.id + "." + self.__class__.__name__ + str(self._instance_count + 1)
+        self.id = (
+            self.window.id
+            + "."
+            + self.__class__.__name__
+            + str(self._instance_count + 1)
+        )
         SkWidget._instance_count += 1
 
         self.attributes: dict[str, Any] = {
@@ -75,20 +80,22 @@ class SkWidget(SkEventHanding):
         self.focusable: bool = False
         self.visible: bool = False
 
-        self.events = {
-            "mouse_motion": {},
-            "mouse_enter": {},
-            "mouse_leave": {},
-            "mouse_pressed": {},
-            "mouse_released": {},
-            "focus_gain": {},
-            "focus_loss": {},
-            "key_pressed": {},
-            "key_released": {},
-            "key_repeated": {},
-            "char": {},
-        }
-
+        self.init_events(
+            {
+                "mouse_motion": {},
+                "mouse_enter": {},
+                "mouse_leave": {},
+                "mouse_pressed": {},
+                "mouse_released": {},
+                "focus_gain": {},
+                "focus_loss": {},
+                "key_pressed": {},
+                "key_released": {},
+                "key_repeated": {},
+                "char": {},
+                "clicked": {},
+            }
+        )
         self.layout_config: dict[str, dict] = {"none": {}}
 
         try:
@@ -109,6 +116,21 @@ class SkWidget(SkEventHanding):
 
         self.bind("mouse_enter", _on_event)
         self.bind("mouse_motion", _on_event)
+
+        self.bind("mouse_released", self._click)
+
+    # endregion
+
+    # region Event
+
+    def _click(self, event) -> None:
+        """
+        Check click event (not pressed)
+
+        :return: None
+        """
+        if self.is_mouse_floating:
+            self.event_generate("click", event)
 
     # endregion
 

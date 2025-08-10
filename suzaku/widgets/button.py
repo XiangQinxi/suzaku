@@ -30,8 +30,6 @@ class SkButton(SkFrame):
 
         self._handle_layout()
 
-        self.events["click"] = {}
-
         self.attributes["cursor"] = cursor
 
         self.command = command
@@ -40,17 +38,6 @@ class SkButton(SkFrame):
 
         if command:
             self.bind("click", lambda _: command())
-
-        self.bind("mouse_released", self._click)
-
-    def _click(self, event) -> None:
-        """
-        Check click event (not pressed)
-
-        :return: None
-        """
-        if self.is_mouse_floating:
-            self.event_generate("click", event)
 
     def _draw(self, canvas, rect) -> None:
         """Draw button

@@ -40,7 +40,6 @@ class SkAppBase(SkEventHanding):
         :param draw_on_focus: Whether to draw on focus
         """
 
-        super().__init__()
         from .windowbase import SkWindowBase
 
         self.windows: list[SkWindowBase] = []

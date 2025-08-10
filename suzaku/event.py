@@ -5,10 +5,14 @@ from .after import SkAfter
 
 
 class SkEventHanding(SkAfter):
-    def __init__(self):
-        """SkEvent binding manager."""
+    """SkEvent binding manager."""
 
-        self.events: dict[str, dict[str, Callable]] = {}
+    events: dict[str, dict[str, dict[str, Callable]]] = {}
+
+    # events = { widget_id : { event_name : { event_id : event_func } } }
+
+    def init_events(self, dict):
+        self.events[self.id] = dict
 
     def event_generate(self, name: str, *args, **kwargs) -> Union[bool, Any]:
         """Send event signal.
@@ -19,10 +23,12 @@ class SkEventHanding(SkAfter):
         :return: self
         """
 
-        if not name in self.events:
-            self.events[name] = {}
+        if not self.id in self.events:  # Auto create widget events
+            self.events[self.id] = {}
+        if not name in self.events[self.id]:  # Auto create widget`s event
+            self.events[self.id][name] = {}
 
-        for event in self.events[name].values():
+        for event in self.events[self.id][name].values():
             event(*args, **kwargs)
 
         return self
@@ -35,14 +41,16 @@ class SkEventHanding(SkAfter):
         :param add: Whether to add after existed events, otherwise clean other and add itself.
         :return: Event ID
         """
-        if name not in self.events:  # Create a new event
-            self.events[name] = {}
-        _id = name + "." + str(len(self.events[name]) + 1)
+        if self.id not in self.events:  # Create widget events
+            self.events[self.id] = {}
+        if name not in self.events[self.id]:  # Create a new event
+            self.events[self.id][name] = {}
+        _id = name + "." + str(len(self.events[self.id][name]) + 1)  # Create event ID
 
         if add:
-            self.events[name][_id] = func
+            self.events[self.id][name][_id] = func
         else:
-            self.events[name] = {_id: func}
+            self.events[self.id][name] = {_id: func}
         return _id
 
     def unbind(self, name: str, _id: str) -> None:
@@ -52,7 +60,7 @@ class SkEventHanding(SkAfter):
         :param _id Event ID.
         :return: None
         """
-        del self.events[name][_id]
+        del self.events[self.id][name][_id]  # Delete event
 
 
 @dataclass

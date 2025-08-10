@@ -14,8 +14,6 @@ class SkTextButton(SkText):
     ) -> None:
         super().__init__(*args, size=size, **kwargs)
 
-        self.events["click"] = {}
-
         self.attributes["cursor"] = cursor
 
         self.command = command
@@ -25,18 +23,7 @@ class SkTextButton(SkText):
         if command:
             self.bind("click", lambda _: command())
 
-        self.bind("mouse_released", self._click)
-
     # region Draw
-
-    def _click(self, event) -> None:
-        """
-        Check click event (not pressed)
-
-        :return: None
-        """
-        if self.is_mouse_floating:
-            self.event_generate("click", event)
 
     def _draw(self, canvas, rect):
         sheets = None

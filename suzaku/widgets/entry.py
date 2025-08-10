@@ -40,7 +40,6 @@ class SkEntry(SkWidget):
 
         self.attributes["right_margin"] = 20
 
-        self.events["click"] = {}
         self.bind("click", self._on_click)
         self.attributes["placeholder"] = placeholder
         self.attributes["cursor_pos"] = 0
