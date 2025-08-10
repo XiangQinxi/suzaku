@@ -30,7 +30,7 @@ class SkButton(SkFrame):
 
         self._handle_layout()
 
-        self.events["click"] = []
+        self.events["click"] = {}
 
         self.attributes["cursor"] = cursor
 

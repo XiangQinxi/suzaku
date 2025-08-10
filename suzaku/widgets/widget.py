@@ -84,17 +84,17 @@ class SkWidget(SkEventHanding):
             self.attributes["id"] = name + "." + str(self.__class__._instance_count)
 
         self.events = {
-            "mouse_motion": [],
-            "mouse_enter": [],
-            "mouse_leave": [],
-            "mouse_pressed": [],
-            "mouse_released": [],
-            "focus_gain": [],
-            "focus_loss": [],
-            "key_pressed": [],
-            "key_released": [],
-            "key_repeated": [],
-            "char": [],
+            "mouse_motion": {},
+            "mouse_enter": {},
+            "mouse_leave": {},
+            "mouse_pressed": {},
+            "mouse_released": {},
+            "focus_gain": {},
+            "focus_loss": {},
+            "key_pressed": {},
+            "key_released": {},
+            "key_repeated": {},
+            "char": {},
         }
 
         self.layout_config: dict[str, dict] = {"none": {}}

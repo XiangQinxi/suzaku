@@ -14,7 +14,7 @@ class SkTextButton(SkText):
     ) -> None:
         super().__init__(*args, size=size, name="sk_text_button", **kwargs)
 
-        self.events["click"] = []
+        self.events["click"] = {}
 
         self.attributes["cursor"] = cursor
 

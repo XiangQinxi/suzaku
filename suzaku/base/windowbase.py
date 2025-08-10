@@ -79,24 +79,24 @@ class SkWindowBase(SkEventHanding):
         }
 
         self.events = {
-            "closed": [],
-            "move": [],
-            "update": [],
-            "mouse_motion": [],
-            "mouse_pressed": [],
-            "mouse_released": [],
-            "mouse_enter": [],
-            "mouse_leave": [],
-            "key_pressed": [],
-            "key_released": [],
-            "key_repeated": [],
-            "char": [],
-            "focus_gain": [],
-            "focus_loss": [],
-            "resize": [],
-            "drop": [],
-            "maximize": [],
-            "iconify": [],
+            "closed": {},
+            "move": {},
+            "update": {},
+            "mouse_motion": {},
+            "mouse_pressed": {},
+            "mouse_released": {},
+            "mouse_enter": {},
+            "mouse_leave": {},
+            "key_pressed": {},
+            "key_released": {},
+            "key_repeated": {},
+            "char": {},
+            "focus_gain": {},
+            "focus_loss": {},
+            "resize": {},
+            "drop": {},
+            "maximize": {},
+            "iconify": {},
         }
 
         SkWindowBase._instance_count += 1
@@ -254,9 +254,18 @@ class SkWindowBase(SkEventHanding):
         :param action: Action
         :param mods: Modifiers
         """
-        from glfw import (MOD_ALT, MOD_CAPS_LOCK, MOD_CONTROL, MOD_NUM_LOCK,
-                          MOD_SHIFT, MOD_SUPER, PRESS, RELEASE, REPEAT,
-                          get_key_name)
+        from glfw import (
+            MOD_ALT,
+            MOD_CAPS_LOCK,
+            MOD_CONTROL,
+            MOD_NUM_LOCK,
+            MOD_SHIFT,
+            MOD_SUPER,
+            PRESS,
+            RELEASE,
+            REPEAT,
+            get_key_name,
+        )
 
         keyname: str = get_key_name(
             key, scancode

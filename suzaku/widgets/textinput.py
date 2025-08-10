@@ -1,5 +1,7 @@
+import glfw
 import skia
 
+from ..event import SkEvent
 from ..styles.color_old import color
 from ..var import SkStringVar
 from .widget import SkWidget
@@ -33,14 +35,54 @@ class SkTextInput(SkWidget):
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["placeholder"] = placeholder
         self.attributes["cursor_index"] = 0
+        self.attributes["visible_start_index"] = 0
 
         self.textvariable = textvariable
 
         self.focusable = True
 
+        self.bind("char", self._char)
+        self.bind("key", self._key)
+
     # endregion
 
     # region Text&Cursor 文本、光标操作
+
+    def _char(self, event: SkEvent):
+        cursor_index = self.attributes["cursor_index"]
+        text = self.get()
+
+        self.set(text[:cursor_index] + event.char + text[cursor_index:])
+        self.attributes["cursor_index"] += 1
+
+    def _key(self, event: SkEvent):
+        """Key event 按键事件触发
+
+        :param event:
+        :return:
+        """
+
+        cursor_index = self.attributes["cursor_index"]
+        text = self.get()
+        key = event.key
+
+        match key:
+            case glfw.KEY_BACKSPACE:
+                if cursor_index > 0:
+                    self.set(text[: cursor_index - 1] + text[cursor_index:])
+            case glfw.KEY_DELETE:
+                print(cursor_index, text)
+                if cursor_index < len(text):
+                    self.set(text[:cursor_index] + text[cursor_index + 1 :])
+            case glfw.KEY_LEFT:
+                if cursor_index > 0:
+                    cursor_index -= 1
+            case glfw.KEY_RIGHT:
+                if cursor_index < len(text):
+                    cursor_index += 1
+        self._update()
+
+    def _update(self): ...
 
     def get(self) -> str:
         if self.attributes["textvariable"]:
@@ -101,10 +143,12 @@ class SkTextInput(SkWidget):
         )
 
         if self.get():
-            if self.is_focus:
-                ...
+            canvas.drawSimpleText(self.get(), draw_x, draw_y, font, text_paint)
+
+        if self.is_focus:
+            ...
         else:
-            if self.attributes["placeholder"]:
+            if self.attributes["placeholder"] and not self.get():
                 text_paint.setColor(color(sheets["placeholder"]))
                 canvas.drawSimpleText(
                     self.attributes["placeholder"], draw_x, draw_y, font, text_paint
