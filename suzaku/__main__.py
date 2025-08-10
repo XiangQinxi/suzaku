@@ -22,9 +22,13 @@ if __name__ == "__main__":
         SkTextButton(
             window, text="This is a SkButton / 这是一个按钮", command=window.restore
         ).box(padx=10, pady=10)
-        SkText(window, text="This is a SkLabel / 这是一个标签").box(padx=10, pady=10)
+        text = SkText(window, text="This is a SkLabel / 这是一个标签").box(
+            padx=10, pady=10
+        )
 
         var = SkStringVar()
+        print(var.id)
+        print(window.events)
         SkEntry(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
         SkText(window, textvariable=var).box(padx=10, pady=10)
         SkTextButton(window, text="Close the window", command=window.destroy).box(
@@ -34,7 +38,7 @@ if __name__ == "__main__":
             padx=10, pady=10, side="bottom"
         )
 
-    create1window()
+    # create1window()
     create1window()
 
     app.run()

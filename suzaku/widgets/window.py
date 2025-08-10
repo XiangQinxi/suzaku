@@ -27,7 +27,7 @@ class SkWindow(SkWindowBase, SkContainer):
         :param theme: Theme
         :param kwargs: SkWindowBase Kwargs
         """
-        SkWindowBase.__init__(self, *args, name=name, **kwargs)
+        SkWindowBase.__init__(self, *args, name=name, size=size, **kwargs)
         SkContainer.__init__(self)
 
         self.theme = theme

@@ -2,6 +2,8 @@ import warnings
 
 import glfw
 
+from ..event import SkEventHanding
+
 
 class SkAppInitError(Exception):
     """Exception when GLFW initialization fails."""
@@ -23,7 +25,7 @@ def init_glfw() -> None:
     glfw.window_hint(glfw.STENCIL_BITS, 8)
 
 
-class SkAppBase:
+class SkAppBase(SkEventHanding):
 
     _instance = None
 

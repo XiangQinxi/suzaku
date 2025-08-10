@@ -2,6 +2,9 @@ from suzaku.event import SkEventHanding
 
 
 class SkVar(SkEventHanding):
+
+    _instance = 0
+
     def __init__(self, default_value, value_type: type = any):
         """
         Save a variable.
@@ -12,7 +15,9 @@ class SkVar(SkEventHanding):
         """
 
         super().__init__()
-        self.events = {"change": []}
+        self.id = self.__class__.__name__ + str(self._instance + 1)
+        SkVar._instance += 1
+        self.events = {"change": {}}
         self.value: type = default_value
         self.value_type = value_type
 

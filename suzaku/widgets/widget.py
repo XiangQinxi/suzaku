@@ -26,8 +26,6 @@ class SkWidget(SkEventHanding):
         parent,
         size: tuple[int, int] = (100, 30),
         cursor: str = "arrow",
-        widget_id: Union[str, None] = None,
-        name="SkWidget",
         font: skia.Font | None = default_font,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
@@ -35,13 +33,9 @@ class SkWidget(SkEventHanding):
         :param parent: Parent component (Usually a SkWindow)
         :param size: Default size (not the final drawn size)
         :param cursor: Cursor style
-        :param name: Name of the widget
-        :param widget_id: Identification code
         """
 
         super().__init__()
-
-        self.__class__._instance_count += 1
 
         self.parent = parent
 
@@ -56,10 +50,16 @@ class SkWidget(SkEventHanding):
                 f"Parent component is not a SkWindow-based object. {self.parent}"
             )
 
+        self.id = (
+            self.window.id
+            + "."
+            + self.__class__.__name__
+            + str(self._instance_count + 1)
+        )
+        SkWidget._instance_count += 1
+
         self.attributes: dict[str, Any] = {
-            "name": name,
             "cursor": cursor,
-            "id": widget_id,
             "theme": None,
             "dwidth": size[0],  # default width
             "dheight": size[1],  # default height
@@ -80,23 +80,22 @@ class SkWidget(SkEventHanding):
         self.focusable: bool = False
         self.visible: bool = False
 
-        if not widget_id:
-            self.attributes["id"] = name + "." + str(self.__class__._instance_count)
-
-        self.events = {
-            "mouse_motion": [],
-            "mouse_enter": [],
-            "mouse_leave": [],
-            "mouse_pressed": [],
-            "mouse_released": [],
-            "focus_gain": [],
-            "focus_loss": [],
-            "key_pressed": [],
-            "key_released": [],
-            "key_repeated": [],
-            "char": [],
-        }
-
+        self.init_events(
+            {
+                "mouse_motion": {},
+                "mouse_enter": {},
+                "mouse_leave": {},
+                "mouse_pressed": {},
+                "mouse_released": {},
+                "focus_gain": {},
+                "focus_loss": {},
+                "key_pressed": {},
+                "key_released": {},
+                "key_repeated": {},
+                "char": {},
+                "clicked": {},
+            }
+        )
         self.layout_config: dict[str, dict] = {"none": {}}
 
         try:
@@ -117,6 +116,21 @@ class SkWidget(SkEventHanding):
 
         self.bind("mouse_enter", _on_event)
         self.bind("mouse_motion", _on_event)
+
+        self.bind("mouse_released", self._click)
+
+    # endregion
+
+    # region Event
+
+    def _click(self, event) -> None:
+        """
+        Check click event (not pressed)
+
+        :return: None
+        """
+        if self.is_mouse_floating:
+            self.event_generate("click", event)
 
     # endregion
 
@@ -225,9 +239,8 @@ class SkWidget(SkEventHanding):
         """
         paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
-    @staticmethod
     def _draw_central_text(
-        canvas, text, fg, x, y, width, height, font: skia.Font = None
+        self, canvas, text, fg, x, y, width, height, font: skia.Font = None
     ):
         """Draw central text
 
