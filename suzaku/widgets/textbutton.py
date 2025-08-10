@@ -12,7 +12,7 @@ class SkTextButton(SkText):
         command: Union[callable, None] = None,
         **kwargs,
     ) -> None:
-        super().__init__(*args, size=size, name="sk_text_button", **kwargs)
+        super().__init__(*args, size=size, **kwargs)
 
         self.events["click"] = {}
 

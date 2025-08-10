@@ -36,6 +36,7 @@ class SkWindowBase(SkEventHanding):
         :param opacity: window opacity
         """
 
+        self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
 
         super().__init__()

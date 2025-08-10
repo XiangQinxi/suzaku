@@ -7,6 +7,7 @@ app = Sk(
 app.resize(400, 400)
 
 textinput = SkTextInput(app, placeholder="请输入")
+print(textinput.__name__)
 textinput.box()
 
 app.run()

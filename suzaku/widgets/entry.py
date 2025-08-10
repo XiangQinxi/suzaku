@@ -36,7 +36,7 @@ class SkEntry(SkWidget):
         :param kwargs: SkVisual arguments
         """
 
-        super().__init__(*args, size=size, name="sk_entry", cursor=cursor, **kwargs)
+        super().__init__(*args, size=size, cursor=cursor, **kwargs)
 
         self.attributes["right_margin"] = 20
 

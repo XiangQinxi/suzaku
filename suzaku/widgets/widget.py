@@ -26,8 +26,6 @@ class SkWidget(SkEventHanding):
         parent,
         size: tuple[int, int] = (100, 30),
         cursor: str = "arrow",
-        widget_id: Union[str, None] = None,
-        name="SkWidget",
         font: skia.Font | None = default_font,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
@@ -35,13 +33,9 @@ class SkWidget(SkEventHanding):
         :param parent: Parent component (Usually a SkWindow)
         :param size: Default size (not the final drawn size)
         :param cursor: Cursor style
-        :param name: Name of the widget
-        :param widget_id: Identification code
         """
 
         super().__init__()
-
-        self.__class__._instance_count += 1
 
         self.parent = parent
 
@@ -56,10 +50,11 @@ class SkWidget(SkEventHanding):
                 f"Parent component is not a SkWindow-based object. {self.parent}"
             )
 
+        self.id = self.window.id + "." + self.__class__.__name__ + str(self._instance_count + 1)
+        SkWidget._instance_count += 1
+
         self.attributes: dict[str, Any] = {
-            "name": name,
             "cursor": cursor,
-            "id": widget_id,
             "theme": None,
             "dwidth": size[0],  # default width
             "dheight": size[1],  # default height
@@ -79,9 +74,6 @@ class SkWidget(SkEventHanding):
 
         self.focusable: bool = False
         self.visible: bool = False
-
-        if not widget_id:
-            self.attributes["id"] = name + "." + str(self.__class__._instance_count)
 
         self.events = {
             "mouse_motion": {},
