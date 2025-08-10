@@ -13,7 +13,8 @@ class SkColor:
         self.color = None
         self.set_color(color)
 
-    def set_color(self, color) -> None:
+    def set_color(self, color: str | tuple | list) -> SkColor:
+        """Set the color of the SkColor."""
         typec = type(color)
         if typec is str:
             if color.startswith("#"):
@@ -28,7 +29,7 @@ class SkColor:
                 raise ValueError(
                     "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
                 )
-        return None
+        return self
 
     def set_color_name(self, name: str) -> None:
         """Convert color name string to skia color.
@@ -208,3 +209,28 @@ class SkGradient:
             return self
         else:
             return None
+
+
+def style_to_color(style_attr_value: list[int] | \
+                                     tuple[int,int,int,int] | \
+                                     dict) -> SkColor | SkGradient:
+    """Returns the color object indicated by the color style attribute value.
+
+    Example
+    -------
+    .. code-block:: python
+        my_theme = SkTheme()
+        background_attr_value = my_theme.get_style_attr("SkButton:hover", "background")
+        theme.style_to_color(background_attr_value)
+    This shows getting a color object for the background of a `SkButton` at `hover` state.
+
+    :param style_attr_value: The value of style attribute
+    """
+    match style_attr_value:
+        case style_attr_value if type(style_attr_value) in [list, tuple]:
+            # If is configured to a RGB(A) color
+            return SkColor("").set_color(style_attr_value)
+        case style_attr_value if type(style_attr_value) is str:
+            # If is configured to a hex color string
+            return SkColor(style_attr_value)
+        NotImplemented
