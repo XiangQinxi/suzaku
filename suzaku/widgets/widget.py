@@ -225,9 +225,8 @@ class SkWidget(SkEventHanding):
         """
         paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
-    @staticmethod
     def _draw_central_text(
-        canvas, text, fg, x, y, width, height, font: skia.Font = None
+        self, canvas, text, fg, x, y, width, height, font: skia.Font = None
     ):
         """Draw central text
 
