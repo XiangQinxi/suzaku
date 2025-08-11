@@ -17,6 +17,7 @@ class SkTextInputBase(SkWidget):
     def __init__(
         self,
         *args,
+        size: tuple[int, int] = (105, 35),
         text: str = "",
         textvariable: SkStringVar | None = None,
         placeholder: str | None = None,
@@ -30,7 +31,7 @@ class SkTextInputBase(SkWidget):
         :param placeholder: 占位符
         :param cursor: 光标样式
         """
-        super().__init__(*args, cursor=cursor, **kwargs)
+        super().__init__(*args, size=size, cursor=cursor, **kwargs)
         self.attributes["text"] = text
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["placeholder"] = placeholder

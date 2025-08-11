@@ -326,12 +326,18 @@ class SkWidget(SkEventHanding):
         # Background
         bg_paint.setColor(color(bg))
         if bg_shader:
-            if bg_shader.lower() == "rainbow":
-                self._draw_rainbow_shader(bg_paint, rect)
-            elif bg_shader.lower() == "rainbow:follow_cursor":
-                self._draw_rainbow_shader(
-                    bg_paint, rect, cx=self.mouse_x, cy=self.mouse_y
-                )
+            if isinstance(bg_shader, dict):
+                if "linear_gradient" in bg_shader:
+                    gradient = SkGradient()
+                    gradient.set_linear(
+                        widget=self, config=bg_shader["linear_gradient"]
+                    )
+                    gradient.draw(
+                        paint=bg_paint,
+                    )
+            else:
+                if bg_shader.lower() == "rainbow":
+                    self._draw_rainbow_shader(bg_paint, rect)
 
         # Border
         bd_paint.setStrokeWidth(width)
