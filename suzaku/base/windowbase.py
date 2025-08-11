@@ -144,12 +144,20 @@ class SkWindowBase(SkEventHanding):
                 monitor = None
 
             glfw.window_hint(glfw.STENCIL_BITS, 8)
+
             # see https://www.glfw.org/faq#macos
             if sys.platform.startswith("darwin"):
                 glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
                 glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
                 glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
                 glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+            else:
+                if self.attributes["force_hardware_acceleration"]:
+                    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
+                    glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
+                    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+                    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
             window = glfw.create_window(
                 self.width, self.height, self.attributes["title"], monitor, None
@@ -163,13 +171,6 @@ class SkWindowBase(SkEventHanding):
 
             self.x = pos[0]
             self.y = pos[1]
-
-            if self.attributes["force_hardware_acceleration"]:
-                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
-                glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
-                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
-                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
             glfw.set_window_opacity(window, self.cget("opacity"))
 
