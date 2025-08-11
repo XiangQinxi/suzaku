@@ -4,7 +4,7 @@ import skia
 from glfw import KEY_BACKSPACE, KEY_DELETE, KEY_LEFT, KEY_RIGHT
 
 from ..event import SkEvent
-from ..styles.color_old import color
+from ..styles.color import color
 from ..styles.font import default_font
 from ..var import SkVar
 from .widget import SkWidget

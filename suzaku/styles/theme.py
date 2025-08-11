@@ -1,10 +1,10 @@
 from __future__ import annotations as _
 
-import typing
 import json
 import os
 import pathlib
 import re
+import typing
 import warnings
 
 if typing.TYPE_CHECKING:
@@ -34,7 +34,9 @@ class SkTheme:
         for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
             if file == f"{SkTheme.DEFAULT_THEME_FILENAME}.json":
                 # For default theme, no need to reload it
-                SkTheme.INTERNAL_THEMES[SkTheme.DEFAULT_THEME.name] = SkTheme.DEFAULT_THEME
+                SkTheme.INTERNAL_THEMES[SkTheme.DEFAULT_THEME.name] = (
+                    SkTheme.DEFAULT_THEME
+                )
                 continue
             _ = SkTheme({}).load_from_file(SkTheme.INTERNAL_THEME_DIR / file)
             SkTheme.INTERNAL_THEMES[_.name] = _
@@ -42,7 +44,7 @@ class SkTheme:
     @classmethod
     def find_loaded_theme(cls, theme_name: str) -> "SkTheme | typing.Literal[False]":
         """Search for a loaded theme by name, returns the SkTheme object if found, or False if not.
-        
+
         Example
         -------
         .. code-block:: python
@@ -88,7 +90,7 @@ class SkTheme:
         :param styles: Styles of the theme
         :param parent: Parent theme
         """
-            
+
         self.styles: dict = styles
         if styles is None:
             self.styles: dict = SkTheme.DEFAULT_THEME.styles
@@ -110,7 +112,7 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme().load_from_file("./path/to/a/theme.json")
             my_theme.load_from_file("./path/to/another/theme.json")
-        This shows loading a theme to `my_theme` from the theme file at `./path/to/a/theme.json`, 
+        This shows loading a theme to `my_theme` from the theme file at `./path/to/a/theme.json`,
         and change it to theme from `./path/to/another/theme.json` later.
 
         :param file_path: Path to the theme file
@@ -138,7 +140,7 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme().load_from_json({<Some JSON theme data>})
             my_theme.load_from_json({<Some JSON theme data>})
-        This shows loading a theme to `my_theme` from json data, and change it to theme from 
+        This shows loading a theme to `my_theme` from json data, and change it to theme from
         another json later.
 
         :param theme_data: dict that contains the theme data
@@ -159,7 +161,7 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme().load_styles_from_json({<Some styles>})
             my_theme.load_from_json({<Some styles>})
-        This shows loading styles data to `my_theme` from json data, and change its styles from 
+        This shows loading styles data to `my_theme` from json data, and change its styles from
         that stored in another json later.
 
         :param style_json: dict that contains the styles
@@ -176,8 +178,8 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme().set_parent("DEFAULT")
             my_theme.set_parent("default.dark")
-        The first line shows setting the parent of `my_theme` to the default theme, which is 
-        suggested for third-party themes that act as a root. The second line shows setting the 
+        The first line shows setting the parent of `my_theme` to the default theme, which is
+        suggested for third-party themes that act as a root. The second line shows setting the
         parent of `my_theme` to `default.dark` after its creation.
 
         Parent Name
@@ -205,7 +207,7 @@ class SkTheme:
                 else:
                     warnings.warn(
                         f"Parent theme specified with name <{parent_name}> is not yet loaded. "
-                         "Will fall back to <DEFAULT> for parent instead."
+                        "Will fall back to <DEFAULT> for parent instead."
                     )
                     self.set_parent("DEFAULT")
         return self
@@ -218,7 +220,7 @@ class SkTheme:
         .. code-block:: python
             my_theme = Theme().rename("theme.name")
             my_theme.rename("i_hate.that_name")
-        This shows renaming `my_theme` to `theme.name`, and renaming it to `i_hate.that_name` after 
+        This shows renaming `my_theme` to `theme.name`, and renaming it to `i_hate.that_name` after
         its creaton.
 
         :param new_name: The new name for the theme
@@ -267,7 +269,10 @@ class SkTheme:
 
         # Check if the widget is not in the widgets list
         # Also check if the state is not in the widget's states
-        if result[0] not in self.styles.keys() or result[1] not in self.styles[result[0]].keys():
+        if (
+            result[0] not in self.styles.keys()
+            or result[1] not in self.styles[result[0]].keys()
+        ):
             raise SkStyleNotFoundError(f"Cannot find styles with selector [{selector}]")
         return result
 
@@ -317,19 +322,19 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme()
             button_background = my_theme.get_style_attr("SkButton:rest", "background")
-        This shows getting the value of `background` attribute from styles of `SkButton` at `rest` 
+        This shows getting the value of `background` attribute from styles of `SkButton` at `rest`
         state.
 
         Fallback Machanism
         ------------------
         - The program first tries to get attribute from the style indicated by the selector.
-        - If fails, which means that the attribute cannot be found, the program tries to fallback 
+        - If fails, which means that the attribute cannot be found, the program tries to fallback
           to the base state of the target state, which is specified with `"base": "<State name>"`.
         - If still fails, fallback to the rest state.
-        - If still, which means that the attribute is not specified in the current theme, the 
-          program will try the parent theme, then the parent of parent theme, and repeat this until 
+        - If still, which means that the attribute is not specified in the current theme, the
+          program will try the parent theme, then the parent of parent theme, and repeat this until
           it reaches the default theme (or more accurately, the root theme).
-        - As the root theme must contain all attributes available, if the selector or attribute 
+        - As the root theme must contain all attributes available, if the selector or attribute
           still cannot be found even in root theme, the program throws an error.
 
         :param selector: The selector to the style
@@ -366,10 +371,10 @@ class SkTheme:
             my_theme = SkTheme()
             my_theme.mixin("SkButton.ITSELF", {"rest": {"background": (255, 0, 0, 255)},
                                                "hover": {"background": (0, 0, 255, 255)}})
-            my_subtheme = my_theme.mixin("SkButton:hover", {"background": (255, 0, 0, 255)}, 
+            my_subtheme = my_theme.mixin("SkButton:hover", {"background": (255, 0, 0, 255)},
                                          copy=True)
-        The first line shows mixing in a red background style at rest state and a blue background 
-        style at hover state into SkButton. The second line shows creating a subtheme base on 
+        The first line shows mixing in a red background style at rest state and a blue background
+        style at hover state into SkButton. The second line shows creating a subtheme base on
         `my_theme`, but with red background for `SkButton` at `hover` state.
 
         :param selector: The selector string, indicates where to mix in

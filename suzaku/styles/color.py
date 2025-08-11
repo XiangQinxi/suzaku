@@ -1,15 +1,20 @@
 from __future__ import annotations
 
-from typing import Union, Literal, Any
 import typing
+from typing import Any, Literal, Union
+
 import skia
 
 if typing.TYPE_CHECKING:
     from ..widgets.widget import SkWidget
 
 
+def color(value):
+    return SkColor(value).color
+
+
 class SkColor:
-    def __init__(self, color: str) -> None:
+    def __init__(self, color: str | None = None) -> None:
         self.color = None
         self.set_color(color)
 
@@ -29,6 +34,8 @@ class SkColor:
                 raise ValueError(
                     "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
                 )
+        else:
+            return self
         return self
 
     def set_color_name(self, name: str) -> None:
@@ -159,7 +166,7 @@ class SkGradient:
         Example
         -------
         .. code-block:: python
-            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red", 
+            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red",
                                  "end": "blue"})
 
         :param end_pos: End position
@@ -189,14 +196,14 @@ class SkGradient:
 
             colors = []
             for color in config["colors"]:
-                raise NotImplementedError("To XiangQinXi: 这里得改")
-                colors.append(_color(color))
+                # raise NotImplementedError("To XiangQinXi: 这里得改")
+                colors.append(SkColor(color).color)
 
             if widget:
                 self.gradient = skia.GradientShader.MakeLinear(
                     points=[
                         tuple(self.get_anchor_pos(widget, start_anchor)),
-                        tuple(self.get_anchor_pos(widget, end_anchor))
+                        tuple(self.get_anchor_pos(widget, end_anchor)),
                     ],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
@@ -211,9 +218,9 @@ class SkGradient:
             return None
 
 
-def style_to_color(style_attr_value: list[int] | \
-                                     tuple[int,int,int,int] | \
-                                     dict) -> SkColor | SkGradient:
+def style_to_color(
+    style_attr_value: list[int] | tuple[int, int, int, int] | dict,
+) -> SkColor | SkGradient:
     """Returns the color object indicated by the color style attribute value.
 
     Example
@@ -233,4 +240,3 @@ def style_to_color(style_attr_value: list[int] | \
         case style_attr_value if type(style_attr_value) is str:
             # If is configured to a hex color string
             return SkColor(style_attr_value)
-        NotImplemented

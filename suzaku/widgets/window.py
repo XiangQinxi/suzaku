@@ -5,8 +5,7 @@ import skia
 from ..base.container import SkContainer
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
-from ..styles.color import SkColor
-from ..styles.color_old import color
+from ..styles.color import SkColor, color
 from ..styles.theme import SkTheme, default_theme
 
 

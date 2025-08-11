@@ -4,8 +4,7 @@ import glfw
 import skia
 
 from ..event import SkEvent, SkEventHanding
-from ..styles.color import SkGradient
-from ..styles.color_old import color
+from ..styles.color import SkGradient, color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme

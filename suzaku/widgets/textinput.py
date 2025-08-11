@@ -2,7 +2,7 @@ import glfw
 import skia
 
 from ..event import SkEvent
-from ..styles.color_old import color
+from ..styles.color import color
 from ..var import SkStringVar
 from .widget import SkWidget
 
