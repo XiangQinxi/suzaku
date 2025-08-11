@@ -80,7 +80,9 @@ class SkTextInputBase(SkWidget):
             case glfw.KEY_V:
                 if event.mods == "control":
                     self.set(
-                        text[:self.cursor_index] + self.clipboard_get + text[self.cursor_index:]
+                        text[: self.cursor_index]
+                        + self.clipboard_get
+                        + text[self.cursor_index :]
                     )
                     self.cursor_index += len(self.clipboard_get)
             case glfw.KEY_HOME:
@@ -120,7 +122,9 @@ class SkTextInputBase(SkWidget):
 
     def cursor_backspace(self) -> Self:
         if self.cursor_index > 0:
-            self.set(self.get()[: self.cursor_index - 1] + self.get()[self.cursor_index:])
+            self.set(
+                self.get()[: self.cursor_index - 1] + self.get()[self.cursor_index :]
+            )
             self.cursor_index -= 1
         return self
 
@@ -154,7 +158,10 @@ class SkTextInputBase(SkWidget):
         canvas.save()
         canvas.clipRect(
             skia.Rect.MakeLTRB(
-                rect.left() + padding + 2, rect.top(), rect.right() - padding - 2, rect.bottom()
+                rect.left() + padding + 2,
+                rect.top(),
+                rect.right() - padding - 2,
+                rect.bottom(),
             )
         )
 

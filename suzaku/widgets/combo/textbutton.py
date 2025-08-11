@@ -1,6 +1,6 @@
 from typing import Union
 
-from .text import SkText
+from ..text import SkText
 
 
 class SkTextButton(SkText):

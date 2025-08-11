@@ -74,17 +74,6 @@ class SkWindow(SkWindowBase, SkContainer):
 
     # region Event handlers 事件处理
 
-    def _update(self, event):
-        """Update event for SkWindow.
-
-        :param event: SkEvent
-        :return:
-        """
-        for widget in self.children:
-            from suzaku.event import SkEvent
-
-            widget.event_generate("update", SkEvent(event_type="update"))
-
     def _key_pressed(self, event):
         """Key press event for SkWindow.
 

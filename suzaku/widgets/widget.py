@@ -1,8 +1,8 @@
 from typing import Any, Literal, Union
 
 import glfw
-import skia
 import pyperclip
+import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..styles.color import SkGradient, color
@@ -35,7 +35,7 @@ class SkWidget(SkEventHanding):
         :param cursor: Cursor style
         """
 
-        super().__init__()
+        SkEventHanding.__init__(self)
 
         self.parent = parent
 
@@ -57,7 +57,6 @@ class SkWidget(SkEventHanding):
             + str(self._instance_count + 1)
         )
         SkWidget._instance_count += 1
-        print(self.id)
 
         self.attributes: dict[str, Any] = {
             "cursor": cursor,

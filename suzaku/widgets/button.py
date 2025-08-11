@@ -13,22 +13,20 @@ class SkButton(SkFrame):
         command: Union[callable, None] = None,
         **kwargs,
     ) -> None:
-        """Button Component.
+        """Button without Label.
 
         **Will be re-written in future.**
 
-        : param args: Passed to SkVisual
-        : param text: Button text
-        : param size: Default size
-        : param cursor: Cursor styles when hovering
-        : param styles: Style name
-        : param command: Function to run when clicked
-        : param **kwargs: Passed to SkVisual
+        :param args: Passed to SkVisual
+        :param text: Button text
+        :param size: Default size
+        :param cursor: Cursor styles when hovering
+        :param styles: Style name
+        :param command: Function to run when clicked
+        :param **kwargs: Passed to SkVisual
         """
 
         super().__init__(*args, size=size, name="sk_button", **kwargs)
-
-        self._handle_layout()
 
         self.attributes["cursor"] = cursor
 
