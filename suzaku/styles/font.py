@@ -27,6 +27,10 @@ class SkFont:
 
         if platform == "win32":
             f = "Microsoft YaHei"
+        elif platform == "linux":
+            f = "Noto Sans CJK SC"
+        elif platform == "darwin":
+            f = "PingFang SC"
 
         return self.font(name=f, size=14.5)
 

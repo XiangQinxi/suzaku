@@ -542,8 +542,8 @@ class SkWidget(SkEventHanding):
     def box(
         self,
         side: Literal["top", "bottom", "left", "right"] = "top",
-        padx: int | float | tuple[int | float, int | float] = 10,
-        pady: int | float | tuple[int | float, int | float] = 10,
+        padx: int | float | tuple[int | float, int | float] = 5,
+        pady: int | float | tuple[int | float, int | float] = 5,
         ipadx: int | float | tuple[int | float, int | float] = 0,
         ipady: int | float | tuple[int | float, int | float] = 0,
         expand: bool | tuple[bool, bool] = False,

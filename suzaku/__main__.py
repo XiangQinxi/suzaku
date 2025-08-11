@@ -17,16 +17,16 @@ if __name__ == "__main__":
     # print(glfw.default_window_hints())
     root.bind("drop", lambda evt: print("drop", evt))
 
-    frame = SkFrame(root)
+    frame = SkFrame(root, border=True)
 
-    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=10, pady=10)
-    SkLabel(frame, text="This is a SkLabel / 这是一个标签").box(padx=10, pady=10)
+    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
+    SkLabel(frame, text="This is a SkLabel / 这是一个标签").box(padx=8, pady=(8, 0))
 
-    #SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
+    SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
     var = SkStringVar()
-    SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
-    SkLabel(frame, textvariable=var).box(padx=10, pady=10)
+    SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=8, pady=(8, 0))
+    SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
 
     frame.box(padx=10, pady=10, expand=True)
 

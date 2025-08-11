@@ -27,14 +27,14 @@
     "SkButton": {
       "radius": 5,
       "rest": {
-        "bg": [255, 255, 255, 255],
+        "bg": [255, 255, 255, 235],
         "bg_shader": {
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": [
               [0, 0, 0, 20],
-              [0, 0, 0, 40]
+              [0, 0, 0, 50]
             ]
           }
         },
