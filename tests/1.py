@@ -41,3 +41,4 @@ def handle_titlebar_drag(window, hwnd, mouse_x, mouse_y, titlebar_height=30):
 
 
 window, hwnd = create_custom_titlebar_window()
+

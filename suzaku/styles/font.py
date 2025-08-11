@@ -5,7 +5,6 @@ from typing import Any, Union
 
 import skia
 
-
 class SkFont:
     """
     SkFont
@@ -45,15 +44,16 @@ class SkFont:
 
         return self.font(name=f, size=14.5)
 
+    @staticmethod
     def font(
-        self,
-        name: str | None = None,
-        font_path: Union[Path, str] | None = None,
+        name: str = None,
+        font_path: Union[Path, str] = None,
         size: int | float = 14,
     ) -> skia.Font:
         """
         Get font from path
 
+        :param font_path: Path to a font file.
         :param name: Name of the local font.
 
         :param path: Path to a font file.
@@ -64,16 +64,15 @@ class SkFont:
         size = size
 
         if name:
-            name = name
-            font = skia.Font(skia.Typeface(name), size)
+            _font = skia.Font(skia.Typeface(name), size)
         elif font_path:
             if not os.path.exists(font_path):
                 raise FileNotFoundError
-            font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
+            _font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
         else:
             raise ValueError("Unexcepted name or font_path in default_font()")
-
+      
         return font
 
 
-default_font = SkFont().default_font()
+default_font = SkFont.font(None)

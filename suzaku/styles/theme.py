@@ -25,6 +25,7 @@ class SkTheme:
 
     @classmethod
     def _load_internal_themes(cls):
+        """Load internal themes. Should be run once at import, see the end of this file."""
         # Load default (ROOT) theme
         SkTheme.DEFAULT_THEME = SkTheme({}).load_from_file(
             SkTheme.INTERNAL_THEME_DIR / f"{SkTheme.DEFAULT_THEME_FILENAME}.json"
@@ -91,15 +92,16 @@ class SkTheme:
         :param parent: Parent theme
         """
 
-        self.styles: dict = styles
-        if styles is None:
-            self.styles: dict = SkTheme.DEFAULT_THEME.styles
-
         self.name: str = f"untitled.{len(SkTheme.loaded_themes) + 1}"
         self.friendly_name = f"Untitled theme {len(SkTheme.loaded_themes) + 1}"
         # friendly_name感觉有点多余? ——Little White Cloud
         # Keep it 4 now currently. ——rgzz666
         self.parent: typing.Union["SkTheme", None] = parent
+
+        self.styles: dict = styles
+        if styles is None:
+            self.styles: dict = SkTheme.DEFAULT_THEME.styles
+        self.color_palette = {}
 
         SkTheme.loaded_themes.append(self)  # TODO: figure out.
         return
@@ -146,8 +148,28 @@ class SkTheme:
         :param theme_data: dict that contains the theme data
         :return self: The SkTheme itself
         """
-        self.styles = theme_data["styles"]
-
+        # Type check
+        EXPECTED_DATA_TYPE = {
+            "styles": dict,
+            "color_palette": dict,
+            "name": str,
+            "friendly_name": str,
+            "base": str,
+        }
+        for item in EXPECTED_DATA_TYPE.keys():
+            if type(theme_data[item]) != EXPECTED_DATA_TYPE[item]:
+                theme_name = theme_data["name"] if type(theme_data["name"]) is str \
+                                                else "(Type error)"
+                warnings.warn(
+                    f"Error data type of <{item}> in theme data that is about to be loaded. "
+                    f"Expected {EXPECTED_DATA_TYPE[item]} but got {type(item)}. The json data "
+                    f"with theme named <{theme_name}> will not be loaded to the theme <{self.name}>"
+                , ResourceWarning)
+                return self
+        # Load data
+        self.styles = theme_data["styles"].copy()
+        self.color_palette = theme_data["color_palette"].copy()
+        # Load Metadata
         self.rename(theme_data["name"], theme_data["friendly_name"])
         self.set_parent(theme_data["base"])
 

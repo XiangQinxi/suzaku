@@ -9,8 +9,8 @@ from .window import SkWindow
 
 
 class SkText(SkWidget):
-    def __init__(self, *args, text: str = "", textvariable=None, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent=None, *args, text: str = "", textvariable=None, **kwargs):
+        super().__init__(parent=parent, *args, **kwargs)
         self.attributes["textvariable"] = textvariable
         self.attributes["text"] = text
         self.attributes["font"] = default_font
