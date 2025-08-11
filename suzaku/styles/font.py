@@ -13,7 +13,7 @@ class SkFont:
     字体
     """
 
-    def __init__(self, name: str = None, path: Union[Path, str] = None, size: int = 14):
+    def __init__(self, name: str | None = None, path: Union[Path, str] | None = None, size: int = 14):
         """
         SkFont object. For customizing fonts in your UI
 
@@ -23,21 +23,32 @@ class SkFont:
 
     def default_font(self):
         """Get default font via different system"""
-        from sys import platform
+        import tkinter as tk
+        import tkinter.font as tkfont
+        import platform
 
-        if platform == "win32":
-            f = "Microsoft YaHei"
-        elif platform == "linux":
-            f = "Noto Sans CJK SC"
-        elif platform == "darwin":
-            f = "PingFang SC"
+        f = None
+
+        root = tk.Tk()
+        f = tkfont.nametofont("TkDefaultFont").actual().get("family")
+        root.destroy()
+
+        if f == ".AppleSystemUIFont":
+            if int(platform.mac_ver()[0].split(".")[0]) >= 11:
+                f = "SF Pro"
+            elif platform.mac_ver()[0] == "10.15":
+                f = "Helvetica Neue"
+            else:
+                f = "Lucida Grande"
+
+        del root, tk, tkfont, platform
 
         return self.font(name=f, size=14.5)
 
     def font(
         self,
-        name: str = None,
-        font_path: Union[Path, str] = None,
+        name: str | None = None,
+        font_path: Union[Path, str] | None = None,
         size: int | float = 14,
     ) -> skia.Font:
         """
@@ -60,7 +71,8 @@ class SkFont:
                 raise FileNotFoundError
             font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
         else:
-            font = self.default_font()
+            raise ValueError("Unexcepted name or font_path in default_font()")
+
         return font
 
 
