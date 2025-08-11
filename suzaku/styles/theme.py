@@ -16,6 +16,29 @@ class SkStyleNotFoundError(NameError):
 
 
 class SkTheme:
+    """Theme class for SkWindow and SkWidgets.
+
+    Example
+    -------
+    .. code-block:: python
+        my_theme = SkTheme({<Some styles>})
+        my_sub_theme = SkTheme(parent="default.light")
+        my_external_theme = SkTheme().load_from_file("./path/to/a/theme.json")
+    This shows examples of creating themes, either from a json, a parent theme or a file.
+
+    .. code-block:: python
+        all_themes = SkTheme.loaded_themes
+        internal_themes = SkTheme.INTERNAL_THEMES
+        default_theme = SkTheme.DEFAULT_THEME
+    This shows getting all loaded themes, internal themes, and the default theme.
+
+    .. code-block:: python
+        default_light_theme = SkTheme.find_loaded_theme("default.light")
+        if SkTheme.validate_theme_existed("default.light"):
+            print("Default light theme exists!")
+    This shows finding a theme and checking if it exists
+
+    """
 
     loaded_themes: list["SkTheme"] = []
     INTERNAL_THEME_DIR = pathlib.Path(__file__).parent.parent / "resources" / "themes"
