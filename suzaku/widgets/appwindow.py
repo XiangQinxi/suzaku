@@ -8,6 +8,12 @@ class SkAppWindow(SkWindow):
 
     def __init__(self, *args, window_event_wait: bool = False, **kwargs) -> None:
         """Main window that connects SkApp with SkWindow."""
+        import platform
+
+        if platform.system() == "Darwin":
+            if "force_hardware_acceleration" in kwargs.keys():
+                kwargs.pop("force_hardware_acceleration")
+
         self.app = SkApp(window_event_wait=window_event_wait)
         super().__init__(parent=self.app, *args, **kwargs)
         if self.__class__._instance_count == 0:
@@ -15,6 +21,8 @@ class SkAppWindow(SkWindow):
         else:
             raise ValueError("SkAppWindow can only be instantiated once.")
         self.attributes["name"] = "sk_appwindow"
+
+        del platform
 
     def run(self, *args, **kwargs) -> None:
         """Run application."""
