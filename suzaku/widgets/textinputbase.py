@@ -16,7 +16,6 @@ class SkTextInputBase(SkWidget):
 
     def __init__(
         self,
-        parent: SkWidget,
         *args,
         text: str = "",
         textvariable: SkStringVar | None = None,
@@ -26,13 +25,12 @@ class SkTextInputBase(SkWidget):
     ) -> None:
         """Text input widget
 
-        :param parent: 父控件
         :param text: 初始文本
         :param textvariable: 绑定的字符串变量
         :param placeholder: 占位符
         :param cursor: 光标样式
         """
-        super().__init__(parent, *args, cursor=cursor, **kwargs)
+        super().__init__(*args, cursor=cursor, **kwargs)
         self.attributes["text"] = text
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["placeholder"] = placeholder
@@ -49,12 +47,6 @@ class SkTextInputBase(SkWidget):
         self.bind("char", self._char)
         self.bind("key_pressed", self._key)
         self.bind("key_repeated", self._key)
-
-        if textvariable is not None:
-            textvariable.bind("change", self._textvariable)
-
-    def _textvariable(self, evt):
-        self.attributes["text"] = self.attributes["textvariable"].get()
 
     # endregion
 
@@ -141,9 +133,6 @@ class SkTextInputBase(SkWidget):
 
     # endregion
 
-    def _draw(self, canvas, rect) -> None:
-        self._draw_text_input(canvas, rect)
-
     def _draw_text_input(
         self, canvas: skia.Canvas, rect: skia.Rect, fg, placeholder
     ) -> None:
@@ -187,3 +176,4 @@ class SkTextInputBase(SkWidget):
                 canvas.drawSimpleText(
                     self.attributes["placeholder"], draw_x, draw_y, font, text_paint
                 )
+        canvas.restore()

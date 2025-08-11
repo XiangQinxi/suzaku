@@ -31,9 +31,7 @@ if __name__ == "__main__":
 
         var = SkStringVar()
         SkTextInput(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
-        SkTextInput(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
-        SkTextInput(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
-        SkText(window, text="This is a SkLabel / 这是一个标签").box(
+        SkText(window, textvariable=var).box(
             padx=10, pady=10)
         SkTextButton(window, text="Close the window", command=window.destroy).box(
             side="bottom"

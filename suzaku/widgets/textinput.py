@@ -6,7 +6,6 @@ class SkTextInput(SkTextInputBase):
         super().__init__(*args, **kwargs)
 
     def _draw(self, canvas, rect) -> None:
-
         if self.is_mouse_floating:
             if self.is_focus:
                 sheets = self.styles["SkTextInput"]["focus"]
