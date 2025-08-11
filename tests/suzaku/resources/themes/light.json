@@ -1,0 +1,128 @@
+{
+  "name": "default.light",
+  "base": "ROOT",
+  "friendly_name": "Default Light",
+
+  "styles":{
+    "SkWindow": {
+      "bg": [255, 255, 255, 240]
+    },
+
+    "SkFrame": {
+      "radius": 8,
+      "bg": [0, 0, 0, 20],
+      "bd": [0, 0, 0, 25],
+      "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+      "width": 3
+    },
+
+    "SkBadge": {
+      "radius": 99,
+      "bg": [5, 105, 200, 255],
+      "fg": [255, 255, 255, 235],
+      "bd": "transparent",
+      "width": 0
+    },
+
+    "SkButton": {
+      "radius": 5,
+      "rest": {
+        "bg": [255, 255, 255, 235],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [0, 0, 0, 20],
+              [0, 0, 0, 50]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [0, 0, 0, 25],
+        "bd_shadow": [0, 3, 1, 1, [0, 0, 0, 50]],
+        "width": 2
+      },
+      "hover": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [0, 0, 0, 20],
+              [0, 0, 0, 40]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [0, 0, 0, 25],
+        "bd_shadow": [0, 0, 5, 5, [40, 130, 255, 245]],
+        "width": 3
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [0, 0, 0, 50],
+              [0, 0, 0, 30]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [0, 0, 0, 25],
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 245]],
+        "width": 2
+      },
+      "focus": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [0, 0, 0, 20],
+              [0, 0, 0, 40]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [0, 0, 0, 100],
+        "bd_shadow": [0, 3, 1, 1, [0, 0, 0, 100]],
+        "width": 3
+      }
+    },
+
+    "SkText": {
+      "fg": [0, 0, 0, 245]
+    },
+
+    "SkTextInput": {
+      "radius": 8,
+      "rest": {
+        "bg": [0, 0, 0, 10],
+        "fg": [0, 0, 0, 235],
+        "bd": [0, 0, 0, 10],
+        "width": 2,
+        "placeholder": [0, 0, 0, 165]
+      },
+      "hover": {
+        "bg": [0, 0, 0, 30],
+        "fg": [0, 0, 0, 235],
+        "bd": [25, 125, 225, 235],
+        "width": 2,
+        "placeholder": [0, 0, 0, 165]
+      },
+      "focus": {
+        "bg": [0, 0, 0, 15],
+        "fg": [0, 0, 0, 235],
+        "bd": [25, 125, 225, 235],
+        "width": 2,
+        "placeholder": [0, 0, 0, 0]
+      }
+    }
+  }
+}

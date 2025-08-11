@@ -1,0 +1,61 @@
+# Suzaku 朱雀
+
+> This project is experiencing a reconstruction. For latest usable versions, please see [releases](github.com/XiangQinXi/suzaku/releases). However, always note that the APIs will change frequently in this period without notifying or warning, please only use versions under development for evaluation purposes.
+>
+> 本项目正在经历重构。最新可用版本可以在[releases](github.com/XiangQinXi/suzaku/releases)中找到。请务必注意：在此期间API会经常发生变更，恕不另行通知或给出警告。请将这些开发中的版本仅用于评估用途。
+
+Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
+
+基于`skia-python`、`pyopengl`与`glfw`高级界面库。
+
+> Still under developing... / 正在抓紧制作中...
+> 
+> Evaluate out current achievements by downloading this project while it is still under development.
+> 
+> 您可以下载正在开发的版本来进行评估。
+> 
+
+---
+
+## Basic Example / 简单示例
+
+```bash
+python3 -m suzaku
+```
+![0.0.2a1.png](https://youke1.picui.cn/s1/2025/08/02/688dd38fc1d9a.png)
+
+Minimal Exanple / 最小示例
+
+![mini.png](https://youke1.picui.cn/s1/2025/08/02/688dd41f6d338.png)
+
+```python
+from suzaku import *
+
+root = Sk()
+btn = SkButton(window, text="Hello World")
+btn.place(10, 10)
+root.mainloop()
+```
+
+## How it Works / 原理
+### Basic Pricinples / 基础原理
+`SkApp` manages all `SkWindow` objects. We may consider each of the visible elements and ocmponents as a `SkWidget` in `SkWindow`.
+
+`SkApp`管理着所有的`SkWindow`。我们将每一个可视化的元素&组件视为一个个的`SkWidget`，居于`SkWindow`中。
+
+A number of properties are owned by `SkWidget`, telling `SkWindow` how it should be drawn. `SkWidget` components are added to the window via`SkWindow.add_draw()`, then be drawn by `SkWindow.draw()`.
+
+`SkWidget`具有一个个属性，告诉`SkWindow`自己该如何被绘制，用`SkWindow.add_draw()`将自己的绘制方式加入进去，然后在`SkWindow.draw()`中被一个个的绘制在画布上。
+
+## Layout / 布局
+**Under construction / 正在开发**
+
+## Naming / 取名
+Suzaku is one of the four mythical beasts in ancient China. ~~Sounds cool isn't it?~~
+
+`suzaku`是朱雀的意思，朱雀是中国古代的四大神兽之一。~~取这名呢感觉很霸气，先占个名先。~~
+
+## Plans / 计划
+`svg` in `Canvas` module will be used to draw shapes.
+
+我将会使用跨平台的`Canvas`库，用`svg`来绘制图形。
