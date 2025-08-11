@@ -17,7 +17,11 @@ class SkVar(SkEventHanding):
         super().__init__()
         self.id = self.__class__.__name__ + str(self._instance + 1)
         SkVar._instance += 1
-        self.events = {"change": {}}
+        self.init_events(
+            {
+                "change": {}
+            }
+        )
         self.value: type = default_value
         self.value_type = value_type
 

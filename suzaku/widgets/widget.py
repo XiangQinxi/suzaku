@@ -2,6 +2,7 @@ from typing import Any, Literal, Union
 
 import glfw
 import skia
+import pyperclip
 
 from ..event import SkEvent, SkEventHanding
 from ..styles.color import SkGradient, color
@@ -56,6 +57,7 @@ class SkWidget(SkEventHanding):
             + str(self._instance_count + 1)
         )
         SkWidget._instance_count += 1
+        print(self.id)
 
         self.attributes: dict[str, Any] = {
             "cursor": cursor,
@@ -356,6 +358,10 @@ class SkWidget(SkEventHanding):
     # endregion
 
     # region Widget attribute configs 组件属性配置
+
+    @property
+    def clipboard_get(self):
+        return pyperclip.paste()
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.

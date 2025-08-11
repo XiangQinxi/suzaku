@@ -5,14 +5,14 @@ import skia
 
 app = Sk(
     window_event_wait=False, #theme=SkTheme.INTERNAL_THEMES["dark"]
-    overrideredirect=True
 )
 
-app.resize(400, 400)
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
 
-textinput = SkTextInput(app, placeholder="请输入")
-textinput.box()
-
-hwnd = app.hwnd
 
 app.run()

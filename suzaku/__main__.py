@@ -9,7 +9,7 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    app = SkApp(window_event_wait=False, draw_on_focus=False)
+    app = SkApp()
 
     def create1window():
         window = SkWindow(
@@ -23,15 +23,18 @@ if __name__ == "__main__":
         window.bind("drop", lambda evt: print("drop", evt))
 
         SkTextButton(
-            window, text="This is a SkButton / 这是一个按钮", command=window.restore
+            window, text="This is a SkButton / 这是一个按钮"
         ).box(padx=10, pady=10)
-        text = SkText(window, text="This is a SkLabel / 这是一个标签").box(
+        SkText(window, text="This is a SkLabel / 这是一个标签").box(
             padx=10, pady=10
         )
 
         var = SkStringVar()
-        SkEntry(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
-        SkText(window, textvariable=var).box(padx=10, pady=10)
+        SkTextInput(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
+        SkTextInput(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
+        SkTextInput(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
+        SkText(window, text="This is a SkLabel / 这是一个标签").box(
+            padx=10, pady=10)
         SkTextButton(window, text="Close the window", command=window.destroy).box(
             side="bottom"
         )
