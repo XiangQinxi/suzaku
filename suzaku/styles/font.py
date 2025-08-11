@@ -24,17 +24,17 @@ class SkFont:
         """Get default font via different system"""
         import platform
 
-        t = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle())
+        _font = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle())
 
-        if f == ".AppleSystemUIFont":
+        if _font == ".AppleSystemUIFont":
             if int(platform.mac_ver()[0].split(".")[0]) >= 11:
-                f = "SF Pro"
+                _font = "SF Pro"
             elif platform.mac_ver()[0] == "10.15":
-                f = "Helvetica Neue"
+                _font = "Helvetica Neue"
             else:
-                f = "Lucida Grande"
+                _font = "Lucida Grande"
 
-        return self.font(name=f, size=14.5)
+        return self.font(name=_font, size=14.5)
 
     @staticmethod
     def font(
@@ -53,7 +53,6 @@ class SkFont:
         :param size: SkFont size.
         :return: skia.Font object
         """
-        size = size
 
         if name:
             _font = skia.Font(skia.Typeface(name), size)
