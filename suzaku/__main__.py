@@ -9,11 +9,14 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    app = SkApp(window_event_wait=True)
+    app = SkApp(window_event_wait=False, draw_on_focus=False)
 
     def create1window():
         window = SkWindow(
-            app, title="Suzaku GUI", size=(280, 460), force_hardware_acceleration=True
+            app,
+            title="Suzaku GUI",
+            size=(280, 460),
+            force_hardware_acceleration=True,  # overrideredirect=True,
         )
         # print(glfw.default_window_hints())
         window.bind("closed", lambda evt: print("SkWindowBase closed"))
@@ -27,8 +30,6 @@ if __name__ == "__main__":
         )
 
         var = SkStringVar()
-        print(var.id)
-        print(window.events)
         SkEntry(window, placeholder="数值绑定", textvariable=var).box(padx=10, pady=10)
         SkText(window, textvariable=var).box(padx=10, pady=10)
         SkTextButton(window, text="Close the window", command=window.destroy).box(

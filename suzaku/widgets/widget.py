@@ -94,6 +94,7 @@ class SkWidget(SkEventHanding):
                 "key_repeated": {},
                 "char": {},
                 "clicked": {},
+                "configure": {},
             }
         )
         self.layout_config: dict[str, dict] = {"none": {}}
@@ -373,6 +374,7 @@ class SkWidget(SkEventHanding):
         :return: self
         """
         self.attributes.update(**kwargs)
+        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute

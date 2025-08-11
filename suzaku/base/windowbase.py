@@ -25,6 +25,7 @@ class SkWindowBase(SkEventHanding):
         fullscreen=False,
         opacity: float = 1.0,
         force_hardware_acceleration: bool = False,
+        overrideredirect: bool = False,
         name="window",
     ):
         """Base Window class
@@ -72,6 +73,8 @@ class SkWindowBase(SkEventHanding):
         self.new_cursor = "arrow"
         self.focus = True
 
+        glfw.window_hint(glfw.DECORATED, not overrideredirect)
+
         self.attributes = {
             "title": title,
             "opacity": opacity,
@@ -99,6 +102,7 @@ class SkWindowBase(SkEventHanding):
                 "drop": {},
                 "maximize": {},
                 "iconify": {},
+                "configure": {},
             }
         )
 
@@ -520,9 +524,7 @@ class SkWindowBase(SkEventHanding):
 
     # endregion
 
-    # region Attributes config 属性配置
-
-    def cursor(self, cursor_name: Union[str, None] = None) -> "SkWindowBase":
+    def wm_cursor(self, cursor_name: Union[str, None] = None) -> "SkWindowBase":
         """Set the mouse pointer style of the window.
 
         cursor_name:
@@ -552,6 +554,8 @@ class SkWindowBase(SkEventHanding):
             set_cursor(self.glfw_window, create_standard_cursor(cursor_get))
         return self
 
+    cursor = wm_cursor
+
     def default_cursor(self, cursor_name: str = None) -> Union[str, "SkWindowBase"]:
         """Set the default cursor style of the window.
 
@@ -567,7 +571,7 @@ class SkWindowBase(SkEventHanding):
         self.attributes["cursor"] = cursor_name
         return self
 
-    def visible(self, is_visible: bool = None) -> Union[bool, "SkWindowBase"]:
+    def wm_visible(self, is_visible: bool = None) -> Union[bool, "SkWindowBase"]:
         """Get or set the visibility of the window.
 
         is_visible:
@@ -588,6 +592,8 @@ class SkWindowBase(SkEventHanding):
 
         self.visible = is_visible
         return self
+
+    visible = wm_visible
 
     def show(self) -> "SkWindowBase":
         """Show the window.
@@ -612,7 +618,7 @@ class SkWindowBase(SkEventHanding):
         self.visible = False
         return self
 
-    def maximize(self) -> "SkWindowBase":
+    def wm_maximize(self) -> "SkWindowBase":
         """Maximize the window.
 
         :return: cls
@@ -622,7 +628,9 @@ class SkWindowBase(SkEventHanding):
         maximize_window(self.glfw_window)
         return self
 
-    def iconify(self) -> "SkWindowBase":
+    maximize = wm_maximize
+
+    def wm_iconify(self) -> "SkWindowBase":
         """Iconify the window.
 
         :return: cls
@@ -632,7 +640,9 @@ class SkWindowBase(SkEventHanding):
         iconify_window(self.glfw_window)
         return self
 
-    def restore(self) -> "SkWindowBase":
+    iconify = wm_iconify
+
+    def wm_restore(self) -> "SkWindowBase":
         """Restore the window (cancel window maximization).
 
         :return: cls
@@ -641,6 +651,8 @@ class SkWindowBase(SkEventHanding):
 
         restore_window(self.glfw_window)
         return self
+
+    restore = wm_restore
 
     def destroy(self) -> None:
         """Destroy the window.
@@ -653,7 +665,7 @@ class SkWindowBase(SkEventHanding):
             self.glfw_window = None  # Clear the reference
             # self.event_init = False
 
-    def title(self, text: str = None) -> Union[str, "SkWindowBase"]:
+    def wm_title(self, text: str = None) -> Union[str, "SkWindowBase"]:
         """Get or set the window title.
 
         text:
@@ -672,6 +684,8 @@ class SkWindowBase(SkEventHanding):
             set_window_title(self.glfw_window, text)
 
         return self
+
+    title = wm_title
 
     def resize(self, width: int = None, height: int = None) -> "SkWindowBase":
         """Resize the window.
@@ -759,8 +773,13 @@ class SkWindowBase(SkEventHanding):
                 print(f"[ERROR] Failed to set opacity: {e}")
 
         self.attributes.update(kwargs)
+        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     config = configure = set_attribute
+
+    @property
+    def hwnd(self):
+        return glfw.get_win32_window(self.glfw_window)
 
     # endregion
