@@ -1,8 +1,11 @@
-from typing import Any, Literal, Union
+from __future__ import annotations
 
+from typing import Union, Literal, Any
+import typing
 import skia
 
-from ..styles.color_old import color as _color
+if typing.TYPE_CHECKING:
+    from ..widgets.widget import SkWidget
 
 
 class SkColor:
@@ -10,7 +13,8 @@ class SkColor:
         self.color = None
         self.set_color(color)
 
-    def set_color(self, color) -> None:
+    def set_color(self, color: str | tuple | list) -> SkColor:
+        """Set the color of the SkColor."""
         typec = type(color)
         if typec is str:
             if color.startswith("#"):
@@ -25,14 +29,14 @@ class SkColor:
                 raise ValueError(
                     "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
                 )
-        return None
+        return self
 
     def set_color_name(self, name: str) -> None:
         """Convert color name string to skia color.
 
         :param name: Color name
         :return skia.Color: Skia color
-        :raise ValueError: When color not exists
+        :raises ValueError: When color not exists
         """
         try:
             self.color = getattr(skia, f"Color{name.upper()}")
@@ -111,7 +115,7 @@ class SkGradient:
         return self.gradient
 
     @staticmethod
-    def get_anchor_pos(widget: "SkWidget", anchor) -> tuple[int, int]:
+    def get_anchor_pos(widget: SkWidget, anchor) -> tuple[int | float, int | float]:
         """Get widget`s anchor position(Relative widget position, not absolute position within the
         window)
 
@@ -147,14 +151,16 @@ class SkGradient:
             dict | None
         ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
         widget=None,
-        start_pos: tuple[int, int] = None,
-        end_pos: tuple[int, int] = None,
+        start_pos: tuple[int | float, int | float] | None = None,
+        end_pos: tuple[int | float, int | float] | None = None,
     ):
         """Set linear gradient
 
-        ## Example
-        `gradient.set_linear({"start_anchor": "n", "end_anchor": "s",
-        "start": "red", "end": "blue"})`
+        Example
+        -------
+        .. code-block:: python
+            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red", 
+                                 "end": "blue"})
 
         :param end_pos: End position
         :param start_pos: Start position
@@ -183,13 +189,14 @@ class SkGradient:
 
             colors = []
             for color in config["colors"]:
+                raise NotImplementedError("To XiangQinXi: 这里得改")
                 colors.append(_color(color))
 
             if widget:
                 self.gradient = skia.GradientShader.MakeLinear(
                     points=[
                         tuple(self.get_anchor_pos(widget, start_anchor)),
-                        tuple(self.get_anchor_pos(widget, end_anchor)),
+                        tuple(self.get_anchor_pos(widget, end_anchor))
                     ],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
@@ -202,3 +209,28 @@ class SkGradient:
             return self
         else:
             return None
+
+
+def style_to_color(style_attr_value: list[int] | \
+                                     tuple[int,int,int,int] | \
+                                     dict) -> SkColor | SkGradient:
+    """Returns the color object indicated by the color style attribute value.
+
+    Example
+    -------
+    .. code-block:: python
+        my_theme = SkTheme()
+        background_attr_value = my_theme.get_style_attr("SkButton:hover", "background")
+        theme.style_to_color(background_attr_value)
+    This shows getting a color object for the background of a `SkButton` at `hover` state.
+
+    :param style_attr_value: The value of style attribute
+    """
+    match style_attr_value:
+        case style_attr_value if type(style_attr_value) in [list, tuple]:
+            # If is configured to a RGB(A) color
+            return SkColor("").set_color(style_attr_value)
+        case style_attr_value if type(style_attr_value) is str:
+            # If is configured to a hex color string
+            return SkColor(style_attr_value)
+        NotImplemented
