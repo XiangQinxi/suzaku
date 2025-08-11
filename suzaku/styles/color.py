@@ -15,7 +15,7 @@ class SkColorWarning(Warning):
 
 
 class SkColor:
-    def __init__(self, color: str | tuple | list) -> None:
+    def __init__(self, color: str | None = None) -> None:
         self.color = None
         self.set_color(color)
 
@@ -35,6 +35,8 @@ class SkColor:
                 raise ValueError(
                     "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
                 )
+        else:
+            return self
         return self
 
     def set_color_name(self, name: str) -> None:
@@ -165,7 +167,7 @@ class SkGradient:
         Example
         -------
         .. code-block:: python
-            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red", 
+            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red",
                                  "end": "blue"})
 
         :param end_pos: End position
@@ -195,14 +197,14 @@ class SkGradient:
 
             colors = []
             for color in config["colors"]:
-                raise NotImplementedError("To XiangQinXi: 这里得改")
-                colors.append(_color(color))
+                # raise NotImplementedError("To XiangQinXi: 这里得改")
+                colors.append(SkColor(color).color)
 
             if widget:
                 self.gradient = skia.GradientShader.MakeLinear(
                     points=[
                         tuple(self.get_anchor_pos(widget, start_anchor)),
-                        tuple(self.get_anchor_pos(widget, end_anchor))
+                        tuple(self.get_anchor_pos(widget, end_anchor)),
                     ],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
@@ -260,3 +262,9 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
             # If invalid, then return green to prevent crash
             warnings.warn("Invalid color configuration in styles!", ValueError)
             return SkColor((0, 255, 0, 255))
+
+
+def color(value: typing.Any) -> Any:
+    """To be written..."""
+    raise NotImplementedError("To XiangQinXi: 相亲西你给我补docstring")
+    return SkColor(value).color

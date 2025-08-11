@@ -32,7 +32,7 @@ class SkAppBase(SkEventHanding):
     # region __init__ 初始化
 
     def __init__(
-        self, window_event_wait: bool = False, draw_on_focus: bool = True
+        self, window_event_wait: bool = False, draw_on_focus: bool = False
     ) -> None:
         """Base Application class.
 

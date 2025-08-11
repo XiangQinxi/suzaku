@@ -1,13 +1,18 @@
 from suzaku import *
-# import glfw
+import glfw
+import ctypes
+import skia
 
 app = Sk(
     window_event_wait=False, #theme=SkTheme.INTERNAL_THEMES["dark"]
 )
-app.resize(400, 400)
 
-textinput = SkTextInput(app, placeholder="请输入")
-print(textinput.__name__)
-textinput.box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+SkTextInput(app, placeholder="请输入").box()
+
 
 app.run()

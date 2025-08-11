@@ -1,11 +1,11 @@
 from typing import Any, Literal, Union
 
 import glfw
+import pyperclip
 import skia
 
 from ..event import SkEvent, SkEventHanding
-from ..styles.color import SkGradient
-from ..styles.color_old import color
+from ..styles.color import SkGradient, color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
@@ -35,7 +35,7 @@ class SkWidget(SkEventHanding):
         :param cursor: Cursor style
         """
 
-        super().__init__()
+        SkEventHanding.__init__(self)
 
         self.parent = parent
 
@@ -94,6 +94,7 @@ class SkWidget(SkEventHanding):
                 "key_repeated": {},
                 "char": {},
                 "clicked": {},
+                "configure": {},
             }
         )
         self.layout_config: dict[str, dict] = {"none": {}}
@@ -324,12 +325,18 @@ class SkWidget(SkEventHanding):
         # Background
         bg_paint.setColor(color(bg))
         if bg_shader:
-            if bg_shader.lower() == "rainbow":
-                self._draw_rainbow_shader(bg_paint, rect)
-            elif bg_shader.lower() == "rainbow:follow_cursor":
-                self._draw_rainbow_shader(
-                    bg_paint, rect, cx=self.mouse_x, cy=self.mouse_y
-                )
+            if isinstance(bg_shader, dict):
+                if "linear_gradient" in bg_shader:
+                    gradient = SkGradient()
+                    gradient.set_linear(
+                        widget=self, config=bg_shader["linear_gradient"]
+                    )
+                    gradient.draw(
+                        paint=bg_paint,
+                    )
+            else:
+                if bg_shader.lower() == "rainbow":
+                    self._draw_rainbow_shader(bg_paint, rect)
 
         # Border
         bd_paint.setStrokeWidth(width)
@@ -357,6 +364,10 @@ class SkWidget(SkEventHanding):
 
     # region Widget attribute configs 组件属性配置
 
+    @property
+    def clipboard_get(self):
+        return pyperclip.paste()
+
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
 
@@ -373,6 +384,7 @@ class SkWidget(SkEventHanding):
         :return: self
         """
         self.attributes.update(**kwargs)
+        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute
@@ -530,8 +542,8 @@ class SkWidget(SkEventHanding):
     def box(
         self,
         side: Literal["top", "bottom", "left", "right"] = "top",
-        padx: int | float | tuple[int | float, int | float] = 10,
-        pady: int | float | tuple[int | float, int | float] = 10,
+        padx: int | float | tuple[int | float, int | float] = 5,
+        pady: int | float | tuple[int | float, int | float] = 5,
         ipadx: int | float | tuple[int | float, int | float] = 0,
         ipady: int | float | tuple[int | float, int | float] = 0,
         expand: bool | tuple[bool, bool] = False,

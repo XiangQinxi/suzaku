@@ -1,5 +1,4 @@
-from .color import SkGradient
-from .color_old import color
+from .color import SkGradient, color
 
 
 def style(sheet, paint, widget=None):

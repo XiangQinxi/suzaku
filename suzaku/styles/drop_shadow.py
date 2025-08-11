@@ -1,6 +1,6 @@
 import skia
 
-from .color_old import color
+from .color import color
 
 
 class SkDropShadow:

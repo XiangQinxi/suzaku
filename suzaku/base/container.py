@@ -1,4 +1,5 @@
 import warnings
+import skia
 
 from ..event import SkEvent
 
@@ -11,7 +12,7 @@ class SkContainer:
 
     # region __init__ 初始化
 
-    def __init__(self, pos: tuple[int, int] = (0, 0), size: tuple[int, int] = (0, 0)):
+    def __init__(self, allowed_out_of_bounds: bool = False):
         """A SkContainer represents a widget that has the ability to contain other widgets inside.
 
         SkContainer is only for internal use. If any user would like to create a widget from
@@ -36,9 +37,6 @@ class SkContainer:
         In each layer, items will be drawn in the order of index. Meaning that those with lower
         index will be drawn first, and may get covered by those with higher index. Same for layers,
         layers with higher index cover those with lower index.
-
-        :param pos: The coordinates of the container in tuple (x, y), default is (0, 0)
-        :param size: Size of the container, in tuple (width, height), default is (0, 0)
         """
         # self.parent = None
         self.children = []  # Children
@@ -53,8 +51,11 @@ class SkContainer:
         # self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
 
         self._box_direction = None  # h(horizontal) or v(vertical)
+        self.allowed_out_of_bounds = allowed_out_of_bounds
 
+        #self.bind("resize", self._handle_layout)
         self.bind("resize", self._handle_layout)
+        self.bind("update", self._update)
 
         if isinstance(self, SkWidget):
 
@@ -64,11 +65,17 @@ class SkContainer:
 
             self.bind("resize", children_resize)
 
-        if not hasattr(self, "x"):
-            self.x = pos[0]
-            self.y = pos[1]
-            self.width = size[0]
-            self.height = size[1]
+    def _update(self, event):
+        """Update event for SkWindow.
+
+        :param event: SkEvent
+        :return:
+        """
+        self._handle_layout(event)
+        for widget in self.children:
+            from suzaku.event import SkEvent
+
+            widget.event_generate("update", SkEvent(event_type="update"))
 
     # endregion
 
@@ -139,16 +146,38 @@ class SkContainer:
 
     # region draw 绘制
 
-    def draw_children(self, canvas):
+    def draw_children(self, canvas: skia.Canvas):
         """Draw children widgets.
 
         :param canvas: The canvas to draw on
         :return: None
         """
+        from ..widgets.widget import SkWidget
+        from .windowbase import SkWindowBase
+
+        if not isinstance(self, SkWindowBase):
+            if isinstance(self, SkWidget):
+                x = self.x
+                y = self.y
+            else:
+                x = 0
+                y = 0
+
+            if not self.allowed_out_of_bounds:
+                canvas.save()
+                canvas.clipRect(
+                    skia.Rect.MakeXYWH(
+                        x,
+                        y,
+                        self.width,
+                        self.height,
+                    )
+                )
         for layer in self.draw_list:
             for child in layer:
                 if child.visible:
                     child.draw(canvas)
+        canvas.restore()
 
     # endregion
 

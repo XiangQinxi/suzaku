@@ -5,8 +5,7 @@ import skia
 from ..base.container import SkContainer
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
-from ..styles.color import SkColor
-from ..styles.color_old import color
+from ..styles.color import SkColor, color
 from ..styles.theme import SkTheme, default_theme
 
 
@@ -74,17 +73,6 @@ class SkWindow(SkWindowBase, SkContainer):
     # endregion
 
     # region Event handlers 事件处理
-
-    def _update(self, event):
-        """Update event for SkWindow.
-
-        :param event: SkEvent
-        :return:
-        """
-        for widget in self.children:
-            from suzaku.event import SkEvent
-
-            widget.event_generate("update", SkEvent(event_type="update"))
 
     def _key_pressed(self, event):
         """Key press event for SkWindow.
