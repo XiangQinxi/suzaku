@@ -1,15 +1,21 @@
 from __future__ import annotations
 
-from typing import Union, Literal, Any
-import typing
+import warnings
 import skia
+import typing
+
+from ..styles.theme import SkTheme
 
 if typing.TYPE_CHECKING:
     from ..widgets.widget import SkWidget
 
 
+class SkColorWarning(Warning):
+    pass
+
+
 class SkColor:
-    def __init__(self, color: str) -> None:
+    def __init__(self, color: str | tuple | list) -> None:
         self.color = None
         self.set_color(color)
 
@@ -176,14 +182,14 @@ class SkGradient:
                         start_anchor = config["start_anchor"]
                         del config["start_anchor"]
                     else:
-                        start_anchor: Literal[
+                        start_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"
                         ] = "n"
                     if "end_anchor" in config:
                         end_anchor = config["end_anchor"]
                         del config["end_anchor"]
                     else:
-                        end_anchor: Literal[
+                        end_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"
                         ] = "s"
 
@@ -211,9 +217,8 @@ class SkGradient:
             return None
 
 
-def style_to_color(style_attr_value: list[int] | \
-                                     tuple[int,int,int,int] | \
-                                     dict) -> SkColor | SkGradient:
+def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
+                   theme: str | SkTheme) -> SkColor | SkGradient:
     """Returns the color object indicated by the color style attribute value.
 
     Example
@@ -221,16 +226,37 @@ def style_to_color(style_attr_value: list[int] | \
     .. code-block:: python
         my_theme = SkTheme()
         background_attr_value = my_theme.get_style_attr("SkButton:hover", "background")
-        theme.style_to_color(background_attr_value)
+        theme.style_to_color(background_attr_value, my_theme.name)
     This shows getting a color object for the background of a `SkButton` at `hover` state.
 
     :param style_attr_value: The value of style attribute
+    :param theme_name: The name of the theme used, or the theme itself
     """
     match style_attr_value:
-        case style_attr_value if type(style_attr_value) in [list, tuple]:
-            # If is configured to a RGB(A) color
-            return SkColor("").set_color(style_attr_value)
-        case style_attr_value if type(style_attr_value) is str:
-            # If is configured to a hex color string
+        case list() | tuple() | str():
+            # If is configured to a RGB(A) color tuple of hex string
             return SkColor(style_attr_value)
-        NotImplemented
+        case dict():
+            # If is configured to something else: color palette, gradient, texture, etc.
+            match list(style_attr_value.keys())[0]:
+                case "color_palette":
+                    # If is set to a color in color palette
+                    if type(theme) is str:
+                        theme = SkTheme.find_loaded_theme(theme)
+                        if theme == False:
+                            warnings.warn("No theme found using given name!", 
+                                          SkColorWarning)
+                            return SkColor((0, 255, 0, 255))
+                    if style_attr_value["color_palette"] not in theme.color_palette:
+                        warnings.warn(f"No color found in color palette of theme <{theme}>.", 
+                                      SkColorWarning)
+                    return style_to_color(theme.color_palette[style_attr_value["color_palette"]],
+                                          theme)
+                case "texture":
+                    warnings.warn("Texture is currently not implemented", FutureWarning)
+                    return SkColor((0, 255, 0, 255))
+                    NotImplemented
+        case _:
+            # If invalid, then return green to prevent crash
+            warnings.warn("Invalid color configuration in styles!", ValueError)
+            return SkColor((0, 255, 0, 255))
