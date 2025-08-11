@@ -12,13 +12,37 @@ class SkFont:
     字体
     """
 
-    def __init__(self, name: str = None, path: Union[Path, str] = None, size: int = 14):
+    def __init__(self, name: str | None = None, path: Union[Path, str] | None = None, size: int = 14):
         """
         SkFont object. For customizing fonts in your UI
 
         字体对象。用于自定义您界面上的字体
         """
         ...
+
+    def default_font(self):
+        """Get default font via different system"""
+        import tkinter as tk
+        import tkinter.font as tkfont
+        import platform
+
+        f = None
+
+        root = tk.Tk()
+        f = tkfont.nametofont("TkDefaultFont").actual().get("family")
+        root.destroy()
+
+        if f == ".AppleSystemUIFont":
+            if int(platform.mac_ver()[0].split(".")[0]) >= 11:
+                f = "SF Pro"
+            elif platform.mac_ver()[0] == "10.15":
+                f = "Helvetica Neue"
+            else:
+                f = "Lucida Grande"
+
+        del root, tk, tkfont, platform
+
+        return self.font(name=f, size=14.5)
 
     @staticmethod
     def font(
@@ -46,8 +70,9 @@ class SkFont:
                 raise FileNotFoundError
             _font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
         else:
-            _font = skia.Font(skia.Typeface(), size=14.5)
-        return _font
+            raise ValueError("Unexcepted name or font_path in default_font()")
+      
+        return font
 
 
 default_font = SkFont.font(None)
