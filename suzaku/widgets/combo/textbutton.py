@@ -68,7 +68,7 @@ class SkTextButton(SkText):
         self._draw_central_text(
             canvas,
             text=self.attributes["text"],
-            fg=style["fg"],
+            fg=self.theme.get_style("SkText")["fg"],
             canvas_x=self.canvas_x,
             canvas_y=self.canvas_y,
             width=self.width,
