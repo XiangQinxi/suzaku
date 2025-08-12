@@ -28,7 +28,7 @@ class SkText(SkWidget):
         self._draw_central_text(
             canvas,
             text=self.get(),
-            fg=self.theme.styles["SkText"]["fg"],
+            fg=self.theme.styles["SkText"]["rest"]["fg"],
             canvas_x=self.canvas_x,
             canvas_y=self.canvas_y,
             width=self.width,
