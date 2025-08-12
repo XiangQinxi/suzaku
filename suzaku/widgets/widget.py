@@ -5,7 +5,7 @@ import pyperclip
 import skia
 
 from ..event import SkEvent, SkEventHanding
-from ..styles.color import SkGradient, color
+from ..styles.color import SkGradient, make_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
@@ -270,7 +270,7 @@ class SkWidget(SkEventHanding):
         else:
             colors2 = list
             for _color in colors:
-                colors2.append(color(_color))
+                colors2.append(make_color(_color))
             colors = tuple(colors2)
         return skia.GradientShader.MakeSweep(
             cx=cx,  # Center x position of the sweep
@@ -359,7 +359,7 @@ class SkWidget(SkEventHanding):
         font = self.attributes["font"]
 
         # 绘制字体
-        text_paint = skia.Paint(AntiAlias=True, Color=color(fg))
+        text_paint = skia.Paint(AntiAlias=True, Color=make_color(fg))
 
         text_width = font.measureText(text)
         metrics = font.getMetrics()
@@ -420,7 +420,7 @@ class SkWidget(SkEventHanding):
         )
 
         # Background
-        bg_paint.setColor(color(bg))
+        bg_paint.setColor(make_color(bg))
         if bg_shader:
             if isinstance(bg_shader, dict):
                 if "linear_gradient" in bg_shader:
@@ -437,7 +437,7 @@ class SkWidget(SkEventHanding):
 
         # Border
         bd_paint.setStrokeWidth(width)
-        bd_paint.setColor(color(bd))
+        bd_paint.setColor(make_color(bd))
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:

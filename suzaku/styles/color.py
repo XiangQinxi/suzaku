@@ -11,6 +11,9 @@ if typing.TYPE_CHECKING:
     from ..widgets.widget import SkWidget
 
 
+ERR_COLOR = (0, 255, 0, 255)
+
+
 class SkColorWarning(Warning):
     pass
 
@@ -279,43 +282,31 @@ def style_to_color(
                             warnings.warn(
                                 "No theme found using given name!", SkColorWarning
                             )
-                            return SkColor((0, 255, 0, 255))
-                    if style_attr_value["color_palette"] not in theme.color_palette:
-                        warnings.warn(
-                            f"No color found in color palette of theme <{theme}>.",
-                            SkColorWarning,
-                        )
+                            return SkColor(ERR_COLOR)
                     return style_to_color(
-                        theme.color_palette[style_attr_value["color_palette"]], theme
+                        theme.get_preset_color(style_attr_value["color_palette"]), theme
                     )
                 case "texture":
                     warnings.warn("Texture is currently not implemented", FutureWarning)
                     NotImplemented
-                    return SkColor((0, 255, 0, 255))
+                    return SkColor(ERR_COLOR)
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn("Invalid color configuration in styles!", ValueError)
-            return SkColor((0, 255, 0, 255))
+            return SkColor(ERR_COLOR)
 
 
-from warnings import warn
-
-
-def color(value: str | tuple | list | None) -> int:
+def make_color(value: str | tuple | list | None) -> int:
     """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
 
-    >>> color("#ffffff")  # Supports hex
-    >>> color( (255, 255, 255, 255 ) )  # Supports RGBA format
-    >>> color("white")  # Supports predefined color names (refer to color parameters in skia)
+    Example
+    -------
+    .. code-block:: python
+        color("#ffffff")  # Supports hex
+        color( (255, 255, 255, 255 ) )  # Supports RGBA format
+        color("white")  # Supports predefined color names (refer to color parameters in skia)
 
     :param value: Color value, can be hex, rgba, or color name.
     :type value: str | tuple | list | None
     """
     return SkColor(value).color
-
-
-# from theme import SkTheme
-
-# my_theme = SkTheme()
-# background_attr_value = my_theme.get_style_attr("SkButton:hover", "background")
-# theme.style_to_color(background_attr_value, my_theme.name)

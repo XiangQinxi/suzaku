@@ -7,6 +7,8 @@ import re
 import typing
 import warnings
 
+from . import color
+
 if typing.TYPE_CHECKING:
     from ..widgets.widget import SkWidget
 
@@ -417,10 +419,45 @@ class SkTheme:
     
     def get_preset_color(self, color_name: str):
         """Find a preset color from color palette.
+
+        Example
+        -------
+        .. code-block:: python
+            my_theme = SkTheme()
+            white = my_theme.get_preset_color("-white")
+            default_bg = my_theme.get_preset_color("default_bg")
+        This shows getting the white color and the preset color named `default_bg`.
         
         :param color_name: Name of the color
         """
-        NotImplemented
+        keywords = {
+            "-transparent": (0, 0, 0, 0),
+            "-black": (0, 0, 0, 255),
+            "-white": (255, 255, 255, 255),
+            "-absneutralgrey": (128, 128, 128, 255),
+            "-errcolor": color.ERR_COLOR,
+        }
+        if color_name in keywords:
+            # If is a keyword
+            result = keywords[color_name]
+        else:
+            # If not a keyword
+            if color_name in self.color_palette:
+                # If existed
+                result = self.color_palette[color_name]
+            else:
+                # If not, fallback
+                if isinstance(self.parent, SkTheme):
+                    # If has parent, fallback to parent
+                    result = self.parent.get_preset_color(color_name)
+                else:
+                    # If not, then is root theme, go fuck your color name
+                    warnings.warn(f"Color <{color_name}> if not found anywhere.", color.SkColorWarning)
+                    result = color.ERR_COLOR
+        if type(result) is dict:
+            return result.copy()
+        else:
+            return result
 
     def mixin(self, selector: str, new_style: dict, copy: bool = False) -> "SkTheme":
         """Mix, or in other words, override custom styles into the theme.

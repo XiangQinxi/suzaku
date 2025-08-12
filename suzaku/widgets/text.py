@@ -2,7 +2,7 @@ from typing import Union
 
 import skia
 
-from ..styles.color import SkColor, color
+from ..styles.color import SkColor, make_color
 from ..styles.font import default_font
 from .widget import SkWidget
 from .window import SkWindow
