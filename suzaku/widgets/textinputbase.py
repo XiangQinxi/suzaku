@@ -4,7 +4,7 @@ import glfw
 import skia
 
 from ..event import SkEvent
-from ..styles.color import color
+from ..styles.color import make_color
 from ..var import SkStringVar
 from .widget import SkWidget
 
@@ -145,7 +145,7 @@ class SkTextInputBase(SkWidget):
         text_paint = skia.Paint(
             AntiAlias=True,
         )
-        text_paint.setColor(color(fg))
+        text_paint.setColor(make_color(fg))
         # Draw text
         font = self.attributes["font"]
         padding = 2  # sheets["width"] * 2
@@ -180,7 +180,7 @@ class SkTextInputBase(SkWidget):
             )
         else:
             if self.attributes["placeholder"] and not self.get():
-                text_paint.setColor(color(placeholder))
+                text_paint.setColor(make_color(placeholder))
                 canvas.drawSimpleText(
                     self.attributes["placeholder"], draw_x, draw_y, font, text_paint
                 )
