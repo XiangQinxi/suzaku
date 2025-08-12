@@ -240,6 +240,7 @@ class SkWidget(SkEventHanding):
         self._draw(canvas, rect)
         if hasattr(self, "draw_children"):
             self.draw_children(canvas)
+            self._handle_layout(None)
 
     def _draw(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Execute the widget rendering

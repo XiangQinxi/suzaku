@@ -65,8 +65,8 @@ class SkContainer:
         self.allowed_out_of_bounds = allowed_out_of_bounds
 
         # self.bind("resize", self._handle_layout)
-        self.bind("resize", self._handle_layout)
-        self.bind("update", self._update)
+        self.bind("resize", self._update)
+        #self.bind("update", self._update)
 
         if isinstance(self, SkWidget):
 
@@ -76,13 +76,13 @@ class SkContainer:
 
             self.bind("resize", children_resize)
 
-    def _update(self, event):
+    def _update(self, event=None):
         """Organize the layout and send an `update` event message to the child components
 
         :param event: SkEvent
         :return:
         """
-        self._handle_layout(event)
+        self._handle_layout(event=None)
         for widget in self.children:
             from suzaku.event import SkEvent
 
@@ -133,7 +133,7 @@ class SkContainer:
                 self._box_direction = direction
 
         self.draw_list[0].append(child)
-        self._handle_layout()
+        self._update()
 
     def add_floating_child(self, child):
         """Add floating child widget to window.
@@ -142,7 +142,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[1].append(child)
-        self._handle_layout()
+        self._update()
 
     def add_fixed_child(self, child):
         """Add fixed child widget to window.
@@ -156,7 +156,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[2].append(child)
-        self._handle_layout()
+        self._update()
 
     # endregion
 
@@ -200,9 +200,9 @@ class SkContainer:
     # region layout 布局
 
     def update_layout(self):
-        self._handle_layout()
+        self._update()
 
-    def _handle_layout(self, evt=None):
+    def _handle_layout(self, event=None):
         """Handle layout of the container.
 
         :return: None
