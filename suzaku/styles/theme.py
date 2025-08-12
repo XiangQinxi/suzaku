@@ -358,7 +358,7 @@ class SkTheme:
                 # result = styles["SkButton"]["hover"]
                 result = result[selector_level]
 
-        if copy:
+        if copy and type(result) is dict:
             return result.copy()
         else:
             return result
