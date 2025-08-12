@@ -450,6 +450,11 @@ class SkWidget(SkEventHanding):
     ) -> "SkWidget":
         """Fix the widget at a specific position.
 
+        Example:
+            .. code-block:: python
+
+                widget.fixed(x=10, y=10, width=100, height=100)
+
         :param x:
         :param y:
         :param width:

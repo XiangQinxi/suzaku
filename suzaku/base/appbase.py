@@ -2,6 +2,7 @@ import warnings
 
 import glfw
 
+
 from ..event import SkEventHanding
 
 
@@ -26,20 +27,31 @@ def init_glfw() -> None:
 
 
 class SkAppBase(SkEventHanding):
+    """Base Application class.
+
+    Example:
+
+    .. code-block:: python
+
+        app = SkAppBase()
+        # Context #
+        window = SkWindowBase()
+        ###########
+        app.run()
+
+    :param bool window_event_wait:
+        Whether to wait for window events
+    :param bool draw_on_focus:
+        Whether to draw on focus
+    """
 
     _instance = None
 
     # region __init__ 初始化
 
     def __init__(
-        self, window_event_wait: bool = False, draw_on_focus: bool = False
+        self, window_event_wait: bool = True, draw_on_focus: bool = True
     ) -> None:
-        """Base Application class.
-
-        :param window_event_wait: Whether to wait for window events
-        :param draw_on_focus: Whether to draw on focus
-        """
-
         from .windowbase import SkWindowBase
 
         self.windows: list[SkWindowBase] = []
@@ -67,6 +79,14 @@ class SkAppBase(SkEventHanding):
         """Add a window.
 
         :param window: The window
+
+        Example:
+
+        .. code-block:: python
+            app = SkAppBase()
+            window = SkWindowBase(app)
+            app.add_window(window)
+
         """
 
         self.windows.append(window)

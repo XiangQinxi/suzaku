@@ -14,9 +14,30 @@ def color(value):
 
 
 class SkColor:
+    """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
+
+    >>> SkColor("#ffffff")  # Supports hex
+    >>> SkColor( (255, 255, 255, 255 ) )  # Supports RGBA format
+    >>> SkColor("white")  # Supports predefined color names (refer to color parameters in skia)
+
+    Afterwards, use `Color().color` to obtain the Skia.Color.
+
+    Of course, if you want to change the color value, you can use the `set_color` method of `SkColor` to modify it—though generally, you won't need to.
+
+    :param color: Color value, can be hex, rgba, or color name.
+    :type color: str | tuple | list | None
+    """
+
     def __init__(self, color: str | None = None) -> None:
         self.color = None
         self.set_color(color)
+
+    def get(self) -> skia.Color:
+        """Get the color value.
+
+        :return: Color value.
+        """
+        return self.color
 
     def set_color(self, color: str | tuple | list) -> SkColor:
         """Set the color of the SkColor."""
@@ -95,11 +116,11 @@ class SkColor:
 
 
 class SkGradient:
-    def __init__(self):
-        """Initialize gradient
+    """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use.
 
-        :param widget: Widget
-        """
+    :param widget: Widget
+    """
+    def __init__(self):
         # self.widget = widget
         self.gradient: skia.GradientShader | None = None
 
@@ -163,11 +184,17 @@ class SkGradient:
     ):
         """Set linear gradient
 
-        Example
-        -------
         .. code-block:: python
-            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red",
-                                 "end": "blue"})
+            gradient.set_linear(
+                {
+                    "start_anchor": "n",
+                    "end_anchor": "s",
+                    "start": "red",
+                    "end": "blue"
+                }
+            )
+
+
 
         :param end_pos: End position
         :param start_pos: Start position

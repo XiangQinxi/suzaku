@@ -11,6 +11,19 @@ from .appbase import SkAppBase
 
 
 class SkWindowBase(SkEventHanding):
+    """Base Window class
+
+    Example:
+        .. code-block:: python
+
+            window = SkWindowBase()
+
+    :param parent: window parent
+    :param title: window title
+    :param size: window size
+    :param fullscreen: window fullscreen
+    :param opacity: window opacity
+    """
 
     _instance_count = 0
 
@@ -28,15 +41,6 @@ class SkWindowBase(SkEventHanding):
         overrideredirect: bool = False,
         name="window",
     ):
-        """Base Window class
-
-        :param parent: window parent
-        :param title: window title
-        :param size: window size
-        :param fullscreen: window fullscreen
-        :param opacity: window opacity
-        """
-
         self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
 
@@ -127,6 +131,8 @@ class SkWindowBase(SkEventHanding):
     @classmethod
     def get_instance_count(cls) -> int:
         """Get instance count.
+
+        >>> print(SkWindowBase.get_instance_count())
 
         :return: Instance count
         """

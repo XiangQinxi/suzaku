@@ -12,7 +12,6 @@ if __name__ == "__main__":
     root = Sk(
         title="Suzaku GUI",
         size=(280, 460),
-        force_hardware_acceleration=True,  # overrideredirect=True,
     )
     # print(glfw.default_window_hints())
     root.bind("drop", lambda evt: print("drop", evt))
