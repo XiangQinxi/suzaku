@@ -64,8 +64,8 @@ class SkTextButton(SkText):
             canvas,
             text=self.attributes["text"],
             fg=sheets["fg"],
-            x=self.x,
-            y=self.y,
+            canvas_x=self.canvas_x,
+            canvas_y=self.canvas_y,
             width=self.width,
             height=self.height,
         )

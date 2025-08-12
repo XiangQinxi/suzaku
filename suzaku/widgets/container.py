@@ -173,8 +173,8 @@ class SkContainer:
 
         if not isinstance(self, SkWindow):
             if isinstance(self, SkWidget):
-                x = self.x
-                y = self.y
+                x = self.canvas_x
+                y = self.canvas_y
             else:
                 x = 0
                 y = 0
@@ -235,14 +235,6 @@ class SkContainer:
         """
 
         from ..widgets.widget import SkWidget
-        from ..widgets.window import SkWindow
-
-        if isinstance(self, SkWindow):
-            x = 0
-            y = 0
-        else:
-            x = self.x
-            y = self.y
 
         width = self.width  # container width
         height = self.height  # container height
@@ -380,8 +372,8 @@ class SkContainer:
                     child.height = child.cget("dheight")
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = x + left
-                child.y = y + last_child_bottom_y + top
+                child.x = left
+                child.y = last_child_bottom_y + top
                 last_child_bottom_y = child.y + child.height + bottom
 
             last_child_top_y = height  # Last top y position of the child component
@@ -404,8 +396,8 @@ class SkContainer:
                     child.height = child.cget("dheight")
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = x + left
-                child.y = y + last_child_top_y - child.height - bottom
+                child.x = left
+                child.y = last_child_top_y - child.height - bottom
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
     def _handle_fixed(self, child):
@@ -415,13 +407,8 @@ class SkContainer:
         """
         from ..widgets.window import SkWindow
 
-        if isinstance(self, SkWindow):
-            x = y = 0
-        else:
-            x = self.x
-            y = self.y
-        child.x = child.layout_config["fixed"]["x"] + x
-        child.y = child.layout_config["fixed"]["y"] + y
+        child.x = child.layout_config["fixed"]["x"]
+        child.y = child.layout_config["fixed"]["y"]
         child.width = child.layout_config["fixed"]["width"]
         child.height = child.layout_config["fixed"]["height"]
 

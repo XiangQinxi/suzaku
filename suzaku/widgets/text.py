@@ -29,8 +29,8 @@ class SkText(SkWidget):
             canvas,
             text=self.get(),
             fg=self.theme.styles["SkText"]["fg"],
-            x=self.x,
-            y=self.y,
+            canvas_x=self.canvas_x,
+            canvas_y=self.canvas_y,
             width=self.width,
             height=self.height,
         )

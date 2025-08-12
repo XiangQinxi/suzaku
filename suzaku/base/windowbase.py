@@ -63,12 +63,18 @@ class SkWindowBase(SkEventHanding):
 
         self.event_init = False
 
-        self.x: int | float = 0  # Always is 0
-        self.y: int | float = 0  # Always is 0
+        # Always is 0
+        self.x: int | float = 0
+        self.y: int | float = 0
+        self.canvas_x: int | float = 0
+        self.canvas_y: int | float = 0
+        # Window position
         self.root_x: int | float = 0
         self.root_y: int | float = 0
+        # Window size
         self.width: int | float = size[0]
         self.height: int | float = size[1]
+
         self.glfw_window = None
         self.visible = False
         self.mouse_x = 0

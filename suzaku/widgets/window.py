@@ -112,8 +112,8 @@ class SkWindow(SkWindowBase, SkContainer):
     def _mouse(self, event) -> None:
         for widget in self.children:
             if (
-                widget.x <= event.x <= widget.x + widget.width
-                and widget.y <= event.y <= widget.y + widget.height
+                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
+                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
             ):
                 widget.is_mouse_floating = True
                 if widget.focusable:
@@ -139,8 +139,8 @@ class SkWindow(SkWindowBase, SkContainer):
         # 找到当前鼠标所在的视觉元素
         for widget in reversed(self.children):
             if (
-                widget.x <= event.x <= widget.x + widget.width
-                and widget.y <= event.y <= widget.y + widget.height
+                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
+                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
             ):
                 current_widget = widget
                 break
