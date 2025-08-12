@@ -3,7 +3,7 @@ from .widget import SkWidget
 
 
 class SkFrame(SkWidget, SkContainer):
-    def __init__(self, *args, border: bool = True, **kwargs) -> None:
+    def __init__(self, *args, border: bool = False, **kwargs) -> None:
         SkWidget.__init__(self, *args, **kwargs)
         SkContainer.__init__(self)
 

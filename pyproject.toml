@@ -12,7 +12,7 @@ dependencies = [
     "skia-python",
     "glfw",
     "pyopengl",
-    "pyperclip"
+    "clipman"
 ]
 license = "MIT"
 
