@@ -441,9 +441,13 @@ class SkWidget(SkEventHanding):
 
     # region Widget attribute configs 组件属性配置
 
-    @property
-    def clipboard_get(self):
+    @staticmethod
+    def clipboard_get() -> str:
         return pyperclip.paste()
+
+    @staticmethod
+    def clipboard_set(value) -> None:
+        pyperclip.copy(value)
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.

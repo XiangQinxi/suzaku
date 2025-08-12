@@ -1,7 +1,6 @@
 from typing import Self
 
 import glfw
-import pyperclip
 import skia
 
 from ..event import SkEvent
@@ -79,12 +78,13 @@ class SkTextInputBase(SkWidget):
                 self.cursor_right()
             case glfw.KEY_V:
                 if event.mods == "control":
-                    self.set(
-                        text[: self.cursor_index]
-                        + self.clipboard_get
-                        + text[self.cursor_index :]
-                    )
-                    self.cursor_index += len(self.clipboard_get)
+                    if isinstance(self.clipboard_get(), str):
+                        self.set(
+                            text[: self.cursor_index]
+                            + self.clipboard_get()
+                            + text[self.cursor_index :]
+                        )
+                        self.cursor_index += len(self.clipboard_get())
             case glfw.KEY_HOME:
                 self.cursor_home()
             case glfw.KEY_END:

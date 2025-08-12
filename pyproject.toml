@@ -1,6 +1,6 @@
 [project]
 name = "suzaku"
-version = "0.0.2dev3"
+version = "0.0.2"
 description = "New and aesthetically pleasing GUI library (新型美观GUI库)"
 keywords = ["suzaku","future","lightweight","gui","framework"]
 authors = [
@@ -11,7 +11,8 @@ requires-python = ">=3.8"
 dependencies = [
     "skia-python",
     "glfw",
-    "pyopengl"
+    "pyopengl",
+    "pyperclip"
 ]
 license = "MIT"
 
