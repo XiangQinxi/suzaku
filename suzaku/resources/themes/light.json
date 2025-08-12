@@ -3,6 +3,11 @@
   "base": "ROOT",
   "friendly_name": "Default Light",
 
+  "color_palette": {
+    "default_bg": [255, 255, 255, 235],
+    "default_fg": [0, 0, 0, 235]
+  },
+
   "styles":{
     "SkWindow": {
       "bg": [255, 255, 255, 240]
