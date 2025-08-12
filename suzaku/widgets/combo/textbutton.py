@@ -49,10 +49,12 @@ class SkTextButton(SkText):
         else:
             bd_shader = None
 
+        print(self.theme.get_style("SkButton:radius"))
+
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.styles["SkButton"]["radius"],
+            radius=self.theme.get_style("SkButton", "radius"),
             bg=sheets["bg"],
             width=sheets["width"],
             bd=sheets["bd"],

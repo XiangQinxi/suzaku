@@ -148,6 +148,7 @@ class SkWidget(SkEventHanding):
     @property
     def y(self):
         return self._y
+
     @y.setter
     def y(self, value):
         self._y = value
@@ -198,7 +199,16 @@ class SkWidget(SkEventHanding):
         self._root_x = self.canvas_x + self.window.root_x
         self._root_y = self.canvas_y + self.window.root_y
 
-        self.event_generate("move", SkEvent(event_type="move", x=self._x, y=self._y, rootx=self._root_x, rooty=self._root_y))
+        self.event_generate(
+            "move",
+            SkEvent(
+                event_type="move",
+                x=self._x,
+                y=self._y,
+                rootx=self._root_x,
+                rooty=self._root_y,
+            ),
+        )
 
     def _click(self, event) -> None:
         """
@@ -222,7 +232,9 @@ class SkWidget(SkEventHanding):
         if self.width <= 0 or self.height <= 0:
             return
 
-        rect = skia.Rect.MakeXYWH(x=self.canvas_x, y=self.canvas_y, w=self.width, h=self.height)
+        rect = skia.Rect.MakeXYWH(
+            x=self.canvas_x, y=self.canvas_y, w=self.width, h=self.height
+        )
         self._draw(canvas, rect)
         if hasattr(self, "draw_children"):
             self.draw_children(canvas)
@@ -318,7 +330,15 @@ class SkWidget(SkEventHanding):
         paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
     def _draw_central_text(
-        self, canvas, text, fg, canvas_x, canvas_y, width, height, font: skia.Font = None
+        self,
+        canvas,
+        text,
+        fg,
+        canvas_x,
+        canvas_y,
+        width,
+        height,
+        font: skia.Font = None,
     ):
         """Draw central text
 

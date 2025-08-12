@@ -1,44 +1,44 @@
 import glfw
 import OpenGL.GL as gl
-from ctypes import windll, wintypes, byref
-import ctypes
 
 
-def create_custom_titlebar_window():
+def main():
     # 初始化GLFW
     if not glfw.init():
-        return None
+        return
 
-    # 设置窗口提示 - 隐藏装饰
-    glfw.window_hint(glfw.DECORATED, glfw.FALSE)
-    glfw.window_hint(glfw.RESIZABLE, glfw.TRUE)
+    # 设置窗口提示：启用DPI缩放感知 (GLFW 3.3+)
+    glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
+    glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
 
     # 创建窗口
-    window = glfw.create_window(800, 600, "Custom Titlebar", None, None)
+    window = glfw.create_window(800, 600, "DPI-Aware Window", None, None)
     if not window:
         glfw.terminate()
-        return None
+        return
 
     glfw.make_context_current(window)
 
-    # 获取Windows句柄
-    hwnd = glfw.get_win32_window(window)
+    # 获取初始DPI缩放因子
+    x_scale, y_scale = glfw.get_window_content_scale(window)
+    print(f"Initial content scale: {x_scale:.1f}x{y_scale:.1f}")
 
-    # 设置窗口样式以支持拖拽
-    style = windll.user32.GetWindowLongW(hwnd, -16)  # GWL_STYLE
-    style |= 0x00800000  # WS_BORDER
-    windll.user32.SetWindowLongW(hwnd, -16, style)
+    # 设置DPI变化回调
+    def content_scale_callback(win, x_scale, y_scale):
+        print(f"Content scale changed: {x_scale:.1f}x{y_scale:.1f}")
+        # 在此处更新UI元素尺寸/重新加载纹理等
+        gl.glViewport(0, 0, int(800 * x_scale), int(600 * y_scale))
 
-    return window, hwnd
+    glfw.set_window_content_scale_callback(window, content_scale_callback)
+
+    # 主循环
+    while not glfw.window_should_close(window):
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        glfw.swap_buffers(window)
+        glfw.poll_events()
+
+    glfw.terminate()
 
 
-def handle_titlebar_drag(window, hwnd, mouse_x, mouse_y, titlebar_height=30):
-    """处理标题栏拖拽"""
-    if mouse_y < titlebar_height:  # 鼠标在标题栏区域
-        # 发送拖拽消息
-        windll.user32.ReleaseCapture()
-        windll.user32.SendMessageW(hwnd, 0x00A1, 2, 0)  # WM_NCLBUTTONDOWN, HTCAPTION
-
-
-window, hwnd = create_custom_titlebar_window()
-
+if __name__ == "__main__":
+    main()

@@ -75,6 +75,12 @@ class SkWindowBase(SkEventHanding):
         self.width: int | float = size[0]
         self.height: int | float = size[1]
 
+        # 添加DPI相关属性
+        self.dpi_scale = 1.0
+        self.monitor = None
+        self.physical_width = size[0]
+        self.physical_height = size[1]
+
         self.glfw_window = None
         self.visible = False
         self.mouse_x = 0
@@ -115,6 +121,7 @@ class SkWindowBase(SkEventHanding):
                 "maximize": {},
                 "iconify": {},
                 "configure": {},
+                "dpi_change": {},  # 添加DPI变化事件
             }
         )
 
@@ -158,6 +165,8 @@ class SkWindowBase(SkEventHanding):
                 monitor = None
 
             glfw.window_hint(glfw.STENCIL_BITS, 8)
+            glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
+            glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
 
             # see https://www.glfw.org/faq#macos
             if sys.platform.startswith("darwin"):
@@ -188,6 +197,11 @@ class SkWindowBase(SkEventHanding):
 
             glfw.set_window_opacity(window, self.cget("opacity"))
 
+            # 初始化DPI缩放
+            self.monitor = glfw.get_window_monitor(window)
+            if self.monitor:
+                self._update_dpi_scale()
+
             return window
         else:
             raise RuntimeError(
@@ -216,7 +230,7 @@ class SkWindowBase(SkEventHanding):
             backend_render_target = skia.GrBackendRenderTarget(
                 fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
             )
-            surface = skia.Surface.MakeFromBackendRenderTarget(
+            surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
                 context,
                 backend_render_target,
                 skia.kBottomLeft_GrSurfaceOrigin,
@@ -357,7 +371,14 @@ class SkWindowBase(SkEventHanding):
         self._on_framebuffer_size(window, width, height)
         self.width = width
         self.height = height
-        event = SkEvent(event_type="resize", width=width, height=height)
+
+        # 更新物理尺寸
+        self.physical_width = int(width * self.dpi_scale)
+        self.physical_height = int(height * self.dpi_scale)
+
+        event = SkEvent(
+            event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
+        )
         self.event_generate("resize", event)
         for child in self.children:
             child.event_generate("resize", event)
@@ -526,11 +547,18 @@ class SkWindowBase(SkEventHanding):
             glfw.set_window_maximize_callback(window, self._on_maximize)
             glfw.set_drop_callback(window, self._on_drop)
             glfw.set_window_iconify_callback(window, self._on_iconify)
+
+            # 添加DPI变化回调
+            if hasattr(glfw, "set_window_content_scale_callback"):
+                glfw.set_window_content_scale_callback(window, self._on_dpi_change)
+
             self.event_init = True
 
     # endregion
 
-    def wm_cursor(self, cursor_name: typing.Union[str, None] = None) -> typing.Self | str:
+    def wm_cursor(
+        self, cursor_name: typing.Union[str, None] = None
+    ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 
         cursor_name:
@@ -562,7 +590,9 @@ class SkWindowBase(SkEventHanding):
 
     cursor = wm_cursor
 
-    def default_cursor(self, cursor_name: str = None) -> typing.Union[str, "SkWindowBase"]:
+    def default_cursor(
+        self, cursor_name: str = None
+    ) -> typing.Union[str, "SkWindowBase"]:
         """Set the default cursor style of the window.
 
         cursor_name:
@@ -787,5 +817,98 @@ class SkWindowBase(SkEventHanding):
     @property
     def hwnd(self):
         return glfw.get_win32_window(self.glfw_window)
+
+    # endregion
+
+    # region DPI缩放相关
+    # 添加DPI缩放相关方法
+    def _update_dpi_scale(self) -> None:
+        """Update DPI scale based on current monitor"""
+        if not self.monitor:
+            self.dpi_scale = 1.0
+            return
+
+        # 获取显示器的物理尺寸和分辨率
+        video_mode = glfw.get_video_mode(self.monitor)
+        if not video_mode:
+            self.dpi_scale = 1.0
+            return
+
+        # 计算DPI缩放因子 (假设标准DPI为96)
+        if hasattr(glfw, "get_monitor_physical_size"):
+            width_mm, height_mm = glfw.get_monitor_physical_size(self.monitor)
+            if width_mm > 0 and height_mm > 0:
+                # 计算每毫米的像素数
+                pixels_per_mm = video_mode.size[0] / (width_mm / 25.4)  # 转换为英寸
+                self.dpi_scale = pixels_per_mm / 96.0  # 标准DPI为96
+        elif sys.platform == "win32":
+            # Windows平台特定的DPI获取方式
+            try:
+                import ctypes
+
+                user32 = ctypes.windll.user32
+                user32.SetProcessDPIAware()
+                self.dpi_scale = user32.GetDpiForWindow(self.hwnd) / 96.0
+            except:
+                self.dpi_scale = 1.0
+        else:
+            # 回退方案
+            self.dpi_scale = 1.0
+
+        # 触发DPI变化事件
+        self.event_generate(
+            "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale)
+        )
+
+    def _on_dpi_change(self, window, xscale, yscale) -> None:
+        """Handle DPI change event
+
+        :param window: GLFW Window
+        :param xscale: X scale factor
+        :param yscale: Y scale factor
+        """
+        # 更新DPI缩放因子
+        self.dpi_scale = (xscale + yscale) / 2.0
+
+        # 触发DPI变化事件
+        self.event_generate(
+            "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale)
+        )
+
+        # 更新窗口物理尺寸
+        self.physical_width = int(self.width * self.dpi_scale)
+        self.physical_height = int(self.height * self.dpi_scale)
+
+        # 触发重绘
+        self.update()
+
+    # 添加获取DPI缩放因子的方法
+    def get_dpi_scale(self) -> float:
+        """Get current DPI scale factor
+
+        :return: DPI scale factor
+        """
+        return self.dpi_scale
+
+    # 添加设置DPI缩放因子的方法
+    def set_dpi_scale(self, scale: float) -> "SkWindowBase":
+        """Set DPI scale factor
+
+        :param scale: DPI scale factor
+        :return: cls
+        """
+        if scale <= 0:
+            raise ValueError("DPI scale must be positive")
+
+        self.dpi_scale = scale
+        self.physical_width = int(self.width * scale)
+        self.physical_height = int(self.height * scale)
+
+        # 触发DPI变化事件
+        self.event_generate(
+            "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale)
+        )
+
+        return self
 
     # endregion
