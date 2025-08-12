@@ -2,11 +2,11 @@ from typing import Callable
 
 import skia
 
-from ..base.container import SkContainer
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
-from ..styles.color import SkColor, color
+from ..styles.color import color
 from ..styles.theme import SkTheme, default_theme
+from .container import SkContainer
 
 
 class SkWindow(SkWindowBase, SkContainer):

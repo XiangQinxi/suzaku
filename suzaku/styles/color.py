@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-import warnings
-import skia
 import typing
+import warnings
+
+import skia
+
 from ..styles.theme import SkTheme
 
 if typing.TYPE_CHECKING:
@@ -120,6 +122,7 @@ class SkGradient:
 
     :param widget: Widget
     """
+
     def __init__(self):
         # self.widget = widget
         self.gradient: skia.GradientShader | None = None
@@ -245,8 +248,9 @@ class SkGradient:
             return None
 
 
-def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
-                   theme: str | SkTheme) -> SkColor | SkGradient:
+def style_to_color(
+    style_attr_value: list[int] | tuple[int, int, int, int] | dict, theme: str | SkTheme
+) -> SkColor | SkGradient:
     """Returns the color object indicated by the color style attribute value.
 
     Example
@@ -272,14 +276,18 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
                     if type(theme) is str:
                         theme = SkTheme.find_loaded_theme(theme)
                         if theme == False:
-                            warnings.warn("No theme found using given name!", 
-                                          SkColorWarning)
+                            warnings.warn(
+                                "No theme found using given name!", SkColorWarning
+                            )
                             return SkColor((0, 255, 0, 255))
                     if style_attr_value["color_palette"] not in theme.color_palette:
-                        warnings.warn(f"No color found in color palette of theme <{theme}>.", 
-                                      SkColorWarning)
-                    return style_to_color(theme.color_palette[style_attr_value["color_palette"]],
-                                          theme)
+                        warnings.warn(
+                            f"No color found in color palette of theme <{theme}>.",
+                            SkColorWarning,
+                        )
+                    return style_to_color(
+                        theme.color_palette[style_attr_value["color_palette"]], theme
+                    )
                 case "texture":
                     warnings.warn("Texture is currently not implemented", FutureWarning)
                     return SkColor((0, 255, 0, 255))
@@ -289,7 +297,9 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
             warnings.warn("Invalid color configuration in styles!", ValueError)
             return SkColor((0, 255, 0, 255))
 
+
 from warnings import warn
+
 
 def color(value: str | tuple | list | None) -> int:
     """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
@@ -302,6 +312,7 @@ def color(value: str | tuple | list | None) -> int:
     :type value: str | tuple | list | None
     """
     return SkColor(value).color
+
 
 # from theme import SkTheme
 

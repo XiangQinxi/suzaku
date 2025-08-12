@@ -1,4 +1,4 @@
-from ..base.container import SkContainer
+from .container import SkContainer
 from .widget import SkWidget
 
 

@@ -181,13 +181,17 @@ class SkTheme:
         }
         for item in EXPECTED_DATA_TYPE.keys():
             if type(theme_data[item]) != EXPECTED_DATA_TYPE[item]:
-                theme_name = theme_data["name"] if type(theme_data["name"]) is str \
-                                                else "(Type error)"
+                theme_name = (
+                    theme_data["name"]
+                    if type(theme_data["name"]) is str
+                    else "(Type error)"
+                )
                 warnings.warn(
                     f"Error data type of <{item}> in theme data that is about to be loaded. "
                     f"Expected {EXPECTED_DATA_TYPE[item]} but got {type(item)}. The json data "
-                    f"with theme named <{theme_name}> will not be loaded to the theme <{self.name}>"
-                , ResourceWarning)
+                    f"with theme named <{theme_name}> will not be loaded to the theme <{self.name}>",
+                    ResourceWarning,
+                )
                 return self
         # Load data
         self.styles = theme_data["styles"].copy()

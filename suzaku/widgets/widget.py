@@ -71,6 +71,8 @@ class SkWidget(SkEventHanding):
 
         self.x: int | float = 0
         self.y: int | float = 0
+        self.root_x: int | float = 0
+        self.root_y: int | float = 0
         self.mouse_x = 0
         self.mouse_y = 0
 

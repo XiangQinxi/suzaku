@@ -2,7 +2,6 @@ import warnings
 
 import glfw
 
-
 from ..event import SkEventHanding
 
 

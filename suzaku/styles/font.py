@@ -5,12 +5,18 @@ from typing import Any, Union
 
 import skia
 
+
 class SkFont:
     """
     SkFont
     """
 
-    def __init__(self, name: str | None = None, path: Union[Path, str] | None = None, size: int = 14):
+    def __init__(
+        self,
+        name: str | None = None,
+        path: Union[Path, str] | None = None,
+        size: int = 14,
+    ):
         """
         SkFont object. For customizing fonts in your UI
         """
@@ -18,17 +24,17 @@ class SkFont:
 
     def default_font(self):
         """Get default font via different system
-        
+
         Example
         -------
         .. code-block:: python
             # get the system default font
             default_font = SkFont.default_font()
         """
-        #_ = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle()) # seems right, but won't return font that support Chinese, shit
+        # _ = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle()) # seems right, but won't return font that support Chinese, shit
+        import platform
         import tkinter as tk
         import tkinter.font as tkfont
-        import platform
 
         f = None
 
@@ -74,7 +80,7 @@ class SkFont:
             _font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
         else:
             raise ValueError("Unexcepted name or font_path in default_font()")
-      
+
         return _font
 
 

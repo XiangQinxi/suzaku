@@ -1,4 +1,5 @@
 import warnings
+
 import skia
 
 from ..event import SkEvent
@@ -63,7 +64,7 @@ class SkContainer:
         self._box_direction = None  # h(horizontal) or v(vertical)
         self.allowed_out_of_bounds = allowed_out_of_bounds
 
-        #self.bind("resize", self._handle_layout)
+        # self.bind("resize", self._handle_layout)
         self.bind("resize", self._handle_layout)
         self.bind("update", self._update)
 
@@ -95,9 +96,9 @@ class SkContainer:
 
         :param child: The child to add
         """
-        from .appbase import SkAppBase
+        from .app import SkApp
 
-        if not isinstance(self.parent, SkAppBase):
+        if not isinstance(self.parent, SkApp):
             self.parent.add_child(child)
         self.children.append(child)
 
@@ -168,9 +169,9 @@ class SkContainer:
         :return: None
         """
         from ..widgets.widget import SkWidget
-        from .windowbase import SkWindowBase
+        from .window import SkWindow
 
-        if not isinstance(self, SkWindowBase):
+        if not isinstance(self, SkWindow):
             if isinstance(self, SkWidget):
                 x = self.x
                 y = self.y
@@ -233,8 +234,8 @@ class SkContainer:
         :return: None
         """
 
-        from ..widgets.window import SkWindow
         from ..widgets.widget import SkWidget
+        from ..widgets.window import SkWindow
 
         if isinstance(self, SkWindow):
             x = 0

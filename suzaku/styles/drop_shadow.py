@@ -12,6 +12,7 @@ class SkDropShadow:
     :param sigmaY: The standard deviation in the y-direction.
     :param colr: The color of the drop shadow.
     """
+
     def __init__(self, dx=0, dy=0, sigmaX=0, sigmaY=0, colr=None, config_list=None):
         if config_list:
             self.dx = config_list[0]
