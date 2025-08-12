@@ -22,27 +22,19 @@ class SkFont:
 
     def default_font(self):
         """Get default font via different system"""
-        import tkinter as tk
-        import tkinter.font as tkfont
         import platform
 
-        f = None
+        _font = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle())
 
-        root = tk.Tk()
-        f = tkfont.nametofont("TkDefaultFont").actual().get("family")
-        root.destroy()
-
-        if f == ".AppleSystemUIFont":
+        if _font == ".AppleSystemUIFont":
             if int(platform.mac_ver()[0].split(".")[0]) >= 11:
-                f = "SF Pro"
+                _font = "SF Pro"
             elif platform.mac_ver()[0] == "10.15":
-                f = "Helvetica Neue"
+                _font = "Helvetica Neue"
             else:
-                f = "Lucida Grande"
+                _font = "Lucida Grande"
 
-        del root, tk, tkfont, platform
-
-        return self.font(name=f, size=14.5)
+        return self.font(name=_font, size=14.5)
 
     @staticmethod
     def font(
@@ -61,7 +53,6 @@ class SkFont:
         :param size: SkFont size.
         :return: skia.Font object
         """
-        size = size
 
         if name:
             _font = skia.Font(skia.Typeface(name), size)
@@ -72,7 +63,7 @@ class SkFont:
         else:
             raise ValueError("Unexcepted name or font_path in default_font()")
       
-        return font
+        return _font
 
 
 default_font = SkFont.font(None)
