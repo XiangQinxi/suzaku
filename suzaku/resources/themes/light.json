@@ -10,7 +10,9 @@
 
   "styles":{
     "SkWindow": {
-      "bg": [255, 255, 255, 240]
+      "rest":{
+        "bg": [255, 255, 255, 240]
+      }
     },
 
     "SkFrame": {
@@ -24,11 +26,13 @@
     },
 
     "SkBadge": {
-      "radius": 99,
-      "bg": [5, 105, 200, 255],
-      "fg": [255, 255, 255, 235],
-      "bd": "transparent",
-      "width": 0
+      "rest": {
+        "radius": 99,
+        "bg": [5, 105, 200, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": "transparent",
+        "width": 0
+      }
     },
 
     "SkButton": {
