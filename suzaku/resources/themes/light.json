@@ -30,8 +30,8 @@
     },
 
     "SkButton": {
-      "radius": 5,
       "rest": {
+        "radius": 5,
         "bg": [255, 255, 255, 235],
         "bg_shader": {
           "linear_gradient": {
@@ -105,8 +105,8 @@
     },
 
     "SkTextInput": {
-      "radius": 8,
       "rest": {
+        "radius": 8,
         "bg": [0, 0, 0, 10],
         "fg": [0, 0, 0, 235],
         "bd": [0, 0, 0, 10],
