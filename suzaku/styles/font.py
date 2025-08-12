@@ -8,33 +8,45 @@ import skia
 class SkFont:
     """
     SkFont
-
-    字体
     """
 
     def __init__(self, name: str | None = None, path: Union[Path, str] | None = None, size: int = 14):
         """
         SkFont object. For customizing fonts in your UI
-
-        字体对象。用于自定义您界面上的字体
         """
         ...
 
     def default_font(self):
-        """Get default font via different system"""
+        """Get default font via different system
+        
+        Example
+        -------
+        .. code-block:: python
+            # get the system default font
+            default_font = SkFont.default_font()
+        """
+        #_ = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle()) # seems right, but won't return font that support Chinese, shit
+        import tkinter as tk
+        import tkinter.font as tkfont
         import platform
 
-        _font = skia.FontMgr.RefDefault().legacyMakeTypeface("", skia.FontStyle())
+        f = None
 
-        if _font == ".AppleSystemUIFont":
+        root = tk.Tk()
+        f = tkfont.nametofont("TkDefaultFont").actual().get("family")
+        root.destroy()
+
+        if f == ".AppleSystemUIFont":
             if int(platform.mac_ver()[0].split(".")[0]) >= 11:
-                _font = "SF Pro"
+                f = "SF Pro"
             elif platform.mac_ver()[0] == "10.15":
-                _font = "Helvetica Neue"
+                f = "Helvetica Neue"
             else:
-                _font = "Lucida Grande"
+                f = "Lucida Grande"
 
-        return self.font(name=_font, size=14.5)
+        del root, tk, tkfont, platform
+
+        return self.font(name=f)
 
     @staticmethod
     def font(
@@ -66,4 +78,4 @@ class SkFont:
         return _font
 
 
-default_font = SkFont.font(None)
+default_font = SkFont().default_font()
