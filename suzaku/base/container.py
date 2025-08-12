@@ -206,43 +206,6 @@ class SkContainer:
 
         :return: None
         """
-        """for child in self.children:
-            if child.visible:
-                layout_type = list(child.layout_config.keys())[0]
-                # Build draw_item dict
-                draw_item = {
-                    "widget": child,
-                    "x": 0,
-                    "y": 0,
-                    "width": 0,
-                    "height": 0,
-                }
-                # Sort children
-                match layout_type:
-                    case "none":
-                        continue
-                    case "pack" | "box" | "grid":  # -> Layout layer
-                        if self.layers_layout_type[0] == "none":
-                            self.layers_layout_type[0] = layout_type
-                        elif self.layers_layout_type[0] != layout_type:
-                            raise SkLayoutError("Layout layer can only contain no more than " + \
-                                                f"one layout type. Not {layout_type} with " + \
-                                                f"{self.layers_layout_type[0]} which is existed.")
-                        self.draw_list[0].append(draw_item)
-                    case "place":  # -> Floating layer
-                        if self.layers_layout_type[1] != "place":
-                            self.layers_layout_type[1] = layout_type
-                        self.draw_list[1].append(draw_item)
-                    case "fixed":  # -> Fixed layer
-                        if self.layers_layout_type[2] != "fixed":
-                            self.layers_layout_type[2] = layout_type
-                        self.draw_list[2].append(draw_item)
-
-        # Process layouts
-        for layout_type in self.layers_layout_type:
-            if layout_type != "none":
-                getattr(self, f"_handle_{layout_type}")(event)
-        # self._handle_fixed()"""
         for layer in self.draw_list:
             for child in layer:
                 if child.visible:
@@ -270,14 +233,16 @@ class SkContainer:
         :return: None
         """
 
+        from ..widgets.window import SkWindow
         from ..widgets.widget import SkWidget
 
-        if isinstance(self, SkWidget):
-            x = self.x
-            y = self.y
-        else:
+        if isinstance(self, SkWindow):
             x = 0
             y = 0
+        else:
+            x = self.x
+            y = self.y
+
         width = self.width  # container width
         height = self.height  # container height
         start_children: list[SkWidget] = []  # side="top" or "left" children
@@ -452,7 +417,8 @@ class SkContainer:
         if isinstance(self, SkWindow):
             x = y = 0
         else:
-            x = self.x, y = self.y
+            x = self.x
+            y = self.y
         child.x = child.layout_config["fixed"]["x"] + x
         child.y = child.layout_config["fixed"]["y"] + y
         child.width = child.layout_config["fixed"]["width"]

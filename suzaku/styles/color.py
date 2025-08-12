@@ -29,7 +29,7 @@ class SkColor:
     """
 
     def __init__(self, color: str | None = None) -> None:
-        self.color = None
+        self.color: int | None = None
         self.set_color(color)
 
     def get(self) -> skia.Color:
@@ -291,9 +291,16 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
 
 from warnings import warn
 
-def color(value: typing.Any) -> int:
-    """To be written..."""
-    warn("To XiangQinXi: 相亲西你给我补docstring")
+def color(value: str | tuple | list | None) -> int:
+    """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
+
+    >>> color("#ffffff")  # Supports hex
+    >>> color( (255, 255, 255, 255 ) )  # Supports RGBA format
+    >>> color("white")  # Supports predefined color names (refer to color parameters in skia)
+
+    :param value: Color value, can be hex, rgba, or color name.
+    :type value: str | tuple | list | None
+    """
     return SkColor(value).color
 
 # from theme import SkTheme

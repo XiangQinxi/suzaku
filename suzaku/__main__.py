@@ -17,15 +17,21 @@ if __name__ == "__main__":
     root.bind("drop", lambda evt: print("drop", evt))
 
     frame = SkFrame(root, border=True)
+    #frame.allowed_out_of_bounds = True
 
     SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
     SkLabel(frame, text="This is a SkLabel / 这是一个标签").box(padx=8, pady=(8, 0))
-
-    SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
+    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
+    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
+    #SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
     var = SkStringVar()
     SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=8, pady=(8, 0))
     SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
+
+    frame2 = SkFrame(frame, border=True)
+    SkButton(frame2, text="这是一个按钮").box(padx=8, pady=(8, 0))
+    frame2.box(padx=10, pady=10, expand=True)
 
     frame.box(padx=10, pady=10, expand=True)
 
