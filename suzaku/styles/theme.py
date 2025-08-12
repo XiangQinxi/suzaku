@@ -409,14 +409,14 @@ class SkTheme:
             if self.name == SkTheme.DEFAULT_THEME.name:
                 raise SkStyleNotFoundError(
                     f"Attribute <{attr_name}> is not exsited in the default theme. "
-                     "Check your selector!"
+                    "Check your selector!"
                 )
 
         if type(style[attr_name]) is dict:
             return style[attr_name].copy
         else:
             return style[attr_name]
-    
+
     def get_preset_color(self, color_name: str):
         """Find a preset color from color palette.
 
@@ -427,7 +427,7 @@ class SkTheme:
             white = my_theme.get_preset_color("-white")
             default_bg = my_theme.get_preset_color("default_bg")
         This shows getting the white color and the preset color named `default_bg`.
-        
+
         :param color_name: Name of the color
         """
         keywords = {
@@ -452,7 +452,10 @@ class SkTheme:
                     result = self.parent.get_preset_color(color_name)
                 else:
                     # If not, then is root theme, go fuck your color name
-                    warnings.warn(f"Color <{color_name}> if not found anywhere.", color.SkColorWarning)
+                    warnings.warn(
+                        f"Color <{color_name}> if not found anywhere.",
+                        color.SkColorWarning,
+                    )
                     result = color.ERR_COLOR
         if type(result) is dict:
             return result.copy()

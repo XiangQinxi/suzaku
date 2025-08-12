@@ -1,7 +1,7 @@
 from typing import Any, Literal, Union
 
-import glfw
 import clipman
+import glfw
 import skia
 
 from ..event import SkEvent, SkEventHanding
@@ -13,6 +13,7 @@ from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
 
 clipman.init()
+
 
 class SkWidget(SkEventHanding):
 
@@ -397,18 +398,19 @@ class SkWidget(SkEventHanding):
 
         """
 
-        drop_shadow_rect = skia.Rect.MakeXYWH(
-            self.canvas_x, self.canvas_y, self.width, self.height
-        )
-        drop_shadow_paint = skia.Paint(
-            AntiAlias=True, Style=skia.Paint.kStrokeAndFill_Style, Color=skia.ColorWHITE
-        )
-
         if bd_shadow:
+            drop_shadow_rect = skia.Rect.MakeXYWH(
+                self.canvas_x, self.canvas_y, self.width, self.height
+            )
+            drop_shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStrokeAndFill_Style,
+                Color=skia.ColorWHITE,
+            )
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(drop_shadow_paint)
 
-        canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
+            canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
 
         bg_paint = skia.Paint(
             AntiAlias=True,

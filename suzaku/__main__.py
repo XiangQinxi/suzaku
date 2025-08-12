@@ -32,16 +32,22 @@ if __name__ == "__main__":
         SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var = SkStringVar()
-        SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=8, pady=(8, 0))
+        SkEntry(frame, placeholder="数值绑定", textvariable=var).box(
+            padx=8, pady=(8, 0)
+        )
         SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
 
         frame2 = SkFrame(frame, border=True)
-        SkButton(frame2, text="Create 1 New window", command=create1window).box(padx=8, pady=(8, 0))
+        SkButton(frame2, text="Create 1 New window", command=create1window).box(
+            padx=8, pady=(8, 0)
+        )
         frame2.box(padx=10, pady=10, expand=True)
 
         frame.box(padx=10, pady=10, expand=True)
 
-        SkButton(window, text="Close the window", command=window.destroy).box(side="bottom")
+        SkButton(window, text="Close the window", command=window.destroy).box(
+            side="bottom"
+        )
 
     create1window()
 
