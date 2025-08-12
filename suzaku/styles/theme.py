@@ -406,7 +406,8 @@ class SkTheme:
             # If is already default theme (no parent), then go fuck your selector
             if self.name == SkTheme.DEFAULT_THEME.name:
                 raise SkStyleNotFoundError(
-                    "Style is not exsited in the default theme. Check your selector!"
+                    f"Attribute <{attr_name}> is not exsited in the default theme. "
+                     "Check your selector!"
                 )
 
         return style[attr_name]
