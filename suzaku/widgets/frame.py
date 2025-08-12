@@ -12,23 +12,23 @@ class SkFrame(SkWidget, SkContainer):
     # region Draw
 
     def _draw(self, canvas, rect):
+        style = self.theme.get_style("SkFrame")
         if self.attributes["border"]:
-            sheets = self.theme.styles["SkFrame"]
-            if "bd_shadow" in sheets:
-                bd_shadow = sheets["bd_shadow"]
+            if "bd_shadow" in style:
+                bd_shadow = style["bd_shadow"]
             else:
                 bd_shadow = False
-            if "bd_shader" in sheets:
-                bd_shader = sheets["bd_shader"]
+            if "bd_shader" in style:
+                bd_shader = style["bd_shader"]
             else:
                 bd_shader = None
             self._draw_frame(
                 canvas,
                 rect,
-                radius=sheets["radius"],
-                bg=sheets["bg"],
-                width=sheets["width"],
-                bd=sheets["bd"],
+                radius=style["radius"],
+                bg=style["bg"],
+                width=style["width"],
+                bd=style["bd"],
                 bd_shadow=bd_shadow,
                 bd_shader=bd_shader,
             )
