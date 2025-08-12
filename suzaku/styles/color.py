@@ -21,9 +21,12 @@ class SkColorWarning(Warning):
 class SkColor:
     """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
 
-    >>> SkColor("#ffffff")  # Supports hex
-    >>> SkColor( (255, 255, 255, 255 ) )  # Supports RGBA format
-    >>> SkColor("white")  # Supports predefined color names (refer to color parameters in skia)
+    Example
+    -------
+    .. code-block:: python
+        SkColor("#ffffff")  # Supports hex
+        SkColor( (255, 255, 255, 255 ) )  # Supports RGBA format
+        SkColor("white")  # Supports predefined color names (refer to color parameters in skia)
 
     Afterwards, use `Color().color` to obtain the Skia.Color.
 
@@ -33,8 +36,8 @@ class SkColor:
     :type color: str | tuple | list | None
     """
 
-    def __init__(self, color: str | None = None) -> None:
-        self.color: int | None = None
+    def __init__(self, color: str | tuple | list | None = None) -> None:
+        self.color: str | tuple | list | None = None
         self.set_color(color)
 
     def get(self) -> skia.Color:
@@ -58,7 +61,7 @@ class SkColor:
                 self.set_color_rgba(color[0], color[1], color[2], color[3])
             else:
                 raise ValueError(
-                    "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
+                    "Color tuple / list must have 3 (RGB) or 4 (RGBA) elements"
                 )
         else:
             return self
