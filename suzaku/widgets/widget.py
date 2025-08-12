@@ -294,12 +294,6 @@ class SkWidget(SkEventHanding):
             colors=colors,
         )
 
-    @staticmethod
-    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
-        if not style:
-            style = skia.kNormal_BlurStyle
-        return skia.MaskFilter.MakeBlur(style, sigma)
-
     def _draw_radial_shader(self, paint, center, radius, colors):
         """Draw radial shader of the rect
 
@@ -310,6 +304,12 @@ class SkWidget(SkEventHanding):
         :return: None
         """
         paint.setShader(self._radial_shader(center, radius, colors))
+
+    @staticmethod
+    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
+        if not style:
+            style = skia.kNormal_BlurStyle
+        return skia.MaskFilter.MakeBlur(style, sigma)
 
     def _draw_blur(self, paint: skia.Paint, style=None, sigma=None):
         paint.setMaskFilter(self._blur(style, sigma))

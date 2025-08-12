@@ -20,6 +20,8 @@ if __name__ == "__main__":
         )
         window.bind("drop", lambda evt: print("drop", evt))
 
+        window.set_dpi_scale(1)
+
         frame = SkFrame(window, border=True)
         # frame.allowed_out_of_bounds = True
 

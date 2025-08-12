@@ -237,6 +237,11 @@ class SkWindowBase(SkEventHanding):
                 skia.kRGBA_8888_ColorType,
                 skia.ColorSpace.MakeSRGB(),
             )
+            canvas = surface.getCanvas()
+
+            # 应用DPI缩放变换
+            canvas.save()
+            canvas.scale(self.dpi_scale, self.dpi_scale)
             # 将断言改为更友好的错误处理
             if surface is None:
                 raise RuntimeError("Failed to create Skia surface")
@@ -555,6 +560,8 @@ class SkWindowBase(SkEventHanding):
             self.event_init = True
 
     # endregion
+
+    # region Configure 属性配置
 
     def wm_cursor(
         self, cursor_name: typing.Union[str, None] = None
