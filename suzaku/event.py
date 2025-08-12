@@ -86,3 +86,4 @@ class SkEvent:
     maximized: Optional[bool] = None
     paths: Optional[List[str]] = None
     iconified: Optional[bool] = None
+    dpi_scale: Optional[float] = None

@@ -19,7 +19,7 @@ class SkTextInput(SkTextInputBase):
         self._draw_frame(
             canvas,
             rect,
-            radius=self.styles["SkTextInput"]["radius"],
+            radius=self.theme.get_style("SkTextInput")["radius"],
             bg=sheets["bg"],
             bd=sheets["bd"],
             width=sheets["width"],

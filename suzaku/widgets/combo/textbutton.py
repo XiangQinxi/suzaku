@@ -28,34 +28,39 @@ class SkTextButton(SkText):
     def _draw(self, canvas, rect):
         sheets = None
         if self.is_mouse_floating:
-            sheets = self.theme.styles["SkButton"][
-                f"{"pressed" if self.is_mouse_pressed else "hover"}"
-            ]
+            if self.is_mouse_pressed:
+                stylename = "SkButton:pressed"
+            else:
+                stylename = "SkButton:hover"
         else:
-            sheets = self.theme.styles["SkButton"][
-                f"{"focus" if self.is_focus else "rest"}"
-            ]
-        if "bg_shader" in sheets:
-            bg_shader = sheets["bg_shader"]
+            if self.is_focus:
+                stylename = "SkButton:focus"
+            else:
+                stylename = "SkButton"
+
+        style = self.theme.get_style(stylename)
+
+        if "bg_shader" in style:
+            bg_shader = style["bg_shader"]
         else:
             bg_shader = None
 
-        if "bd_shadow" in sheets:
-            bd_shadow = sheets["bd_shadow"]
+        if "bd_shadow" in style:
+            bd_shadow = style["bd_shadow"]
         else:
             bd_shadow = None
-        if "bd_shader" in sheets:
-            bd_shader = sheets["bd_shader"]
+        if "bd_shader" in style:
+            bd_shader = style["bd_shader"]
         else:
             bd_shader = None
 
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.styles["SkButton"]["radius"],
-            bg=sheets["bg"],
-            width=sheets["width"],
-            bd=sheets["bd"],
+            radius=self.theme.get_style("SkButton")["radius"],
+            bg=style["bg"],
+            width=style["width"],
+            bd=style["bd"],
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
             bg_shader=bg_shader,
@@ -63,7 +68,7 @@ class SkTextButton(SkText):
         self._draw_central_text(
             canvas,
             text=self.attributes["text"],
-            fg=sheets["fg"],
+            fg=self.theme.get_style("SkText")["fg"],
             canvas_x=self.canvas_x,
             canvas_y=self.canvas_y,
             width=self.width,

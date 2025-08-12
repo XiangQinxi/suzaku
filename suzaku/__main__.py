@@ -9,32 +9,38 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    root = Sk(
-        title="Suzaku GUI",
-        size=(280, 460),
-    )
+    app = SkApp()
     # print(glfw.default_window_hints())
-    root.bind("drop", lambda evt: print("drop", evt))
 
-    frame = SkFrame(root, border=True)
-    # frame.allowed_out_of_bounds = True
+    def create1window():
+        window = SkToplevel(
+            app,
+            title="Suzaku GUI",
+            size=(280, 460),
+        )
+        window.bind("drop", lambda evt: print("drop", evt))
 
-    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
-    SkLabel(frame, text="This is a SkLabel / 这是一个标签").box(padx=8, pady=(8, 0))
-    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
-    SkButton(frame, text="This is a SkButton / 这是一个按钮").box(padx=8, pady=(8, 0))
-    SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
+        frame = SkFrame(window, border=True)
+        # frame.allowed_out_of_bounds = True
 
-    var = SkStringVar()
-    SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=8, pady=(8, 0))
-    SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
+        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
+        SkLabel(frame, text="This is a SkLabel").box(padx=8, pady=(8, 0))
+        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
+        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
+        SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
-    frame2 = SkFrame(frame, border=True)
-    SkButton(frame2, text="这是一个按钮").box(padx=8, pady=(8, 0))
-    frame2.box(padx=10, pady=10, expand=True)
+        var = SkStringVar()
+        SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=8, pady=(8, 0))
+        SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
 
-    frame.box(padx=10, pady=10, expand=True)
+        frame2 = SkFrame(frame, border=True)
+        SkButton(frame2, text="Create 1 New window", command=create1window).box(padx=8, pady=(8, 0))
+        frame2.box(padx=10, pady=10, expand=True)
 
-    SkButton(root, text="Close the window", command=root.destroy).box(side="bottom")
+        frame.box(padx=10, pady=10, expand=True)
 
-    root.run()
+        SkButton(window, text="Close the window", command=window.destroy).box(side="bottom")
+
+    create1window()
+
+    app.run()
