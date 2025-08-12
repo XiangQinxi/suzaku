@@ -290,8 +290,8 @@ def style_to_color(
                     )
                 case "texture":
                     warnings.warn("Texture is currently not implemented", FutureWarning)
-                    return SkColor((0, 255, 0, 255))
                     NotImplemented
+                    return SkColor((0, 255, 0, 255))
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn("Invalid color configuration in styles!", ValueError)
