@@ -410,7 +410,17 @@ class SkTheme:
                      "Check your selector!"
                 )
 
-        return style[attr_name]
+        if type(style[attr_name]) is dict:
+            return style[attr_name].copy
+        else:
+            return style[attr_name]
+    
+    def get_preset_color(self, color_name: str):
+        """Find a preset color from color palette.
+        
+        :param color_name: Name of the color
+        """
+        NotImplemented
 
     def mixin(self, selector: str, new_style: dict, copy: bool = False) -> "SkTheme":
         """Mix, or in other words, override custom styles into the theme.
