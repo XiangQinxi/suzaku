@@ -28,11 +28,11 @@ class SkColor:
         SkColor( (255, 255, 255, 255 ) )  # Supports RGBA format
         SkColor("white")  # Supports predefined color names (refer to color parameters in skia)
 
-    Afterwards, use `Color().color` to obtain the Skia.Color.
+    Afterward, use `Color().color` to obtain the Skia.Color.
 
     Of course, if you want to change the color _value, you can use the `set_color` method of `SkColor` to modify it—though generally, you won't need to.
 
-    :param color: Color _value, can be hex, rgba, or color name.
+    :param color: Color value, can be hex, rgba, or color name.
     :type color: str | tuple | list | None
     """
 
@@ -94,12 +94,12 @@ class SkColor:
         """
         self.color = skia.Color(r, g, b, a)
 
-    def set_color_hex(self, hex: str) -> None:
+    def set_color_hex(self, _hex: str) -> None:
         """
         转换十六进制颜色字符串为Skia颜色
 
         Args:
-            hex: 十六进制颜色字符串(支持 #RRGGBB 和 #RRGGBBAA 格式)
+            _hex: 十六进制颜色字符串(支持 #RRGGBB 和 #RRGGBBAA 格式)
 
         Returns:
             skia.Color: 对应的RGBA颜色对象
@@ -107,7 +107,7 @@ class SkColor:
         Raises:
             ValueError: 当十六进制格式无效时抛出
         """
-        hex_color = hex.lstrip("#")
+        hex_color = _hex.lstrip("#")
         if len(hex_color) == 6:  # RGB 格式，默认不透明(Alpha=255)
             r = int(hex_color[0:2], 16)
             g = int(hex_color[2:4], 16)
@@ -124,16 +124,12 @@ class SkColor:
 
 
 class SkGradient:
-    """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use.
-
-    :param widget: Widget
-    """
+    """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use."""
 
     def __init__(self):
-        # self.widget = widget
         self.gradient: skia.GradientShader | None = None
 
-    def draw(self, paint: skia.Paint) -> skia.Paint:
+    def draw(self, paint: skia.Paint) -> skia.Paint | None:
         """Draw gradient
 
         :param paint: Paint
@@ -232,7 +228,6 @@ class SkGradient:
 
             colors = []
             for color in config["colors"]:
-                # raise NotImplementedError("To XiangQinXi: 这里得改")
                 colors.append(SkColor(color).color)
 
             if widget:
@@ -256,7 +251,7 @@ class SkGradient:
 
 def style_to_color(
     style_attr_value: list[int] | tuple[int, int, int, int] | dict, theme: str | SkTheme
-) -> SkColor | SkGradient:
+) -> None | SkColor | SkGradient:
     """Returns the color object indicated by the color style attribute _value.
 
     Example
@@ -268,7 +263,7 @@ def style_to_color(
     This shows getting a color object for the background of a `SkButton` at `hover` state.
 
     :param style_attr_value: The _value of style attribute
-    :param theme_name: The name of the theme used, or the theme itself
+    :param theme: The name of the theme used, or the theme itself
     """
     match style_attr_value:
         case list() | tuple() | str():
@@ -293,23 +288,26 @@ def style_to_color(
                     warnings.warn("Texture is currently not implemented", FutureWarning)
                     NotImplemented
                     return SkColor(ERR_COLOR)
+            return None
         case _:
             # If invalid, then return green to prevent crash
-            warnings.warn("Invalid color configuration in styles!", ValueError)
+            warnings.warn(
+                message="Invalid color configuration in styles!", category=ValueError
+            )
             return SkColor(ERR_COLOR)
 
 
-def make_color(value: str | tuple | list | None) -> int:
+def make_color(value: str | tuple | list | None) -> str | tuple | list | None:
     """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
 
     Example
     -------
     .. code-block:: python
-        color("#ffffff")  # Supports hex
-        color( (255, 255, 255, 255 ) )  # Supports RGBA format
-        color("white")  # Supports predefined color names (refer to color parameters in skia)
+        make_color("#ffffff")  # Supports _hex
+        make_color( (255, 255, 255, 255 ) )  # Supports RGBA format
+        make_color("white")  # Supports predefined color names (refer to color parameters in skia)
 
-    :param value: Color _value, can be hex, rgba, or color name.
+    :param value: Color _value, can be _hex, rgba, or color name.
     :type value: str | tuple | list | None
     """
     return SkColor(value).color

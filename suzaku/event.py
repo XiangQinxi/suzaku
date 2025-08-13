@@ -137,7 +137,7 @@ class SkEvent:
     iconified: Optional[bool] = None  # 【窗口是否最小化】
     dpi_scale: Optional[float] = None  # 【DPI缩放】
     glfw_window: Optional[any] = None  # 【glfw窗口】
-    window: Optional[any] = None    # 【SkWindow窗口】
+    window: Optional[any] = None  # 【SkWindow窗口】
     button: typing.Literal[0, 1, 2] = None
     # The provided values are: 0 for left button, 1 for right button, and 2 for middle button.
     # 【给出的值0为左键，1为右键，2为中键】

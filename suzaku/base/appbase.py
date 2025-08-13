@@ -54,10 +54,14 @@ class SkAppBase(SkEventHanding):
     ) -> None:
         from .windowbase import SkWindowBase
 
-        self.windows: list[SkWindowBase] = []  # Windows that have been added to the event loop. 【被添加进事件循环的SkWindow】
+        self.windows: list[SkWindowBase] = (
+            []
+        )  # Windows that have been added to the event loop. 【被添加进事件循环的SkWindow】
         self.is_always_update: bool = is_always_update
         self.is_get_context_on_focus = is_get_context_on_focus
-        self.alive: bool = False  # Is the program currently running. 【程序是否正在运行】
+        self.alive: bool = (
+            False  # Is the program currently running. 【程序是否正在运行】
+        )
 
         SkAppBase.default_application = self
 
@@ -65,7 +69,6 @@ class SkAppBase(SkEventHanding):
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
         SkAppBase._instance = self
-
 
     @classmethod
     def get_instance(cls) -> int:
@@ -85,7 +88,7 @@ class SkAppBase(SkEventHanding):
         :param SkWindowBase window: The window
 
         >>> app = SkAppBase()
-        >>> window = SkWindowBase(app)
+        >>> win = SkWindowBase(app)
         >>> app.add_window(window)
 
         """
@@ -141,6 +144,7 @@ class SkAppBase(SkEventHanding):
                 ):
                     window.destroy()
                     continue
+
                 # Draw window
                 # 【绘制窗口】
                 def draw(the_window=window):
@@ -163,7 +167,9 @@ class SkAppBase(SkEventHanding):
                                 surface.flushAndSubmit()
                                 glfw.swap_buffers(the_window.glfw_window)
 
-                if self.is_get_context_on_focus:  # Only draw the window that has gained focus.
+                if (
+                    self.is_get_context_on_focus
+                ):  # Only draw the window that has gained focus.
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
                         draw()
                 else:

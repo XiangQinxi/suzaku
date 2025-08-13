@@ -17,7 +17,7 @@ class SkApp(SkAppBase):
         is_always_update: bool = False,
         is_get_context_on_focus: bool = True,
         **kwargs,
-    ) ->  None:
+    ) -> None:
         super().__init__(
             *args,
             is_always_update=is_always_update,
