@@ -4,7 +4,7 @@ import ctypes
 import skia
 
 app = Sk(
-    window_event_wait=False, #theme=SkTheme.INTERNAL_THEMES["dark"]
+    #theme=SkTheme.INTERNAL_THEMES["dark"]
 )
 
 frame1 = SkFrame(app, border=True)
