@@ -1,15 +1,25 @@
-from typing import Union
+import skia
+import typing
 
 from ..widgets.text import SkText
 
 
 class SkTextButton(SkText):
+    """A Button with Text
+
+    :param args:
+    :param size: Widget default size
+    :param cursor: The style displayed when the mouse hovers over it
+    :param command: Triggered when the button is clicked
+    :param kwargs:
+    """
+
     def __init__(
         self,
         *args,
         size: tuple[int, int] = (105, 35),
-        cursor: Union[str, None] = "hand",
-        command: Union[callable, None] = None,
+        cursor: typing.Union[str, None] = "hand",
+        command: typing.Union[function, None] = None,
         **kwargs,
     ) -> None:
         super().__init__(*args, size=size, **kwargs)
@@ -25,20 +35,25 @@ class SkTextButton(SkText):
 
     # region Draw
 
-    def _draw(self, canvas, rect):
-        sheets = None
+    def _draw(self, canvas: skia.Canvas, rect: skia.Rect):
+        """Draw the button
+
+        :param canvas:
+        :param rect:
+        :return:
+        """
         if self.is_mouse_floating:
             if self.is_mouse_pressed:
-                stylename = "SkButton:pressed"
+                style_name = "SkButton:pressed"
             else:
-                stylename = "SkButton:hover"
+                style_name = "SkButton:hover"
         else:
             if self.is_focus:
-                stylename = "SkButton:focus"
+                style_name = "SkButton:focus"
             else:
-                stylename = "SkButton"
+                style_name = "SkButton"
 
-        style = self.theme.get_style(stylename)
+        style = self.theme.get_style(style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]
@@ -54,6 +69,7 @@ class SkTextButton(SkText):
         else:
             bd_shader = None
 
+        # Draw the button border
         self._draw_frame(
             canvas,
             rect,
@@ -65,6 +81,8 @@ class SkTextButton(SkText):
             bd_shader=bd_shader,
             bg_shader=bg_shader,
         )
+
+        # Draw the button text
         self._draw_central_text(
             canvas,
             text=self.attributes["text"],

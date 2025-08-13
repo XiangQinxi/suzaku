@@ -1,8 +1,14 @@
+"""
+
+Easy to use suzaku，like tkinter
+
+"""
+
 from .event import *
 from .styles import *
 from .var import *
-from .widgets import SkAppWindow as Sk
 from .widgets import SkApp
+from .widgets import SkAppWindow as Sk
 from .widgets import SkFrame
 from .widgets import SkLabeledCheckbox as SkCheckbox
 from .widgets import SkText as SkLabel

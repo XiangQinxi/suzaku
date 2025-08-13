@@ -14,32 +14,38 @@ if __name__ == "__main__":
 
     def create1window():
         window = SkToplevel(
-            app,
+            parent=None,
             title="Suzaku GUI",
             size=(280, 460),
         )
         window.bind("drop", lambda evt: print("drop", evt))
+
+        window.set_dpi_scale(1)
 
         frame = SkFrame(window, border=True)
         # frame.allowed_out_of_bounds = True
 
         SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
         SkLabel(frame, text="This is a SkLabel").box(padx=8, pady=(8, 0))
-        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
-        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
         SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var = SkStringVar()
-        SkEntry(frame, placeholder="数值绑定", textvariable=var).box(padx=8, pady=(8, 0))
+        SkEntry(frame, placeholder="数值绑定", textvariable=var).box(
+            padx=8, pady=(8, 0)
+        )
         SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
 
         frame2 = SkFrame(frame, border=True)
-        SkButton(frame2, text="Create 1 New window", command=create1window).box(padx=8, pady=(8, 0))
+        SkButton(frame2, text="Create 1 New window", command=create1window).box(
+            padx=8, pady=(8, 0)
+        )
         frame2.box(padx=10, pady=10, expand=True)
 
         frame.box(padx=10, pady=10, expand=True)
 
-        SkButton(window, text="Close the window", command=window.destroy).box(side="bottom")
+        SkButton(window, text="Close the window", command=window.destroy).box(
+            side="bottom"
+        )
 
     create1window()
 

@@ -1,44 +1,88 @@
-import glfw
-import OpenGL.GL as gl
+import time
+import threading
+import heapq
+from typing import Callable, Optional
 
 
-def main():
-    # 初始化GLFW
-    if not glfw.init():
-        return
+class AfterScheduler:
+    """完全独立实现的定时任务调度器，模拟 tkinter.after 功能"""
 
-    # 设置窗口提示：启用DPI缩放感知 (GLFW 3.3+)
-    glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
-    glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
+    def __init__(self):
+        self._tasks = []
+        self._counter = 0
+        self._lock = threading.Lock()
+        self._running = True
+        self._thread = threading.Thread(target=self._run_scheduler, daemon=True)
+        self._thread.start()
 
-    # 创建窗口
-    window = glfw.create_window(800, 600, "DPI-Aware Window", None, None)
-    if not window:
-        glfw.terminate()
-        return
+    def after(self, delay_ms: int, callback: Callable, *args) -> str:
+        """
+        安排延迟执行的任务
+        :param delay_ms: 延迟毫秒数
+        :param callback: 回调函数
+        :param args: 回调参数
+        :return: 任务ID (可用于取消)
+        """
+        with self._lock:
+            task_id = f"task_{self._counter}"
+            heapq.heappush(
+                self._tasks,
+                (time.monotonic() + delay_ms / 1000, self._counter, task_id, callback,
+                 args)
+            )
+            self._counter += 1
+            return task_id
 
-    glfw.make_context_current(window)
+    def cancel(self, task_id: str) -> None:
+        """取消已安排的任务"""
+        with self._lock:
+            for i, task in enumerate(self._tasks):
+                if task[2] == task_id:
+                    self._tasks.pop(i)
+                    heapq.heapify(self._tasks)  # 重新堆化
+                    break
 
-    # 获取初始DPI缩放因子
-    x_scale, y_scale = glfw.get_window_content_scale(window)
-    print(f"Initial content scale: {x_scale:.1f}x{y_scale:.1f}")
+    def _run_scheduler(self) -> None:
+        """调度器主循环"""
+        while self._running:
+            with self._lock:
+                now = time.monotonic()
+                while self._tasks and self._tasks[0][0] <= now:
+                    _, _, _, callback, args = heapq.heappop(self._tasks)
+                    try:
+                        callback(*args)
+                    except Exception as e:
+                        print(f"Task error: {e}")
 
-    # 设置DPI变化回调
-    def content_scale_callback(win, x_scale, y_scale):
-        print(f"Content scale changed: {x_scale:.1f}x{y_scale:.1f}")
-        # 在此处更新UI元素尺寸/重新加载纹理等
-        gl.glViewport(0, 0, int(800 * x_scale), int(600 * y_scale))
+            time.sleep(0.01)  # 降低CPU占用
 
-    glfw.set_window_content_scale_callback(window, content_scale_callback)
+    def destroy(self) -> None:
+        """停止调度器并清理资源"""
+        with self._lock:
+            self._running = False
+            self._tasks.clear()
 
-    # 主循环
-    while not glfw.window_should_close(window):
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-        glfw.swap_buffers(window)
-        glfw.poll_events()
-
-    glfw.terminate()
+    def __del__(self):
+        self.destroy()
 
 
+# 使用示例
 if __name__ == "__main__":
-    main()
+    scheduler = AfterScheduler()
+
+
+    def say_hello(name: str):
+        print(f"Hello {name}! Time: {time.time():.2f}")
+
+
+    # 安排3个任务
+    task1 = scheduler.after(1000, say_hello, "Alice")  # 1秒后执行
+    task2 = scheduler.after(2000, say_hello, "Bob")  # 2秒后执行
+    #scheduler.after(1500, lambda: scheduler.cancel(task2))  # 1.5秒后取消task2
+
+    # 保持主线程运行
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        scheduler.destroy()

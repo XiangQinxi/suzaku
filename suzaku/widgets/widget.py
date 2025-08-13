@@ -1,9 +1,10 @@
 from typing import Any, Literal, Union
 
-import glfw
 import clipman
+import glfw
 import skia
 
+from ..after import SkAfter
 from ..event import SkEvent, SkEventHanding
 from ..styles.color import SkGradient, make_color
 from ..styles.drop_shadow import SkDropShadow
@@ -14,7 +15,8 @@ from .window import SkWindow
 
 clipman.init()
 
-class SkWidget(SkEventHanding):
+
+class SkWidget(SkEventHanding, SkAfter):
 
     _instance_count = 0
 
@@ -37,6 +39,7 @@ class SkWidget(SkEventHanding):
         """
 
         SkEventHanding.__init__(self)
+        SkAfter.__init__(self)
 
         self.parent = parent
 
@@ -106,8 +109,9 @@ class SkWidget(SkEventHanding):
                 "key_released": {},
                 "key_repeated": {},
                 "char": {},
-                "clicked": {},
+                "click": {},
                 "configure": {},
+                "update": {},
             }
         )
         self.layout_config: dict[str, dict] = {"none": {}}
@@ -200,7 +204,7 @@ class SkWidget(SkEventHanding):
         self._root_x = self.canvas_x + self.window.root_x
         self._root_y = self.canvas_y + self.window.root_y
 
-        self.event_generate(
+        self.event_trigger(
             "move",
             SkEvent(
                 event_type="move",
@@ -218,7 +222,7 @@ class SkWidget(SkEventHanding):
         :return: None
         """
         if self.is_mouse_floating:
-            self.event_generate("click", event)
+            self.event_trigger("click", event)
 
     # endregion
 
@@ -239,6 +243,7 @@ class SkWidget(SkEventHanding):
         self._draw(canvas, rect)
         if hasattr(self, "draw_children"):
             self.draw_children(canvas)
+            self._handle_layout(None)
 
     def _draw(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Execute the widget rendering
@@ -294,12 +299,6 @@ class SkWidget(SkEventHanding):
             colors=colors,
         )
 
-    @staticmethod
-    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
-        if not style:
-            style = skia.kNormal_BlurStyle
-        return skia.MaskFilter.MakeBlur(style, sigma)
-
     def _draw_radial_shader(self, paint, center, radius, colors):
         """Draw radial shader of the rect
 
@@ -310,6 +309,12 @@ class SkWidget(SkEventHanding):
         :return: None
         """
         paint.setShader(self._radial_shader(center, radius, colors))
+
+    @staticmethod
+    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
+        if not style:
+            style = skia.kNormal_BlurStyle
+        return skia.MaskFilter.MakeBlur(style, sigma)
 
     def _draw_blur(self, paint: skia.Paint, style=None, sigma=None):
         paint.setMaskFilter(self._blur(style, sigma))
@@ -356,8 +361,8 @@ class SkWidget(SkEventHanding):
         :return: None
         :raises: None
         """
-
-        font = self.attributes["font"]
+        if not font:
+            font = self.attributes["font"]
 
         # 绘制字体
         text_paint = skia.Paint(AntiAlias=True, Color=make_color(fg))
@@ -397,18 +402,19 @@ class SkWidget(SkEventHanding):
 
         """
 
-        drop_shadow_rect = skia.Rect.MakeXYWH(
-            self.canvas_x, self.canvas_y, self.width, self.height
-        )
-        drop_shadow_paint = skia.Paint(
-            AntiAlias=True, Style=skia.Paint.kStrokeAndFill_Style, Color=skia.ColorWHITE
-        )
-
         if bd_shadow:
+            drop_shadow_rect = skia.Rect.MakeXYWH(
+                self.canvas_x, self.canvas_y, self.width, self.height
+            )
+            drop_shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStrokeAndFill_Style,
+                Color=make_color(bg),
+            )
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(drop_shadow_paint)
 
-        canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
+            canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
 
         bg_paint = skia.Paint(
             AntiAlias=True,
@@ -456,18 +462,27 @@ class SkWidget(SkEventHanding):
         # Draw background first
         canvas.drawRoundRect(rect, radius, radius, bg_paint)
 
+        # canvas.save()
+
+        # shadow = SkDropShadow(config_list=bd_shadow)
+        # shadow.draw(bd_paint)
+
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
     # endregion
 
     # region Widget attribute configs 组件属性配置
-    @staticmethod
-    def clipboard_get() -> str:
-        return clipman.paste()
 
-    @staticmethod
-    def clipboard_set(value) -> None:
-        clipman.copy(value)
+    @property
+    def clipboard_get(self) -> str:
+        """Get string from clipboard
+
+        anti images
+        """
+        try:
+            return glfw.get_clipboard_string(None).decode("utf-8")
+        except:
+            return ""
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
@@ -481,11 +496,11 @@ class SkWidget(SkEventHanding):
     def set_attribute(self, **kwargs):
         """Set attribute of a widget by name.
 
-        :param kwargs: attribute name and value
+        :param kwargs: attribute name and _value
         :return: self
         """
         self.attributes.update(**kwargs)
-        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
+        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute
@@ -688,13 +703,13 @@ class SkWidget(SkEventHanding):
         Set focus
         """
         if self.focusable:
-            self.window.focus_get().event_generate(
+            self.window.focus_get().event_trigger(
                 "focus_loss", SkEvent(event_type="focus_loss")
             )
             self.window.focus_get().is_focus = False
             self.window.focus_widget = self
             self.is_focus = True
-            self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
+            self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:
         """

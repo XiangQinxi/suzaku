@@ -141,6 +141,7 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme().load_from_file("./path/to/a/theme.json")
             my_theme.load_from_file("./path/to/another/theme.json")
+
         This shows loading a theme to `my_theme` from the theme file at `./path/to/a/theme.json`,
         and change it to theme from `./path/to/another/theme.json` later.
 
@@ -154,17 +155,18 @@ class SkTheme:
             if (
                 search_result := SkTheme.find_loaded_theme(theme_data["name"])
             ) != False:
-                # If name already occupied, meaning the theme might already be loaded 
+                # If name already occupied, meaning the theme might already be loaded
                 # (or just simply has an occupied name)
                 warnings.warn(
-                    f"Theme <{theme_data["name"]}> already loaded or existed.", RuntimeWarning
+                    f"Theme <{theme_data['name']}> already loaded or existed.",
+                    RuntimeWarning,
                 )
                 return search_result
 
         return self.load_from_json(theme_data)
 
     def load_from_json(self, theme_data: dict) -> "SkTheme":
-        """Load all data (including matadata) to the theme.
+        """Load all data (including metadata) to the theme.
 
         Example
         -------
@@ -241,7 +243,7 @@ class SkTheme:
         Parent Name
         -----------
         - `ROOT` means the theme does not have a parent. This is not recommended for third-party
-          themes as fallback machanisms will all stop working, use `DEFAULT` instead.
+          themes as fallback mechanisms will all stop working, use `DEFAULT` instead.
         - `DEFAULT` means the parent of the theme is the default internal theme.
 
         If the parent name is none of above, it should be the theme of the name and will be set as
@@ -283,8 +285,9 @@ class SkTheme:
             my_theme = Theme().rename("theme.name")
             my_theme.rename("i_hate.that_name")
         This shows renaming `my_theme` to `theme.name`, and renaming it to `i_hate.that_name` after
-        its creaton.
+        its creation.
 
+        :param friendly_name:
         :param new_name: The new name for the theme
         :return self: The SkTheme itself
         """
@@ -299,7 +302,8 @@ class SkTheme:
             )
         return self
 
-    def select(self, selector: str) -> list:
+    @staticmethod
+    def select(selector: str) -> list:
         """Parse styles selector.
 
         This is a selector parser mainly used by internal functions.
@@ -312,7 +316,7 @@ class SkTheme:
         --------
         - `<Widget>` indicates the styles of Widget at rest state, e.g. `SkButton`.
         - `<Widget>:<state>` indicates the styles of the state of Widget, e.g. `SkButton:hover`.
-        - `<Widget>:ITSELF` indecates the styles of the widget, e.g. `SkButton.ITSELF`.
+        - `<Widget>:ITSELF` indicates the styles of the widget, e.g. `SkButton.ITSELF`.
           Note that this is not available everywhere.
 
         :param selector: The selector string
@@ -366,8 +370,9 @@ class SkTheme:
                             return self.parent.get_style(selector, copy)
                         else:
                             # If is root theme, then go fuck ur selector
-                            raise SkStyleNotFoundError("Cannot find styles with selector "
-                                                      f"[{selector}]")
+                            raise SkStyleNotFoundError(
+                                "Cannot find styles with selector " f"[{selector}]"
+                            )
                     _ = _[selector_level]
             except SkStyleNotFoundError:
                 # If this fails, then the selector is invalid
@@ -386,17 +391,17 @@ class SkTheme:
             return result
 
     def get_style_attr(self, selector: str, attr_name: str) -> typing.Any:
-        """Get style attribute value.
+        """Get style attribute _value.
 
         Example
         -------
         .. code-block:: python
             my_theme = SkTheme()
             button_background = my_theme.get_style_attr("SkButton:rest", "background")
-        This shows getting the value of `background` attribute from styles of `SkButton` at `rest`
+        This shows getting the _value of `background` attribute from styles of `SkButton` at `rest`
         state.
 
-        Fallback Machanism
+        Fallback Mechanism
         ------------------
         - The program first tries to get attribute from the style indicated by the selector.
         - If fails, which means that the attribute cannot be found, the program tries to fallback
@@ -410,11 +415,11 @@ class SkTheme:
 
         :param selector: The selector to the style
         :param attr_name: The attribute name
-        :return: The attribute value
+        :return: The attribute _value
         """
         style = self.get_style(selector, copy=False)
         if attr_name not in style:
-            # Fallback machanism
+            # Fallback mechanism
             # Fallback to base or rest state and try
             if self.select(selector)[-1] != "rest":
                 new_selector = self.select(selector)
@@ -429,14 +434,14 @@ class SkTheme:
             if self.name == SkTheme.DEFAULT_THEME.name:
                 raise SkStyleNotFoundError(
                     f"Attribute <{attr_name}> is not exsited in the default theme. "
-                     "Check your selector!"
+                    "Check your selector!"
                 )
 
         if type(style[attr_name]) is dict:
             return style[attr_name].copy
         else:
             return style[attr_name]
-    
+
     def get_preset_color(self, color_name: str):
         """Find a preset color from color palette.
 
@@ -447,7 +452,7 @@ class SkTheme:
             white = my_theme.get_preset_color("-white")
             default_bg = my_theme.get_preset_color("default_bg")
         This shows getting the white color and the preset color named `default_bg`.
-        
+
         :param color_name: Name of the color
         """
         keywords = {
@@ -468,7 +473,7 @@ class SkTheme:
             else:
                 # If not, fallback
                 if isinstance(self.parent, SkTheme):
-                    # If has parent, fallback to parent
+                    # If it has parent, fallback to parent
                     result = self.parent.get_preset_color(color_name)
                 else:
                     # If not, then is root theme, go fuck your color name
@@ -520,17 +525,17 @@ class SkTheme:
         This shows setting a `SkButton`'s style base on `my_theme`, but with background red.
 
         :param selector: The selector string, indicates where to mix in
-        :param **kwargs: Styles to change
+        :param kwargs: Styles to change
         :return new_theme: The modified SkTheme object
         """
         ## Handling <SkWidget.ITSELF> selectors
         if "ITSELF" in selector:
-            # special() does not suppport SkWidget.ITSELF, as it simply changes attributes.
+            # special() does not support SkWidget.ITSELF, as it simply changes attributes.
             warnings.warn(
                 "<SkWidget.ITSELF> is not supported by SkTheme.special()! "
                 "It will be regarded as <SkWidget.rest>"
             )
-            # So we just simply regard any <ITSELF> as <rest>, as in this case the user may want to 
+            # So we just simply regard any <ITSELF> as <rest>, as in this case the user may want to
             # change the default appearance.
             selector = selector.replace("ITSELF", "rest")
         ## Creating a modified sub-theme
@@ -549,8 +554,10 @@ class SkTheme:
             if child.is_special:
                 existed_special_count += 1
         new_name = self.name + f".special{existed_special_count}"
-        new_theme.rename(f".special{existed_special_count}", 
-                         f"{self.friendly_name} (Special {existed_special_count})")
+        new_theme.rename(
+            f".special{existed_special_count}",
+            f"{self.friendly_name} (Special {existed_special_count})",
+        )
         # (Shall we delete unnecessary data from the modified theme in the future?)
         ## Returning the modified theme
         return new_theme
@@ -576,5 +583,5 @@ class SkTheme:
 # Load internal themes
 SkTheme._load_internal_themes()
 
-# Alias for defualt theme
+# Alias for default theme
 default_theme = SkTheme.DEFAULT_THEME

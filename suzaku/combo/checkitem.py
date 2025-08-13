@@ -6,6 +6,9 @@ from ..widgets.text import SkText
 
 
 class SkCheckItem(SkFrame):
+
+    """Not yet completed"""
+
     def __init__(
         self,
         *args,
@@ -22,6 +25,9 @@ class SkCheckItem(SkFrame):
         self.focusable = True
 
         self.checkbox = SkCheckBox(self)
-        self.checkbox.box(side="left", expand=True, padx=2, pady=2)
+        self.checkbox.box(side="left", padx=2, pady=2)
         self.label = SkText(self, text=text)
-        self.label.box(side="left", expand=True, padx=2, pady=2)
+        self.label.box(side="left", padx=2, pady=2)
+
+        if command:
+            self.bind("click", lambda _: command())
