@@ -109,8 +109,9 @@ class SkWidget(SkEventHanding, SkAfter):
                 "key_released": {},
                 "key_repeated": {},
                 "char": {},
-                "clicked": {},
+                "click": {},
                 "configure": {},
+                "update": {},
             }
         )
         self.layout_config: dict[str, dict] = {"none": {}}

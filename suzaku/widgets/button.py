@@ -34,7 +34,6 @@ class SkButton(SkFrame):
 
         self.focusable = True
 
-
         if command:
             self.bind("click", lambda _: command())
 
