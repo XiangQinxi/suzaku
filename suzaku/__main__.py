@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     def create1window():
         window = SkToplevel(
-            app,
+            parent=None,
             title="Suzaku GUI",
             size=(280, 460),
         )
@@ -27,8 +27,6 @@ if __name__ == "__main__":
 
         SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
         SkLabel(frame, text="This is a SkLabel").box(padx=8, pady=(8, 0))
-        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
-        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
         SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var = SkStringVar()

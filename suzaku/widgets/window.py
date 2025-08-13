@@ -1,3 +1,4 @@
+import typing
 from typing import Callable
 
 import skia
@@ -16,6 +17,7 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
 
     def __init__(
         self,
+        parent: typing.Self = None,
         *args,
         theme: SkTheme = default_theme,
         size: tuple[int, int] = (300, 300),
@@ -28,7 +30,7 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
         :param theme: Theme
         :param kwargs: SkWindowBase Kwargs
         """
-        SkWindowBase.__init__(self, *args, name=name, size=size, **kwargs)
+        SkWindowBase.__init__(self, parent=parent, *args, name=name, size=size, **kwargs)
         SkContainer.__init__(self)
         SkAfter.__init__(self)
 

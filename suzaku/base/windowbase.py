@@ -44,18 +44,19 @@ class SkWindowBase(SkEventHanding):
         self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
 
-        super().__init__()
-
-        self.parent: SkAppBase | "SkWindowBase" = (
+        SkEventHanding.__init__(self)
+        self.parent: SkAppBase | typing.Self = (
             parent if parent is not None else SkAppBase.get_instance()
         )
-        if isinstance(parent, SkAppBase):  # parent=SkAppBase
-            self.application = parent
-            parent.add_window(self)
-        elif isinstance(parent, self.__class__):  # parent=SkWindowBase
-            self.application = parent.application
-            parent.application.add_window(self)
-            parent.bind("closed", lambda _: self.destroy())
+        if self.parent is None:
+            raise ValueError("parent must be not None")
+        if isinstance(self.parent, SkAppBase):  # parent=SkAppBase
+            self.application = self.parent
+            self.parent.add_window(self)
+        elif isinstance(self.parent, self.__class__):  # parent=SkWindowBase
+            self.application = self.parent.application
+            self.parent.application.add_window(self)
+            self.parent.bind("closed", lambda _: self.destroy())
         else:
             raise TypeError("parent must be SkAppBase or SkWindowBase")
 
@@ -707,6 +708,7 @@ class SkWindowBase(SkEventHanding):
             self.event_trigger("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
             # self.event_init = False
+        self.application.windows.remove(self)
 
     def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.
