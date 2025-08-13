@@ -1,18 +1,22 @@
 from typing import Any, Literal, Union
 
+import clipman
 import glfw
 import skia
 
+from ..after import SkAfter
 from ..event import SkEvent, SkEventHanding
-from ..styles.color import SkGradient, color
+from ..styles.color import SkGradient, make_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
 from ..widgets.appwindow import SkAppWindow
 from .window import SkWindow
 
+clipman.init()
 
-class SkWidget(SkEventHanding):
+
+class SkWidget(SkEventHanding, SkAfter):
 
     _instance_count = 0
 
@@ -35,6 +39,7 @@ class SkWidget(SkEventHanding):
         """
 
         SkEventHanding.__init__(self)
+        SkAfter.__init__(self)
 
         self.parent = parent
 
@@ -68,10 +73,20 @@ class SkWidget(SkEventHanding):
         self.theme: SkTheme = self.parent.theme
         self.styles = self.theme.styles
 
-        self.x: int | float = 0
-        self.y: int | float = 0
+        # 相对于父组件的坐标
+        self._x: int | float = 0
+        self._y: int | float = 0
+        # 相对于整个画布、整个窗口（除了标题栏）的坐标
+        self._canvas_x: int | float = self.parent.x + self._x
+        self._canvas_y: int | float = self.parent.y + self._y
+        # 相对于整个屏幕的坐标
+        self._root_x: int | float = self.window.root_x
+        self._root_y: int | float = self.window.root_y
+        # 鼠标坐标
         self.mouse_x = 0
         self.mouse_y = 0
+        self.mouse_root_x = 0
+        self.mouse_root_y = 0
 
         self.width: int | float = size[0]
         self.height: int | float = size[1]
@@ -81,6 +96,8 @@ class SkWidget(SkEventHanding):
 
         self.init_events(
             {
+                "resize": {},
+                "move": {},
                 "mouse_motion": {},
                 "mouse_enter": {},
                 "mouse_leave": {},
@@ -92,8 +109,9 @@ class SkWidget(SkEventHanding):
                 "key_released": {},
                 "key_repeated": {},
                 "char": {},
-                "clicked": {},
+                "click": {},
                 "configure": {},
+                "update": {},
             }
         )
         self.layout_config: dict[str, dict] = {"none": {}}
@@ -123,6 +141,80 @@ class SkWidget(SkEventHanding):
 
     # region Event
 
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        self._x = value
+        self._pos_update()
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, value):
+        self._y = value
+        self._pos_update()
+
+    @property
+    def canvas_x(self):
+        return self._canvas_x
+
+    @canvas_x.setter
+    def canvas_x(self, value):
+        self._canvas_x = value
+        self._pos_update()
+
+    @property
+    def canvas_y(self):
+        return self._canvas_y
+
+    @canvas_y.setter
+    def canvas_y(self, value):
+        self._canvas_y = value
+        self._pos_update()
+
+    @property
+    def root_x(self):
+        return self._root_x
+
+    @root_x.setter
+    def root_x(self, value):
+        self._root_x = value
+        self._pos_update()
+
+    @property
+    def root_y(self):
+        return self._root_y
+
+    @root_y.setter
+    def root_y(self, value):
+        self._root_y = value
+        self._pos_update()
+
+    def _pos_update(self, event: SkEvent | None = None):
+        # 更新组件的位置
+        # 相对整个画布的坐标
+        self._canvas_x = self.parent.canvas_x + self._x
+        self._canvas_y = self.parent.canvas_y + self._y
+        # 相对整个窗口（除了标题栏）的坐标
+        self._root_x = self.canvas_x + self.window.root_x
+        self._root_y = self.canvas_y + self.window.root_y
+
+        self.event_trigger(
+            "move",
+            SkEvent(
+                event_type="move",
+                x=self._x,
+                y=self._y,
+                rootx=self._root_x,
+                rooty=self._root_y,
+            ),
+        )
+
     def _click(self, event) -> None:
         """
         Check click event (not pressed)
@@ -130,7 +222,7 @@ class SkWidget(SkEventHanding):
         :return: None
         """
         if self.is_mouse_floating:
-            self.event_generate("click", event)
+            self.event_trigger("click", event)
 
     # endregion
 
@@ -144,10 +236,14 @@ class SkWidget(SkEventHanding):
         """
         if self.width <= 0 or self.height <= 0:
             return
-        rect = skia.Rect(self.x, self.y, self.x + self.width, self.y + self.height)
+
+        rect = skia.Rect.MakeXYWH(
+            x=self.canvas_x, y=self.canvas_y, w=self.width, h=self.height
+        )
         self._draw(canvas, rect)
         if hasattr(self, "draw_children"):
             self.draw_children(canvas)
+            self._handle_layout(None)
 
     def _draw(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Execute the widget rendering
@@ -180,7 +276,7 @@ class SkWidget(SkEventHanding):
         else:
             colors2 = list
             for _color in colors:
-                colors2.append(color(_color))
+                colors2.append(make_color(_color))
             colors = tuple(colors2)
         return skia.GradientShader.MakeSweep(
             cx=cx,  # Center x position of the sweep
@@ -203,12 +299,6 @@ class SkWidget(SkEventHanding):
             colors=colors,
         )
 
-    @staticmethod
-    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
-        if not style:
-            style = skia.kNormal_BlurStyle
-        return skia.MaskFilter.MakeBlur(style, sigma)
-
     def _draw_radial_shader(self, paint, center, radius, colors):
         """Draw radial shader of the rect
 
@@ -219,6 +309,12 @@ class SkWidget(SkEventHanding):
         :return: None
         """
         paint.setShader(self._radial_shader(center, radius, colors))
+
+    @staticmethod
+    def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
+        if not style:
+            style = skia.kNormal_BlurStyle
+        return skia.MaskFilter.MakeBlur(style, sigma)
 
     def _draw_blur(self, paint: skia.Paint, style=None, sigma=None):
         paint.setMaskFilter(self._blur(style, sigma))
@@ -240,7 +336,15 @@ class SkWidget(SkEventHanding):
         paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
     def _draw_central_text(
-        self, canvas, text, fg, x, y, width, height, font: skia.Font = None
+        self,
+        canvas,
+        text,
+        fg,
+        canvas_x,
+        canvas_y,
+        width,
+        height,
+        font: skia.Font = None,
     ):
         """Draw central text
 
@@ -257,17 +361,17 @@ class SkWidget(SkEventHanding):
         :return: None
         :raises: None
         """
-
-        font = self.attributes["font"]
+        if not font:
+            font = self.attributes["font"]
 
         # 绘制字体
-        text_paint = skia.Paint(AntiAlias=True, Color=color(fg))
+        text_paint = skia.Paint(AntiAlias=True, Color=make_color(fg))
 
         text_width = font.measureText(text)
         metrics = font.getMetrics()
 
-        draw_x = x + width / 2 - text_width / 2
-        draw_y = y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+        draw_x = canvas_x + width / 2 - text_width / 2
+        draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
 
         canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
 
@@ -298,18 +402,19 @@ class SkWidget(SkEventHanding):
 
         """
 
-        drop_shadow_rect = skia.Rect(
-            self.x, self.y, self.x + self.width, self.y + self.height
-        )
-        drop_shadow_paint = skia.Paint(
-            AntiAlias=True, Style=skia.Paint.kStrokeAndFill_Style, Color=skia.ColorWHITE
-        )
-
         if bd_shadow:
+            drop_shadow_rect = skia.Rect.MakeXYWH(
+                self.canvas_x, self.canvas_y, self.width, self.height
+            )
+            drop_shadow_paint = skia.Paint(
+                AntiAlias=True,
+                Style=skia.Paint.kStrokeAndFill_Style,
+                Color=make_color(bg),
+            )
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(drop_shadow_paint)
 
-        canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
+            canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
 
         bg_paint = skia.Paint(
             AntiAlias=True,
@@ -322,7 +427,7 @@ class SkWidget(SkEventHanding):
         )
 
         # Background
-        bg_paint.setColor(color(bg))
+        bg_paint.setColor(make_color(bg))
         if bg_shader:
             if isinstance(bg_shader, dict):
                 if "linear_gradient" in bg_shader:
@@ -339,7 +444,7 @@ class SkWidget(SkEventHanding):
 
         # Border
         bd_paint.setStrokeWidth(width)
-        bd_paint.setColor(color(bd))
+        bd_paint.setColor(make_color(bd))
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:
@@ -356,6 +461,11 @@ class SkWidget(SkEventHanding):
 
         # Draw background first
         canvas.drawRoundRect(rect, radius, radius, bg_paint)
+
+        # canvas.save()
+
+        # shadow = SkDropShadow(config_list=bd_shadow)
+        # shadow.draw(bd_paint)
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
@@ -386,11 +496,11 @@ class SkWidget(SkEventHanding):
     def set_attribute(self, **kwargs):
         """Set attribute of a widget by name.
 
-        :param kwargs: attribute name and value
+        :param kwargs: attribute name and _value
         :return: self
         """
         self.attributes.update(**kwargs)
-        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
+        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute
@@ -456,6 +566,11 @@ class SkWidget(SkEventHanding):
     ) -> "SkWidget":
         """Fix the widget at a specific position.
 
+        Example:
+            .. code-block:: python
+
+                widget.fixed(x=10, y=10, width=100, height=100)
+
         :param x:
         :param y:
         :param width:
@@ -484,8 +599,9 @@ class SkWidget(SkEventHanding):
     def place(self, anchor: str = "nw", x: int = 0, y: int = 0) -> "SkWidget":
         """Place widget at a specific position.
 
+        :param x: X coordinate
+        :param y: Y coordinate
         :param anchor:
-        :param
         :return: self
         """
         self.visible = True
@@ -587,13 +703,13 @@ class SkWidget(SkEventHanding):
         Set focus
         """
         if self.focusable:
-            self.window.focus_get().event_generate(
+            self.window.focus_get().event_trigger(
                 "focus_loss", SkEvent(event_type="focus_loss")
             )
             self.window.focus_get().is_focus = False
             self.window.focus_widget = self
             self.is_focus = True
-            self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
+            self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:
         """

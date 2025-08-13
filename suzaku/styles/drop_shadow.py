@@ -1,19 +1,19 @@
 import skia
 
-from .color import color
+from .color import make_color
 
 
 class SkDropShadow:
-    def __init__(self, dx=0, dy=0, sigmaX=0, sigmaY=0, colr=None, config_list=None):
-        """
-        Initialize the drop shadow.
+    """A class for handling shadow styles.
 
-        :param dx: The offset in the x-direction.
-        :param dy: The offset in the y-direction.
-        :param sigmaX: The standard deviation in the x-direction.
-        :param sigmaY: The standard deviation in the y-direction.
-        :param colr: The color of the drop shadow.
-        """
+    :param dx: The offset in the x-direction.
+    :param dy: The offset in the y-direction.
+    :param sigmaX: The standard deviation in the x-direction.
+    :param sigmaY: The standard deviation in the y-direction.
+    :param colr: The color of the drop shadow.
+    """
+
+    def __init__(self, dx=0, dy=0, sigmaX=0, sigmaY=0, colr=None, config_list=None):
         if config_list:
             self.dx = config_list[0]
             self.dy = config_list[1]
@@ -28,11 +28,15 @@ class SkDropShadow:
             self.colr = colr
 
     def draw(self, paint):
+        """Set the ImageFilter property of a given `skia.Paint` to draw shadows.
+
+        :param paint:
+        :return:
+        """
         paint.setImageFilter(self.get())
 
     def set(self, dx, dy, sigmaX, sigmaY, colr):
-        """
-        Set the drop shadow parameters.
+        """Set the drop shadow parameters.
 
         :param dx: The offset in the x-direction.
         :param dy: The offset in the y-direction.
@@ -60,5 +64,5 @@ class SkDropShadow:
             dy=self.dy,
             sigmaX=self.sigmaX,
             sigmaY=self.sigmaY,
-            color=color(self.colr),
+            color=make_color(self.colr),
         )

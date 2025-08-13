@@ -1,9 +1,20 @@
 from typing import Union
 
+import skia
+
 from ..text import SkText
 
 
 class SkTextButton(SkText):
+    """A Button with Text
+
+    :param args:
+    :param size: Widget default size
+    :param cursor: The style displayed when the mouse hovers over it
+    :param command: Triggered when the button is clicked
+    :param kwargs:
+    """
+
     def __init__(
         self,
         *args,
@@ -25,47 +36,60 @@ class SkTextButton(SkText):
 
     # region Draw
 
-    def _draw(self, canvas, rect):
-        sheets = None
+    def _draw(self, canvas: skia.Canvas, rect: skia.Rect):
+        """Draw the button
+
+        :param canvas:
+        :param rect:
+        :return:
+        """
         if self.is_mouse_floating:
-            sheets = self.theme.styles["SkButton"][
-                f"{"pressed" if self.is_mouse_pressed else "hover"}"
-            ]
+            if self.is_mouse_pressed:
+                style_name = "SkButton:pressed"
+            else:
+                style_name = "SkButton:hover"
         else:
-            sheets = self.theme.styles["SkButton"][
-                f"{"focus" if self.is_focus else "rest"}"
-            ]
-        if "bg_shader" in sheets:
-            bg_shader = sheets["bg_shader"]
+            if self.is_focus:
+                style_name = "SkButton:focus"
+            else:
+                style_name = "SkButton"
+
+        style = self.theme.get_style(style_name)
+
+        if "bg_shader" in style:
+            bg_shader = style["bg_shader"]
         else:
             bg_shader = None
 
-        if "bd_shadow" in sheets:
-            bd_shadow = sheets["bd_shadow"]
+        if "bd_shadow" in style:
+            bd_shadow = style["bd_shadow"]
         else:
             bd_shadow = None
-        if "bd_shader" in sheets:
-            bd_shader = sheets["bd_shader"]
+        if "bd_shader" in style:
+            bd_shader = style["bd_shader"]
         else:
             bd_shader = None
 
+        # Draw the button border
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.styles["SkButton"]["radius"],
-            bg=sheets["bg"],
-            width=sheets["width"],
-            bd=sheets["bd"],
+            radius=self.theme.get_style("SkButton")["radius"],
+            bg=style["bg"],
+            width=style["width"],
+            bd=style["bd"],
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
             bg_shader=bg_shader,
         )
+
+        # Draw the button text
         self._draw_central_text(
             canvas,
             text=self.attributes["text"],
-            fg=sheets["fg"],
-            x=self.x,
-            y=self.y,
+            fg=style["fg"],
+            canvas_x=self.canvas_x,
+            canvas_y=self.canvas_y,
             width=self.width,
             height=self.height,
         )

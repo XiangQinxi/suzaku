@@ -4,6 +4,18 @@ from .frame import SkFrame
 
 
 class SkButton(SkFrame):
+    """Button without Label or Icon.
+
+    **Will be re-written in the future.**
+
+    :param args: Passed to SkVisual
+    :param text: Button text
+    :param size: Default size
+    :param cursor: Cursor styles when hovering
+    :param styles: Style name
+    :param command: Function to run when clicked
+    :param **kwargs: Passed to SkVisual
+    """
 
     def __init__(
         self,
@@ -13,19 +25,6 @@ class SkButton(SkFrame):
         command: Union[callable, None] = None,
         **kwargs,
     ) -> None:
-        """Button without Label.
-
-        **Will be re-written in future.**
-
-        :param args: Passed to SkVisual
-        :param text: Button text
-        :param size: Default size
-        :param cursor: Cursor styles when hovering
-        :param styles: Style name
-        :param command: Function to run when clicked
-        :param **kwargs: Passed to SkVisual
-        """
-
         super().__init__(*args, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
@@ -45,36 +44,40 @@ class SkButton(SkFrame):
 
         :return: None
         """
-        sheets = None
         if self.is_mouse_floating:
-            sheets = self.theme.styles["SkButton"][
-                f"{"pressed" if self.is_mouse_pressed else "hover"}"
-            ]
+            if self.is_mouse_pressed:
+                style_name = "SkButton:pressed"
+            else:
+                style_name = "SkButton:hover"
         else:
-            sheets = self.theme.styles["SkButton"][
-                f"{"focus" if self.is_focus else "rest"}"
-            ]
-        if "bg_shader" in sheets:
-            bg_shader = sheets["bg_shader"]
+            if self.is_focus:
+                style_name = "SkButton:focus"
+            else:
+                style_name = "SkButton"
+
+        style = self.theme.get_style(style_name)
+
+        if "bg_shader" in style:
+            bg_shader = style["bg_shader"]
         else:
             bg_shader = None
 
-        if "bd_shadow" in sheets:
-            bd_shadow = sheets["bd_shadow"]
+        if "bd_shadow" in style:
+            bd_shadow = style["bd_shadow"]
         else:
-            bd_shadow = False
-        if "bd_shader" in sheets:
-            bd_shader = sheets["bd_shader"]
+            bd_shadow = None
+        if "bd_shader" in style:
+            bd_shader = style["bd_shader"]
         else:
             bd_shader = None
 
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.styles["SkButton"]["radius"],
-            bg=sheets["bg"],
-            width=sheets["width"],
-            bd=sheets["bd"],
+            radius=self.theme.get_style("SkButton")["radius"],
+            bg=style["bg"],
+            width=style["width"],
+            bd=style["bd"],
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
             bg_shader=bg_shader,

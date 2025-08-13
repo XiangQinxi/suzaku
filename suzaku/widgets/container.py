@@ -1,4 +1,5 @@
-import warnings
+import typing
+
 import skia
 
 from ..event import SkEvent
@@ -9,35 +10,49 @@ class SkLayoutError(TypeError):
 
 
 class SkContainer:
+    """A SkContainer represents a widget that has the ability to contain other widgets inside.
+
+    SkContainer is only for internal use. If any user would like to create a widget from
+    several of existed ones, they should use SkComboWidget instead. The authors will not
+    guarantee the stability of inheriting SkContainer for third-party widgets.
+
+    SkContainer class contains code for widget embedding, and layout handling, providing the
+    ability of containing `children` to widgets inherit from it. All other classes with such
+    abilities should be inherited from SkContainer.
+
+    SkContainer has a `children` list, each item is a `SkWidget`, called `child`. This helps
+    the SkContainer knows which `SkWidget`s it should handle.
+
+    SkContainer has a `draw_list` that stores all widgets contained in it that should be drawn.
+    They are separated into a few layers which are listed below, in the order of from behind to
+    the top:
+
+    1. `Layout layer`: The layer for widgets using pack or grid layout.
+    2. `Floating layer`: The layer for widgets using place layout.
+    3. `Fixed layer`: The layer for widgets using fixed layout.
+
+    In each layer, items will be drawn in the order of index. Meaning that those with lower
+    index will be drawn first, and may get covered by those with higher index. Same for layers,
+    layers with higher index cover those with lower index.
+
+    Example:
+
+    .. code-block:: python
+
+        container = SkContainer()
+        widget = SkWidget(parent=container)
+        widget.fixed(x=10, y=10, width=100, height=100)
+
+    """
 
     # region __init__ 初始化
 
+    parent: typing.Self
+    width: int | float
+    height: int | float
+
     def __init__(self, allowed_out_of_bounds: bool = False):
-        """A SkContainer represents a widget that has the ability to contain other widgets inside.
 
-        SkContainer is only for internal use. If any user would like to create a widget from
-        several of existed ones, they should use SkComboWidget instead. The authors will not
-        guarantee the stability of inheriting SkContainer for third-party widgets.
-
-        SkContainer class contains code for widget embedding, and layout handling, providing the
-        ability of containing `children` to widgets inerit from it. All other classes with such
-        abilities should be inherited from SkContainer.
-
-        SkContainer has a `children` list, each item is a `SkWidget`, called `child`. This helps
-        the SkContainer knows which `SkWidget`s it should handle.
-
-        SkContainer has a `draw_list` that stores all widgets contained in it that should be drawn.
-        They are separated into a few layers which are listed below, in the order of from behind to
-        the top:
-
-        1. `Layout layer`: The layer for widgets using pack or grid layout.
-        2. `Floating layer`: The layer for widgets using place layout.
-        3. `Fixed layer`: The layer for widgets using fixed layout.
-
-        In each layer, items will be drawn in the order of index. Meaning that those with lower
-        index will be drawn first, and may get covered by those with higher index. Same for layers,
-        layers with higher index cover those with lower index.
-        """
         # self.parent = None
         self.children = []  # Children
 
@@ -53,29 +68,29 @@ class SkContainer:
         self._box_direction = None  # h(horizontal) or v(vertical)
         self.allowed_out_of_bounds = allowed_out_of_bounds
 
-        #self.bind("resize", self._handle_layout)
-        self.bind("resize", self._handle_layout)
-        self.bind("update", self._update)
+        # self.bind("resize", self._handle_layout)
+        self.bind("resize", self._update)
+        # self.bind("update", self._update)
 
         if isinstance(self, SkWidget):
 
             def children_resize(event: SkEvent):
                 for child in self.children:
-                    child.event_generate("resize", event)
+                    child.event_trigger("resize", event)
 
             self.bind("resize", children_resize)
 
-    def _update(self, event):
-        """Update event for SkWindow.
+    def _update(self, event=None):
+        """Organize the layout and send an `update` event message to the child components
 
         :param event: SkEvent
         :return:
         """
-        self._handle_layout(event)
+        self._handle_layout(event=event)
         for widget in self.children:
             from suzaku.event import SkEvent
 
-            widget.event_generate("update", SkEvent(event_type="update"))
+            widget.event_trigger("update", SkEvent(event_type="update"))
 
     # endregion
 
@@ -85,9 +100,9 @@ class SkContainer:
 
         :param child: The child to add
         """
-        from .appbase import SkAppBase
+        from .app import SkApp
 
-        if not isinstance(self.parent, SkAppBase):
+        if not isinstance(self.parent, SkApp):
             self.parent.add_child(child)
         self.children.append(child)
 
@@ -122,7 +137,7 @@ class SkContainer:
                 self._box_direction = direction
 
         self.draw_list[0].append(child)
-        self._handle_layout()
+        self._update()
 
     def add_floating_child(self, child):
         """Add floating child widget to window.
@@ -131,16 +146,21 @@ class SkContainer:
         :return: None
         """
         self.draw_list[1].append(child)
-        self._handle_layout()
+        self._update()
 
     def add_fixed_child(self, child):
         """Add fixed child widget to window.
+
+        Example:
+            .. code-block:: python
+
+                widget.fixed(x=10, y=10, width=100, height=100)
 
         :arg child: SkWidget
         :return: None
         """
         self.draw_list[2].append(child)
-        self._handle_layout()
+        self._update()
 
     # endregion
 
@@ -153,12 +173,12 @@ class SkContainer:
         :return: None
         """
         from ..widgets.widget import SkWidget
-        from .windowbase import SkWindowBase
+        from .window import SkWindow
 
-        if not isinstance(self, SkWindowBase):
+        if not isinstance(self, SkWindow):
             if isinstance(self, SkWidget):
-                x = self.x
-                y = self.y
+                x = self.canvas_x
+                y = self.canvas_y
             else:
                 x = 0
                 y = 0
@@ -167,10 +187,10 @@ class SkContainer:
                 canvas.save()
                 canvas.clipRect(
                     skia.Rect.MakeXYWH(
-                        x,
-                        y,
-                        self.width,
-                        self.height,
+                        x=x,
+                        y=y,
+                        w=self.width,
+                        h=self.height,
                     )
                 )
         for layer in self.draw_list:
@@ -184,50 +204,13 @@ class SkContainer:
     # region layout 布局
 
     def update_layout(self):
-        self._handle_layout()
+        self._update()
 
-    def _handle_layout(self, evt=None):
+    def _handle_layout(self, event=None):
         """Handle layout of the container.
 
         :return: None
         """
-        """for child in self.children:
-            if child.visible:
-                layout_type = list(child.layout_config.keys())[0]
-                # Build draw_item dict
-                draw_item = {
-                    "widget": child,
-                    "x": 0,
-                    "y": 0,
-                    "width": 0,
-                    "height": 0,
-                }
-                # Sort children
-                match layout_type:
-                    case "none":
-                        continue
-                    case "pack" | "box" | "grid":  # -> Layout layer
-                        if self.layers_layout_type[0] == "none":
-                            self.layers_layout_type[0] = layout_type
-                        elif self.layers_layout_type[0] != layout_type:
-                            raise SkLayoutError("Layout layer can only contain no more than " + \
-                                                f"one layout type. Not {layout_type} with " + \
-                                                f"{self.layers_layout_type[0]} which is existed.")
-                        self.draw_list[0].append(draw_item)
-                    case "place":  # -> Floating layer
-                        if self.layers_layout_type[1] != "place":
-                            self.layers_layout_type[1] = layout_type
-                        self.draw_list[1].append(draw_item)
-                    case "fixed":  # -> Fixed layer
-                        if self.layers_layout_type[2] != "fixed":
-                            self.layers_layout_type[2] = layout_type
-                        self.draw_list[2].append(draw_item)
-
-        # Process layouts
-        for layout_type in self.layers_layout_type:
-            if layout_type != "none":
-                getattr(self, f"_handle_{layout_type}")(event)
-        # self._handle_fixed()"""
         for layer in self.draw_list:
             for child in layer:
                 if child.visible:
@@ -257,12 +240,6 @@ class SkContainer:
 
         from ..widgets.widget import SkWidget
 
-        if isinstance(self, SkWidget):
-            x = self.x
-            y = self.y
-        else:
-            x = 0
-            y = 0
         width = self.width  # container width
         height = self.height  # container height
         start_children: list[SkWidget] = []  # side="top" or "left" children
@@ -399,8 +376,8 @@ class SkContainer:
                     child.height = child.cget("dheight")
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = x + left
-                child.y = y + last_child_bottom_y + top
+                child.x = left
+                child.y = last_child_bottom_y + top
                 last_child_bottom_y = child.y + child.height + bottom
 
             last_child_top_y = height  # Last top y position of the child component
@@ -423,23 +400,18 @@ class SkContainer:
                     child.height = child.cget("dheight")
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = x + left
-                child.y = y + last_child_top_y - child.height - bottom
+                child.x = left
+                child.y = last_child_top_y - child.height - bottom
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
-    def _handle_fixed(self, child):
+    @staticmethod
+    def _handle_fixed(child):
         """Process fixed layout.
 
         :param child: The child widget
         """
-        from ..widgets.window import SkWindow
-
-        if isinstance(self, SkWindow):
-            x = y = 0
-        else:
-            x = self.x, y = self.y
-        child.x = child.layout_config["fixed"]["x"] + x
-        child.y = child.layout_config["fixed"]["y"] + y
+        child.x = child.layout_config["fixed"]["x"]
+        child.y = child.layout_config["fixed"]["y"]
         child.width = child.layout_config["fixed"]["width"]
         child.height = child.layout_config["fixed"]["height"]
 

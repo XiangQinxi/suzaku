@@ -7,6 +7,8 @@ import re
 import typing
 import warnings
 
+from . import color
+
 if typing.TYPE_CHECKING:
     from ..widgets.widget import SkWidget
 
@@ -120,6 +122,8 @@ class SkTheme:
         # friendly_name感觉有点多余? ——Little White Cloud
         # Keep it 4 now currently. ——rgzz666
         self.parent: typing.Union["SkTheme", None] = parent
+        self.children = []
+        self.is_special = False
 
         self.styles: dict = styles
         if styles is None:
@@ -137,28 +141,32 @@ class SkTheme:
         .. code-block:: python
             my_theme = SkTheme().load_from_file("./path/to/a/theme.json")
             my_theme.load_from_file("./path/to/another/theme.json")
+
         This shows loading a theme to `my_theme` from the theme file at `./path/to/a/theme.json`,
         and change it to theme from `./path/to/another/theme.json` later.
 
         :param file_path: Path to the theme file
         :return self: The SkTheme itself
         """
-
+        # We need a file to load from file \o/ \o/ \o/
         with open(file_path, mode="r", encoding="utf-8") as f:
             style_raw = f.read()
             theme_data = json.loads(style_raw)
             if (
                 search_result := SkTheme.find_loaded_theme(theme_data["name"])
             ) != False:
+                # If name already occupied, meaning the theme might already be loaded
+                # (or just simply has an occupied name)
                 warnings.warn(
-                    f"Theme <{theme_data["name"]}> already loaded or existed."
+                    f"Theme <{theme_data['name']}> already loaded or existed.",
+                    RuntimeWarning,
                 )
                 return search_result
 
         return self.load_from_json(theme_data)
 
     def load_from_json(self, theme_data: dict) -> "SkTheme":
-        """Load all data (including matadata) to the theme.
+        """Load all data (including metadata) to the theme.
 
         Example
         -------
@@ -181,13 +189,17 @@ class SkTheme:
         }
         for item in EXPECTED_DATA_TYPE.keys():
             if type(theme_data[item]) != EXPECTED_DATA_TYPE[item]:
-                theme_name = theme_data["name"] if type(theme_data["name"]) is str \
-                                                else "(Type error)"
+                theme_name = (
+                    theme_data["name"]
+                    if type(theme_data["name"]) is str
+                    else "(Type error)"
+                )
                 warnings.warn(
                     f"Error data type of <{item}> in theme data that is about to be loaded. "
                     f"Expected {EXPECTED_DATA_TYPE[item]} but got {type(item)}. The json data "
-                    f"with theme named <{theme_name}> will not be loaded to the theme <{self.name}>"
-                , ResourceWarning)
+                    f"with theme named <{theme_name}> will not be loaded to the theme <{self.name}>",
+                    ResourceWarning,
+                )
                 return self
         # Load data
         self.styles = theme_data["styles"].copy()
@@ -212,7 +224,8 @@ class SkTheme:
         :param style_json: dict that contains the styles
         :return self: The SkTheme itself
         """
-        self.styles = style_json
+        # This just fucks everything from source json into the styles
+        self.styles = style_json.copy()
         return self
 
     def set_parent(self, parent_name: str) -> "SkTheme":
@@ -230,7 +243,7 @@ class SkTheme:
         Parent Name
         -----------
         - `ROOT` means the theme does not have a parent. This is not recommended for third-party
-          themes, use `DEFAULT` instead.
+          themes as fallback mechanisms will all stop working, use `DEFAULT` instead.
         - `DEFAULT` means the parent of the theme is the default internal theme.
 
         If the parent name is none of above, it should be the theme of the name and will be set as
@@ -242,19 +255,25 @@ class SkTheme:
         """
         match parent_name:
             case "ROOT":
+                # If root theme, then no parent (which means no fallback)
                 self.parent = None
             case "DEFAULT":
+                # If default theme for parent, then... hmm... default theme for parent... 🤔
                 self.parent = self.DEFAULT_THEME
             case _:
+                # If else, find the theme
                 search_result = SkTheme.find_loaded_theme(parent_name)
                 if search_result != False:
                     self.parent = search_result
                 else:
+                    # When not found, fallback to default for parent
                     warnings.warn(
                         f"Parent theme specified with name <{parent_name}> is not yet loaded. "
                         "Will fall back to <DEFAULT> for parent instead."
                     )
                     self.set_parent("DEFAULT")
+        if isinstance(self.parent, SkTheme):
+            self.parent.children.append(self)
         return self
 
     def rename(self, new_name: str, friendly_name: str) -> "SkTheme":
@@ -266,21 +285,25 @@ class SkTheme:
             my_theme = Theme().rename("theme.name")
             my_theme.rename("i_hate.that_name")
         This shows renaming `my_theme` to `theme.name`, and renaming it to `i_hate.that_name` after
-        its creaton.
+        its creation.
 
+        :param friendly_name:
         :param new_name: The new name for the theme
         :return self: The SkTheme itself
         """
         if not SkTheme.validate_theme_existed(new_name):
+            # If name not occupied, then rename self.
             self.name = new_name
             self.friendly_name = friendly_name  # 🤔
         else:
+            # Otherwise stop this.
             warnings.warn(
                 f"Theme name <{new_name}> occupied. Rename for <{self.name}> is canceled."
             )
         return self
 
-    def select(self, selector: str) -> list:
+    @staticmethod
+    def select(selector: str) -> list:
         """Parse styles selector.
 
         This is a selector parser mainly used by internal functions.
@@ -293,13 +316,13 @@ class SkTheme:
         --------
         - `<Widget>` indicates the styles of Widget at rest state, e.g. `SkButton`.
         - `<Widget>:<state>` indicates the styles of the state of Widget, e.g. `SkButton:hover`.
-        - `<Widget>:ITSELF` indecates the styles of the widget, e.g. `SkButton.ITSELF`.
+        - `<Widget>:ITSELF` indicates the styles of the widget, e.g. `SkButton.ITSELF`.
           Note that this is not available everywhere.
 
         :param selector: The selector string
         :return: Parsed selector, levels in a list
         """
-        # Validation
+        # Validate if selector valid
         if not re.match("[a-zA-Z0-9-_.:]", selector):
             raise ValueError(f"Invalid styles selector [{selector}].")
         # Handling
@@ -311,14 +334,7 @@ class SkTheme:
                 result = [result[0]]
         else:
             result = [selector, "rest"]
-
-        # Check if the widget is not in the widgets list
-        # Also check if the state is not in the widget's states
-        if (
-            result[0] not in self.styles.keys()
-            or result[1] not in self.styles[result[0]].keys()
-        ):
-            raise SkStyleNotFoundError(f"Cannot find styles with selector [{selector}]")
+        # Return the parsed selector
         return result
 
     def get_style(self, selector: str, copy: bool = True) -> dict:
@@ -336,41 +352,56 @@ class SkTheme:
         :param copy: Whether to copy a new styles json, otherwise returns the styles itself
         :return result: The style dict
         """
+        # First, set the result to all styles
         result = self.styles
         if not selector:
-            result = self.styles
+            # If no selector is provided, then return all styles, so do nothing
+            pass
         else:
             try:
+                # To get a parsed selector
                 selector_parsed = self.select(selector)
+                # Validate if selector exists in theme
+                _ = self.styles
+                for selector_level in selector_parsed:
+                    if selector_level not in _:
+                        if isinstance(self.parent, SkTheme):
+                            # If parent exists, then fallback
+                            return self.parent.get_style(selector, copy)
+                        else:
+                            # If is root theme, then go fuck ur selector
+                            raise SkStyleNotFoundError(
+                                "Cannot find styles with selector " f"[{selector}]"
+                            )
+                    _ = _[selector_level]
             except SkStyleNotFoundError:
-                if self.name == SkTheme.DEFAULT_THEME.name:
-                    raise SkStyleNotFoundError(
-                        "Style is not exsited in the default theme. Check your selector!"
-                    )
-                return default_theme.get_style(selector, copy=True)
+                # If this fails, then the selector is invalid
+                raise SkStyleNotFoundError(
+                    "Style is not exsited in the default theme. Check your selector!"
+                )
 
             for selector_level in selector_parsed:
-                # e.g. result = stlyes["SkButton"]
+                # e.g. result = styles["SkButton"]
                 # result = styles["SkButton"]["hover"]
                 result = result[selector_level]
 
-        if copy:
+        if copy and type(result) is dict:
             return result.copy()
         else:
             return result
 
     def get_style_attr(self, selector: str, attr_name: str) -> typing.Any:
-        """Get style attribute value.
+        """Get style attribute _value.
 
         Example
         -------
         .. code-block:: python
             my_theme = SkTheme()
             button_background = my_theme.get_style_attr("SkButton:rest", "background")
-        This shows getting the value of `background` attribute from styles of `SkButton` at `rest`
+        This shows getting the _value of `background` attribute from styles of `SkButton` at `rest`
         state.
 
-        Fallback Machanism
+        Fallback Mechanism
         ------------------
         - The program first tries to get attribute from the style indicated by the selector.
         - If fails, which means that the attribute cannot be found, the program tries to fallback
@@ -384,11 +415,11 @@ class SkTheme:
 
         :param selector: The selector to the style
         :param attr_name: The attribute name
-        :return: The attribute value
+        :return: The attribute _value
         """
         style = self.get_style(selector, copy=False)
         if attr_name not in style:
-            # Fallback machanism
+            # Fallback mechanism
             # Fallback to base or rest state and try
             if self.select(selector)[-1] != "rest":
                 new_selector = self.select(selector)
@@ -402,10 +433,59 @@ class SkTheme:
             # If is already default theme (no parent), then go fuck your selector
             if self.name == SkTheme.DEFAULT_THEME.name:
                 raise SkStyleNotFoundError(
-                    "Style is not exsited in the default theme. Check your selector!"
+                    f"Attribute <{attr_name}> is not exsited in the default theme. "
+                    "Check your selector!"
                 )
 
-        return style[attr_name]
+        if type(style[attr_name]) is dict:
+            return style[attr_name].copy
+        else:
+            return style[attr_name]
+
+    def get_preset_color(self, color_name: str):
+        """Find a preset color from color palette.
+
+        Example
+        -------
+        .. code-block:: python
+            my_theme = SkTheme()
+            white = my_theme.get_preset_color("-white")
+            default_bg = my_theme.get_preset_color("default_bg")
+        This shows getting the white color and the preset color named `default_bg`.
+
+        :param color_name: Name of the color
+        """
+        keywords = {
+            "-transparent": (0, 0, 0, 0),
+            "-black": (0, 0, 0, 255),
+            "-white": (255, 255, 255, 255),
+            "-absneutralgrey": (128, 128, 128, 255),
+            "-errcolor": color.ERR_COLOR,
+        }
+        if color_name in keywords:
+            # If is a keyword
+            result = keywords[color_name]
+        else:
+            # If not a keyword
+            if color_name in self.color_palette:
+                # If existed
+                result = self.color_palette[color_name]
+            else:
+                # If not, fallback
+                if isinstance(self.parent, SkTheme):
+                    # If it has parent, fallback to parent
+                    result = self.parent.get_preset_color(color_name)
+                else:
+                    # If not, then is root theme, go fuck your color name
+                    warnings.warn(
+                        f"Color <{color_name}> if not found anywhere.",
+                        color.SkColorWarning,
+                    )
+                    result = color.ERR_COLOR
+        if type(result) is dict:
+            return result.copy()
+        else:
+            return result
 
     def mixin(self, selector: str, new_style: dict, copy: bool = False) -> "SkTheme":
         """Mix, or in other words, override custom styles into the theme.
@@ -447,18 +527,41 @@ class SkTheme:
         This shows setting a `SkButton`'s style base on `my_theme`, but with background red.
 
         :param selector: The selector string, indicates where to mix in
-        :param **kwargs: Styles to change
+        :param kwargs: Styles to change
         :return new_theme: The modified SkTheme object
         """
+        ## Handling <SkWidget.ITSELF> selectors
         if "ITSELF" in selector:
+            # special() does not support SkWidget.ITSELF, as it simply changes attributes.
             warnings.warn(
                 "<SkWidget.ITSELF> is not supported by SkTheme.special()! "
                 "It will be regarded as <SkWidget.rest>"
             )
+            # So we just simply regard any <ITSELF> as <rest>, as in this case the user may want to
+            # change the default appearance.
             selector = selector.replace("ITSELF", "rest")
-        new_theme = SkTheme(self.styles, parent=self)
+        ## Creating a modified sub-theme
+        # Create a new theme with required stuff
+        # (This is to prevent modifications on original theme)
+        new_theme = SkTheme({}, parent=self)
+        new_theme.is_special = True
+        selector_parsed = self.select(selector)
+        new_theme.styles[selector_parsed[0]][selector_parsed[1]] = None
+        # Modifying styles of the new theme
         style_operate = new_theme.get_style(selector, copy=False)
         style_operate.update(kwargs)
+        # Renaming the new theme
+        existed_special_count = 0
+        for child in self.children:
+            if child.is_special:
+                existed_special_count += 1
+        new_name = self.name + f".special{existed_special_count}"
+        new_theme.rename(
+            f".special{existed_special_count}",
+            f"{self.friendly_name} (Special {existed_special_count})",
+        )
+        # (Shall we delete unnecessary data from the modified theme in the future?)
+        ## Returning the modified theme
         return new_theme
 
     def apply_on(self, widget: SkWidget) -> SkTheme:
@@ -482,5 +585,5 @@ class SkTheme:
 # Load internal themes
 SkTheme._load_internal_themes()
 
-# Alias for defualt theme
+# Alias for default theme
 default_theme = SkTheme.DEFAULT_THEME

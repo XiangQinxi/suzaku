@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import typing
 import warnings
+
 import skia
 import typing
 
@@ -10,14 +12,41 @@ if typing.TYPE_CHECKING:
     from ..widgets.widget import SkWidget
 
 
+ERR_COLOR = (0, 255, 0, 255)
+
+
 class SkColorWarning(Warning):
     pass
 
 
 class SkColor:
-    def __init__(self, color: str | None = None) -> None:
-        self.color = None
+    """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
+
+    Example
+    -------
+    .. code-block:: python
+        SkColor("#ffffff")  # Supports hex
+        SkColor( (255, 255, 255, 255 ) )  # Supports RGBA format
+        SkColor("white")  # Supports predefined color names (refer to color parameters in skia)
+
+    Afterward, use `Color().color` to obtain the Skia.Color.
+
+    Of course, if you want to change the color _value, you can use the `set_color` method of `SkColor` to modify it—though generally, you won't need to.
+
+    :param color: Color value, can be hex, rgba, or color name.
+    :type color: str | tuple | list | None
+    """
+
+    def __init__(self, color: str | tuple | list | None = None) -> None:
+        self.color: str | tuple | list | None = None
         self.set_color(color)
+
+    def get(self) -> skia.Color:
+        """Get the color _value.
+
+        :return: Color _value.
+        """
+        return self.color
 
     def set_color(self, color: str | tuple | list) -> SkColor:
         """Set the color of the SkColor."""
@@ -33,7 +62,7 @@ class SkColor:
                 self.set_color_rgba(color[0], color[1], color[2], color[3])
             else:
                 raise ValueError(
-                    "Color tuple/list must have 3 (RGB) or 4 (RGBA) elements"
+                    "Color tuple / list must have 3 (RGB) or 4 (RGBA) elements"
                 )
         else:
             return self
@@ -67,12 +96,12 @@ class SkColor:
         """
         self.color = skia.Color(r, g, b, a)
 
-    def set_color_hex(self, hex: str) -> None:
+    def set_color_hex(self, _hex: str) -> None:
         """
         转换十六进制颜色字符串为Skia颜色
 
         Args:
-            hex: 十六进制颜色字符串(支持 #RRGGBB 和 #RRGGBBAA 格式)
+            _hex: 十六进制颜色字符串(支持 #RRGGBB 和 #RRGGBBAA 格式)
 
         Returns:
             skia.Color: 对应的RGBA颜色对象
@@ -80,7 +109,7 @@ class SkColor:
         Raises:
             ValueError: 当十六进制格式无效时抛出
         """
-        hex_color = hex.lstrip("#")
+        hex_color = _hex.lstrip("#")
         if len(hex_color) == 6:  # RGB 格式，默认不透明(Alpha=255)
             r = int(hex_color[0:2], 16)
             g = int(hex_color[2:4], 16)
@@ -97,15 +126,12 @@ class SkColor:
 
 
 class SkGradient:
-    def __init__(self):
-        """Initialize gradient
+    """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use."""
 
-        :param widget: Widget
-        """
-        # self.widget = widget
+    def __init__(self):
         self.gradient: skia.GradientShader | None = None
 
-    def draw(self, paint: skia.Paint) -> skia.Paint:
+    def draw(self, paint: skia.Paint) -> skia.Paint | None:
         """Draw gradient
 
         :param paint: Paint
@@ -165,11 +191,17 @@ class SkGradient:
     ):
         """Set linear gradient
 
-        Example
-        -------
         .. code-block:: python
-            gradient.set_linear({"start_anchor": "n", "end_anchor": "s", "start": "red",
-                                 "end": "blue"})
+            gradient.set_linear(
+                {
+                    "start_anchor": "n",
+                    "end_anchor": "s",
+                    "start": "red",
+                    "end": "blue"
+                }
+            )
+
+
 
         :param end_pos: End position
         :param start_pos: Start position
@@ -198,7 +230,6 @@ class SkGradient:
 
             colors = []
             for color in config["colors"]:
-                # raise NotImplementedError("To XiangQinXi: 这里得改")
                 colors.append(SkColor(color).color)
 
             if widget:
@@ -220,9 +251,10 @@ class SkGradient:
             return None
 
 
-def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
-                   theme: str | SkTheme) -> SkColor | SkGradient:
-    """Returns the color object indicated by the color style attribute value.
+def style_to_color(
+    style_attr_value: list[int] | tuple[int, int, int, int] | dict, theme: str | SkTheme
+) -> None | SkColor | SkGradient:
+    """Returns the color object indicated by the color style attribute _value.
 
     Example
     -------
@@ -232,8 +264,8 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
         theme.style_to_color(background_attr_value, my_theme.name)
     This shows getting a color object for the background of a `SkButton` at `hover` state.
 
-    :param style_attr_value: The value of style attribute
-    :param theme_name: The name of the theme used, or the theme itself
+    :param style_attr_value: The _value of style attribute
+    :param theme: The name of the theme used, or the theme itself
     """
     match style_attr_value:
         case list() | tuple() | str():
@@ -247,22 +279,24 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
                     if type(theme) is str:
                         theme = SkTheme.find_loaded_theme(theme)
                         if theme == False:
-                            warnings.warn("No theme found using given name!", 
-                                          SkColorWarning)
-                            return SkColor((0, 255, 0, 255))
-                    if style_attr_value["color_palette"] not in theme.color_palette:
-                        warnings.warn(f"No color found in color palette of theme <{theme}>.", 
-                                      SkColorWarning)
-                    return style_to_color(theme.color_palette[style_attr_value["color_palette"]],
-                                          theme)
+                            warnings.warn(
+                                "No theme found using given name!", SkColorWarning
+                            )
+                            return SkColor(ERR_COLOR)
+                    return style_to_color(
+                        theme.get_preset_color(style_attr_value["color_palette"]), theme
+                    )
                 case "texture":
                     warnings.warn("Texture is currently not implemented", FutureWarning)
-                    return SkColor((0, 255, 0, 255))
                     NotImplemented
+                    return SkColor(ERR_COLOR)
+            return None
         case _:
             # If invalid, then return green to prevent crash
-            warnings.warn("Invalid color configuration in styles!", ValueError)
-            return SkColor((0, 255, 0, 255))
+            warnings.warn(
+                message="Invalid color configuration in styles!", category=ValueError
+            )
+            return SkColor(ERR_COLOR)
 
 
 def color(value: typing.Any) -> Any:
