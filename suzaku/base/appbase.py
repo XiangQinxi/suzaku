@@ -38,9 +38,9 @@ class SkAppBase(SkEventHanding):
         ###########
         app.run()
 
-    :param bool window_event_wait:
+    :param bool is_always_update:
         Whether to wait for window events
-    :param bool draw_on_focus:
+    :param bool is_update_on_focus:
         Whether to draw on focus
     """
 
@@ -49,14 +49,14 @@ class SkAppBase(SkEventHanding):
     # region __init__ 初始化
 
     def __init__(
-        self, window_event_wait: bool = True, draw_on_focus: bool = True
+        self, is_always_update: bool = True, is_update_on_focus: bool = True
     ) -> None:
         from .windowbase import SkWindowBase
 
         self.windows: list[SkWindowBase] = []
-        self.window_event_wait: bool = window_event_wait
-        self.running: bool = False
-        self.draw_on_focus = draw_on_focus
+        self.is_always_update: bool = is_always_update
+        self.alive: bool = False
+        self.is_update_on_focus = is_update_on_focus
 
         init_glfw()
         if SkAppBase._instance is not None:
@@ -102,17 +102,17 @@ class SkAppBase(SkEventHanding):
                 "At least one window is required to run application!",
                 SkAppNotFoundWindow,
             )
-        self.running = True
+        self.alive = True
         for window in self.windows:
             window.create_bind()
         glfw.swap_interval(1)
 
         # Event loop
-        if self.window_event_wait:
+        if self.is_always_update:
             deal_event = glfw.wait_events
         else:
             deal_event = glfw.poll_events
-        while self.running and self.windows:
+        while self.alive and self.windows:
             deal_event()
 
             # Create a copy of the window list to avoid modifying it while iterating
@@ -145,7 +145,7 @@ class SkAppBase(SkEventHanding):
                                 glfw.swap_buffers(window.glfw_window)
 
                 # Only draw visible windows
-                if self.draw_on_focus:
+                if self.is_update_on_focus:
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
                         draw()
                 else:
@@ -158,10 +158,10 @@ class SkAppBase(SkEventHanding):
         for window in self.windows:
             glfw.destroy_window(window.glfw_window)
         glfw.terminate()
-        self.running = False
+        self.alive = False
 
     def quit(self) -> None:
         """Quit application."""
-        self.running = False
+        self.alive = False
 
     # endregion

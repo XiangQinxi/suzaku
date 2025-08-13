@@ -72,7 +72,7 @@ class SkContainer:
 
             def children_resize(event: SkEvent):
                 for child in self.children:
-                    child.event_generate("resize", event)
+                    child.event_trigger("resize", event)
 
             self.bind("resize", children_resize)
 
@@ -86,7 +86,7 @@ class SkContainer:
         for widget in self.children:
             from suzaku.event import SkEvent
 
-            widget.event_generate("update", SkEvent(event_type="update"))
+            widget.event_trigger("update", SkEvent(event_type="update"))
 
     # endregion
 

@@ -265,7 +265,7 @@ class SkWindowBase(SkEventHanding):
         :return: None
         """
         if self.visible:
-            self.event_generate("update", SkEvent(event_type="update"))
+            self.event_trigger("update", SkEvent(event_type="update"))
             glfw.swap_buffers(self.glfw_window)
             if hasattr(self, "update_layout"):
                 self.update_layout()
@@ -281,7 +281,7 @@ class SkWindowBase(SkEventHanding):
         :param char: Unicode character
         """
 
-        self.event_generate("char", SkEvent(event_type="char", char=chr(char)))
+        self.event_trigger("char", SkEvent(event_type="char", char=chr(char)))
 
     def _on_key(
         self, window: any, key: str, scancode: str, action: str, mods: int
@@ -331,17 +331,17 @@ class SkWindowBase(SkEventHanding):
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
-            self.event_generate(
+            self.event_trigger(
                 "key_pressed",
                 SkEvent(event_type="key_pressed", key=key, keyname=keyname, mods=m),
             )
         elif action == RELEASE:
-            self.event_generate(
+            self.event_trigger(
                 "key_released",
                 SkEvent(event_type="key_released", key=key, keyname=keyname, mods=m),
             )
         elif action == REPEAT:
-            self.event_generate(
+            self.event_trigger(
                 "key_repeated",
                 SkEvent(event_type="key_repeated", key=key, keyname=keyname, mods=m),
             )
@@ -355,10 +355,10 @@ class SkWindowBase(SkEventHanding):
         """
         if focused:
             self.attributes["focus"] = True
-            self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
+            self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
         else:
             self.attributes["focus"] = False
-            self.event_generate("focus_loss", SkEvent(event_type="focus_loss"))
+            self.event_trigger("focus_loss", SkEvent(event_type="focus_loss"))
 
     def flush(self, window: any):
         if self.draw_func:
@@ -393,9 +393,9 @@ class SkWindowBase(SkEventHanding):
         event = SkEvent(
             event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
         )
-        self.event_generate("resize", event)
+        self.event_trigger("resize", event)
         for child in self.children:
-            child.event_generate("resize", event)
+            child.event_trigger("resize", event)
         # cls.update()
 
     def _on_window_pos(self, window: any, x: int, y: int) -> None:
@@ -408,7 +408,7 @@ class SkWindowBase(SkEventHanding):
         """
         self.root_x = x
         self.root_y = y
-        self.event_generate("move", SkEvent(event_type="move", x=x, y=y))
+        self.event_trigger("move", SkEvent(event_type="move", x=x, y=y))
 
     def _on_closed(self, window: any) -> None:
         """Trigger closed event (triggered when the window is closed).
@@ -416,7 +416,7 @@ class SkWindowBase(SkEventHanding):
         :param window: GLFW Window
         :return: None
         """
-        self.event_generate("closed", SkEvent(event_type="closed"))
+        self.event_trigger("closed", SkEvent(event_type="closed"))
 
     def _on_mouse_button(
         self, window: any, arg1: any, is_pressed: bool, arg2: any
@@ -440,7 +440,7 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rooty = pos[1] + self.root_y
 
         if is_pressed:
-            self.event_generate(
+            self.event_trigger(
                 "mouse_pressed",
                 SkEvent(
                     event_type="mouse_pressed",
@@ -451,7 +451,7 @@ class SkWindowBase(SkEventHanding):
                 ),
             )
         else:
-            self.event_generate(
+            self.event_trigger(
                 "mouse_released",
                 SkEvent(
                     event_type="mouse_released",
@@ -479,7 +479,7 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rooty = pos[1] + self.root_y
 
         if is_enter:
-            self.event_generate(
+            self.event_trigger(
                 "mouse_enter",
                 SkEvent(
                     event_type="mouse_enter",
@@ -490,7 +490,7 @@ class SkWindowBase(SkEventHanding):
                 ),
             )
         else:
-            self.event_generate(
+            self.event_trigger(
                 "mouse_leave",
                 SkEvent(
                     event_type="mouse_leave",
@@ -515,7 +515,7 @@ class SkWindowBase(SkEventHanding):
         self.mouse_rootx = x + self.root_x
         self.mouse_rooty = y + self.root_y
 
-        self.event_generate(
+        self.event_trigger(
             "mouse_motion",
             SkEvent(
                 event_type="mouse_motion",
@@ -527,15 +527,15 @@ class SkWindowBase(SkEventHanding):
         )
 
     def _on_maximize(self, window, maximized: bool):
-        self.event_generate(
+        self.event_trigger(
             "maximize", SkEvent(event_type="maximize", maximized=maximized)
         )
 
     def _on_drop(self, window: typing.Any, paths):
-        self.event_generate("drop", SkEvent(event_type="drop", paths=paths))
+        self.event_trigger("drop", SkEvent(event_type="drop", paths=paths))
 
     def _on_iconify(self, window: typing.Any, iconified: bool):
-        self.event_generate(
+        self.event_trigger(
             "iconify", SkEvent(event_type="iconify", iconified=iconified)
         )
 
@@ -713,7 +713,7 @@ class SkWindowBase(SkEventHanding):
         """
         if self.glfw_window:
             glfw.destroy_window(self.glfw_window)
-            self.event_generate("closed", SkEvent(event_type="closed"))
+            self.event_trigger("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
             # self.event_init = False
 
@@ -757,7 +757,7 @@ class SkWindowBase(SkEventHanding):
         from glfw import set_window_size
 
         set_window_size(self.glfw_window, width, height)
-        self.event_generate(
+        self.event_trigger(
             "resize", SkEvent(event_type="resize", width=width, height=height)
         )
 
@@ -779,7 +779,7 @@ class SkWindowBase(SkEventHanding):
         from glfw import set_window_pos
 
         set_window_pos(self.glfw_window, x, y)
-        self.event_generate("move", SkEvent(event_type="move", rootx=x, rooty=y))
+        self.event_trigger("move", SkEvent(event_type="move", rootx=x, rooty=y))
 
         return self
 
@@ -825,7 +825,7 @@ class SkWindowBase(SkEventHanding):
                 print(f"[ERROR] Failed to set opacity: {e}")
 
         self.attributes.update(kwargs)
-        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
+        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     config = configure = set_attribute
@@ -872,7 +872,7 @@ class SkWindowBase(SkEventHanding):
             self.dpi_scale = 1.0
 
         # 触发DPI变化事件
-        self.event_generate(
+        self.event_trigger(
             "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale)
         )
 
@@ -887,7 +887,7 @@ class SkWindowBase(SkEventHanding):
         self.dpi_scale = (xscale + yscale) / 2.0
 
         # 触发DPI变化事件
-        self.event_generate(
+        self.event_trigger(
             "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale)
         )
 
@@ -921,7 +921,7 @@ class SkWindowBase(SkEventHanding):
         self.physical_height = int(self.height * scale)
 
         # 触发DPI变化事件
-        self.event_generate(
+        self.event_trigger(
             "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale)
         )
 

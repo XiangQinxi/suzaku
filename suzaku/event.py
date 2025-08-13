@@ -14,7 +14,7 @@ class SkEventHanding(SkAfter):
     def init_events(self, dict):
         self.events[self.id] = dict
 
-    def event_generate(self, name: str, *args, **kwargs) -> Union[bool, Any]:
+    def event_trigger(self, name: str, *args, **kwargs) -> Union[bool, Any]:
         """Send event signal.
 
         :param name: Event name.

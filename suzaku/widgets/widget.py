@@ -4,6 +4,7 @@ import clipman
 import glfw
 import skia
 
+from ..after import SkAfter
 from ..event import SkEvent, SkEventHanding
 from ..styles.color import SkGradient, make_color
 from ..styles.drop_shadow import SkDropShadow
@@ -15,7 +16,7 @@ from .window import SkWindow
 clipman.init()
 
 
-class SkWidget(SkEventHanding):
+class SkWidget(SkEventHanding, SkAfter):
 
     _instance_count = 0
 
@@ -38,6 +39,7 @@ class SkWidget(SkEventHanding):
         """
 
         SkEventHanding.__init__(self)
+        SkAfter.__init__(self)
 
         self.parent = parent
 
@@ -201,7 +203,7 @@ class SkWidget(SkEventHanding):
         self._root_x = self.canvas_x + self.window.root_x
         self._root_y = self.canvas_y + self.window.root_y
 
-        self.event_generate(
+        self.event_trigger(
             "move",
             SkEvent(
                 event_type="move",
@@ -219,7 +221,7 @@ class SkWidget(SkEventHanding):
         :return: None
         """
         if self.is_mouse_floating:
-            self.event_generate("click", event)
+            self.event_trigger("click", event)
 
     # endregion
 
@@ -358,8 +360,8 @@ class SkWidget(SkEventHanding):
         :return: None
         :raises: None
         """
-
-        font = self.attributes["font"]
+        if not font:
+            font = self.attributes["font"]
 
         # 绘制字体
         text_paint = skia.Paint(AntiAlias=True, Color=make_color(fg))
@@ -406,7 +408,7 @@ class SkWidget(SkEventHanding):
             drop_shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStrokeAndFill_Style,
-                Color=skia.ColorWHITE,
+                Color=make_color("white"),
             )
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(drop_shadow_paint)
@@ -488,7 +490,7 @@ class SkWidget(SkEventHanding):
         :return: self
         """
         self.attributes.update(**kwargs)
-        self.event_generate("configure", SkEvent(event_type="configure", widget=self))
+        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute
@@ -691,13 +693,13 @@ class SkWidget(SkEventHanding):
         Set focus
         """
         if self.focusable:
-            self.window.focus_get().event_generate(
+            self.window.focus_get().event_trigger(
                 "focus_loss", SkEvent(event_type="focus_loss")
             )
             self.window.focus_get().is_focus = False
             self.window.focus_widget = self
             self.is_focus = True
-            self.event_generate("focus_gain", SkEvent(event_type="focus_gain"))
+            self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:
         """

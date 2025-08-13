@@ -34,7 +34,7 @@ class SkVar(SkEventHanding):
         if not type(value) is self.value_type:
             raise ValueError(f"Value must be {self.value_type}")
         self.value = value
-        self.event_generate("change", value)
+        self.event_trigger("change", value)
         return None
 
     def get(self) -> any:
