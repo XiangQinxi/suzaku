@@ -4,6 +4,18 @@ from .frame import SkFrame
 
 
 class SkButton(SkFrame):
+    """Button without Label or Icon.
+
+    **Will be re-written in the future.**
+
+    :param args: Passed to SkVisual
+    :param text: Button text
+    :param size: Default size
+    :param cursor: Cursor styles when hovering
+    :param styles: Style name
+    :param command: Function to run when clicked
+    :param **kwargs: Passed to SkVisual
+    """
 
     def __init__(
         self,
@@ -13,19 +25,6 @@ class SkButton(SkFrame):
         command: Union[callable, None] = None,
         **kwargs,
     ) -> None:
-        """Button without Label.
-
-        **Will be re-written in future.**
-
-        :param args: Passed to SkVisual
-        :param text: Button text
-        :param size: Default size
-        :param cursor: Cursor styles when hovering
-        :param styles: Style name
-        :param command: Function to run when clicked
-        :param **kwargs: Passed to SkVisual
-        """
-
         super().__init__(*args, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
@@ -45,19 +44,18 @@ class SkButton(SkFrame):
 
         :return: None
         """
-        sheets = None
         if self.is_mouse_floating:
             if self.is_mouse_pressed:
-                stylename = "SkButton:pressed"
+                style_name = "SkButton:pressed"
             else:
-                stylename = "SkButton:hover"
+                style_name = "SkButton:hover"
         else:
             if self.is_focus:
-                stylename = "SkButton:focus"
+                style_name = "SkButton:focus"
             else:
-                stylename = "SkButton"
+                style_name = "SkButton"
 
-        style = self.theme.get_style(stylename)
+        style = self.theme.get_style(style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]

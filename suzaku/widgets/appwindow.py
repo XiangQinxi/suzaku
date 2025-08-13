@@ -1,5 +1,3 @@
-from typing import Literal
-
 from .app import SkApp
 from .window import SkWindow
 

@@ -6,6 +6,8 @@ from ..text import SkText
 
 
 class SkLabeledCheckbox(SkFrame):
+    """Not yet completed"""
+
     def __init__(
         self,
         *args,
@@ -25,3 +27,6 @@ class SkLabeledCheckbox(SkFrame):
         self.checkbox.box(side="left", padx=2, pady=2)
         self.label = SkText(self, text=text)
         self.label.box(side="left", padx=2, pady=2)
+
+        if command:
+            self.bind("click", lambda _: command())

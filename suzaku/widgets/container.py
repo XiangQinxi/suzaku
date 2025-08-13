@@ -1,4 +1,4 @@
-import warnings
+import typing
 
 import skia
 
@@ -17,7 +17,7 @@ class SkContainer:
     guarantee the stability of inheriting SkContainer for third-party widgets.
 
     SkContainer class contains code for widget embedding, and layout handling, providing the
-    ability of containing `children` to widgets inerit from it. All other classes with such
+    ability of containing `children` to widgets inherit from it. All other classes with such
     abilities should be inherited from SkContainer.
 
     SkContainer has a `children` list, each item is a `SkWidget`, called `child`. This helps
@@ -46,6 +46,10 @@ class SkContainer:
     """
 
     # region __init__ 初始化
+
+    parent: typing.Self
+    width: int | float
+    height: int | float
 
     def __init__(self, allowed_out_of_bounds: bool = False):
 
@@ -82,7 +86,7 @@ class SkContainer:
         :param event: SkEvent
         :return:
         """
-        self._handle_layout(event=None)
+        self._handle_layout(event=event)
         for widget in self.children:
             from suzaku.event import SkEvent
 
@@ -183,10 +187,10 @@ class SkContainer:
                 canvas.save()
                 canvas.clipRect(
                     skia.Rect.MakeXYWH(
-                        x,
-                        y,
-                        self.width,
-                        self.height,
+                        x=x,
+                        y=y,
+                        w=self.width,
+                        h=self.height,
                     )
                 )
         for layer in self.draw_list:
@@ -400,13 +404,12 @@ class SkContainer:
                 child.y = last_child_top_y - child.height - bottom
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
-    def _handle_fixed(self, child):
+    @staticmethod
+    def _handle_fixed(child):
         """Process fixed layout.
 
         :param child: The child widget
         """
-        from ..widgets.window import SkWindow
-
         child.x = child.layout_config["fixed"]["x"]
         child.y = child.layout_config["fixed"]["y"]
         child.width = child.layout_config["fixed"]["width"]

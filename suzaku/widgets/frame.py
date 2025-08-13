@@ -1,8 +1,23 @@
+import skia
+
 from .container import SkContainer
 from .widget import SkWidget
 
 
 class SkFrame(SkWidget, SkContainer):
+    """Used for layout components or decoration 【用于布局组件、或装饰】
+
+    >>> frame = SkFrame(parent)
+    >>> button = SkTextButton(frame, text="I`m a Button")
+    >>> button.fixed(x=10, y=10, width=100, height=100)
+    >>> frame.box(expand=True)
+
+    :param args:
+    :param size: Default size
+    :param border: Whether to draw a border
+    :param kwargs:
+    """
+
     def __init__(
         self, *args, size: tuple[int, int] = (100, 100), border: bool = False, **kwargs
     ) -> None:
@@ -13,9 +28,15 @@ class SkFrame(SkWidget, SkContainer):
 
     # region Draw
 
-    def _draw(self, canvas, rect):
-        style = self.theme.get_style("SkFrame")
+    def _draw(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
+        """Draw the Frame border（If self.attributes["border"] is True）
+
+        :param canvas: skia.Canvas
+        :param rect: skia.Rect
+        :return: None
+        """
         if self.attributes["border"]:
+            style = self.theme.get_style("SkFrame")
             if "bd_shadow" in style:
                 bd_shadow = style["bd_shadow"]
             else:
@@ -34,5 +55,6 @@ class SkFrame(SkWidget, SkContainer):
                 bd_shadow=bd_shadow,
                 bd_shader=bd_shader,
             )
+        return None
 
     # endregion

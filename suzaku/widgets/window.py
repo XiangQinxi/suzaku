@@ -9,6 +9,7 @@ from ..event import SkEvent
 from ..styles.color import make_color
 from ..styles.texture import SkAcrylic
 from ..styles.theme import SkTheme, default_theme
+from .app import SkApp
 from .container import SkContainer
 
 
@@ -17,7 +18,7 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
 
     def __init__(
         self,
-        parent: typing.Self = None,
+        parent: typing.Self | SkApp = None,
         *args,
         theme: SkTheme = default_theme,
         size: tuple[int, int] = (300, 300),
