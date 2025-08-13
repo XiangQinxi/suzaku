@@ -118,19 +118,26 @@ class SkEvent:
     【用于传递事件的参数。】
     """
 
-    event_type: str
-    x: Optional[int] = None
-    y: Optional[int] = None
-    rootx: Optional[int] = None
-    rooty: Optional[int] = None
-    key: Union[int, str, None] = None
-    keyname: Optional[str] = None
-    mods: Optional[str] = None
-    char: Optional[str] = None
-    width: Optional[int] = None
-    height: Optional[int] = None
-    widget: Any = None
-    maximized: Optional[bool] = None
+    event_type: str  # 【事件类型】
+    x: Optional[int] = None  # 【x轴坐标】
+    y: Optional[int] = None  # 【y轴坐标】
+    rootx: Optional[int] = None  # 【相对x轴坐标】
+    rooty: Optional[int] = None  # 【相对y轴坐标】
+    key: Union[int, str, None] = None  # 【键盘按键】
+    keyname: Optional[str] = None  # 【键盘按键名】
+    mods: Optional[str] = None  # 【修饰键】
+    char: Optional[str] = None  # 【输入文本值】
+    width: Optional[int] = None  # 【宽度】
+    height: Optional[int] = None  # 【高度】
+    widget: Any = None  # 【事件组件】
+    maximized: Optional[bool] = None  # 【窗口是否最大化】
     paths: Optional[List[str]] = None
-    iconified: Optional[bool] = None
-    dpi_scale: Optional[float] = None
+    #  The file path passed in when the window triggers the `drop` event
+    #  【窗口触发drop事件传入的文件路径】
+    iconified: Optional[bool] = None  # 【窗口是否最小化】
+    dpi_scale: Optional[float] = None  # 【DPI缩放】
+    glfw_window: Optional[any] = None  # 【glfw窗口】
+    window: Optional[any] = None    # 【SkWindow窗口】
+    button: typing.Literal[0, 1, 2] = None
+    # The provided values are: 0 for left button, 1 for right button, and 2 for middle button.
+    # 【给出的值0为左键，1为右键，2为中键】

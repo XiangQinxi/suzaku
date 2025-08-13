@@ -21,7 +21,6 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
         *args,
         theme: SkTheme = default_theme,
         size: tuple[int, int] = (300, 300),
-        name="sk_window",
         **kwargs,
     ) -> None:
         """SkWindow, inherited from SkWindowBase
@@ -30,7 +29,7 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
         :param theme: Theme
         :param kwargs: SkWindowBase Kwargs
         """
-        SkWindowBase.__init__(self, parent=parent, *args, name=name, size=size, **kwargs)
+        SkWindowBase.__init__(self, parent=parent, *args, size=size, **kwargs)
         SkContainer.__init__(self)
         SkAfter.__init__(self)
 
