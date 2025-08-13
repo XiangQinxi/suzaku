@@ -462,7 +462,7 @@ class SkWidget(SkEventHanding, SkAfter):
         # Draw background first
         canvas.drawRoundRect(rect, radius, radius, bg_paint)
 
-        #canvas.save()
+        # canvas.save()
 
         # shadow = SkDropShadow(config_list=bd_shadow)
         # shadow.draw(bd_paint)

@@ -18,7 +18,11 @@ class SkAppNotFoundWindow(Warning):
 
 
 def init_glfw() -> None:
-    """Initialize GLFW module."""
+    """Initialize GLFW module.
+
+    :raises SkAppInitError:
+        If GLFW initialization fails
+    """
     if not glfw.init():
         raise SkAppInitError("glfw.init() failed")
     # 设置全局GLFW配置
@@ -39,9 +43,11 @@ class SkAppBase(SkEventHanding):
         app.run()
 
     :param bool is_always_update:
-        Whether to wait for window events
-    :param bool is_update_on_focus:
-        Whether to draw on focus
+        Whether to continuously refresh (if `False`, refresh only when a window event is triggered).
+        【是否一直刷新（如果为False，则只有触发窗口事件时才刷新）】
+    :param bool is_get_context_on_focus:
+        Is the context only obtained when the window gains focus.
+        【是否只有在窗口获得焦点时，获得上下文】
     """
 
     _instance = None
@@ -49,14 +55,14 @@ class SkAppBase(SkEventHanding):
     # region __init__ 初始化
 
     def __init__(
-        self, is_always_update: bool = True, is_update_on_focus: bool = True
+        self, is_always_update: bool = True, is_get_context_on_focus: bool = True
     ) -> None:
         from .windowbase import SkWindowBase
 
         self.windows: list[SkWindowBase] = []
         self.is_always_update: bool = is_always_update
         self.alive: bool = False
-        self.is_update_on_focus = is_update_on_focus
+        self.is_get_context_on_focus = is_get_context_on_focus
 
         init_glfw()
         if SkAppBase._instance is not None:
@@ -108,7 +114,7 @@ class SkAppBase(SkEventHanding):
         glfw.swap_interval(1)
 
         # Event loop
-        if self.is_always_update:
+        if not self.is_always_update:
             deal_event = glfw.wait_events
         else:
             deal_event = glfw.poll_events
@@ -145,7 +151,7 @@ class SkAppBase(SkEventHanding):
                                 glfw.swap_buffers(window.glfw_window)
 
                 # Only draw visible windows
-                if self.is_update_on_focus:
+                if self.is_get_context_on_focus:
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
                         draw()
                 else:

@@ -8,7 +8,13 @@ class SkAppWindow(SkWindow):
 
     _instance_count = 0
 
-    def __init__(self, *args, is_always_update: bool = False, is_update_on_focus: bool = False, **kwargs) -> None:
+    def __init__(
+        self,
+        *args,
+        is_always_update: bool = False,
+        is_get_context_on_focus: bool = False,
+        **kwargs,
+    ) -> None:
         """Main window that connects SkApp with SkWindow."""
         import platform
 
@@ -16,7 +22,10 @@ class SkAppWindow(SkWindow):
             if "force_hardware_acceleration" in kwargs.keys():
                 kwargs.pop("force_hardware_acceleration")
 
-        self.app = SkApp(is_always_update=is_always_update, is_update_on_focus=is_update_on_focus)
+        self.app = SkApp(
+            is_always_update=is_always_update,
+            is_get_context_on_focus=is_get_context_on_focus,
+        )
         super().__init__(parent=self.app, *args, **kwargs)
         if self.__class__._instance_count == 0:
             self.__class__._instance_count += 1
