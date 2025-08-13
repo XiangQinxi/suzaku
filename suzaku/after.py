@@ -1,6 +1,6 @@
-import time
-import threading
 import heapq
+import threading
+import time
 from typing import Callable, Optional
 
 
@@ -26,8 +26,13 @@ class SkAfter:
             task_id = f"task_{self._counter}"
             heapq.heappush(
                 self._tasks,
-                (time.monotonic() + delay_ms / 1000, self._counter, task_id, callback,
-                 args)
+                (
+                    time.monotonic() + delay_ms / 1000,
+                    self._counter,
+                    task_id,
+                    callback,
+                    args,
+                ),
             )
             self._counter += 1
             return task_id

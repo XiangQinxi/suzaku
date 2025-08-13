@@ -1,3 +1,9 @@
+"""
+
+Easy to use suzaku，like tkinter
+
+"""
+
 from .event import *
 from .styles import *
 from .var import *

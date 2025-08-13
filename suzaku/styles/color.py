@@ -30,9 +30,9 @@ class SkColor:
 
     Afterwards, use `Color().color` to obtain the Skia.Color.
 
-    Of course, if you want to change the color value, you can use the `set_color` method of `SkColor` to modify it—though generally, you won't need to.
+    Of course, if you want to change the color _value, you can use the `set_color` method of `SkColor` to modify it—though generally, you won't need to.
 
-    :param color: Color value, can be hex, rgba, or color name.
+    :param color: Color _value, can be hex, rgba, or color name.
     :type color: str | tuple | list | None
     """
 
@@ -41,9 +41,9 @@ class SkColor:
         self.set_color(color)
 
     def get(self) -> skia.Color:
-        """Get the color value.
+        """Get the color _value.
 
-        :return: Color value.
+        :return: Color _value.
         """
         return self.color
 
@@ -257,7 +257,7 @@ class SkGradient:
 def style_to_color(
     style_attr_value: list[int] | tuple[int, int, int, int] | dict, theme: str | SkTheme
 ) -> SkColor | SkGradient:
-    """Returns the color object indicated by the color style attribute value.
+    """Returns the color object indicated by the color style attribute _value.
 
     Example
     -------
@@ -267,7 +267,7 @@ def style_to_color(
         theme.style_to_color(background_attr_value, my_theme.name)
     This shows getting a color object for the background of a `SkButton` at `hover` state.
 
-    :param style_attr_value: The value of style attribute
+    :param style_attr_value: The _value of style attribute
     :param theme_name: The name of the theme used, or the theme itself
     """
     match style_attr_value:
@@ -309,7 +309,7 @@ def make_color(value: str | tuple | list | None) -> int:
         color( (255, 255, 255, 255 ) )  # Supports RGBA format
         color("white")  # Supports predefined color names (refer to color parameters in skia)
 
-    :param value: Color value, can be hex, rgba, or color name.
+    :param value: Color _value, can be hex, rgba, or color name.
     :type value: str | tuple | list | None
     """
     return SkColor(value).color

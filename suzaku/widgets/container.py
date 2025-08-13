@@ -66,7 +66,7 @@ class SkContainer:
 
         # self.bind("resize", self._handle_layout)
         self.bind("resize", self._update)
-        #self.bind("update", self._update)
+        # self.bind("update", self._update)
 
         if isinstance(self, SkWidget):
 

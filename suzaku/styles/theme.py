@@ -154,10 +154,11 @@ class SkTheme:
             if (
                 search_result := SkTheme.find_loaded_theme(theme_data["name"])
             ) != False:
-                # If name already occupied, meaning the theme might already be loaded 
+                # If name already occupied, meaning the theme might already be loaded
                 # (or just simply has an occupied name)
                 warnings.warn(
-                    f"Theme <{theme_data["name"]}> already loaded or existed.", RuntimeWarning
+                    f"Theme <{theme_data["name"]}> already loaded or existed.",
+                    RuntimeWarning,
                 )
                 return search_result
 
@@ -366,8 +367,9 @@ class SkTheme:
                             return self.parent.get_style(selector, copy)
                         else:
                             # If is root theme, then go fuck ur selector
-                            raise SkStyleNotFoundError("Cannot find styles with selector "
-                                                      f"[{selector}]")
+                            raise SkStyleNotFoundError(
+                                "Cannot find styles with selector " f"[{selector}]"
+                            )
                     _ = _[selector_level]
             except SkStyleNotFoundError:
                 # If this fails, then the selector is invalid
@@ -386,14 +388,14 @@ class SkTheme:
             return result
 
     def get_style_attr(self, selector: str, attr_name: str) -> typing.Any:
-        """Get style attribute value.
+        """Get style attribute _value.
 
         Example
         -------
         .. code-block:: python
             my_theme = SkTheme()
             button_background = my_theme.get_style_attr("SkButton:rest", "background")
-        This shows getting the value of `background` attribute from styles of `SkButton` at `rest`
+        This shows getting the _value of `background` attribute from styles of `SkButton` at `rest`
         state.
 
         Fallback Machanism
@@ -410,7 +412,7 @@ class SkTheme:
 
         :param selector: The selector to the style
         :param attr_name: The attribute name
-        :return: The attribute value
+        :return: The attribute _value
         """
         style = self.get_style(selector, copy=False)
         if attr_name not in style:
@@ -532,7 +534,7 @@ class SkTheme:
                 "<SkWidget.ITSELF> is not supported by SkTheme.special()! "
                 "It will be regarded as <SkWidget.rest>"
             )
-            # So we just simply regard any <ITSELF> as <rest>, as in this case the user may want to 
+            # So we just simply regard any <ITSELF> as <rest>, as in this case the user may want to
             # change the default appearance.
             selector = selector.replace("ITSELF", "rest")
         ## Creating a modified sub-theme
@@ -551,8 +553,10 @@ class SkTheme:
             if child.is_special:
                 existed_special_count += 1
         new_name = self.name + f".special{existed_special_count}"
-        new_theme.rename(f".special{existed_special_count}", 
-                         f"{self.friendly_name} (Special {existed_special_count})")
+        new_theme.rename(
+            f".special{existed_special_count}",
+            f"{self.friendly_name} (Special {existed_special_count})",
+        )
         # (Shall we delete unnecessary data from the modified theme in the future?)
         ## Returning the modified theme
         return new_theme

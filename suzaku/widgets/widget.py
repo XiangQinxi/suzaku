@@ -464,8 +464,8 @@ class SkWidget(SkEventHanding, SkAfter):
 
         canvas.save()
 
-        #shadow = SkDropShadow(config_list=bd_shadow)
-        #shadow.draw(bd_paint)
+        # shadow = SkDropShadow(config_list=bd_shadow)
+        # shadow.draw(bd_paint)
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
@@ -492,7 +492,7 @@ class SkWidget(SkEventHanding, SkAfter):
     def set_attribute(self, **kwargs):
         """Set attribute of a widget by name.
 
-        :param kwargs: attribute name and value
+        :param kwargs: attribute name and _value
         :return: self
         """
         self.attributes.update(**kwargs)

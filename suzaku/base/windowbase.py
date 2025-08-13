@@ -295,18 +295,9 @@ class SkWindowBase(SkEventHanding):
         :param action: Action
         :param mods: Modifiers
         """
-        from glfw import (
-            MOD_ALT,
-            MOD_CAPS_LOCK,
-            MOD_CONTROL,
-            MOD_NUM_LOCK,
-            MOD_SHIFT,
-            MOD_SUPER,
-            PRESS,
-            RELEASE,
-            REPEAT,
-            get_key_name,
-        )
+        from glfw import (MOD_ALT, MOD_CAPS_LOCK, MOD_CONTROL, MOD_NUM_LOCK,
+                          MOD_SHIFT, MOD_SUPER, PRESS, RELEASE, REPEAT,
+                          get_key_name)
 
         keyname: str = get_key_name(
             key, scancode
@@ -790,7 +781,7 @@ class SkWindowBase(SkEventHanding):
         """Get the window attribute with attribute name.
 
         :param attribute_name: Attribute name
-        :return: Attribute value
+        :return: Attribute _value
         """
         if attribute_name == "opacity":
             if not hasattr(self, "glfw_window") or not self.glfw_window:
@@ -805,7 +796,7 @@ class SkWindowBase(SkEventHanding):
     def set_attribute(self, **kwargs):
         """Set the window attribute with attribute name.
 
-        :param kwargs: Attribute name and value
+        :param kwargs: Attribute name and _value
         :return: cls
         """
         if "opacity" in kwargs:
