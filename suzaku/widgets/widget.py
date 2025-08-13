@@ -408,7 +408,7 @@ class SkWidget(SkEventHanding, SkAfter):
             drop_shadow_paint = skia.Paint(
                 AntiAlias=True,
                 Style=skia.Paint.kStrokeAndFill_Style,
-                Color=make_color("white"),
+                Color=make_color(bg),
             )
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(drop_shadow_paint)
@@ -460,6 +460,11 @@ class SkWidget(SkEventHanding, SkAfter):
 
         # Draw background first
         canvas.drawRoundRect(rect, radius, radius, bg_paint)
+
+        canvas.save()
+
+        #shadow = SkDropShadow(config_list=bd_shadow)
+        #shadow.draw(bd_paint)
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
 

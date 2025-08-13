@@ -38,7 +38,7 @@
     "SkButton": {
       "rest": {
         "radius": 5,
-        "bg": [255, 255, 255, 245],
+        "bg": [255, 255, 255, 255],
         "bg_shader": {
           "linear_gradient": {
             "start_anchor": "n",
@@ -55,7 +55,7 @@
         "width": 2
       },
       "hover": {
-        "bg": [255, 255, 255, 245],
+        "bg": [255, 255, 255, 255],
         "bg_shader": {
           "linear_gradient": {
             "start_anchor": "n",
@@ -72,7 +72,7 @@
         "width": 2
       },
       "pressed": {
-        "bg": [255, 255, 255, 245],
+        "bg": [255, 255, 255, 255],
         "bg_shader": {
           "linear_gradient": {
             "start_anchor": "n",
@@ -90,16 +90,6 @@
       },
       "focus": {
         "bg": [255, 255, 255, 255],
-        "bg_shader": {
-          "linear_gradient": {
-            "start_anchor": "n",
-            "end_anchor": "s",
-            "colors": [
-              [0, 0, 0, 20],
-              [0, 0, 0, 40]
-            ]
-          }
-        },
         "fg": [0, 0, 0, 235],
         "bd": [40, 130, 255, 255],
         "width": 3
