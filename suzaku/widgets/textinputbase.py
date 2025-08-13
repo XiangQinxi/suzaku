@@ -1,7 +1,6 @@
 from typing import Self
 
 import glfw
-import pyperclip
 import skia
 
 from ..event import SkEvent

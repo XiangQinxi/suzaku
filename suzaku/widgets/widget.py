@@ -1,7 +1,6 @@
 from typing import Any, Literal, Union
 
 import glfw
-import pyperclip
 import skia
 
 from ..event import SkEvent, SkEventHanding
@@ -365,8 +364,15 @@ class SkWidget(SkEventHanding):
     # region Widget attribute configs 组件属性配置
 
     @property
-    def clipboard_get(self):
-        return pyperclip.paste()
+    def clipboard_get(self) -> str:
+        """Get string from clipboard
+
+        anti images
+        """
+        try:
+            return glfw.get_clipboard_string(None).decode("utf-8")
+        except:
+            return ""
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.

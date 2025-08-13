@@ -26,7 +26,7 @@ class SkButton(SkFrame):
         :param **kwargs: Passed to SkVisual
         """
 
-        super().__init__(*args, size=size, name="sk_button", **kwargs)
+        super().__init__(*args, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
 

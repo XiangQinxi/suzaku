@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 import skia
 import typing
+
 from ..styles.theme import SkTheme
 
 if typing.TYPE_CHECKING:
@@ -45,6 +46,7 @@ class SkColor:
         :return skia.Color: Skia color
         :raises ValueError: When color not exists
         """
+        # TODO: doc string wrong
         try:
             self.color = getattr(skia, f"Color{name.upper()}")
         except:
@@ -262,15 +264,8 @@ def style_to_color(style_attr_value: list[int] | tuple[int,int,int,int] | dict,
             warnings.warn("Invalid color configuration in styles!", ValueError)
             return SkColor((0, 255, 0, 255))
 
-from warnings import warn
 
-def color(value: typing.Any) -> int:
+def color(value: typing.Any) -> Any:
     """To be written..."""
-    warn("To XiangQinXi: 相亲西你给我补docstring")
+    #raise NotImplementedError("To XiangQinXi: 相亲西你给我补docstring")
     return SkColor(value).color
-
-# from theme import SkTheme
-
-# my_theme = SkTheme()
-# background_attr_value = my_theme.get_style_attr("SkButton:hover", "background")
-# theme.style_to_color(background_attr_value, my_theme.name)
