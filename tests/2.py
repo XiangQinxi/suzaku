@@ -1,7 +1,14 @@
-from suzaku import *
-import glfw
-import ctypes
-import skia
+try:
+    from suzaku import *
+except ModuleNotFoundError:
+    import os
+    import sys
+    parent_dir = os.path.abspath("../suzaku")
+    sys.path.append(parent_dir)
+    from suzaku import *
+# import glfw
+# import ctypes
+# import skia
 
 app = Sk(
     window_event_wait=False, #theme=SkTheme.INTERNAL_THEMES["dark"]

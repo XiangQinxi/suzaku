@@ -472,7 +472,8 @@ class SkTheme:
                     result = self.parent.get_preset_color(color_name)
                 else:
                     # If not, then is root theme, go fuck your color name
-                    warnings.warn(f"Color <{color_name}> if not found anywhere.", color.SkColorWarning)
+                    warnings.warn(f"Color <{color_name}> if not found anywhere.", 
+                                  color.SkColorWarning)
                     result = color.ERR_COLOR
         if type(result) is dict:
             return result.copy()

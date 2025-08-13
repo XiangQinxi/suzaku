@@ -1,11 +1,11 @@
 from typing import Union
 
-from ..checkbox import SkCheckBox
-from ..frame import SkFrame
-from ..text import SkText
+from ..widgets.checkbox import SkCheckBox
+from ..widgets.frame import SkFrame
+from ..widgets.text import SkText
 
 
-class SkLabeledCheckbox(SkFrame):
+class SkCheckItem(SkFrame):
     def __init__(
         self,
         *args,

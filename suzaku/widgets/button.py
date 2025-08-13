@@ -71,7 +71,7 @@ class SkButton(SkFrame):
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.styles["SkButton"]["radius"],
+            radius=self.theme.get_style_attr("SkButton", "radius"),
             bg=sheets["bg"],
             width=sheets["width"],
             bd=sheets["bd"],
