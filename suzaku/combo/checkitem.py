@@ -6,7 +6,6 @@ from ..widgets.text import SkText
 
 
 class SkCheckItem(SkFrame):
-
     """Not yet completed"""
 
     def __init__(

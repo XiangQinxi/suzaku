@@ -1,5 +1,6 @@
-import skia
 import typing
+
+import skia
 
 from ..widgets.text import SkText
 
@@ -19,7 +20,7 @@ class SkTextButton(SkText):
         *args,
         size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
-        command: typing.Union[function, None] = None,
+        command: typing.Union[callable, None] = None,
         **kwargs,
     ) -> None:
         super().__init__(*args, size=size, **kwargs)

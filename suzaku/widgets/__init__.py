@@ -1,7 +1,6 @@
 from .app import SkApp
 from .appwindow import Sk, SkAppWindow
 from .button import SkButton
-from .combo import *
 from .empty import SkEmpty
 from .frame import SkFrame
 from .hynix import SkHynix

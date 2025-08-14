@@ -4,7 +4,6 @@ import typing
 import warnings
 
 import skia
-import typing
 
 from ..styles.theme import SkTheme
 
@@ -75,7 +74,6 @@ class SkColor:
         :return skia.Color: Skia color
         :raises ValueError: When color not exists
         """
-        # TODO: doc string wrong
         try:
             self.color = getattr(skia, f"Color{name.upper()}")
         except:
@@ -151,8 +149,8 @@ class SkGradient:
 
     @staticmethod
     def get_anchor_pos(widget: SkWidget, anchor) -> tuple[int | float, int | float]:
-        """Get widget`s anchor position(Relative widget position, not absolute position within the
-        window)
+        """Get widget`s anchor position
+        (Relative widget position, not absolute position within the window)
 
         :param widget: The SkWidget
         :param anchor: Anchor position
@@ -211,6 +209,12 @@ class SkGradient:
         """
 
         if config:
+
+            # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
+            colors = []
+            for color in config["colors"]:
+                colors.append(SkColor(color).color)
+
             if start_pos is None or end_pos is None:
                 if widget:
                     if "start_anchor" in config:
@@ -227,10 +231,6 @@ class SkGradient:
                         end_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"
                         ] = "s"
-
-            colors = []
-            for color in config["colors"]:
-                colors.append(SkColor(color).color)
 
             if widget:
                 self.gradient = skia.GradientShader.MakeLinear(
@@ -294,12 +294,22 @@ def style_to_color(
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn(
-                message="Invalid color configuration in styles!", category=ValueError
+                message="Invalid color configuration in styles!", category=Warning
             )
             return SkColor(ERR_COLOR)
 
 
-def color(value: typing.Any) -> Any:
-    """To be written..."""
-    #raise NotImplementedError("To XiangQinXi: 相亲西你给我补docstring")
+def make_color(value: str | tuple | list | None) -> str | tuple | list | None:
+    """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
+
+    Example
+    -------
+    .. code-block:: python
+        make_color("#ffffff")  # Supports _hex
+        make_color( (255, 255, 255, 255 ) )  # Supports RGBA format
+        make_color("white")  # Supports predefined color names (refer to color parameters in skia)
+
+    :param value: Color _value, can be _hex, rgba, or color name.
+    :type value: str | tuple | list | None
+    """
     return SkColor(value).color

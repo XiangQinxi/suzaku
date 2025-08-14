@@ -72,11 +72,11 @@ class SkButton(SkFrame):
         self._draw_frame(
             canvas,
             rect,
-            radius = self.theme.get_style_attr("SkButton", "radius"),
-            bg = style["bg"],
-            width = style["width"],
-            bd = style["bd"],
-            bd_shadow = bd_shadow,
-            bd_shader = bd_shader,
-            bg_shader = bg_shader,
+            radius=self.theme.get_style_attr("SkButton", "radius"),
+            bg=style["bg"],
+            width=style["width"],
+            bd=style["bd"],
+            bd_shadow=bd_shadow,
+            bd_shader=bd_shader,
+            bg_shader=bg_shader,
         )
