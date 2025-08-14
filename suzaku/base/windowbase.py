@@ -277,14 +277,19 @@ class SkWindowBase(SkEventHanding):
 
     @staticmethod
     def mods_name(_mods):
+        MOD_CTRL_SHIFT = 3
         mods_dict = {
             glfw.MOD_CONTROL: "control",
             glfw.MOD_ALT: "alt",
             glfw.MOD_SHIFT: "shift",
+            MOD_CTRL_SHIFT: "control+shift",
             glfw.MOD_SUPER: "super",
             glfw.MOD_NUM_LOCK: "num_lock",
             glfw.MOD_CAPS_LOCK: "caps_lock",
         }
+        print(_mods)
+
+        #print(mods_dict[_mods])
         try:
             if _mods:
                 return mods_dict[_mods]
@@ -321,7 +326,7 @@ class SkWindowBase(SkEventHanding):
         keyname: str = get_key_name(
             key, scancode
         )  # 获取对应的键名，不同平台scancode不同，因此需要输入scancode来正确转换。有些按键不具备键名
-
+        print(self.mods_name(mods))
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
