@@ -3,7 +3,6 @@ from typing import Callable
 
 import skia
 
-from ..after import SkAfter
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
 from ..styles.color import style_to_color
@@ -13,7 +12,7 @@ from .app import SkApp
 from .container import SkContainer
 
 
-class SkWindow(SkWindowBase, SkContainer, SkAfter):
+class SkWindow(SkWindowBase, SkContainer):
     # region __init__ 初始化
 
     def __init__(
@@ -32,7 +31,6 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
         """
         SkWindowBase.__init__(self, parent=parent, *args, size=size, **kwargs)
         SkContainer.__init__(self)
-        SkAfter.__init__(self)
 
         self.theme = theme
         self.styles = self.theme.styles

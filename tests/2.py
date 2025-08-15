@@ -6,13 +6,32 @@ except ModuleNotFoundError:
     parent_dir = os.path.abspath("../suzaku")
     sys.path.append(parent_dir)
     from suzaku import *
-# import glfw
-# import ctypes
-# import skia
 
 app = Sk(
     #theme=SkTheme.INTERNAL_THEMES["dark"]
 )
+app.window_attr("topmost", True)
+#app.bind("update", lambda evt: print(app.time()))
+
+def _():
+    print("123")
+    print(app.after2(0.01, _))
+
+_()
+
+"""
+import skia
+
+from win32gui import GetWindowLong, SetWindowLong, SetLayeredWindowAttributes
+from win32con import GWL_EXSTYLE, WS_EX_LAYERED, LWA_COLORKEY, LWA_ALPHA
+
+hwndGLFW = app.hwnd
+
+ret = GetWindowLong(hwndGLFW, GWL_EXSTYLE)
+ret = ret | WS_EX_LAYERED
+SetWindowLong(hwndGLFW, GWL_EXSTYLE, ret)
+SetLayeredWindowAttributes(hwndGLFW, skia.Color(240, 240, 240), 100, LWA_COLORKEY)
+"""
 
 frame1 = SkFrame(app, border=True)
 

@@ -2,10 +2,8 @@ import typing
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional, Union
 
-from .after import SkAfter
 
-
-class SkEventHanding(SkAfter):
+class SkEventHanding:
     """SkEvent binding manager.【事件绑定管理器】"""
 
     events: dict[str, dict[str, dict[str, Callable]]] = {}

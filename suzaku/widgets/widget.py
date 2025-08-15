@@ -4,7 +4,6 @@ import clipman
 import glfw
 import skia
 
-from ..after import SkAfter
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
 from ..styles.color import SkGradient, make_color, style_to_color
@@ -17,7 +16,7 @@ from .window import SkWindow
 clipman.init()
 
 
-class SkWidget(SkEventHanding, SkAfter, SkMisc):
+class SkWidget(SkEventHanding, SkMisc):
 
     _instance_count = 0
 
@@ -40,7 +39,6 @@ class SkWidget(SkEventHanding, SkAfter, SkMisc):
         """
 
         SkEventHanding.__init__(self)
-        SkAfter.__init__(self)
 
         self.parent = parent
 

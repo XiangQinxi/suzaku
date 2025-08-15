@@ -274,6 +274,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             glfw.swap_buffers(self.glfw_window)
             if hasattr(self, "update_layout"):
                 self.update_layout()
+            # self.post()
 
     # endregion
 

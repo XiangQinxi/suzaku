@@ -9,7 +9,7 @@ class SkAppWindow(SkWindow):
     def __init__(
         self,
         *args,
-        is_always_update: bool = False,
+        is_always_update: bool = True,
         is_get_context_on_focus: bool = False,
         **kwargs,
     ) -> None:

@@ -3,7 +3,7 @@ import warnings
 
 import glfw
 
-from ..event import SkEventHanding
+from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
 
 
@@ -51,7 +51,7 @@ class SkAppBase(SkEventHanding, SkMisc):
     # region __init__ 初始化
 
     def __init__(
-        self, is_always_update: bool = True, is_get_context_on_focus: bool = True
+        self, is_always_update: bool = True, is_get_context_on_focus: bool = False
     ) -> None:
         from .windowbase import SkWindowBase
 
@@ -131,6 +131,12 @@ class SkAppBase(SkEventHanding, SkMisc):
         while self.alive and self.windows:
             deal_event()
 
+            if self.afters:
+                for item, config in list(self.afters.items()):
+                    if config["time"] <= self.time():
+                        config["func"]()
+                        del self.afters[item]
+
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】
             current_windows = tuple(self.windows)
@@ -169,6 +175,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                                         the_window.draw_func(canvas)
                                 surface.flushAndSubmit()
                                 glfw.swap_buffers(the_window.glfw_window)
+                        the_window.event_trigger("update", SkEvent(event_type="update"))
 
                 if (
                     self.is_get_context_on_focus
