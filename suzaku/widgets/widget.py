@@ -6,7 +6,7 @@ import skia
 
 from ..after import SkAfter
 from ..event import SkEvent, SkEventHanding
-from ..styles.color import SkGradient, make_color
+from ..styles.color import SkGradient, make_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
@@ -365,7 +365,7 @@ class SkWidget(SkEventHanding, SkAfter):
             font = self.attributes["font"]
 
         # 绘制字体
-        text_paint = skia.Paint(AntiAlias=True, Color=make_color(fg))
+        text_paint = skia.Paint(AntiAlias=True, Color=style_to_color(fg, self.theme).color)
 
         text_width = font.measureText(text)
         metrics = font.getMetrics()
@@ -427,7 +427,7 @@ class SkWidget(SkEventHanding, SkAfter):
         )
 
         # Background
-        bg_paint.setColor(make_color(bg))
+        bg_paint.setColor(style_to_color(bg, self.theme).color)
         if bg_shader:
             if isinstance(bg_shader, dict):
                 if "linear_gradient" in bg_shader:

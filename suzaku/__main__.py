@@ -15,10 +15,13 @@ if __name__ == "__main__":
     def create1window():
         window = SkToplevel(
             parent=None,
+            #theme=SkTheme.INTERNAL_THEMES["default.dark"],
             title="Suzaku GUI",
             size=(280, 460),
         )
         window.bind("drop", lambda evt: print("drop", evt))
+
+        window.window_attr("topmost", True)
 
         window.set_dpi_scale(1)
 

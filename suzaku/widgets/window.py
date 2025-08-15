@@ -6,7 +6,7 @@ import skia
 from ..after import SkAfter
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
-from ..styles.color import make_color
+from ..styles.color import style_to_color
 from ..styles.texture import SkAcrylic
 from ..styles.theme import SkTheme, default_theme
 from .app import SkApp
@@ -176,7 +176,9 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
             self.previous_widget = None
 
     def _draw(self, canvas: skia.Surfaces) -> None:
-        canvas.clear(make_color(self.theme.get_style_attr("SkWindow", "bg")))
+        #print(style_to_color())
+        bg = self.theme.get_style("SkWindow")["bg"]
+        canvas.clear(style_to_color(bg, self.theme).color)
 
         self.draw_children(canvas)
 

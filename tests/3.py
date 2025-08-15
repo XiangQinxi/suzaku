@@ -1,12 +1,8 @@
-import skia
-import numpy as np
-import matplotlib.pyplot as plt
+from suzaku import *
 
-width, height = 200, 200
-array = np.zeros((height, width, 4), dtype=np.uint8)
+root = Sk()
 
-with skia.Surface(array) as canvas:
-    canvas.drawCircle(100, 100, 40, skia.Paint(Color=skia.ColorGREEN))
+button = SkTextButton(root)
+button.box(side="top")
 
-plt.imshow(array)
-plt.show()
+root.mainloop()

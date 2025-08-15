@@ -287,7 +287,7 @@ class SkWindowBase(SkEventHanding):
             glfw.MOD_NUM_LOCK: "num_lock",
             glfw.MOD_CAPS_LOCK: "caps_lock",
         }
-        print(_mods)
+        #print(_mods)
 
         #print(mods_dict[_mods])
         try:
@@ -326,7 +326,7 @@ class SkWindowBase(SkEventHanding):
         keyname: str = get_key_name(
             key, scancode
         )  # 获取对应的键名，不同平台scancode不同，因此需要输入scancode来正确转换。有些按键不具备键名
-        print(self.mods_name(mods))
+        #print(self.mods_name(mods))
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
@@ -578,6 +578,29 @@ class SkWindowBase(SkEventHanding):
     # endregion
 
     # region Configure 属性配置
+
+    def window_attr(self, name: str, value: any = None) -> any:
+
+        attrib_names = {
+            "topmost": glfw.FLOATING,
+            "focused": glfw.FOCUSED,
+            "hovered": glfw.HOVERED,
+            "auto_iconify": glfw.AUTO_ICONIFY,
+            "focus_on_show": glfw.FOCUS_ON_SHOW,
+            "resizable": glfw.RESIZABLE,
+        }
+
+        if name in attrib_names:
+            attrib_name = attrib_names[name]
+        else:
+            return None
+
+        if value is not None:
+            glfw.set_window_attrib(self.glfw_window, attrib_name, value)
+            return None
+        else:
+            return glfw.get_window_attrib(self.glfw_window, attrib_name)
+
 
     def wm_cursor(
         self, cursor_name: typing.Union[str, None] = None

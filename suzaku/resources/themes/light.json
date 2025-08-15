@@ -102,7 +102,7 @@
       }
     },
 
-    "SkTextInput": {
+    "SkEntry": {
       "rest": {
         "radius": 8,
         "bg": [0, 0, 0, 10],
