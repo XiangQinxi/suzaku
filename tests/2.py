@@ -9,12 +9,14 @@ except ModuleNotFoundError:
 
 app = Sk(
     #theme=SkTheme.INTERNAL_THEMES["dark"]
+    is_always_update=True
 )
 app.window_attr("topmost", True)
 #app.bind("update", lambda evt: print(app.time()))
 
 id1 = app.after(2, lambda: print("123"))
 app.after(1, lambda: app.after_cancel(id1))
+app.after(2, lambda: print("456"))
 
 """
 import skia

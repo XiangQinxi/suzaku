@@ -39,7 +39,9 @@ class SkMisc:
 
         :param _id: ID of the timer
         """
-        del self.afters[_id]
+        if _id in self.afters:
+            del self.afters[_id]
+
         return self
 
     def after2(self, s: int | float, func: callable) -> threading.Timer:
