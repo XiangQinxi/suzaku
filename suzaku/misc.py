@@ -1,4 +1,5 @@
 import threading
+import typing
 
 import glfw
 
@@ -33,7 +34,15 @@ class SkMisc:
         self._after += 1
         return _id
 
-    def after2(self, s: int | float, func: callable):
+    def after_cancel(self, _id: str) -> typing.Self:
+        """Cancel a timer.
+
+        :param _id: ID of the timer
+        """
+        del self.afters[_id]
+        return self
+
+    def after2(self, s: int | float, func: callable) -> threading.Timer:
         """Execute a function after a delay (an ID will be provided in the future for unbinding).
 
         :param s: Delay in seconds
@@ -41,4 +50,4 @@ class SkMisc:
         """
         timer = threading.Timer(s, func)
         timer.start()
-        return self
+        return timer

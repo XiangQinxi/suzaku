@@ -1,6 +1,9 @@
 import asyncio
 import time
 
+from tkinter import Tk
+Tk.after_cancel()
+
 async def async_hello_world():
     now = time.time()
     await asyncio.sleep(1)

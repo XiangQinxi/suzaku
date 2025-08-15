@@ -13,11 +13,8 @@ app = Sk(
 app.window_attr("topmost", True)
 #app.bind("update", lambda evt: print(app.time()))
 
-def _():
-    print("123")
-    print(app.after2(0.01, _))
-
-_()
+id1 = app.after(2, lambda: print("123"))
+app.after(1, lambda: app.after_cancel(id1))
 
 """
 import skia
