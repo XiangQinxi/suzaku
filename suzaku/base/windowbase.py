@@ -7,10 +7,11 @@ import skia
 from OpenGL import GL
 
 from ..event import SkEvent, SkEventHanding
+from ..misc import SkMisc
 from .appbase import SkAppBase
 
 
-class SkWindowBase(SkEventHanding):
+class SkWindowBase(SkEventHanding, SkMisc):
     """Base Window class
 
     Example:
@@ -61,6 +62,7 @@ class SkWindowBase(SkEventHanding):
             raise TypeError("parent must be SkAppBase or SkWindowBase")
 
         self._event_init = False  # 【是否使用create_bind方法】
+        self._cursor = None
 
         # Always is 0
         self.x: int | float = 0
@@ -121,6 +123,7 @@ class SkWindowBase(SkEventHanding):
                 "iconify": {},
                 "configure": {},
                 "dpi_change": {},  # 添加DPI变化事件
+                "scroll": {},
             }
         )
 
@@ -243,7 +246,7 @@ class SkWindowBase(SkEventHanding):
 
             # 应用DPI缩放变换
             canvas.save()
-            #canvas.scale(self.dpi_scale, self.dpi_scale)
+            # canvas.scale(self.dpi_scale, self.dpi_scale)
             # 将断言改为更友好的错误处理
             if surface is None:
                 raise RuntimeError("Failed to create Skia surface")
@@ -288,9 +291,9 @@ class SkWindowBase(SkEventHanding):
             glfw.MOD_NUM_LOCK: "num_lock",
             glfw.MOD_CAPS_LOCK: "caps_lock",
         }
-        #print(_mods)
+        # print(_mods)
 
-        #print(mods_dict[_mods])
+        # print(mods_dict[_mods])
         try:
             if _mods:
                 return mods_dict[_mods]
@@ -327,7 +330,7 @@ class SkWindowBase(SkEventHanding):
         keyname: str = get_key_name(
             key, scancode
         )  # 获取对应的键名，不同平台scancode不同，因此需要输入scancode来正确转换。有些按键不具备键名
-        #print(self.mods_name(mods))
+        # print(self.mods_name(mods))
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
@@ -376,6 +379,24 @@ class SkWindowBase(SkEventHanding):
                     self.draw_func(canvas)
                 surface.flushAndSubmit()
                 self.update()
+
+    def _on_scroll(self, window, x_offset, y_offset):
+        """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
+
+        :param window: GLFW Window
+        :param x_offset: X offset
+        :param y_offset: Y offset
+        :return: None
+        """
+        self.event_trigger(
+            "scroll",
+            SkEvent(
+                event_type="scroll",
+                x_offset=x_offset,
+                y_offset=y_offset,
+                glfw_window=window,
+            ),
+        )
 
     def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
         pass
@@ -570,10 +591,8 @@ class SkWindowBase(SkEventHanding):
             glfw.set_window_maximize_callback(window, self._on_maximize)
             glfw.set_drop_callback(window, self._on_drop)
             glfw.set_window_iconify_callback(window, self._on_iconify)
-
-            # 添加DPI变化回调
-            if hasattr(glfw, "set_window_content_scale_callback"):
-                glfw.set_window_content_scale_callback(window, self._on_dpi_change)
+            glfw.set_scroll_callback(window, self._on_scroll)
+            glfw.set_window_content_scale_callback(window, self._on_dpi_change)
 
             self._event_init = True
 
@@ -581,10 +600,58 @@ class SkWindowBase(SkEventHanding):
 
     # region Configure 属性配置
 
-    def resizable(self):
-        self.window_attr("resizable")
+    def wm_ask_notice(self) -> None:
+        """吸引用户注意
 
-    def window_attr(self, name: typing.Literal["topmost", "focused", "hovered", "auto_iconify"], value: any = None) -> any:
+        该方法会请求窗口获得焦点，并且在任务栏中显示窗口图标。
+
+        :return: None
+        """
+        glfw.request_window_attention(self.glfw_window)
+
+    ask_notice = ask_focus = wm_ask_notice
+
+    def wm_maxsize(self, width: int | float = None, height: int | float = None):
+        if width is None:
+            width = glfw.DONT_CARE
+        if height is None:
+            height = glfw.DONT_CARE
+        glfw.set_window_size_limits(
+            self.glfw_window, glfw.DONT_CARE, glfw.DONT_CARE, width, height
+        )
+
+    maxsize = wm_maxsize
+
+    def wm_minsize(self, width: int | float = None, height: int | float = None):
+        if width is None:
+            width = glfw.DONT_CARE
+        if height is None:
+            height = glfw.DONT_CARE
+        glfw.set_window_size_limits(
+            self.glfw_window, width, height, glfw.DONT_CARE, glfw.DONT_CARE
+        )
+
+    minsize = wm_minsize
+
+    def wm_resizable(self, value: bool = None) -> bool | typing.Self:
+        return self.window_attr("resizable", value)
+
+    resizable = wm_resizable
+
+    def window_attr(
+        self,
+        name: typing.Literal[
+            "topmost",
+            "focused",
+            "hovered",
+            "auto_iconify",
+            "focus_on_show",
+            "resizable",
+            "visible",
+            "border",
+        ],
+        value: any = None,
+    ) -> any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -593,22 +660,39 @@ class SkWindowBase(SkEventHanding):
             "auto_iconify": glfw.AUTO_ICONIFY,
             "focus_on_show": glfw.FOCUS_ON_SHOW,
             "resizable": glfw.RESIZABLE,
+            "visible": glfw.VISIBLE,
+            "border": glfw.DECORATED,
         }
 
         if name in attrib_names:
             attrib_name = attrib_names[name]
         else:
-            return None
+            attrib_name = name
 
         if value is not None:
             glfw.set_window_attrib(self.glfw_window, attrib_name, value)
-            return None
+            return self
         else:
             return glfw.get_window_attrib(self.glfw_window, attrib_name)
 
-
     def wm_cursor(
-        self, cursor_name: typing.Union[str, None] = None
+        self,
+        cursor_name: (
+            typing.Literal[
+                "arrow",
+                "center",
+                "ibeam",
+                "hresize",
+                "yresize",
+                "not_allowed",
+                "crosshair",
+                "hand",
+                "arrow",
+            ]
+            | None
+            | str
+        ) = None,
+        custom_cursor: tuple[any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 
@@ -617,10 +701,21 @@ class SkWindowBase(SkEventHanding):
           Other -> Set the current cursor style
 
         :param cursor_name: Cursor style name
+        :param custom_cursor: Custom cursor，e.g. (image, x, y)
         :return: Cursor style name or cls
         """
 
-        from glfw import create_standard_cursor, set_cursor
+        from glfw import create_standard_cursor, destroy_cursor, set_cursor
+
+        if self._cursor is not None:
+            destroy_cursor(self._cursor)
+
+        if custom_cursor is not None:
+            cursor = glfw.create_cursor(
+                custom_cursor[0], custom_cursor[1], custom_cursor[2]
+            )
+            set_cursor(self.glfw_window, cursor)
+            return self
 
         if cursor_name is None:
             return self.new_cursor
@@ -636,7 +731,9 @@ class SkWindowBase(SkEventHanding):
 
         self.new_cursor = name
         if self.glfw_window:
-            set_cursor(self.glfw_window, create_standard_cursor(cursor_get))
+            self._cursor = set_cursor(
+                self.glfw_window, create_standard_cursor(cursor_get)
+            )
         return self
 
     cursor = wm_cursor

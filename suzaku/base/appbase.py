@@ -4,6 +4,7 @@ import warnings
 import glfw
 
 from ..event import SkEventHanding
+from ..misc import SkMisc
 
 
 class SkAppInitError(Exception):
@@ -30,7 +31,7 @@ def init_glfw() -> None:
     glfw.window_hint(glfw.STENCIL_BITS, 8)
 
 
-class SkAppBase(SkEventHanding):
+class SkAppBase(SkEventHanding, SkMisc):
     """Base Application class.
 
     >>> app = SkAppBase()
@@ -113,6 +114,8 @@ class SkAppBase(SkEventHanding):
                 SkAppNotFoundWindow,
             )
 
+        glfw.set_error_callback(self.error)
+
         self.alive = True
         for window in self.windows:
             window.create_bind()
@@ -187,5 +190,18 @@ class SkAppBase(SkEventHanding):
     def quit(self) -> None:
         """Quit application.【退出应用】"""
         self.alive = False
+
+    # endregion
+    # region error 错误处理
+    @staticmethod
+    def error(error_code: typing.Any, description: typing.Any):
+        """
+        处理GLFW错误
+
+        :param error_code: 错误码
+        :param description: 错误信息
+        :return: None
+        """
+        print(f"GLFW Error {error_code}: {description}")
 
     # endregion

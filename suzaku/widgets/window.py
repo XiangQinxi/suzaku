@@ -176,7 +176,7 @@ class SkWindow(SkWindowBase, SkContainer, SkAfter):
             self.previous_widget = None
 
     def _draw(self, canvas: skia.Surfaces) -> None:
-        #print(style_to_color())
+        # print(style_to_color())
         bg = self.theme.get_style("SkWindow")["bg"]
         canvas.clear(style_to_color(bg, self.theme).color)
 

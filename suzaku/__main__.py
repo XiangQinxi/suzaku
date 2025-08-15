@@ -15,20 +15,20 @@ if __name__ == "__main__":
     def create1window():
         window = SkToplevel(
             parent=None,
-            #theme=SkTheme.INTERNAL_THEMES["default.dark"],
+            # theme=SkTheme.INTERNAL_THEMES["default.dark"],
             title="Suzaku GUI",
             size=(280, 460),
         )
+        window.maxsize(500, 500)
         window.bind("drop", lambda evt: print("drop", evt))
-
-        window.window_attr("topmost", True)
-
-        window.set_dpi_scale(1)
 
         frame = SkFrame(window, border=True)
         # frame.allowed_out_of_bounds = True
 
         SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
+        SkButton(frame, text="Ask Notice", command=window.ask_notice).box(
+            padx=8, pady=(8, 0)
+        )
         SkLabel(frame, text="This is a SkLabel").box(padx=8, pady=(8, 0))
         SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 

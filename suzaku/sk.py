@@ -11,8 +11,7 @@ from .styles import *
 from .var import *
 from .widgets import SkApp
 from .widgets import SkAppWindow as Sk
-from .widgets import SkFrame
+from .widgets import SkEntry, SkFrame
 from .widgets import SkText as SkLabel
-from .widgets import SkEntry
 from .widgets import SkWidget
 from .widgets import SkWindow as SkToplevel

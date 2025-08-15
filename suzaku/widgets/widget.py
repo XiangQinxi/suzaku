@@ -1,4 +1,4 @@
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 import clipman
 import glfw
@@ -6,17 +6,18 @@ import skia
 
 from ..after import SkAfter
 from ..event import SkEvent, SkEventHanding
+from ..misc import SkMisc
 from ..styles.color import SkGradient, make_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
-from ..widgets.appwindow import SkAppWindow
+from .appwindow import SkAppWindow
 from .window import SkWindow
 
 clipman.init()
 
 
-class SkWidget(SkEventHanding, SkAfter):
+class SkWidget(SkEventHanding, SkAfter, SkMisc):
 
     _instance_count = 0
 
@@ -49,6 +50,7 @@ class SkWidget(SkEventHanding, SkAfter):
                 if isinstance(self.parent, SkWindow | SkAppWindow)
                 else self.parent.window
             )
+            self.application = self.window.application
         except AttributeError:
             raise AttributeError(
                 f"Parent component is not a SkWindow-based object. {self.parent}"
@@ -365,7 +367,9 @@ class SkWidget(SkEventHanding, SkAfter):
             font = self.attributes["font"]
 
         # 绘制字体
-        text_paint = skia.Paint(AntiAlias=True, Color=style_to_color(fg, self.theme).color)
+        text_paint = skia.Paint(
+            AntiAlias=True, Color=style_to_color(fg, self.theme).color
+        )
 
         text_width = font.measureText(text)
         metrics = font.getMetrics()
