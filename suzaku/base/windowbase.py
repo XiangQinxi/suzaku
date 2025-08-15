@@ -201,7 +201,8 @@ class SkWindowBase(SkEventHanding):
             # 初始化DPI缩放
             self.monitor = glfw.get_window_monitor(window)
             if self.monitor:
-                self._update_dpi_scale()
+                for i in range(2):
+                    self._update_dpi_scale()
 
             return window
         else:
@@ -242,7 +243,7 @@ class SkWindowBase(SkEventHanding):
 
             # 应用DPI缩放变换
             canvas.save()
-            canvas.scale(self.dpi_scale, self.dpi_scale)
+            #canvas.scale(self.dpi_scale, self.dpi_scale)
             # 将断言改为更友好的错误处理
             if surface is None:
                 raise RuntimeError("Failed to create Skia surface")
@@ -399,6 +400,7 @@ class SkWindowBase(SkEventHanding):
         event = SkEvent(
             event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
         )
+        self.update()
         self.event_trigger("resize", event)
         for child in self.children:
             child.event_trigger("resize", event)
@@ -579,7 +581,10 @@ class SkWindowBase(SkEventHanding):
 
     # region Configure 属性配置
 
-    def window_attr(self, name: str, value: any = None) -> any:
+    def resizable(self):
+        self.window_attr("resizable")
+
+    def window_attr(self, name: typing.Literal["topmost", "focused", "hovered", "auto_iconify"], value: any = None) -> any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -942,6 +947,9 @@ class SkWindowBase(SkEventHanding):
 
     # 添加设置DPI缩放因子的方法
     def set_dpi_scale(self, scale: float) -> "SkWindowBase":
+
+        self.update()
+
         """Set DPI scale factor
 
         :param scale: DPI scale factor
