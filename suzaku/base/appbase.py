@@ -120,7 +120,7 @@ class SkAppBase(SkEventHanding, SkMisc):
         self.alive = True
         for window in self.windows:
             window.create_bind()
-        glfw.swap_interval(1)
+        #glfw.swap_interval(1)
 
         if not self.is_always_update:
             deal_event = glfw.wait_events
@@ -183,9 +183,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                                 glfw.swap_buffers(the_window.glfw_window)
                         the_window.event_trigger("update", SkEvent(event_type="update"))
 
-                if (
-                    self.is_get_context_on_focus
-                ):  # Only draw the window that has gained focus.
+                if self.is_get_context_on_focus:  # Only draw the window that has gained focus.
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
                         draw()
                 else:
