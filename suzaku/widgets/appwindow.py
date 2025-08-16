@@ -10,7 +10,7 @@ class SkAppWindow(SkWindow):
         self,
         *args,
         is_always_update: bool = True,
-        is_get_context_on_focus: bool = False,
+        is_get_context_on_focus: bool = True,
         **kwargs,
     ) -> None:
         """Main window that connects SkApp with SkWindow."""

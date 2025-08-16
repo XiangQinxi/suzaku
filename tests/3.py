@@ -3,5 +3,7 @@ from suzaku import *
 
 app = SkApp()
 win = SkWindow()
-win2 = SkWindow(win)
+btn = SkTextButton(win, text="Test")
+btn.box()
+
 app.mainloop()

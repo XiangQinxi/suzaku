@@ -9,21 +9,16 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    app = SkApp()
+    app = SkApp(is_get_context_on_focus=False)
     # print(glfw.default_window_hints())
-
-    mainwindow = SkToplevel(app)
-    button = SkButton(parent=mainwindow, text="Create 1 New window")
-    button.box()
 
     def create1window():
         window = SkToplevel(
-            parent=mainwindow,
+            parent=None,
             # theme=SkTheme.INTERNAL_THEMES["default.dark"],
             title="Suzaku GUI",
             size=(280, 460),
         )
-        window.maxsize(500, 500)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkFrame(window, border=True)

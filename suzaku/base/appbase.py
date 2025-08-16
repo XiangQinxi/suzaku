@@ -29,8 +29,9 @@ def init_glfw() -> None:
         raise SkAppInitError("glfw.init() failed")
     # 设置全局GLFW配置
     glfw.window_hint(glfw.STENCIL_BITS, 8)
-
-
+    glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, True)
+    glfw.window_hint(glfw.WIN32_KEYBOARD_MENU, True)
+    glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, True)
 class SkAppBase(SkEventHanding, SkMisc):
     """Base Application class.
 
@@ -51,7 +52,7 @@ class SkAppBase(SkEventHanding, SkMisc):
     # region __init__ 初始化
 
     def __init__(
-        self, is_always_update: bool = True, is_get_context_on_focus: bool = False
+        self, is_always_update: bool = True, is_get_context_on_focus: bool = True
     ) -> None:
         from .windowbase import SkWindowBase
 

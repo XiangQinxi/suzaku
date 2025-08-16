@@ -63,9 +63,12 @@ class SkContainer:
             [],  # Floating layer [SkWidget1, SkWidget2, ...]
             [],  # Fixed layer [SkWidget1, SkWidget2, ...]
         ]
+        self.layout_names = [None, None, None]
         # self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
 
+        self._grid_lists = []  # [ [row1, ], [] ]
         self._box_direction = None  # h(horizontal) or v(vertical)
+        self._flow_row = 0
         self.allowed_out_of_bounds = allowed_out_of_bounds
 
         # self.bind("resize", self._handle_layout)
@@ -218,10 +221,18 @@ class SkContainer:
                         case {"place": _}:
                             pass
                         case {"box": _}:
+                            self.layout_names[0] = "box"
                             self._handle_box()
                             break
                         case {"fixed": _}:
+                            self.layout_names[2] = "fixed"
                             self._handle_fixed(child)
+                        case {"flow": _}:
+                            self.layout_names[0] = "flow"
+                            self._handle_flow(child)
+
+    def _handle_flow(self, child):
+        pass
 
     def _handle_pack(self):
         pass

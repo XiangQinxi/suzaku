@@ -43,6 +43,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         force_hardware_acceleration: bool = False,
         border: bool = True,
     ):
+        #glfw.default_window_hints()
+
         self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
 
@@ -165,6 +167,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         :return: cls
         """
+
         if hasattr(self, "application") and self.application:
             if self.attributes["fullscreen"]:
                 monitor = glfw.get_primary_monitor()
@@ -219,6 +222,33 @@ class SkWindowBase(SkEventHanding, SkMisc):
             raise RuntimeError(
                 "The window must be added to the Application instance first"
             )
+
+    def create_bind(self) -> None:
+        """Binding glfw window events.
+
+        :return: None
+        """
+        if not self._event_init:
+            window = self.glfw_window
+            glfw.make_context_current(window)
+            glfw.set_window_size_callback(window, self._on_resizing)
+            glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
+            glfw.set_window_close_callback(window, self._on_closed)
+            glfw.set_mouse_button_callback(window, self._on_mouse_button)
+            glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
+            glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
+            glfw.set_window_pos_callback(window, self._on_window_pos)
+            glfw.set_window_focus_callback(window, self._on_focus)
+            glfw.set_key_callback(window, self._on_key)
+            glfw.set_char_callback(window, self._on_char)
+            glfw.set_window_refresh_callback(window, self._on_refresh)
+            glfw.set_window_maximize_callback(window, self._on_maximize)
+            glfw.set_drop_callback(window, self._on_drop)
+            glfw.set_window_iconify_callback(window, self._on_iconify)
+            glfw.set_scroll_callback(window, self._on_scroll)
+            glfw.set_window_content_scale_callback(window, self._on_dpi_change)
+
+            self._event_init = True
 
     # endregion
 
@@ -599,33 +629,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "iconify",
             SkEvent(event_type="iconify", iconified=iconified, glfw_window=window),
         )
-
-    def create_bind(self) -> None:
-        """Binding glfw window events.
-
-        :return: None
-        """
-        if not self._event_init:
-            window = self.glfw_window
-            glfw.make_context_current(window)
-            glfw.set_window_size_callback(window, self._on_resizing)
-            glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
-            glfw.set_window_close_callback(window, self._on_closed)
-            glfw.set_mouse_button_callback(window, self._on_mouse_button)
-            glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
-            glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
-            glfw.set_window_pos_callback(window, self._on_window_pos)
-            glfw.set_window_focus_callback(window, self._on_focus)
-            glfw.set_key_callback(window, self._on_key)
-            glfw.set_char_callback(window, self._on_char)
-            glfw.set_window_refresh_callback(window, self._on_refresh)
-            glfw.set_window_maximize_callback(window, self._on_maximize)
-            glfw.set_drop_callback(window, self._on_drop)
-            glfw.set_window_iconify_callback(window, self._on_iconify)
-            glfw.set_scroll_callback(window, self._on_scroll)
-            glfw.set_window_content_scale_callback(window, self._on_dpi_change)
-
-            self._event_init = True
 
     # endregion
 
