@@ -1,8 +1,7 @@
 from suzaku import *
 
-root = Sk()
 
-button = SkTextButton(root)
-button.box(side="top")
-
-root.mainloop()
+app = SkApp()
+win = SkWindow()
+win2 = SkWindow(win)
+app.mainloop()

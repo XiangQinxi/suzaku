@@ -14,4 +14,4 @@ from .widgets import SkText as SkLabel
 from .widgets import SkWidget
 from .widgets import SkWindow as SkToplevel
 from .widgets import SkTextButton as SkButton
-from .widgets import SkCheckBox as SkCheckbox
+from .widgets import SkCheckItem as SkCheckbox

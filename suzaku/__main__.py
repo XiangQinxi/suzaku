@@ -12,9 +12,13 @@ if __name__ == "__main__":
     app = SkApp()
     # print(glfw.default_window_hints())
 
+    mainwindow = SkToplevel(app)
+    button = SkButton(parent=mainwindow, text="Create 1 New window")
+    button.box()
+
     def create1window():
         window = SkToplevel(
-            parent=None,
+            parent=mainwindow,
             # theme=SkTheme.INTERNAL_THEMES["default.dark"],
             title="Suzaku GUI",
             size=(280, 460),
@@ -26,7 +30,7 @@ if __name__ == "__main__":
         # frame.allowed_out_of_bounds = True
 
         SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
-        SkButton(frame, text="Ask Notice", command=window.ask_notice).box(
+        SkButton(frame, text="Ask Notice", command=window.hongwen).box(
             padx=8, pady=(8, 0)
         )
         SkLabel(frame, text="This is a SkLabel").box(padx=8, pady=(8, 0))

@@ -58,7 +58,10 @@ class SkWindowBase(SkEventHanding, SkMisc):
         elif isinstance(self.parent, self.__class__):  # parent=SkWindowBase
             self.application = self.parent.application
             self.parent.application.add_window(self)
-            self.parent.bind("closed", lambda _: self.destroy())
+            def _closed(_):
+                if self.glfw_window:
+                    self.destroy()
+            self.parent.bind("closed", _closed)
         else:
             raise TypeError("parent must be SkAppBase or SkWindowBase")
 
@@ -185,6 +188,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
                     glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
                     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
                     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+            """
+            if isinstance(self.parent, self.__class__):
+                share = self.parent.glfw_window
+            else:
+                share = None
+            """
 
             window = glfw.create_window(
                 self.width, self.height, self.attributes["title"], monitor, None
@@ -295,7 +304,10 @@ class SkWindowBase(SkEventHanding, SkMisc):
             glfw.set_window_should_close(self.glfw_window, value)
             return self
         else:
-            return glfw.window_should_close(self.glfw_window)
+            if self.glfw_window:
+                return glfw.window_should_close(self.glfw_window)
+            else:
+                return False
 
     @staticmethod
     def mods_name(_mods):
@@ -636,15 +648,19 @@ class SkWindowBase(SkEventHanding, SkMisc):
         return glfw.get_monitor_workarea(self.monitor)
 
     def wm_ask_notice(self) -> None:
-        """吸引用户注意
+        """Request window attention
 
-        该方法会请求窗口获得焦点，并且在任务栏中显示窗口图标。
+        This method will request the window to gain focus and display the window icon in the taskbar.
+        【该方法会请求窗口获得焦点，并且在任务栏中显示窗口图标。】
+
+        >>> window.hongwen()
+        >>> window.ask_notice()
 
         :return: None
         """
         glfw.request_window_attention(self.glfw_window)
 
-    ask_notice = ask_focus = wm_ask_notice
+    ask_notice = ask_focus = hongwen = wm_ask_notice
 
     def wm_maxsize(self, width: int | float = None, height: int | float = None):
         if width is None:
@@ -879,12 +895,13 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: None
         """
         if self.glfw_window:
-            glfw.set_window_should_close(self.glfw_window, True)
+            self.can_be_close(True)
             glfw.destroy_window(self.glfw_window)
             self.glfw_window = None  # Clear the reference
             # self._event_init = False
-        self.application.windows.remove(self)
+        #print(self.id)
         self.event_trigger("closed", SkEvent(event_type="closed"))
+        self.application.windows.remove(self)
 
     def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.

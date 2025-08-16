@@ -149,11 +149,12 @@ class SkAppBase(SkEventHanding, SkMisc):
             for window in current_windows:
                 # Check if the window is valid
                 # 【检查窗口是否有效】
-                if not window.glfw_window or window.can_be_close():
+                if window.can_be_close():
                     window.event_trigger(
                         "delete_window",
                         SkEvent(event_type="delete_window", window=window),
                     )
+                    #print(window.id)
                     if window.can_be_close():
                         window.destroy()
                         continue
@@ -190,6 +191,8 @@ class SkAppBase(SkEventHanding, SkMisc):
                     draw()
 
         self.cleanup()  # 【清理资源】
+
+    mainloop = run
 
     def cleanup(self) -> None:
         """Clean up resources.【清理资源】"""
