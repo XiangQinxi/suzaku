@@ -101,36 +101,34 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "force_hardware_acceleration": force_hardware_acceleration,
         }
 
-        self.init_events(
-            {
-                # Mouse Events
-                "mouse_motion": {},
-                "mouse_pressed": {},
-                "mouse_released": {},
-                "mouse_enter": {},
-                "mouse_leave": {},
-                "scroll": {},
-                # Keyboard Events
-                "key_pressed": {},
-                "key_released": {},
-                "key_repeated": {},
-                "char": {},
-                # Window Events
-                "focus_gain": {},
-                "focus_loss": {},
-                "resize": {},
-                "drop": {},
-                "maximize": {},
-                "iconify": {},
-                "configure": {},
-                "dpi_change": {},  # 添加DPI变化事件
-                "delete_window": {},
-                # Unlike the `closed` event, `delete_window` is triggered when the window is not yet destroyed but the user attempts to close it.
-                "closed": {},
-                "move": {},
-                "update": {},
-            }
-        )
+        self.events = {
+            # Mouse Events
+            "mouse_motion": {},
+            "mouse_pressed": {},
+            "mouse_released": {},
+            "mouse_enter": {},
+            "mouse_leave": {},
+            "scroll": {},
+            # Keyboard Events
+            "key_pressed": {},
+            "key_released": {},
+            "key_repeated": {},
+            "char": {},
+            # Window Events
+            "focus_gain": {},
+            "focus_loss": {},
+            "resize": {},
+            "drop": {},
+            "maximize": {},
+            "iconify": {},
+            "configure": {},
+            "dpi_change": {},  # 添加DPI变化事件
+            "delete_window": {},
+            # Unlike the `closed` event, `delete_window` is triggered when the window is not yet destroyed but the user attempts to close it.
+            "closed": {},
+            "move": {},
+            "update": {},
+        }
 
         SkWindowBase._instance_count += 1
 

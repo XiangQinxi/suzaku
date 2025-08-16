@@ -1,5 +1,6 @@
 import threading
 import typing
+import warnings
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional, Union
 
@@ -7,29 +8,13 @@ from typing import Any, Callable, List, Optional, Union
 class SkEventHanding:
     """SkEvent binding manager.【事件绑定管理器】"""
 
-    events: dict[str, dict[str, dict[str, Callable]]] = {}
+    _events = []
+    _afters = []
+    _after = 0
 
-    # events = { widget_id : { event_name : { event_id : event_func } } }
-
-    def init_events(self, events_dict: dict[str, dict[str, Callable]]) -> typing.Self:
-        """Init current class events.
-        【初始化当前类的事件】
-
-        Under normal circumstances, it should be called during component initialization. In other cases, it is recommended to use `event_generate`.
-        【一般情况下，需要在组件初始化时调用，除此情况下，建议用event_generate】
-
-        .. code-block:: python
-            self.init_events(
-                {
-                    "click": {},
-                }
-            )
-
-        :param dict[str, dict[str, Callable]] events_dict: Event dict.
-        :return: None
-        """
-        self.events[self.id] = events_dict
-        return self
+    def __init__(self):
+        # events = { event_name : { event_id : [event_func, whether_to_use_multithreading] } }
+        self.events: dict[str, dict[str, list[Callable | bool]]] = {}
 
     def event_generate(self, name: str) -> typing.Self:
         """Create a new event type.【创建一个新的事件类型】
@@ -40,10 +25,10 @@ class SkEventHanding:
         :return: self.
         """
 
-        if not self.id in self.events:  # Auto create widget events
-            self.events[self.id] = {}  # Create widget events
-        if not name in self.events[self.id]:  # Auto create widget`s event
-            self.events[self.id][name] = {}  # Create widget`s event
+        if not name in self.events:  # Auto create widget`s event
+            self.events[name] = {}  # Create widget`s event
+        else:
+            warnings.warn(f"Widget {self.id}, Event {name} already exists.")
 
         return self
 
@@ -67,32 +52,34 @@ class SkEventHanding:
         :return: self.
         """
 
-        if self.id in self.events and name in self.events[self.id]:
-            for event in self.events[self.id][name].values():
-                event(*args, **kwargs)
+        if name in self.events:
+            for event in self.events[name].values():
+                if event[1] is True:
+                    threading.Thread(target=event[0], args=args, kwargs=kwargs).start()
+                else:
+                    event[0](*args, **kwargs)
         else:
-            raise ValueError(f"Widget {self.id} Event {name} not found.")
+            raise ValueError(f"Widget {self.id}, Event {name} not found.")
 
         return self
 
-    def bind(self, name: str, func: callable, add: bool = True) -> str:
+    def bind(self, name: str, func: callable, *, add: bool = True, allow_multi: bool = False) -> str:
         """Bind an event.【绑定事件】
 
         :param name: Event name.【事件名】
         :param func: Event function.【事件函数】
         :param add: Whether to add after existed events, otherwise clean other and add itself.【是否在已存在事件后添加，否则清理其他事件并添加本身】
+        :param allow_multi: Whether to allow multiple threads to run the event function at the same time.【是否允许多个线程同时运行事件函数】
         :return: Event ID.【事件ID】
         """
-        if self.id not in self.events:  # Create widget events
-            self.events[self.id] = {}
-        if name not in self.events[self.id]:  # Create a new event
-            self.events[self.id][name] = {}
-        _id = name + "." + str(len(self.events[self.id][name]) + 1)  # Create event ID
+        if name not in self.events:
+            raise ValueError(f"Widget {self.id}, Event {name} not found.")
+        _id = name + "." + str(len(self.events[name]) + 1)  # Create event ID
 
         if add:
-            self.events[self.id][name][_id] = func
+            self.events[name][_id] = [func, allow_multi]
         else:
-            self.events[self.id][name] = {_id: func}
+            self.events[name] = {_id: [func, allow_multi]}
         return _id
 
     event_bind = bind
@@ -104,7 +91,7 @@ class SkEventHanding:
         :param _id Event ID.【事件ID】
         :return: None.【无返回值】
         """
-        del self.events[self.id][name][_id]  # Delete event
+        del self.events[name][_id]  # Delete event
 
     event_unbind = unbind
 
@@ -116,7 +103,7 @@ class SkEventHanding:
         :return: ID of the timer
         """
         _id = "after." + str(self._after)
-        self.afters[_id] = {"time": self.time() + s, "func": func}
+        self._afters[_id] = {"time": self.time() + s, "func": func}
         self._after += 1
         return _id
 
@@ -125,8 +112,8 @@ class SkEventHanding:
 
         :param _id: ID of the timer
         """
-        if _id in self.afters:
-            del self.afters[_id]
+        if _id in self._afters:
+            del self._afters[_id]
 
         return self
 

@@ -178,7 +178,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                                     ):
                                         the_window.draw_func(canvas)
                                 surface.flushAndSubmit()
-                                glfw.swap_interval(1)
+                                #glfw.swap_interval(1)
 
                                 glfw.swap_buffers(the_window.glfw_window)
                         the_window.event_trigger("update", SkEvent(event_type="update"))

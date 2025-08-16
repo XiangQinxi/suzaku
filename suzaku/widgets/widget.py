@@ -94,26 +94,25 @@ class SkWidget(SkEventHanding, SkMisc):
         self.focusable: bool = False
         self.visible: bool = False
 
-        self.init_events(
-            {
-                "resize": {},
-                "move": {},
-                "mouse_motion": {},
-                "mouse_enter": {},
-                "mouse_leave": {},
-                "mouse_pressed": {},
-                "mouse_released": {},
-                "focus_gain": {},
-                "focus_loss": {},
-                "key_pressed": {},
-                "key_released": {},
-                "key_repeated": {},
-                "char": {},
-                "click": {},
-                "configure": {},
-                "update": {},
-            }
-        )
+        self.events = {
+            "resize": {},
+            "move": {},
+            "mouse_motion": {},
+            "mouse_enter": {},
+            "mouse_leave": {},
+            "mouse_pressed": {},
+            "mouse_released": {},
+            "focus_gain": {},
+            "focus_loss": {},
+            "key_pressed": {},
+            "key_released": {},
+            "key_repeated": {},
+            "char": {},
+            "click": {},
+            "configure": {},
+            "update": {},
+        }
+
         self.layout_config: dict[str, dict] = {"none": {}}
 
         try:
