@@ -69,8 +69,8 @@ class SkContainer:
         self.allowed_out_of_bounds = allowed_out_of_bounds
 
         # self.bind("resize", self._handle_layout)
-        self.bind("resize", self._update)
-        # self.bind("update", self._update)
+        self.bind("resize", lambda _: self.update_layout())
+        self.bind("update", lambda _: self.update_layout())
 
         if isinstance(self, SkWidget):
 

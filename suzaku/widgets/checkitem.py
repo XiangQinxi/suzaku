@@ -1,8 +1,8 @@
 from typing import Union
 
-from ..widgets.checkbox import SkCheckBox
-from ..widgets.frame import SkFrame
-from ..widgets.text import SkText
+from suzaku.widgets.checkbox import SkCheckBox
+from suzaku.widgets.frame import SkFrame
+from suzaku.widgets.text import SkText
 
 
 class SkCheckItem(SkFrame):

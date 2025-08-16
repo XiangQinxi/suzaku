@@ -74,8 +74,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.root_x: int | float = 0
         self.root_y: int | float = 0
         # Window size
-        self._width: int | float = size[0]
-        self._height: int | float = size[1]
+        self.width: int | float = size[0]
+        self.height: int | float = size[1]
 
         # 添加DPI相关属性
         self.dpi_scale = 1.0
@@ -136,7 +136,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.attributes["fullscreen"] = fullscreen
 
-        if self._width <= 0 or self._height <= 0:
+        if self.width <= 0 or self.height <= 0:
             raise ValueError("The window size must be positive")
 
         ####################
@@ -203,8 +203,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
             # 初始化DPI缩放
             if monitor:
-                for i in range(2):
-                    self._update_dpi_scale()
+                self._update_dpi_scale()
 
             return window
         else:
@@ -389,7 +388,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 "focus_loss", SkEvent(event_type="focus_loss", glfw_window=window)
             )
 
-    def flush(self, window: any):
+    def _on_refresh(self, window: any):
         if self.draw_func:
             # 确保设置当前窗口上下文
             glfw.make_context_current(window)
@@ -440,7 +439,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         event = SkEvent(
             event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
         )
-        self.update()
+
         self.event_trigger("resize", event)
         for child in self.children:
             child.event_trigger("resize", event)
@@ -607,7 +606,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             glfw.set_window_focus_callback(window, self._on_focus)
             glfw.set_key_callback(window, self._on_key)
             glfw.set_char_callback(window, self._on_char)
-            glfw.set_window_refresh_callback(window, self.flush)
+            glfw.set_window_refresh_callback(window, self._on_refresh)
             glfw.set_window_maximize_callback(window, self._on_maximize)
             glfw.set_drop_callback(window, self._on_drop)
             glfw.set_window_iconify_callback(window, self._on_iconify)
@@ -619,30 +618,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # endregion
 
     # region Configure 属性配置
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, value):
-        self._width = value
-        glfw.set_window_size(self.glfw_window, value, self._height)
-        self.event_trigger(
-            "resize", SkEvent(event_type="resize", width=value, height=self._height)
-        )
-
-    @property
-    def height(self):
-        return self._height
-
-    @height.setter
-    def height(self, value):
-        self._height = value
-        glfw.set_window_size(self.glfw_window, self._width, value)
-        self.event_trigger(
-            "resize", SkEvent(event_type="resize", width=self._width, height=value)
-        )
 
     @property
     def monitor(self):
@@ -1093,7 +1068,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.physical_height = int(self.height * self.dpi_scale)
 
         # 触发重绘
-        self.update()
+        #self.update()
 
     # 添加获取DPI缩放因子的方法
     def get_dpi_scale(self) -> float:

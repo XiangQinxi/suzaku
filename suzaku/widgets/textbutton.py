@@ -2,7 +2,7 @@ import typing
 
 import skia
 
-from ..widgets.text import SkText
+from suzaku.widgets.text import SkText
 
 
 class SkTextButton(SkText):
