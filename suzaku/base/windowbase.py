@@ -4,6 +4,7 @@ import typing
 
 import glfw
 import skia
+from deprecated import deprecated
 from OpenGL import GL
 
 from ..event import SkEvent, SkEventHanding
@@ -73,12 +74,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.root_x: int | float = 0
         self.root_y: int | float = 0
         # Window size
-        self.width: int | float = size[0]
-        self.height: int | float = size[1]
+        self._width: int | float = size[0]
+        self._height: int | float = size[1]
 
         # 添加DPI相关属性
         self.dpi_scale = 1.0
-        self.monitor = None
         self.physical_width = size[0]
         self.physical_height = size[1]
 
@@ -103,18 +103,19 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.init_events(
             {
-                "closed": {},
-                "move": {},
-                "update": {},
+                # Mouse Events
                 "mouse_motion": {},
                 "mouse_pressed": {},
                 "mouse_released": {},
                 "mouse_enter": {},
                 "mouse_leave": {},
+                "scroll": {},
+                # Keyboard Events
                 "key_pressed": {},
                 "key_released": {},
                 "key_repeated": {},
                 "char": {},
+                # Window Events
                 "focus_gain": {},
                 "focus_loss": {},
                 "resize": {},
@@ -123,7 +124,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 "iconify": {},
                 "configure": {},
                 "dpi_change": {},  # 添加DPI变化事件
-                "scroll": {},
+                "delete_window": {},
+                # Unlike the `closed` event, `delete_window` is triggered when the window is not yet destroyed but the user attempts to close it.
+                "closed": {},
+                "move": {},
+                "update": {},
             }
         )
 
@@ -131,12 +136,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.draw_func = None
 
-        self.width = size[0]
-        self.height = size[1]
-
         self.attributes["fullscreen"] = fullscreen
 
-        if self.width <= 0 or self.height <= 0:
+        if self._width <= 0 or self._height <= 0:
             raise ValueError("The window size must be positive")
 
         ####################
@@ -202,8 +204,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             glfw.set_window_opacity(window, self.cget("opacity"))
 
             # 初始化DPI缩放
-            self.monitor = glfw.get_window_monitor(window)
-            if self.monitor:
+            if monitor:
                 for i in range(2):
                     self._update_dpi_scale()
 
@@ -279,6 +280,25 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # endregion
 
     # region Event handling 事件处理
+
+    def can_be_close(self, value: bool | None = None) -> typing.Self | bool:
+        """Set whether the window can be closed.
+
+        Prevent users from closing the window, which can be used in conjunction with prompts like "Save before closing?"
+
+        >>> def delete(_: SkEvent):
+        >>>     window.can_be_close(False)
+        >>> window.bind("delete_window", delete)
+
+
+        :param value: Whether the window can be closed
+        :return: None
+        """
+        if value is not None:
+            glfw.set_window_should_close(self.glfw_window, value)
+            return self
+        else:
+            return glfw.window_should_close(self.glfw_window)
 
     @staticmethod
     def mods_name(_mods):
@@ -442,13 +462,14 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "move", SkEvent(event_type="move", x=x, y=y, glfw_window=window)
         )
 
+    @deprecated
     def _on_closed(self, window: any) -> None:
         """Trigger closed event (triggered when the window is closed).
-
+        (Note: This method is deprecated. Triggering the closed event has been delegated to the destroy method.)
         :param window: GLFW Window
         :return: None
         """
-        self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
+        # self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
 
     def _on_mouse_button(
         self, window: any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: any
@@ -600,6 +621,46 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # endregion
 
     # region Configure 属性配置
+
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        self._width = value
+        glfw.set_window_size(self.glfw_window, value, self._height)
+        self.event_trigger(
+            "resize", SkEvent(event_type="resize", width=value, height=self._height)
+        )
+
+    @property
+    def height(self):
+        return self._height
+
+    @height.setter
+    def height(self, value):
+        self._height = value
+        glfw.set_window_size(self.glfw_window, self._width, value)
+        self.event_trigger(
+            "resize", SkEvent(event_type="resize", width=self._width, height=value)
+        )
+
+    @property
+    def monitor(self):
+        return glfw.get_window_monitor(self.glfw_window)
+
+    @property
+    def monitor_name(self):
+        return glfw.get_monitor_name(self.monitor)
+
+    @property
+    def work_area(self):
+        """The area of a monitor not occupied by global task bars or menu bars is the work area. This is specified in screen coordinates
+
+        :return:
+        """
+        return glfw.get_monitor_workarea(self.monitor)
 
     def wm_ask_notice(self) -> None:
         """吸引用户注意
@@ -845,11 +906,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: None
         """
         if self.glfw_window:
+            glfw.set_window_should_close(self.glfw_window, True)
             glfw.destroy_window(self.glfw_window)
-            self.event_trigger("closed", SkEvent(event_type="closed"))
             self.glfw_window = None  # Clear the reference
             # self._event_init = False
         self.application.windows.remove(self)
+        self.event_trigger("closed", SkEvent(event_type="closed"))
 
     def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.

@@ -1,3 +1,4 @@
+import threading
 import typing
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional, Union
@@ -106,6 +107,38 @@ class SkEventHanding:
         del self.events[self.id][name][_id]  # Delete event
 
     event_unbind = unbind
+
+    def after(self, s: int | float, func: callable):
+        """Execute a function after a delay (an ID will be provided in the future for unbinding).
+
+        :param s: Delay in seconds
+        :param func: Function to execute after delay
+        :return: ID of the timer
+        """
+        _id = "after." + str(self._after)
+        self.afters[_id] = {"time": self.time() + s, "func": func}
+        self._after += 1
+        return _id
+
+    def after_cancel(self, _id: str) -> typing.Self:
+        """Cancel a timer.
+
+        :param _id: ID of the timer
+        """
+        if _id in self.afters:
+            del self.afters[_id]
+
+        return self
+
+    def after2(self, s: int | float, func: callable) -> threading.Timer:
+        """Execute a function after a delay (an ID will be provided in the future for unbinding).
+
+        :param s: Delay in seconds
+        :param func: Function to execute after delay
+        """
+        timer = threading.Timer(s, func)
+        timer.start()
+        return timer
 
 
 @dataclass

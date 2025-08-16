@@ -141,60 +141,6 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Event
 
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, value):
-        self._x = value
-        self._pos_update()
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, value):
-        self._y = value
-        self._pos_update()
-
-    @property
-    def canvas_x(self):
-        return self._canvas_x
-
-    @canvas_x.setter
-    def canvas_x(self, value):
-        self._canvas_x = value
-        self._pos_update()
-
-    @property
-    def canvas_y(self):
-        return self._canvas_y
-
-    @canvas_y.setter
-    def canvas_y(self, value):
-        self._canvas_y = value
-        self._pos_update()
-
-    @property
-    def root_x(self):
-        return self._root_x
-
-    @root_x.setter
-    def root_x(self, value):
-        self._root_x = value
-        self._pos_update()
-
-    @property
-    def root_y(self):
-        return self._root_y
-
-    @root_y.setter
-    def root_y(self, value):
-        self._root_y = value
-        self._pos_update()
-
     def _pos_update(self, event: SkEvent | None = None):
         # 更新组件的位置
         # 相对整个画布的坐标
@@ -474,6 +420,64 @@ class SkWidget(SkEventHanding, SkMisc):
     # endregion
 
     # region Widget attribute configs 组件属性配置
+
+    def update(self):
+        self._pos_update()
+        self.post()
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, value):
+        self._x = value
+        self._pos_update()
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, value):
+        self._y = value
+        self._pos_update()
+
+    @property
+    def canvas_x(self):
+        return self._canvas_x
+
+    @canvas_x.setter
+    def canvas_x(self, value):
+        self._canvas_x = value
+        self._pos_update()
+
+    @property
+    def canvas_y(self):
+        return self._canvas_y
+
+    @canvas_y.setter
+    def canvas_y(self, value):
+        self._canvas_y = value
+        self._pos_update()
+
+    @property
+    def root_x(self):
+        return self._root_x
+
+    @root_x.setter
+    def root_x(self, value):
+        self._root_x = value
+        self._pos_update()
+
+    @property
+    def root_y(self):
+        return self._root_y
+
+    @root_y.setter
+    def root_y(self, value):
+        self._root_y = value
+        self._pos_update()
 
     @property
     def clipboard_get(self) -> str:

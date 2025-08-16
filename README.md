@@ -23,6 +23,7 @@ Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 python3 -m suzaku
 ```
 ![0.0.2a1.png](https://youke1.picui.cn/s1/2025/08/02/688dd38fc1d9a.png)
+![0.0.4.png]()
 
 Minimal Exanple / 最小示例
 

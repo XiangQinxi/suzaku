@@ -67,6 +67,7 @@ class SkAppBase(SkEventHanding, SkMisc):
         SkAppBase.default_application = self
 
         init_glfw()
+
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
         SkAppBase._instance = self
@@ -148,11 +149,14 @@ class SkAppBase(SkEventHanding, SkMisc):
             for window in current_windows:
                 # Check if the window is valid
                 # 【检查窗口是否有效】
-                if not window.glfw_window or glfw.window_should_close(
-                    window.glfw_window
-                ):
-                    window.destroy()
-                    continue
+                if not window.glfw_window or window.can_be_close():
+                    window.event_trigger(
+                        "delete_window",
+                        SkEvent(event_type="delete_window", window=window),
+                    )
+                    if window.can_be_close():
+                        window.destroy()
+                        continue
 
                 # Draw window
                 # 【绘制窗口】
@@ -174,6 +178,8 @@ class SkAppBase(SkEventHanding, SkMisc):
                                     ):
                                         the_window.draw_func(canvas)
                                 surface.flushAndSubmit()
+                                glfw.swap_interval(1)
+
                                 glfw.swap_buffers(the_window.glfw_window)
                         the_window.event_trigger("update", SkEvent(event_type="update"))
 
