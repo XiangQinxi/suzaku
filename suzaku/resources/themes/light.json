@@ -1,0 +1,130 @@
+{
+  "name": "default.light",
+  "base": "ROOT",
+  "friendly_name": "Default Light",
+
+  "color_palette": {
+    "default_bg": [255, 255, 255, 235],
+    "default_fg": [0, 0, 0, 235]
+  },
+
+  "styles":{
+    "SkWindow": {
+      "rest":{
+        "bg": [255, 255, 255, 240]
+      }
+    },
+
+    "SkFrame": {
+      "rest": {
+        "radius": 8,
+        "bg": [225, 225, 225, 245],
+        "bd": [200, 200, 200, 245],
+        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "width": 2
+      }
+    },
+
+    "SkBadge": {
+      "rest": {
+        "radius": 99,
+        "bg": [5, 105, 200, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkButton": {
+      "rest": {
+        "radius": 5,
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [245, 245, 245, 255],
+              [200, 200, 200, 185]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "bd_shadow": [0, 3, 1, 1, [0, 0, 0, 50]],
+        "width": 2
+      },
+      "hover": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [245, 245, 245, 255],
+              [200, 200, 200, 185]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "bd_shadow": [0, 0, 5, 5, [40, 130, 255, 255]],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [200, 200, 200, 225],
+              [235, 235, 235, 255]
+            ]
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 255]],
+        "width": 2
+      },
+      "focus": {
+        "bg": [225, 225, 225, 245],
+        "fg": [0, 0, 0, 235],
+        "bd": [40, 130, 255, 255],
+        "width": 3
+      }
+    },
+
+    "SkText": {
+      "rest": {
+        "fg": [0, 0, 0, 245]
+      }
+    },
+
+    "SkEntry": {
+      "rest": {
+        "radius": 8,
+        "bg": [0, 0, 0, 10],
+        "fg": [0, 0, 0, 235],
+        "bd": [0, 0, 0, 10],
+        "width": 2,
+        "placeholder": [0, 0, 0, 165]
+      },
+      "hover": {
+        "bg": [0, 0, 0, 30],
+        "fg": [0, 0, 0, 235],
+        "bd": [25, 125, 225, 235],
+        "width": 2,
+        "placeholder": [0, 0, 0, 165]
+      },
+      "focus": {
+        "bg": [0, 0, 0, 15],
+        "fg": [0, 0, 0, 235],
+        "bd": [25, 125, 225, 235],
+        "width": 3,
+        "placeholder": [0, 0, 0, 0]
+      }
+    }
+  }
+}

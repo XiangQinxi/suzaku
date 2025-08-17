@@ -1,0 +1,25 @@
+[project]
+name = "suzaku"
+version = "0.0.4"
+description = "New and aesthetically pleasing GUI library (新型美观GUI库)"
+keywords = ["suzaku","future","lightweight","gui","framework"]
+authors = [
+    {name = "XiangQinxi",email = "XiangQinxi@outlook.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "skia-python",
+    "glfw",
+    "pyopengl",
+    "deprecated",
+]
+license = "MIT"
+
+[tool.poetry]
+packages = [{include = "suzaku"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
