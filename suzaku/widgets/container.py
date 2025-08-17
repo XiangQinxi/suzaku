@@ -73,15 +73,9 @@ class SkContainer:
 
         # self.bind("resize", self._handle_layout)
         self.bind("resize", lambda _: self.update_layout())
-        self.bind("update", lambda _: self.update_layout())
+        #self.bind("update", lambda _: self.update_layout())
 
-        if isinstance(self, SkWidget):
 
-            def children_resize(event: SkEvent):
-                for child in self.children:
-                    child.event_trigger("resize", event)
-
-            self.bind("resize", children_resize)
 
     def _update(self, event=None):
         """Organize the layout and send an `update` event message to the child components

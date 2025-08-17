@@ -1,16 +1,24 @@
 import skia
+import numpy as np
 
-surface = skia.Surface(256, 256)
-print(type(surface))
+width, height = 800, 600
+surface = skia.Surface(width, height)
+
 with surface as canvas:
-    print(type(canvas))
-    canvas.save()
-    canvas.translate(128., 128.)
-    canvas.rotate(45.)
-    rect = skia.Rect(-90.5, -90.5, 90.5, 90.5)
-    paint = skia.Paint(Color=skia.Color(0, 0, 255))
-    canvas.drawRect(rect, paint)
-    canvas.restore()
+
+    # 清空画布
+    canvas.clear(skia.Color(255, 255, 255, 255))  # 白色背景
+
+    # 创建画笔
+    paint = skia.Paint()
+    paint.setColor(skia.Color(0, 0, 0, 255))  # 黑色
+
+    # 创建字体
+    font = skia.Font(skia.Typeface('Arial'), 24)
+
+    # 绘制简单文本
+    canvas.drawString("Hello, Skia!", 50, 50, font, paint)
+
 
 image = surface.makeImageSnapshot()
-image.save('output.png', skia.kPNG)
+image.save('basic_text.png', skia.kPNG)

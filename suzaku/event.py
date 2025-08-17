@@ -63,7 +63,7 @@ class SkEventHanding:
 
         return self
 
-    def bind(self, name: str, func: callable, *, add: bool = True, allow_multi: bool = False) -> str:
+    def bind(self, name: str, func: callable, *, add: bool = True, allow_multi: bool = True) -> str:
         """Bind an event.【绑定事件】
 
         :param name: Event name.【事件名】
@@ -95,15 +95,22 @@ class SkEventHanding:
 
     event_unbind = unbind
 
-    def after(self, s: int | float, func: callable):
+    def after(self, s: int | float, func: callable, *, allow_multi: bool = True) -> str | threading.Timer:
         """Execute a function after a delay (an ID will be provided in the future for unbinding).
 
         :param s: Delay in seconds
         :param func: Function to execute after delay
         :return: ID of the timer
         """
+
+        if allow_multi:
+            timer = threading.Timer(s, func)
+            timer.start()
+            return timer
+
         _id = "after." + str(self._after)
-        self._afters[_id] = {"time": self.time() + s, "func": func}
+
+        self._afters[_id] = [self.time() + s, func]
         self._after += 1
         return _id
 
@@ -116,16 +123,6 @@ class SkEventHanding:
             del self._afters[_id]
 
         return self
-
-    def after2(self, s: int | float, func: callable) -> threading.Timer:
-        """Execute a function after a delay (an ID will be provided in the future for unbinding).
-
-        :param s: Delay in seconds
-        :param func: Function to execute after delay
-        """
-        timer = threading.Timer(s, func)
-        timer.start()
-        return timer
 
 
 @dataclass

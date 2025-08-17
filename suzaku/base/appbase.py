@@ -32,6 +32,23 @@ def init_glfw() -> None:
     glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, True)
     glfw.window_hint(glfw.WIN32_KEYBOARD_MENU, True)
     glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, True)
+
+def init_sdl2() -> None:
+    """Initialize SDL2 module.
+
+    :raises SkAppInitError:
+        If SDL2 initialization fails
+    """
+    import sys
+    import ctypes
+    import sdl2dll  # 导入pysdl2-dll
+    from sdl2 import SDL_INIT_VIDEO, SDL_Init  # 导入pysdl2
+    from sdl2.sdlimage import IMG_Init, IMG_INIT_JPG  # 加载图片需要，否则只能加载BMP
+
+    SDL_Init(SDL_INIT_VIDEO)
+    IMG_Init(IMG_INIT_JPG)
+
+
 class SkAppBase(SkEventHanding, SkMisc):
     """Base Application class.
 
@@ -52,7 +69,7 @@ class SkAppBase(SkEventHanding, SkMisc):
     # region __init__ 初始化
 
     def __init__(
-        self, is_always_update: bool = True, is_get_context_on_focus: bool = True
+        self, is_always_update: bool = True, is_get_context_on_focus: bool = True, framework: typing.Literal["glfw", "sdl2"] = "glfw"
     ) -> None:
         from .windowbase import SkWindowBase
 
@@ -67,7 +84,12 @@ class SkAppBase(SkEventHanding, SkMisc):
 
         SkAppBase.default_application = self
 
-        init_glfw()
+        self.framework = framework
+        match framework:
+            case "glfw":
+                init_glfw()
+            case "sdl2":
+                init_sdl2()
 
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -116,17 +138,21 @@ class SkAppBase(SkEventHanding, SkMisc):
                 SkAppNotFoundWindow,
             )
 
-        glfw.set_error_callback(self.error)
+        match self.framework:
+            case "glfw":
+                glfw.set_error_callback(self.error)
+
+                if not self.is_always_update:
+                    deal_event = glfw.wait_events
+                else:
+                    deal_event = glfw.poll_events
+            case "sdl2":
+                from sdl2 import SDL_PollEvent
+                SDL_PollEvent()
 
         self.alive = True
         for window in self.windows:
             window.create_bind()
-        #glfw.swap_interval(1)
-
-        if not self.is_always_update:
-            deal_event = glfw.wait_events
-        else:
-            deal_event = glfw.poll_events
 
         # Start event loop
         # 【开始事件循环】
@@ -135,8 +161,8 @@ class SkAppBase(SkEventHanding, SkMisc):
 
             if self.afters:
                 for item, config in list(self.afters.items()):
-                    if config["time"] <= self.time():
-                        config["func"]()
+                    if config[0] <= self.time():
+                        config[1]()
                         del self.afters[item]
 
             # Create a copy of the window tuple to avoid modifying it while iterating
@@ -174,16 +200,21 @@ class SkAppBase(SkEventHanding, SkMisc):
                                 with surface as canvas:
                                     # Determine and call the drawing function of this window.
                                     # 【判断并调用该窗口的绘制函数】
+
+                                    the_window.event_trigger("update",
+                                                             SkEvent(event_type="update"))
+
+
                                     if (
                                         hasattr(the_window, "draw_func")
                                         and the_window.draw_func
                                     ):
                                         the_window.draw_func(canvas)
+
                                 surface.flushAndSubmit()
                                 #glfw.swap_interval(1)
 
                                 glfw.swap_buffers(the_window.glfw_window)
-                        the_window.event_trigger("update", SkEvent(event_type="update"))
 
                 if self.is_get_context_on_focus:  # Only draw the window that has gained focus.
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):

@@ -1,6 +1,5 @@
 from typing import Any, Literal
 
-import clipman
 import glfw
 import skia
 
@@ -12,8 +11,6 @@ from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
 from .appwindow import SkAppWindow
 from .window import SkWindow
-
-clipman.init()
 
 
 class SkWidget(SkEventHanding, SkMisc):
@@ -622,8 +619,8 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def grid(
         self,
-        row: int,
-        column: int,
+        row: int,  # 行 横
+        column: int,  # 列 竖
         rowspan: int = 1,
         columnspan: int = 1,
     ):
@@ -669,8 +666,8 @@ class SkWidget(SkEventHanding, SkMisc):
     def box(
         self,
         side: Literal["top", "bottom", "left", "right"] = "top",
-        padx: int | float | tuple[int | float, int | float] = 5,
-        pady: int | float | tuple[int | float, int | float] = 5,
+        padx: int | float | tuple[int | float, int | float] = 10,
+        pady: int | float | tuple[int | float, int | float] = 10,
         ipadx: int | float | tuple[int | float, int | float] = 0,
         ipady: int | float | tuple[int | float, int | float] = 0,
         expand: bool | tuple[bool, bool] = False,
