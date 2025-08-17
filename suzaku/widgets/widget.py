@@ -116,7 +116,8 @@ class SkWidget(SkEventHanding, SkMisc):
         try:
             self.parent.add_child(self)
         except TypeError:
-            raise TypeError("Parent component is not a SkContainer-based object.")
+            raise TypeError(
+                "Parent component is not a SkContainer-based object.")
 
         # Events-related
         self.is_mouse_floating: bool = False
@@ -274,7 +275,8 @@ class SkWidget(SkEventHanding, SkMisc):
         :param rect: The rect
         :return: None
         """
-        paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
+        paint.setShader(self._rainbow_shader(
+            rect=rect, colors=colors, cx=cx, cy=cy))
 
     def _draw_central_text(
         self,
@@ -314,7 +316,8 @@ class SkWidget(SkEventHanding, SkMisc):
         metrics = font.getMetrics()
 
         draw_x = canvas_x + width / 2 - text_width / 2
-        draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+        draw_y = canvas_y + height / 2 - \
+            (metrics.fAscent + metrics.fDescent) / 2
 
         canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
 
@@ -327,7 +330,8 @@ class SkWidget(SkEventHanding, SkMisc):
         width: int,
         bd: str,
         bd_shadow: (
-            None | tuple[int | float, int | float, int | float, int | float, str]
+            None | tuple[int | float, int | float,
+                         int | float, int | float, str]
         ) = None,
         bd_shader: None | Literal["rainbow"] = None,
         bg_shader: None | Literal["rainbow"] = None,
@@ -357,7 +361,8 @@ class SkWidget(SkEventHanding, SkMisc):
             shadow = SkDropShadow(config_list=bd_shadow)
             shadow.draw(drop_shadow_paint)
 
-            canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
+            canvas.drawRoundRect(drop_shadow_rect, radius,
+                                 radius, drop_shadow_paint)
 
         bg_paint = skia.Paint(
             AntiAlias=True,
@@ -411,6 +416,23 @@ class SkWidget(SkEventHanding, SkMisc):
         # shadow.draw(bd_paint)
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
+
+    def _draw_image(
+        self,
+        canvas: skia.Canvas,
+        image: str,
+        rect: Any
+    ):
+        with open(image, "rb") as f:
+            data = skia.Image.MakeFromEncoded(
+                skia.Data.MakeWithoutCopy(f.read()))
+        if data:
+            canvas.drawImageRect(
+                data,
+                rect,
+                skia.SamplingOptions(),
+                skia.Paint()
+            )
 
     # endregion
 
@@ -501,7 +523,8 @@ class SkWidget(SkEventHanding, SkMisc):
         :return: self
         """
         self.attributes.update(**kwargs)
-        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
+        self.event_trigger("configure", SkEvent(
+            event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute

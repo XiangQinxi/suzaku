@@ -12,3 +12,4 @@ from .textbutton import SkTextButton
 from .textinputbase import SkTextInputBase
 from .widget import SkWidget
 from .window import SkWindow
+from .image import SkImage
