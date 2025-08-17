@@ -63,7 +63,8 @@ class SkEventHanding:
 
         return self
 
-    def bind(self, name: str, func: callable, *, add: bool = True, allow_multi: bool = True) -> str:
+    # 我也是服了，我不小心将allow_multi的默认值从False改为True，导致创建新窗口时老是报错，
+    def bind(self, name: str, func: callable, *, add: bool = True, allow_multi: bool = False) -> str:
         """Bind an event.【绑定事件】
 
         :param name: Event name.【事件名】
@@ -84,6 +85,7 @@ class SkEventHanding:
 
     event_bind = bind
 
+
     def unbind(self, name: str, _id: str) -> None:
         """Unbind an event with event ID.【解绑事件】
 
@@ -95,7 +97,7 @@ class SkEventHanding:
 
     event_unbind = unbind
 
-    def after(self, s: int | float, func: callable, *, allow_multi: bool = True) -> str | threading.Timer:
+    def after(self, s: int | float, func: callable, *, allow_multi: bool = False) -> str | threading.Timer:
         """Execute a function after a delay (an ID will be provided in the future for unbinding).
 
         :param s: Delay in seconds

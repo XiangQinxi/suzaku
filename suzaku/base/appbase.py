@@ -148,7 +148,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                     deal_event = glfw.poll_events
             case "sdl2":
                 from sdl2 import SDL_PollEvent
-                SDL_PollEvent()
+                deal_event = SDL_PollEvent
 
         self.alive = True
         for window in self.windows:
