@@ -1,9 +1,5 @@
 # Suzaku 朱雀
 
-> This project is experiencing a reconstruction. For latest usable versions, please see [releases](github.com/XiangQinXi/suzaku/releases). However, always note that the APIs will change frequently in this period without notifying or warning, please only use versions under development for evaluation purposes.
->
-> 本项目正在经历重构。最新可用版本可以在[releases](github.com/XiangQinXi/suzaku/releases)中找到。请务必注意：在此期间API会经常发生变更，恕不另行通知或给出警告。请将这些开发中的版本仅用于评估用途。
-
 Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 
 基于`skia-python`、`pyopengl`与`glfw`高级界面库。
@@ -22,21 +18,17 @@ Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 ```bash
 python3 -m suzaku
 ```
+
+### 0.0.4
+![0.0.4.png](https://youke1.picui.cn/s1/2025/08/17/68a1c75ec1ac1.png)
+
+### 0.0.2a1
+> This is an old version of the design, and it will be re-enabled in the future.
+>
+> 这个是老版本的设计，未来将会将它重新启用
+
 ![0.0.2a1.png](https://youke1.picui.cn/s1/2025/08/02/688dd38fc1d9a.png)
-![0.0.4.png]()
-
-Minimal Exanple / 最小示例
-
-![mini.png](https://youke1.picui.cn/s1/2025/08/02/688dd41f6d338.png)
-
-```python
-from suzaku import *
-
-root = Sk()
-btn = SkButton(window, text="Hello World")
-btn.place(10, 10)
-root.mainloop()
-```
+)
 
 ## How it Works / 原理
 ### Basic Pricinples / 基础原理
@@ -57,6 +49,5 @@ Suzaku is one of the four mythical beasts in ancient China. ~~Sounds cool isn't 
 `suzaku`是朱雀的意思，朱雀是中国古代的四大神兽之一。~~取这名呢感觉很霸气，先占个名先。~~
 
 ## Plans / 计划
-`svg` in `Canvas` module will be used to draw shapes.
-
-我将会使用跨平台的`Canvas`库，用`svg`来绘制图形。
+It may be compatible with multiple frameworks in the future, such as `SDL2`.
+可能后续会兼容多个框架，如`SDL2`。

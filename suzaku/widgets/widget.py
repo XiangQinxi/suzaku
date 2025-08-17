@@ -1,5 +1,5 @@
-from typing import Any, Literal
 import typing
+from typing import Any, Literal
 
 import glfw
 import skia
@@ -122,8 +122,6 @@ class SkWidget(SkEventHanding, SkMisc):
         self.is_mouse_floating: bool = False
         self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
-
-        self.parent.add_child(self)
 
         def _on_event(event: SkEvent):
             self.mouse_x = event.x

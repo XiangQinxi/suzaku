@@ -2,7 +2,6 @@ import threading
 import typing
 import warnings
 from dataclasses import dataclass
-import typing
 
 
 class SkEventHanding:
@@ -32,7 +31,9 @@ class SkEventHanding:
 
         return self
 
-    def event_trigger(self, name: str, *args, **kwargs) -> typing.Union[bool, typing.Any]:
+    def event_trigger(
+        self, name: str, *args, **kwargs
+    ) -> typing.Union[bool, typing.Any]:
         """Send the event signal of the corresponding event type
         (trigger the corresponding event)
 
@@ -65,7 +66,12 @@ class SkEventHanding:
 
     # 我也是服了，我不小心将allow_multi的默认值从False改为True，导致创建新窗口时老是报错，
     def bind(
-        self, name: str, func: typing.Callable, *, add: bool = True, allow_multi: bool = False
+        self,
+        name: str,
+        func: typing.Callable,
+        *,
+        add: bool = True,
+        allow_multi: bool = False,
     ) -> str:
         """Bind an event.【绑定事件】
 
@@ -130,7 +136,8 @@ class SkEventHanding:
         return self
 
 
-from typing import Optional, List, Any, Union
+from typing import Any, List, Optional, Union
+
 
 @dataclass
 class SkEvent:

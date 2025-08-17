@@ -5,9 +5,7 @@ import sys
 import typing
 
 import glfw
-
 import skia
-from deprecated import deprecated
 from OpenGL import GL
 
 from ..event import SkEvent, SkEventHanding
@@ -228,8 +226,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
             glfw.set_window_opacity(window, self.cget("opacity"))
 
-
-            #glfw.set_window_icon(window, 1, self.icon1)
+            # glfw.set_window_icon(window, 1, self.icon1)
 
             # 初始化DPI缩放
             if monitor:
@@ -519,7 +516,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "move", SkEvent(event_type="move", x=x, y=y, glfw_window=window)
         )
 
-    @deprecated
     def _on_closed(self, window: typing.Any) -> None:
         """Trigger closed event (triggered when the window is closed).
         (Note: This method is deprecated. Triggering the closed event has been delegated to the destroy method.)
@@ -529,7 +525,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
 
     def _on_mouse_button(
-        self, window: typing.Any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: typing.Any
+        self, window: any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: any
     ) -> None:
         """Trigger mouse button event (triggered when the mouse button is pressed or released).
 
@@ -566,7 +562,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ),
         )
 
-    def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
+    def _on_cursor_enter(self, window: any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
 
         :param window: GLFW Window
@@ -605,7 +601,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 ),
             )
 
-    def _on_cursor_pos(self, window: typing.Any, x: int, y: int) -> None:
+    def _on_cursor_pos(self, window: any, x: int, y: int) -> None:
         """Trigger mouse motion event (triggered when the mouse enters the window and moves).
 
         :param window: GLFW Window
@@ -722,8 +718,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "visible",
             "border",
         ],
-        value: typing.Any = None,
-    ) -> typing.Any:
+        value: any = None,
+    ) -> any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -764,7 +760,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             | None
             | str
         ) = None,
-        custom_cursor: tuple[typing.Any, int, int] | None = None,
+        custom_cursor: tuple[any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 

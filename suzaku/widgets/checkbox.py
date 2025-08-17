@@ -1,4 +1,5 @@
 import typing
+
 import skia
 
 from .widget import SkWidget

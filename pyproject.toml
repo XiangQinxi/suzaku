@@ -12,7 +12,6 @@ dependencies = [
     "skia-python",
     "glfw",
     "pyopengl",
-    "deprecated",
 ]
 license = "MIT"
 
