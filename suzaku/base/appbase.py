@@ -33,17 +33,19 @@ def init_glfw() -> None:
     glfw.window_hint(glfw.WIN32_KEYBOARD_MENU, True)
     glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, True)
 
+
 def init_sdl2() -> None:
     """Initialize SDL2 module.
 
     :raises SkAppInitError:
         If SDL2 initialization fails
     """
-    import sys
     import ctypes
+    import sys
+
     import sdl2dll  # 导入pysdl2-dll
     from sdl2 import SDL_INIT_VIDEO, SDL_Init  # 导入pysdl2
-    from sdl2.sdlimage import IMG_Init, IMG_INIT_JPG  # 加载图片需要，否则只能加载BMP
+    from sdl2.sdlimage import IMG_INIT_JPG, IMG_Init  # 加载图片需要，否则只能加载BMP
 
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
@@ -69,7 +71,10 @@ class SkAppBase(SkEventHanding, SkMisc):
     # region __init__ 初始化
 
     def __init__(
-        self, is_always_update: bool = True, is_get_context_on_focus: bool = True, framework: typing.Literal["glfw", "sdl2"] = "glfw"
+        self,
+        is_always_update: bool = True,
+        is_get_context_on_focus: bool = True,
+        framework: typing.Literal["glfw", "sdl2"] = "glfw",
     ) -> None:
         from .windowbase import SkWindowBase
 
@@ -148,6 +153,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                     deal_event = glfw.poll_events
             case "sdl2":
                 from sdl2 import SDL_PollEvent
+
                 deal_event = SDL_PollEvent
 
         self.alive = True
@@ -181,7 +187,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                         "delete_window",
                         SkEvent(event_type="delete_window", window=window),
                     )
-                    #print(window.id)
+                    # print(window.id)
                     if window.can_be_close():
                         window.destroy()
                         continue
@@ -201,9 +207,9 @@ class SkAppBase(SkEventHanding, SkMisc):
                                     # Determine and call the drawing function of this window.
                                     # 【判断并调用该窗口的绘制函数】
 
-                                    the_window.event_trigger("update",
-                                                             SkEvent(event_type="update"))
-
+                                    the_window.event_trigger(
+                                        "update", SkEvent(event_type="update")
+                                    )
 
                                     if (
                                         hasattr(the_window, "draw_func")
@@ -212,11 +218,13 @@ class SkAppBase(SkEventHanding, SkMisc):
                                         the_window.draw_func(canvas)
 
                                 surface.flushAndSubmit()
-                                #glfw.swap_interval(1)
+                                # glfw.swap_interval(1)
 
                                 glfw.swap_buffers(the_window.glfw_window)
 
-                if self.is_get_context_on_focus:  # Only draw the window that has gained focus.
+                if (
+                    self.is_get_context_on_focus
+                ):  # Only draw the window that has gained focus.
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
                         draw()
                 else:

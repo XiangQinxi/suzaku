@@ -1,4 +1,4 @@
-from typing import Union
+import typing
 
 from .frame import SkFrame
 
@@ -21,8 +21,8 @@ class SkButton(SkFrame):
         self,
         *args,
         size: tuple[int, int] = (105, 35),
-        cursor: Union[str, None] = "hand",
-        command: Union[callable, None] = None,
+        cursor: typing.Union[str, None] = "hand",
+        command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
         super().__init__(*args, size=size, **kwargs)

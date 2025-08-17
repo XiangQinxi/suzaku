@@ -2,7 +2,7 @@ import threading
 import typing
 import warnings
 from dataclasses import dataclass
-from typing import Any, Callable, List, Optional, Union
+import typing
 
 
 class SkEventHanding:
@@ -14,7 +14,7 @@ class SkEventHanding:
 
     def __init__(self):
         # events = { event_name : { event_id : [event_func, whether_to_use_multithreading] } }
-        self.events: dict[str, dict[str, list[Callable | bool]]] = {}
+        self.events: dict[str, dict[str, list[typing.Callable | bool]]] = {}
 
     def event_generate(self, name: str) -> typing.Self:
         """Create a new event type.【创建一个新的事件类型】
@@ -32,7 +32,7 @@ class SkEventHanding:
 
         return self
 
-    def event_trigger(self, name: str, *args, **kwargs) -> Union[bool, Any]:
+    def event_trigger(self, name: str, *args, **kwargs) -> typing.Union[bool, typing.Any]:
         """Send the event signal of the corresponding event type
         (trigger the corresponding event)
 
@@ -64,7 +64,9 @@ class SkEventHanding:
         return self
 
     # 我也是服了，我不小心将allow_multi的默认值从False改为True，导致创建新窗口时老是报错，
-    def bind(self, name: str, func: callable, *, add: bool = True, allow_multi: bool = False) -> str:
+    def bind(
+        self, name: str, func: typing.Callable, *, add: bool = True, allow_multi: bool = False
+    ) -> str:
         """Bind an event.【绑定事件】
 
         :param name: Event name.【事件名】
@@ -85,7 +87,6 @@ class SkEventHanding:
 
     event_bind = bind
 
-
     def unbind(self, name: str, _id: str) -> None:
         """Unbind an event with event ID.【解绑事件】
 
@@ -97,7 +98,9 @@ class SkEventHanding:
 
     event_unbind = unbind
 
-    def after(self, s: int | float, func: callable, *, allow_multi: bool = False) -> str | threading.Timer:
+    def after(
+        self, s: int | float, func: typing.Callable, *, allow_multi: bool = False
+    ) -> str | threading.Timer:
         """Execute a function after a delay (an ID will be provided in the future for unbinding).
 
         :param s: Delay in seconds
@@ -127,6 +130,8 @@ class SkEventHanding:
         return self
 
 
+from typing import Optional, List, Any, Union
+
 @dataclass
 class SkEvent:
     """
@@ -153,8 +158,8 @@ class SkEvent:
     #  【窗口触发drop事件传入的文件路径】
     iconified: Optional[bool] = None  # 【窗口是否最小化】
     dpi_scale: Optional[float] = None  # 【DPI缩放】
-    glfw_window: Optional[any] = None  # 【glfw窗口】
-    window: Optional[any] = None  # 【SkWindow窗口】
+    glfw_window: Optional[typing.Any] = None  # 【glfw窗口】
+    window: Optional[typing.Any] = None  # 【SkWindow窗口】
     button: typing.Literal[0, 1, 2] = None
     # The provided values are: 0 for left button, 1 for right button, and 2 for middle button.
     # 【给出的值0为左键，1为右键，2为中键】

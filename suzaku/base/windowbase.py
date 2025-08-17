@@ -1,8 +1,11 @@
 import contextlib
+import os
+import os.path
 import sys
 import typing
 
 import glfw
+
 import skia
 from deprecated import deprecated
 from OpenGL import GL
@@ -43,7 +46,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         force_hardware_acceleration: bool = False,
         border: bool = True,
     ):
-        #glfw.default_window_hints()
+        # glfw.default_window_hints()
 
         self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
@@ -60,9 +63,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
         elif isinstance(self.parent, self.__class__):  # parent=SkWindowBase
             self.application = self.parent.application
             self.parent.application.add_window(self)
+
             def _closed(_):
                 if self.glfw_window:
                     self.destroy()
+
             self.parent.bind("closed", _closed)
         else:
             raise TypeError("parent must be SkAppBase or SkWindowBase")
@@ -138,6 +143,16 @@ class SkWindowBase(SkEventHanding, SkMisc):
         SkWindowBase._instance_count += 1
 
         self.draw_func = None
+        self.icon1 = target_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "..",
+                "resources",
+                "icon.ico",
+            )
+        )
+
+        self.icons = [self.icon1]
 
         self.attributes["fullscreen"] = fullscreen
 
@@ -162,7 +177,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         return cls._instance_count
 
-    def create(self) -> any:
+    def create(self) -> typing.Any:
         """Create the glfw window.
 
         :return: cls
@@ -213,6 +228,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
             glfw.set_window_opacity(window, self.cget("opacity"))
 
+
+            #glfw.set_window_icon(window, 1, self.icon1)
+
             # 初始化DPI缩放
             if monitor:
                 self._update_dpi_scale()
@@ -255,7 +273,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # region Draw 绘制相关
 
     @contextlib.contextmanager
-    def skia_surface(self, window: any) -> skia.Surface | None:
+    def skia_surface(self, window: typing.Any) -> skia.Surface | None:
         """Create a Skia surface for the window.
 
         :param window: GLFW Window
@@ -292,7 +310,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             if "context" in locals():
                 context.releaseResourcesAndAbandonContext()
 
-    def set_draw_func(self, func: callable) -> "SkWindowBase":
+    def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
 
         :param func: Draw function
@@ -374,7 +392,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         )
 
     def _on_key(
-        self, window: any, key: str, scancode: str, action: str, mods: int
+        self, window: typing.Any, key: str, scancode: str, action: str, mods: int
     ) -> None:
         """
         触发键盘事件
@@ -430,7 +448,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 "focus_loss", SkEvent(event_type="focus_loss", glfw_window=window)
             )
 
-    def _on_refresh(self, window: any):
+    def _on_refresh(self, window: typing.Any):
         if self.draw_func:
             # 确保设置当前窗口上下文
             glfw.make_context_current(window)
@@ -458,7 +476,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ),
         )
 
-    def _on_framebuffer_size(self, window: any, width: int, height: int) -> None:
+    def _on_framebuffer_size(self, window: typing.Any, width: int, height: int) -> None:
         pass
 
     def _on_resizing(self, window, width: int, height: int) -> None:
@@ -487,7 +505,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             child.event_trigger("resize", event)
         # cls.update()
 
-    def _on_window_pos(self, window: any, x: int, y: int) -> None:
+    def _on_window_pos(self, window: typing.Any, x: int, y: int) -> None:
         """Trigger move event (triggered when the window position changes).
 
         :param window: GLFW Window
@@ -502,7 +520,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         )
 
     @deprecated
-    def _on_closed(self, window: any) -> None:
+    def _on_closed(self, window: typing.Any) -> None:
         """Trigger closed event (triggered when the window is closed).
         (Note: This method is deprecated. Triggering the closed event has been delegated to the destroy method.)
         :param window: GLFW Window
@@ -511,7 +529,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
 
     def _on_mouse_button(
-        self, window: any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: any
+        self, window: typing.Any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: typing.Any
     ) -> None:
         """Trigger mouse button event (triggered when the mouse button is pressed or released).
 
@@ -548,7 +566,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ),
         )
 
-    def _on_cursor_enter(self, window: any, is_enter: bool) -> None:
+    def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
 
         :param window: GLFW Window
@@ -587,7 +605,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 ),
             )
 
-    def _on_cursor_pos(self, window: any, x: int, y: int) -> None:
+    def _on_cursor_pos(self, window: typing.Any, x: int, y: int) -> None:
         """Trigger mouse motion event (triggered when the mouse enters the window and moves).
 
         :param window: GLFW Window
@@ -704,8 +722,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "visible",
             "border",
         ],
-        value: any = None,
-    ) -> any:
+        value: typing.Any = None,
+    ) -> typing.Any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -746,7 +764,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             | None
             | str
         ) = None,
-        custom_cursor: tuple[any, int, int] | None = None,
+        custom_cursor: tuple[typing.Any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 
@@ -902,7 +920,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             glfw.destroy_window(self.glfw_window)
             self.glfw_window = None  # Clear the reference
             # self._event_init = False
-        #print(self.id)
+        # print(self.id)
         self.event_trigger("closed", SkEvent(event_type="closed"))
         self.application.windows.remove(self)
 
@@ -1088,7 +1106,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.physical_height = int(self.height * self.dpi_scale)
 
         # 触发重绘
-        #self.update()
+        # self.update()
 
     # 添加获取DPI缩放因子的方法
     def get_dpi_scale(self) -> float:

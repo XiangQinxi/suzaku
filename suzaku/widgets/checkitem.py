@@ -1,8 +1,7 @@
-from typing import Union
-
-from suzaku.widgets.checkbox import SkCheckBox
-from suzaku.widgets.frame import SkFrame
-from suzaku.widgets.text import SkText
+import typing
+from .checkbox import SkCheckBox
+from .frame import SkFrame
+from .text import SkText
 
 
 class SkCheckItem(SkFrame):
@@ -12,8 +11,8 @@ class SkCheckItem(SkFrame):
         self,
         *args,
         size: tuple[int, int] = (105, 35),
-        cursor: Union[str, None] = "hand",
-        command: Union[callable, None] = None,
+        cursor: typing.Union[str, None] = "hand",
+        command: typing.Union[typing.Callable, None] = None,
         text: str = "",
         **kwargs,
     ) -> None:

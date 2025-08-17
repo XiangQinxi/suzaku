@@ -1,4 +1,5 @@
 from typing import Any, Literal
+import typing
 
 import glfw
 import skia
@@ -200,9 +201,9 @@ class SkWidget(SkEventHanding, SkMisc):
     def _rainbow_shader(
         rect, colors: list | tuple[skia.Color] | None, cx=None, cy=None
     ):
-        """Draw the raindow shader of the rect
+        """Draw the rainbow shader of the rect
 
-        :param color: The color of the raindow shader
+        :param color: The color of the rainbow shader
         """
         if not cx:
             cx = rect.centerX()
@@ -322,7 +323,7 @@ class SkWidget(SkEventHanding, SkMisc):
     def _draw_frame(
         self,
         canvas: skia.Canvas,
-        rect: any,
+        rect: typing.Any,
         radius: int,
         bg: str,
         width: int,

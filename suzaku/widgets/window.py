@@ -1,5 +1,4 @@
 import typing
-from typing import Callable
 
 import glfw
 import skia
@@ -37,7 +36,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.styles = self.theme.styles
 
         self.focus_widget = self
-        self.draws: list[Callable] = []
+        self.draws: list[typing.Callable] = []
 
         self.window: SkWindow = self
 
@@ -178,7 +177,7 @@ class SkWindow(SkWindowBase, SkContainer):
         # print(style_to_color())
         bg = self.theme.get_style("SkWindow")["bg"]
         canvas.clear(style_to_color(bg, self.theme).color)
-        #canvas.clear(skia.ColorTRANSPARENT)
+        # canvas.clear(skia.ColorTRANSPARENT)
 
         self.draw_children(canvas)
 

@@ -1,3 +1,5 @@
+import typing
+
 from suzaku.event import SkEventHanding
 
 
@@ -12,7 +14,7 @@ class SkVar(SkEventHanding):
 
     _instance = 0
 
-    def __init__(self, default_value=None, value_type: type = any):
+    def __init__(self, default_value=None, value_type: type = typing.Any):
         super().__init__()
         self.id = self.__class__.__name__ + str(self._instance + 1)
         SkVar._instance += 1
@@ -20,7 +22,7 @@ class SkVar(SkEventHanding):
         self._value: type = default_value if default_value is not None else value_type()
         self._value_type: type = value_type
 
-    def set(self, value: any) -> None:
+    def set(self, value: typing.Any) -> None:
         """
         Set the _value of the data, which will then trigger a `change` event.
         【设置数据的值，之后会触发change事件】
@@ -37,11 +39,11 @@ class SkVar(SkEventHanding):
         self.event_trigger("change", value)
         return None
 
-    def get(self) -> any:
+    def get(self) -> typing.Any:
         """
         Get the _value of the variable.【获取数据值】
 
-        :rtype: any
+        :rtype: typing.Any
         :return: The _value of the data.
         """
         return self._value

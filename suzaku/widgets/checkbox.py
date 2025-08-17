@@ -1,5 +1,4 @@
-from typing import Union
-
+import typing
 import skia
 
 from .widget import SkWidget
@@ -10,8 +9,8 @@ class SkCheckBox(SkWidget):
         self,
         *args,
         size=(32, 32),
-        cursor: Union[str, None] = "hand",
-        command: Union[callable, None] = None,
+        cursor: typing.Union[str, None] = "hand",
+        command: typing.Union[typing.Callable, None] = None,
         selected: bool = False,
         **kwargs,
     ):

@@ -20,7 +20,7 @@ class SkTextButton(SkText):
         *args,
         size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
-        command: typing.Union[callable, None] = None,
+        command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
         super().__init__(*args, size=size, **kwargs)
