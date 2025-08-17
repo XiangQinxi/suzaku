@@ -13,6 +13,21 @@ from ..misc import SkMisc
 from .appbase import SkAppBase
 
 
+class _GLFW_IMAGE:
+    def __init__(self, path: str):
+        self.path = path
+        self.image: skia.Image = skia.Image.open(self.path)
+        self.image.convert()
+
+    @property
+    def size(self):
+        return self.image.width(), self.image.height()
+
+    def convert(self):
+        self.image.convert(colorType=skia.ColorType.kRGBA_8888_ColorType)
+
+
+
 class SkWindowBase(SkEventHanding, SkMisc):
     """Base Window class
 
@@ -141,7 +156,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         SkWindowBase._instance_count += 1
 
         self.draw_func = None
-        self.icon1 = target_path = os.path.abspath(
+        self.icon1_path = os.path.abspath(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
                 "..",
@@ -150,7 +165,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        self.icons = [self.icon1]
+        self._icon1: skia.Image = skia.Image.open(self.icon1_path)
+
+        #self.icon1 = (self._icon1.width(), self._icon1.height(), self._icon1.readPixels())
 
         self.attributes["fullscreen"] = fullscreen
 
@@ -226,7 +243,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
             glfw.set_window_opacity(window, self.cget("opacity"))
 
-            # glfw.set_window_icon(window, 1, self.icon1)
+            #glfw.set_window_icon(window, 1, self.icon1)
 
             # 初始化DPI缩放
             if monitor:
