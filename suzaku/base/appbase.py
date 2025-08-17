@@ -165,11 +165,11 @@ class SkAppBase(SkEventHanding, SkMisc):
         while self.alive and self.windows:
             deal_event()
 
-            if self.afters:
-                for item, config in list(self.afters.items()):
+            if self._afters:
+                for item, config in list(self._afters.items()):
                     if config[0] <= self.time():
                         config[1]()
-                        del self.afters[item]
+                        del self._afters[item]
 
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】

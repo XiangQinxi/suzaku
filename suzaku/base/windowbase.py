@@ -164,7 +164,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        self._icon1: skia.Image = skia.Image.open(self.icon1_path)
+        # self._icon1: skia.Image = skia.Image.open(self.icon1_path)
 
         # self.icon1 = (self._icon1.width(), self._icon1.height(), self._icon1.readPixels())
 
