@@ -9,7 +9,7 @@ from ..var import SkStringVar
 from .widget import SkWidget
 
 
-class SkTextInputBase(SkWidget):
+class SkLineInput(SkWidget):
     """A single-line input box without border 【不带边框的单行输入框】"""
 
     # region Init 初始化
@@ -48,10 +48,17 @@ class SkTextInputBase(SkWidget):
         self.bind("char", self._char)
         self.bind("key_pressed", self._key)
         self.bind("key_repeated", self._key)
+        self.bind("mouse_pressed", self._pressed)
 
     # endregion
 
     # region Text&Cursor 文本、光标操作
+
+    def _pressed(self, event: SkEvent):
+        if event.x >= self._right + self.canvas_x:
+            self.cursor_end()
+        elif event.x <= self._left + self.canvas_x:
+            self.cursor_home()
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered."""
@@ -160,19 +167,13 @@ class SkTextInputBase(SkWidget):
         """Draw the text input"""
 
         # Draw text
-        text_paint = skia.Paint(
-            AntiAlias=True, Color=style_to_color(fg, self.theme).color
-        )
-        font = self.attributes["font"]
-        padding = 4  # sheets["width"] * 2
-        metrics = font.getMetrics()
-        draw_x = rect.left() + padding
-        draw_y = (
-            rect.top() + rect.height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
-        )
+        font: skia.Font = self.attributes["font"]
 
         # Define the display area for text to prevent overflow
         # 【划定文本可以显示的区域，防止文本超出显示】
+
+        padding = 8
+
         canvas.save()
         canvas.clipRect(
             skia.Rect.MakeLTRB(
@@ -185,29 +186,59 @@ class SkTextInputBase(SkWidget):
 
         if self.get():
             # Draw the text
-            canvas.drawSimpleText(self.get(), draw_x, draw_y, font, text_paint)
+            draw_x, draw_y = self._draw_text(
+                canvas=canvas,
+                text=self.get(),
+                font=font,
+                fg=fg,
+                align="left",
+                padding=padding,
+                canvas_x=self.canvas_x,
+                canvas_y=self.canvas_y,
+                width=self.width,
+                height=self.height,
+            )
+            self._left = round(rect.left() + padding)
+            self._right = round(self._left + font.measureText(self.get()))
+
+        metrics = font.getMetrics()
 
         if self.is_focus:
             # Draw the cursor
             cursor_index = self.cursor_index
-            cursor_x = draw_x + font.measureText(self.get()[:cursor_index])
+            cursor_x = (
+                rect.left() + padding + font.measureText(self.get()[:cursor_index])
+            )
+            draw_y = (
+                rect.top()
+                + rect.height() / 2
+                - (metrics.fAscent + metrics.fDescent) / 2
+            )
             canvas.drawLine(
                 x0=cursor_x,
                 y0=draw_y + metrics.fAscent,
                 x1=cursor_x,
                 y1=draw_y + metrics.fDescent,
-                paint=text_paint,
+                paint=skia.Paint(
+                    AntiAlias=True,
+                    Color=style_to_color(fg, self.theme).color,
+                    StrokeWidth=1,
+                ),
             )
         else:
             # Draw the placeholder
             if self.attributes["placeholder"] and not self.get():
-                text_paint.setColor((style_to_color(placeholder, self.theme).color))
-                canvas.drawSimpleText(
-                    self.attributes["placeholder"],
-                    draw_x,
-                    draw_y,
-                    font,
-                    text_paint,
+                self._draw_text(
+                    canvas=canvas,
+                    text=self.attributes["placeholder"],
+                    fg=placeholder,
+                    font=font,
+                    align="left",
+                    padding=padding,
+                    canvas_x=self.canvas_x,
+                    canvas_y=self.canvas_y,
+                    width=self.width,
+                    height=self.height,
                 )
 
         canvas.restore()

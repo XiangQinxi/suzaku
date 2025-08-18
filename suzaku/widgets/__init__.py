@@ -12,6 +12,7 @@ from .hynix import SkHynix
 from .image import SkImage
 from .text import SkText
 from .textbutton import SkTextButton
-from .textinputbase import SkTextInputBase
+from .lineinput import SkLineInput
+from .mutiline_input import SkMultiLineInput
 from .widget import SkWidget
 from .window import SkWindow
