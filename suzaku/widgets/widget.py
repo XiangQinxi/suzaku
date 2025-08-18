@@ -374,12 +374,8 @@ class SkWidget(SkEventHanding, SkMisc):
         if bg_shader:
             if isinstance(bg_shader, dict):
                 if "linear_gradient" in bg_shader:
-                    gradient = SkGradient()
-                    gradient.set_linear(
-                        widget=self, config=bg_shader["linear_gradient"]
-                    )
-                    gradient.draw(
-                        paint=bg_paint,
+                    SkGradient().linear(
+                        widget=self, config=bg_shader["linear_gradient"], paint=bg_paint
                     )
             else:
                 if bg_shader.lower() == "rainbow":
@@ -391,12 +387,8 @@ class SkWidget(SkEventHanding, SkMisc):
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:
-                    gradient = SkGradient()
-                    gradient.set_linear(
-                        widget=self, config=bd_shader["linear_gradient"]
-                    )
-                    gradient.draw(
-                        paint=bd_paint,
+                    SkGradient().linear(
+                        widget=self, config=bd_shader["linear_gradient"], paint=bd_paint
                     )
             else:
                 if bd_shader.lower() == "rainbow":
@@ -411,6 +403,8 @@ class SkWidget(SkEventHanding, SkMisc):
         # shadow.draw(bd_paint)
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
+
+        del bg_paint, bd_paint
 
     # endregion
 

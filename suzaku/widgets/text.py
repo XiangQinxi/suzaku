@@ -1,8 +1,8 @@
 import typing
 
 import skia
-from ..styles.color import style_to_color
 
+from ..styles.color import style_to_color
 from ..styles.font import default_font
 from ..var import SkStringVar
 from .widget import SkWidget
@@ -54,9 +54,7 @@ class SkText(SkWidget):
         self._draw_central_text(
             canvas,
             text=self.get(),
-            fg=style_to_color(
-                self.theme.get_style_attr("SkText", "fg"), self.theme
-            ).color,
+            fg=self.theme.get_style_attr("SkText", "fg"),
             canvas_x=self.canvas_x,
             canvas_y=self.canvas_y,
             width=self.width,

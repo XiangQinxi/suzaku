@@ -126,27 +126,6 @@ class SkColor:
 class SkGradient:
     """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use."""
 
-    def __init__(self):
-        self.gradient: skia.GradientShader | None = None
-
-    def draw(self, paint: skia.Paint) -> skia.Paint | None:
-        """Draw gradient
-
-        :param paint: Paint
-        :return: None
-        """
-        if self.gradient is None:
-            return None
-        paint.setShader(self.gradient)
-        return paint
-
-    def get(self) -> skia.GradientShader:
-        """Get gradient shader
-
-        :return: Gradient shader
-        """
-        return self.gradient
-
     @staticmethod
     def get_anchor_pos(widget: SkWidget, anchor) -> tuple[int | float, int | float]:
         """Get widget`s anchor position
@@ -156,30 +135,33 @@ class SkGradient:
         :param anchor: Anchor position
         :return: Anchor position in widget
         """
+        x = widget.canvas_x
+        y = widget.canvas_y
         width = widget.width
         height = widget.height
         match anchor:
             case "nw":
-                return 0, 0
+                return x, y
             case "n":
-                return width / 2, 0
+                return x + width / 2, y
             case "ne":
-                return width, 0
+                return x + width, y
             case "w":
-                return 0, height / 2
+                return x, y + height / 2
             case "e":
-                return width, height / 2
+                return x + width, y + height / 2
             case "sw":
-                return 0, height
+                return x, y + height
             case "s":
-                return width / 2, height
+                return x + width / 2, y + height
             case "se":
-                return width, height
+                return x + width, y + height
             case _:
                 return 0, 0
 
-    def set_linear(
+    def linear(
         self,
+        paint: skia.Paint,
         config: (
             dict | None
         ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
@@ -200,14 +182,13 @@ class SkGradient:
             )
 
 
-
-        :param end_pos: End position
-        :param start_pos: Start position
+        :param paint: Paint
         :param widget: Widget
         :param config: Gradient configs
+        :param end_pos: End position
+        :param start_pos: Start position
         :return: cls
         """
-
         if config:
 
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
@@ -245,6 +226,8 @@ class SkGradient:
                     points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
+
+            paint.setShader(self.gradient)
 
             return self
         else:

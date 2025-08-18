@@ -4,7 +4,7 @@
   "friendly_name": "Default Dark",
 
   "color_palette": {
-    "default_bg": [15, 15, 15, 255],
+    "default_bg": [20, 20, 20, 255],
     "default_fg": [255, 255, 255, 245]
   },
 
@@ -20,7 +20,7 @@
         "radius": 8,
         "bg": [25, 25, 25, 245],
         "bd": [30, 30, 30, 245],
-        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 50]],
         "width": 2
       }
     },
@@ -44,14 +44,14 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": [
-              [10, 10, 10, 255],
+              [35, 35, 35, 255],
               [50, 50, 50, 185]
             ]
           }
         },
         "fg": {"color_palette": "default_fg"},
         "bd": [50, 50, 50, 255],
-        "bd_shadow": [0, 3, 1, 1, [0, 0, 0, 50]],
+        "bd_shadow": [0, 3, 1, 1, [255, 255, 255, 50]],
         "width": 2
       },
       "hover": {
@@ -61,7 +61,7 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": [
-              [10, 10, 10, 255],
+              [35, 35, 35, 255],
               [50, 50, 50, 185]
             ]
           }
@@ -79,7 +79,7 @@
             "end_anchor": "s",
             "colors": [
               [55, 55, 55, 225],
-              [15, 15, 15, 255]
+              [35, 35, 35, 255]
             ]
           }
         },
@@ -98,7 +98,7 @@
 
     "SkText": {
       "rest": {
-        "fg": {"color_palette": "default_fg"}
+        "fg": [255, 255, 255, 245]
       }
     },
 
@@ -109,18 +109,18 @@
         "fg": {"color_palette": "default_fg"},
         "bd": [50, 50, 50, 255],
         "width": 2,
-        "placeholder": [0, 0, 0, 165]
+        "placeholder": [255, 255, 255, 165]
       },
       "hover": {
         "bg": [0, 0, 0, 30],
-        "fg": [0, 0, 0, 235],
+        "fg": {"color_palette": "default_fg"},
         "bd": [25, 125, 225, 235],
         "width": 2,
-        "placeholder": [0, 0, 0, 165]
+        "placeholder": [255, 255, 255, 165]
       },
       "focus": {
         "bg": [0, 0, 0, 15],
-        "fg": [0, 0, 0, 235],
+        "fg": {"color_palette": "default_fg"},
         "bd": [25, 125, 225, 235],
         "width": 3,
         "placeholder": [0, 0, 0, 0]
