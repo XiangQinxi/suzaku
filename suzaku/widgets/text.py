@@ -51,7 +51,7 @@ class SkText(SkWidget):
     # region Draw
 
     def _draw(self, canvas: skia.Surfaces, rect: skia.Rect):
-        self._draw_central_text(
+        self._draw_text(
             canvas,
             text=self.get(),
             fg=self.theme.get_style_attr("SkText", "fg"),

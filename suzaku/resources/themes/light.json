@@ -4,18 +4,27 @@
   "friendly_name": "Default Light",
 
   "color_palette": {
-    "default_bg": [255, 255, 255, 235],
+    "default_bg": [240, 240, 240, 255],
     "default_fg": [0, 0, 0, 235]
   },
 
   "styles":{
     "SkWindow": {
       "rest":{
-        "bg": [255, 255, 255, 240]
+        "bg": {"color_palette": "default_bg"}
       }
     },
 
     "SkFrame": {
+      "rest": {
+        "radius": 8,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkCard": {
       "rest": {
         "radius": 8,
         "bg": [225, 225, 225, 245],
@@ -45,7 +54,7 @@
             "end_anchor": "s",
             "colors": [
               [235, 235, 235, 255],
-              [200, 200, 200, 185]
+              [200, 200, 200, 255]
             ]
           }
         },
@@ -62,7 +71,7 @@
             "end_anchor": "s",
             "colors": [
               [245, 245, 245, 255],
-              [200, 200, 200, 185]
+              [200, 200, 200, 255]
             ]
           }
         },
@@ -78,7 +87,7 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": [
-              [200, 200, 200, 225],
+              [200, 200, 200, 255],
               [235, 235, 235, 255]
             ]
           }

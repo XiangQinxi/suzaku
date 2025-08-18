@@ -2,7 +2,8 @@ import typing
 
 import skia
 
-from suzaku.widgets.text import SkText
+from .text import SkText
+from .button import SkButton
 
 
 class SkTextButton(SkText):
@@ -84,7 +85,7 @@ class SkTextButton(SkText):
         )
 
         # Draw the button text
-        self._draw_central_text(
+        self._draw_text(
             canvas,
             text=self.attributes["text"],
             fg=style["fg"],

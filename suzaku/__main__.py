@@ -22,7 +22,7 @@ if __name__ == "__main__":
         # window.hide()
         window.bind("drop", lambda evt: print("drop", evt))
 
-        frame = SkFrame(window, border=True)
+        frame = SkCard(window)
         # frame.allowed_out_of_bounds = True
 
         SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
@@ -38,7 +38,7 @@ if __name__ == "__main__":
         )
         SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
 
-        frame2 = SkFrame(frame, border=True)
+        frame2 = SkCard(frame)
         SkButton(frame2, text="Create 1 New window", command=create1window).box(
             padx=8, pady=(8, 0)
         )

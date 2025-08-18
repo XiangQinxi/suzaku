@@ -276,7 +276,7 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
-    def _draw_central_text(
+    def _draw_text(
         self,
         canvas,
         text,
@@ -285,12 +285,14 @@ class SkWidget(SkEventHanding, SkMisc):
         canvas_y,
         width,
         height,
+        padding: int | float = 5,
+        align: typing.Literal["center", "right", "left"] = "center",
         font: skia.Font = None,
     ):
         """Draw central text
 
         .. note::
-            >>> self._draw_central_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
+            >>> self._draw_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
 
         :param canvas: The canvas
         :param text: The text
@@ -311,9 +313,15 @@ class SkWidget(SkEventHanding, SkMisc):
         )
 
         text_width = font.measureText(text)
-        metrics = font.getMetrics()
 
-        draw_x = canvas_x + width / 2 - text_width / 2
+        if align == "center":
+            draw_x = canvas_x + (width - text_width) / 2
+        elif align == "right":
+            draw_x = canvas_x + width - text_width - padding
+        else:  # left
+            draw_x = canvas_x + padding
+
+        metrics = font.getMetrics()
         draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
 
         canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
@@ -345,7 +353,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
         """
 
-        if bd_shadow:
+        if bd_shadow and 1 == 0:
             drop_shadow_rect = skia.Rect.MakeXYWH(
                 self.canvas_x, self.canvas_y, self.width, self.height
             )
@@ -370,7 +378,10 @@ class SkWidget(SkEventHanding, SkMisc):
         )
 
         # Background
+        bg_paint.setStrokeWidth(width)
         bg_paint.setColor(style_to_color(bg, self.theme).color)
+        shadow = SkDropShadow(config_list=bd_shadow)
+        shadow.draw(bg_paint)
         if bg_shader:
             if isinstance(bg_shader, dict):
                 if "linear_gradient" in bg_shader:
@@ -383,7 +394,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
         # Border
         bd_paint.setStrokeWidth(width)
-        bd_paint.setColor(make_color(bd))
+        bd_paint.setColor(style_to_color(bd, self.theme).color)
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:
@@ -396,11 +407,6 @@ class SkWidget(SkEventHanding, SkMisc):
 
         # Draw background first
         canvas.drawRoundRect(rect, radius, radius, bg_paint)
-
-        # canvas.save()
-
-        # shadow = SkDropShadow(config_list=bd_shadow)
-        # shadow.draw(bd_paint)
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
 

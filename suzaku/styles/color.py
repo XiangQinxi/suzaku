@@ -37,7 +37,7 @@ class SkColor:
     """
 
     def __init__(self, color: str | tuple | list | None = None) -> None:
-        self.color: str | tuple | list | None = None
+        self.color: str | tuple | list | int | None = None
         self.set_color(color)
 
     def get(self) -> skia.Color:
@@ -235,7 +235,8 @@ class SkGradient:
 
 
 def style_to_color(
-    style_attr_value: list[int] | tuple[int, int, int, int] | dict, theme: str | SkTheme
+    style_attr_value: list[int] | tuple[int, int, int, int] | dict | str,
+    theme: str | SkTheme,
 ) -> None | SkColor | SkGradient:
     """Returns the color object indicated by the color style attribute _value.
 

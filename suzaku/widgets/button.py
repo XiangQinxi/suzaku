@@ -1,6 +1,7 @@
 import typing
 
 from .frame import SkFrame
+from .container import SkContainer
 
 
 class SkButton(SkFrame):
@@ -19,13 +20,14 @@ class SkButton(SkFrame):
 
     def __init__(
         self,
+        parent: SkContainer,
         *args,
         size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
-        super().__init__(*args, size=size, **kwargs)
+        super().__init__(parent, *args, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
         self.command = command
@@ -51,7 +53,7 @@ class SkButton(SkFrame):
             if self.is_focus:
                 style_name = "SkButton:focus"
             else:
-                style_name = "SkButton:rest"
+                style_name = "SkButton"
 
         style = self.theme.get_style(style_name)
 
@@ -69,10 +71,11 @@ class SkButton(SkFrame):
         else:
             bd_shader = None
 
+        # Draw the button border
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.get_style_attr("SkButton", "radius"),
+            radius=self.theme.get_style("SkButton")["radius"],
             bg=style["bg"],
             width=style["width"],
             bd=style["bd"],

@@ -14,27 +14,29 @@ with surface as canvas:
         AntiAlias=True,
     )
     # paint.setBlendMode(skia.BlendMode.kPlus)
-    paint.setColor(skia.Color(0, 0, 0, 255))  # 黑色
-    paint.setShader(
-        skia.GradientShader.MakeLinear(
-            points=[(50, 50), (250, 250)],
-            colors=[skia.Color(0, 0, 255, 255), skia.Color(255, 0, 0, 255)],
-        )
-    )
+    paint.setColor(skia.ColorBLUE)  # 黑色
+    paint.setStyle(skia.Paint.kFill_Style)
+    paint.setStrokeWidth(10)
 
-    rect = skia.Rect.MakeXYWH(x=50, y=50, w=200, h=200)
+    rect: skia.Rect = skia.Rect.MakeXYWH(x=50, y=50, w=200, h=200)
+    rect.makeOutset(10, 10)
+
+    paint.setImageFilter(skia.ImageFilters.DropShadow(5, 5, 15, 15, skia.ColorBLACK))
+
     canvas.drawRect(rect, paint)
 
-    paint.setShader(
-        skia.GradientShader.MakeLinear(
-            points=[(50, 300), (250, 500)],
-            colors=[skia.Color(0, 0, 255, 255), skia.Color(255, 0, 0, 255)],
-        )
-    )
+    paint.reset()
+    paint.setAntiAlias(True)
 
-    rect = skia.Rect.MakeXYWH(x=50, y=300, w=200, h=200)
+    paint.setColor(skia.ColorRED)  # 黑色
+    paint.setStyle(skia.Paint.kStroke_Style)
+    paint.setStrokeWidth(10)
+
     canvas.drawRect(rect, paint)
 
+    """rect = skia.Rect.MakeXYWH(x=50, y=300, w=200, h=200)
+    canvas.drawRect(rect, paint)
+    """
 
 image = surface.makeImageSnapshot()
-image.save("gradient.png", skia.kPNG)
+image.save("rect.png", skia.kPNG)
