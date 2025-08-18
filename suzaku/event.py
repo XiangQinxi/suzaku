@@ -4,7 +4,23 @@ import warnings
 from dataclasses import dataclass
 
 
-class SkEventHanding:
+class BindedTask():
+    """A class to represent binded task when a event triggered."""
+    def __init__(self, binded_to: str, id_: str):
+        self.binded_to: str = binded_to
+        self.id: str = id_
+
+
+class EventHandling():
+    """A class containing event handling abilities.
+    
+    This class should be inherited by other classes with such abilities."""
+
+    def __init__(self):
+        self.event: dict[str, dict[str, list[typing.Any]]]
+
+
+class SkEventHandingOld:
     """SkEvent binding manager.【事件绑定管理器】"""
 
     _events = []
