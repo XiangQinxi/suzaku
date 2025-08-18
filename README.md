@@ -19,8 +19,9 @@ Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 python3 -m suzaku
 ```
 
-### 0.0.4
-![0.0.4.png](https://youke1.picui.cn/s1/2025/08/17/68a1c75ec1ac1.png)
+### 0.0.5
+![0.0.5-Light.png](https://youke1.picui.cn/s1/2025/08/18/68a2edc08c774.png)
+![0.0.5-Dark.png](https://youke1.picui.cn/s1/2025/08/18/68a2edc088e9e.png)
 
 ### 0.0.2a1
 > This is an old version of the design, and it will be re-enabled in the future.
@@ -28,20 +29,38 @@ python3 -m suzaku
 > 这个是老版本的设计，未来将会将它重新启用
 
 ![0.0.2a1.png](https://youke1.picui.cn/s1/2025/08/02/688dd38fc1d9a.png)
-)
+
+## Layout / 布局
+Each component can use layout methods to arrange itself, such as `widget.box()`, similar to `tkinter`. I think this approach is more concise and user-friendly.
+
+每个组件都可以使用布局方法来布局自己，例如`widget.box()`，类似于`tkinter`，我觉得这样更简洁易用点。
+
+### Box
+It can be considered a simplified version of `tkinter.pack`—without `anchor`, `expand`, or `fill` attributes, only `side`, `expand`, `padx`, and `pady` attributes.  
+(In the future, `ipadx` and `ipady` attributes will be added.)
+Each container can only choose one layout direction. For example, 
+you cannot use both `widget.box(side="left")` and `widget.box(side="right")` simultaneously.
+
+可以被称为`tkinter.pack`的简易版，就是没有`anchor`、`expand`、`fill`属性，只有`side`、`expand`、`padx`、`pady`属性。
+（未来会做`ipadx`、`ipady`属性）
+每个容器只能选择一种布局方向，例如，不能同时使用`widget.box(side="left")`和`widget.box(side="right")`。
+
+### Vertical layout / 垂直布局
+The default layout is vertical.
+
+默认为垂直方向布局。
+```python
+widget.box()
+```
+### Horizontal layout / 水平布局
+```python
+widget.box(side="left")
+widget2.box(side="right")
+```
 
 ## How it Works / 原理
 ### Basic Pricinples / 基础原理
-`SkApp` manages all `SkWindow` objects. We may consider each of the visible elements and ocmponents as a `SkWidget` in `SkWindow`.
-
-`SkApp`管理着所有的`SkWindow`。我们将每一个可视化的元素&组件视为一个个的`SkWidget`，居于`SkWindow`中。
-
-A number of properties are owned by `SkWidget`, telling `SkWindow` how it should be drawn. `SkWidget` components are added to the window via`SkWindow.add_draw()`, then be drawn by `SkWindow.draw()`.
-
-`SkWidget`具有一个个属性，告诉`SkWindow`自己该如何被绘制，用`SkWindow.add_draw()`将自己的绘制方式加入进去，然后在`SkWindow.draw()`中被一个个的绘制在画布上。
-
-## Layout / 布局
-**Under construction / 正在开发**
+使用`glfw`作为窗口管理库，使用`pyopengl`作为后端，使用`skia-python`作为绘画后端。
 
 ## Naming / 取名
 Suzaku is one of the four mythical beasts in ancient China. ~~Sounds cool isn't it?~~
