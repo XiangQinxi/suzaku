@@ -25,22 +25,22 @@ if __name__ == "__main__":
         frame = SkCard(window)
         # frame.allowed_out_of_bounds = True
 
-        SkButton(frame, text="This is a SkButton").box(padx=8, pady=(8, 0))
+        SkButton(frame, text="This is a SkButton").box(padx=10, pady=(10, 0))
         SkButton(frame, text="Ask Notice", command=window.hongwen).box(
-            padx=8, pady=(8, 0)
+            padx=10, pady=(10, 0)
         )
-        SkLabel(frame, text="This is a SkLabel").box(padx=8, pady=(8, 0))
+        SkLabel(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
         SkCheckbox(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var = SkStringVar()
         SkEntry(frame, placeholder="数值绑定", textvariable=var).box(
-            padx=8, pady=(8, 0)
+            padx=10, pady=(10, 0)
         )
-        SkLabel(frame, textvariable=var).box(padx=8, pady=(8, 0))
+        SkLabel(frame, textvariable=var).box(padx=10, pady=(10, 0))
 
         frame2 = SkCard(frame)
         SkButton(frame2, text="Create 1 New window", command=create1window).box(
-            padx=8, pady=(8, 0)
+            padx=10, pady=(10, 0)
         )
         frame2.box(padx=10, pady=10, expand=True)
 

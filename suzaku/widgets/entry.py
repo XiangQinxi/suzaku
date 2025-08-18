@@ -1,14 +1,10 @@
-from .textinputbase import SkTextInputBase
+from .lineinput import SkLineInput
 
 
-class SkEntry(SkTextInputBase):
+class SkEntry(SkLineInput):
     """A single-line input box with a border 【带边框的单行输入框】"""
 
     # region Init 初始化
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     # endregion
 
     # region Draw 绘制

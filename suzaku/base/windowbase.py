@@ -4,6 +4,8 @@ import os.path
 import sys
 import typing
 
+import numpy as np
+
 import glfw
 import skia
 from OpenGL import GL
@@ -155,18 +157,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
         SkWindowBase._instance_count += 1
 
         self.draw_func = None
-        self.icon1_path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "..",
-                "resources",
-                "icon.ico",
-            )
-        )
-
-        # self._icon1: skia.Image = skia.Image.open(self.icon1_path)
-
-        # self.icon1 = (self._icon1.width(), self._icon1.height(), self._icon1.readPixels())
 
         self.attributes["fullscreen"] = fullscreen
 
@@ -180,6 +170,32 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.glfw_window = self.create()
 
         self.cursor(self.default_cursor())
+
+        #
+
+        self.icon1_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "..",
+                "resources",
+                "imgs",
+                "icon.ico",
+            )
+        )
+
+        """icon: skia.Image = skia.Image.open(self.icon1_path)
+
+        info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
+        pixels = bytearray(icon.width() * icon.height() * 4)
+        print(pixels)
+
+        self.icon = (
+            icon.width(),
+            icon.height(),
+            pixels,
+        )
+
+        glfw.set_window_icon(self.glfw_window, 1, self.icon)"""
 
     @classmethod
     def get_instance_count(cls) -> int:
@@ -242,7 +258,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
             glfw.set_window_opacity(window, self.cget("opacity"))
 
-            # glfw.set_window_icon(window, 1, self.icon1)
+            # _glfw.glfwSetWindowIcon(window, 1, [self.icon1])
 
             # 初始化DPI缩放
             if monitor:

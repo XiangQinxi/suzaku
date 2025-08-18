@@ -1,104 +1,124 @@
-import glfw
 import ctypes
+import collections
+
+import glfw
+
 import skia
+import numpy as np
 
 
-# 确保您的GLFW绑定中已有以下结构体定义
 class _GLFWimage(ctypes.Structure):
+    """
+    GLFW图像包装器（纯Skia实现，无PIL依赖）
+    """
+
     _fields_ = [
         ("width", ctypes.c_int),
         ("height", ctypes.c_int),
-        ("pixels", ctypes.POINTER(ctypes.c_ubyte))
+        ("pixels", ctypes.POINTER(ctypes.c_ubyte)),
     ]
 
+    GLFWimage = collections.namedtuple("GLFWimage", ["width", "height", "pixels"])
 
-# 使用Skia加载图像并转换为GLFW需要的格式（修复版本）
-def load_icon_with_skia(file_path):
+    def __init__(self):
+        ctypes.Structure.__init__(self)
+        self.width = 0
+        self.height = 0
+        self.pixels = None
+        self.pixels_array = None
+
+    def wrap(self, image: skia.Image):
+        """
+        包装skia.Image为GLFW可用的格式
+        Args:
+            image: skia.Image对象（必须为RGBA格式）
+        """
+        # 确保图像是RGBA格式
+        if not isinstance(image, skia.Image):
+            raise TypeError("只支持skia.Image类型")
+
+        # 获取像素数据
+        self.width, self.height = image.width(), image.height()
+        pixmap = skia.Pixmap()
+        if not image.peekPixels(pixmap):
+            # 如果无法直接访问像素，转为光栅图像
+            image = image.makeRasterImage()
+            if not image.peekPixels(pixmap):
+                raise RuntimeError("无法获取图像像素数据")
+
+        # 转换为连续的numpy数组（形状为[height, width, 4]）
+        pixels_np = np.array(pixmap, copy=False).reshape(self.height, self.width, 4)
+
+        # 创建ctypes数组并设置指针
+        array_type = ctypes.c_ubyte * (4 * self.width * self.height)
+        self.pixels_array = array_type()
+        ctypes.memmove(
+            self.pixels_array,
+            pixels_np.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte)),
+            len(self.pixels_array),
+        )
+        self.pixels = ctypes.cast(self.pixels_array, ctypes.POINTER(ctypes.c_ubyte))
+
+    def unwrap(self):
+        """
+        返回解包后的数据（兼容原接口）
+        """
+        if not self.pixels_array:
+            return self.GLFWimage(self.width, self.height, None)
+
+        # 将一维数组转为三维结构[height][width][4]
+        pixels_3d = [
+            [
+                [self.pixels_array[(i * self.width + j) * 4 + k] for k in range(4)]
+                for j in range(self.width)
+            ]
+            for i in range(self.height)
+        ]
+        return self.GLFWimage(self.width, self.height, pixels_3d)
+
+
+from glfw.library import glfw as _glfw
+
+
+def set_window_icon(window, count, images):
     """
-    使用Skia加载图像并转换为GLFW兼容格式
-    :param file_path: 图像文件路径
-    :return: 包含width, height, pixels的字典
+    Sets the icon for the specified window.
+
+    Wrapper for:
+        void glfwSetWindowIcon(GLFWwindow* window, int count, const GLFWimage* images);
     """
-    # 使用Skia加载图像
-    image = skia.Image.open(file_path)
-    if not image:
-        raise ValueError(f"无法加载图像: {file_path}")
+    if count == 1 and (not hasattr(images, "__len__") or len(images) == 3):
+        # Stay compatible to calls passing a single icon
+        images = [images]
+    array_type = _GLFWimage * count
+    _images = array_type()
+    for i, image in enumerate(images):
+        _images[i].wrap(image)
+    _glfw.glfwSetWindowIcon(window, count, _images)
 
-    # 获取图像尺寸
-    width = image.width()
-    height = image.height()
 
-    # 创建目标图像信息（RGBA格式）
-    target_info = skia.ImageInfo.Make(
-        width,
-        height,
-        skia.ColorType.kRGBA_8888_ColorType,
-        skia.AlphaType.kPremul_AlphaType
+# 创建skia图像
+import os.path
+
+icon1_path = os.path.abspath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "suzaku",
+        "resources",
+        "imgs",
+        "icon.ico",
     )
+)
+image = skia.Image.open(icon1_path)
 
-    # 创建目标像素映射
-    target_pixmap = skia.Pixmap()
+# 包装为GLFW格式
+glfw_image = _GLFWimage()
+glfw_image.wrap(image)  # 自动处理RGBA转换
 
-    # 分配足够的内存来存储RGBA像素数据
-    buffer_size = width * height * 4
-    pixel_buffer = bytearray(buffer_size)
+# 现在可以传递给GLFW函数
+# 例如设置窗口图标：
 
-    # 设置目标像素映射
-    if not target_pixmap.reset(target_info, pixel_buffer, width * 4):
-        raise RuntimeError("无法重置像素映射")
-
-    # 将图像像素读取到目标像素映射
-    if not image.readPixels(target_pixmap, 0, 0):
-        # 如果直接读取失败，尝试通过Surface绘制
-        surface = skia.Surface.MakeRasterDirect(target_pixmap)
-        if surface:
-            surface.getCanvas().drawImage(image, 0, 0)
-        else:
-            raise RuntimeError("无法读取图像像素")
-
-    # 转换为ctypes数组
-    buffer_type = ctypes.c_ubyte * len(pixel_buffer)
-    ctypes_buffer = buffer_type.from_buffer_copy(pixel_buffer)
-
-    return {
-        "width": width,
-        "height": height,
-        "pixels": ctypes_buffer
-    }
-
-
-# 主程序
-def main():
-    # 初始化GLFW
-    if not glfw.init():
-        return
-
-    # 创建窗口
-    window = glfw.create_window(800, 600, "Skia + GLFW Demo", None, None)
-    if not window:
-        glfw.terminate()
-        return
-
-    glfw.make_context_current(window)
-
-    # 使用Skia加载并设置窗口图标
-    try:
-        # 加载图标（支持PNG、JPEG等格式）
-        icon = load_icon_with_skia("C:\\suzaku\\suzaku\\resources\\icon.ico")
-
-        # 调用您提供的set_window_icon函数
-        glfw.set_window_icon(window, 1, [icon])
-        print("窗口图标设置成功")
-    except Exception as e:
-        print(f"图标加载失败: {e}")
-
-    # 主循环
-    while not glfw.window_should_close(window):
-        glfw.poll_events()
-        glfw.swap_buffers(window)
-
-    glfw.terminate()
-
-
-if __name__ == "__main__":
-    main()
+glfw.init()
+window = glfw.create_window(640, 480, "GLFW Icon Test", None, None)
+glfw.set_window_icon(window, 1, ctypes.byref(glfw_image))

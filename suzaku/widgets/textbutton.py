@@ -87,7 +87,7 @@ class SkTextButton(SkText):
         # Draw the button text
         self._draw_text(
             canvas,
-            text=self.attributes["text"],
+            text=self.get(),
             fg=style["fg"],
             canvas_x=self.canvas_x,
             canvas_y=self.canvas_y,

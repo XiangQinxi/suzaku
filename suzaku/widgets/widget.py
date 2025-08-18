@@ -326,6 +326,8 @@ class SkWidget(SkEventHanding, SkMisc):
 
         canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
 
+        return draw_x, draw_y
+
     def _draw_frame(
         self,
         canvas: skia.Canvas,
