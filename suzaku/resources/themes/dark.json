@@ -4,81 +4,127 @@
   "friendly_name": "Default Dark",
 
   "color_palette": {
-    "default_bg": [255, 255, 255, 20],
-    "default_fg": [255, 255, 255, 255]
+    "default_bg": [15, 15, 15, 255],
+    "default_fg": [255, 255, 255, 245]
   },
 
   "styles": {
     "SkWindow": {
-      "bg": {"color_palette": "default_bg"}
+      "rest":{
+        "bg": {"color_palette": "default_bg"}
+      }
+    },
+
+    "SkFrame": {
+      "rest": {
+        "radius": 8,
+        "bg": [25, 25, 25, 245],
+        "bd": [30, 30, 30, 245],
+        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "width": 2
+      }
     },
 
     "SkBadge": {
-      "radius": 99,
-      "bg": [25, 145, 225, 240],
-      "fg": [0, 0, 0, 255],
-      "bd": {"textures": "transparent"},
-      "width": 0
+      "rest": {
+        "radius": 99,
+        "bg": [5, 105, 200, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": "transparent",
+        "width": 0
+      }
     },
 
     "SkButton": {
       "rest": {
-        "bg": {"color_palette": "default_bg"},
+        "radius": 5,
+        "bg": [40, 40, 40, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [10, 10, 10, 255],
+              [50, 50, 50, 185]
+            ]
+          }
+        },
         "fg": {"color_palette": "default_fg"},
-        "bd": [255, 255, 255, 10],
-        "width": 2,
-        "radius": 2
+        "bd": [50, 50, 50, 255],
+        "bd_shadow": [0, 3, 1, 1, [0, 0, 0, 50]],
+        "width": 2
       },
       "hover": {
-        "bg": [40, 40, 40, 255],
-        "fg": [255, 255, 255, 255],
-        "bd": [25, 145, 225, 180],
+        "bg": [50, 50, 50, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [10, 10, 10, 255],
+              [50, 50, 50, 185]
+            ]
+          }
+        },
+        "fg": {"color_palette": "default_fg"},
+        "bd": [60, 60, 60, 255],
+        "bd_shadow": [0, 0, 5, 5, [80, 160, 255, 255]],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [60, 60, 60, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": [
+              [55, 55, 55, 225],
+              [15, 15, 15, 255]
+            ]
+          }
+        },
+        "fg": {"color_palette": "default_fg"},
+        "bd": [55, 55, 55, 255],
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 255]],
         "width": 2
       },
       "focus": {
-        "bg": {"color_palette": "default_bg"},
-        "fg": [255, 255, 255, 255],
-        "bd": [255, 255, 255, 200],
-        "width": 3,
-        "bd_shader": {"texture": "rainbow"}
-      },
-      "pressed": {
-        "bg": [255, 255, 255, 60],
-        "fg": [255, 255, 255, 155],
-        "bd": [255, 255, 255, 10],
+        "bg": [40, 40, 40, 245],
+        "fg": {"color_palette": "default_fg"},
+        "bd": [40, 130, 255, 255],
         "width": 3
+      }
+    },
+
+    "SkText": {
+      "rest": {
+        "fg": {"color_palette": "default_fg"}
       }
     },
 
     "SkEntry": {
       "rest": {
         "radius": 8,
-        "bg": [255, 255, 255, 0],
-        "fg": [255, 255, 255, 255],
-        "bd": [255, 255, 255, 10],
+        "bg": [30, 30, 30, 245],
+        "fg": {"color_palette": "default_fg"},
+        "bd": [50, 50, 50, 255],
         "width": 2,
-        "placeholder": [255, 255, 255, 165]
+        "placeholder": [0, 0, 0, 165]
       },
       "hover": {
-        "bg": [255, 255, 255, 10],
-        "fg": [255, 255, 255, 255],
-        "bd": [25, 145, 225, 180],
+        "bg": [0, 0, 0, 30],
+        "fg": [0, 0, 0, 235],
+        "bd": [25, 125, 225, 235],
         "width": 2,
-        "bd_shadow": true,
-        "placeholder": [255, 255, 255, 165]
+        "placeholder": [0, 0, 0, 165]
       },
       "focus": {
-        "bg": {"color_palette": "default_bg"},
-        "fg": [255, 255, 255, 255],
-        "bd": [25, 145, 225, 180],
-        "width": 2,
-        "bd_shader": {"texture": "rainbow"}
+        "bg": [0, 0, 0, 15],
+        "fg": [0, 0, 0, 235],
+        "bd": [25, 125, 225, 235],
+        "width": 3,
+        "placeholder": [0, 0, 0, 0]
       }
-    },
-
-    "SkLabel": {
-      "bg": {"textures": "transparent"},
-      "fg": [255, 255, 255, 245]
     }
   }
 }

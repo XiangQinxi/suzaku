@@ -95,6 +95,8 @@ class SkAppBase(SkEventHanding, SkMisc):
                 init_glfw()
             case "sdl2":
                 init_sdl2()
+            case _:
+                raise SkAppInitError(f"Unknown framework {self.framework}")
 
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -155,6 +157,8 @@ class SkAppBase(SkEventHanding, SkMisc):
                 from sdl2 import SDL_PollEvent
 
                 deal_event = SDL_PollEvent
+            case _:
+                raise SkAppInitError(f"Unknown framework {self.framework}")
 
         self.alive = True
         for window in self.windows:
@@ -163,12 +167,16 @@ class SkAppBase(SkEventHanding, SkMisc):
         # Start event loop
         # 【开始事件循环】
         while self.alive and self.windows:
+            # 处理事件
             deal_event()
 
+            # 检查after事件，其中的事件是否到达时间，如到达则执行
             if self._afters:
                 for item, config in list(self._afters.items()):
-                    if config[0] <= self.time():
-                        config[1]()
+                    if config[0] <= self.time():  # Time
+                        config[1]()  # Function
+                        if config[2]:  # Is Post
+                            self.post()
                         del self._afters[item]
 
             # Create a copy of the window tuple to avoid modifying it while iterating

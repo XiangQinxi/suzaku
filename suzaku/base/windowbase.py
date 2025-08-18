@@ -665,11 +665,19 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # region Configure 属性配置
 
     @property
+    def window_frame_size(self) -> tuple[int, int, int, int]:
+        """Get the size of the window frame.
+
+        :return: Window frame size (left, top, right, bottom)
+        """
+        return glfw.get_window_frame_size(self.glfw_window)
+
+    @property
     def monitor(self):
         return glfw.get_window_monitor(self.glfw_window)
 
     @property
-    def monitor_name(self):
+    def monitor_name(self) -> str:
         return glfw.get_monitor_name(self.monitor)
 
     @property

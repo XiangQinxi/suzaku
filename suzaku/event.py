@@ -105,7 +105,12 @@ class SkEventHanding:
     event_unbind = unbind
 
     def after(
-        self, s: int | float, func: typing.Callable, *, allow_multi: bool = False
+        self,
+        s: int | float,
+        func: typing.Callable,
+        *,
+        allow_multi: bool = False,
+        post: bool = False,
     ) -> str | threading.Timer:
         """Execute a function after a delay (an ID will be provided in the future for unbinding).
 
@@ -121,7 +126,7 @@ class SkEventHanding:
 
         _id = "after." + str(self._after)
 
-        self._afters[_id] = [self.time() + s, func]
+        self._afters[_id] = [self.time() + s, func, post]
         self._after += 1
         return _id
 

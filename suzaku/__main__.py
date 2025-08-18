@@ -15,7 +15,7 @@ if __name__ == "__main__":
     def create1window():
         window = SkToplevel(
             parent=None,
-            # theme=SkTheme.INTERNAL_THEMES["default.dark"],
+            theme=SkTheme.INTERNAL_THEMES["default.dark"],
             title="Suzaku GUI",
             size=(280, 460),
         )
