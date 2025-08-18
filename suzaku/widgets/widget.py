@@ -412,6 +412,19 @@ class SkWidget(SkEventHanding, SkMisc):
 
         del bg_paint, bd_paint
 
+    @staticmethod
+    def _draw_image(
+        canvas: skia.Canvas, rect: Any, uri: str | None = None, path: str | None = None
+    ):
+        if path:
+            image = skia.Image.open(path)
+        elif uri:
+            image = skia.Image()
+        else:
+            image = None
+        if image:
+            canvas.drawImageRect(image, rect, skia.SamplingOptions(), skia.Paint())
+
     # endregion
 
     # region Widget attribute configs 组件属性配置

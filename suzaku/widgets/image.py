@@ -11,13 +11,13 @@ class SkImage(SkWidget):
     """
 
     def __init__(
-        self, parent, image: str, x: int, y: int, width: int, height: int
+        self, parent, path: str, x: int, y: int, width: int, height: int
     ) -> None:
         super().__init__(parent, (width, height))
         self.parent = parent
         self.width: int = width
         self.height: int = height
-        self.image = image
+        self.path = path
         self.x: int = x
         self.y: int = y
 
@@ -29,4 +29,8 @@ class SkImage(SkWidget):
 
         :return: None
         """
-        self._draw_image(canvas, self.image, rect)
+        if self.path:
+            path = self.path
+        else:
+            path = None
+        self._draw_image(canvas, path=path, uri=None, rect=rect)
