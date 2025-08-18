@@ -8,7 +8,7 @@ class SkEventHanding:
     """SkEvent binding manager.【事件绑定管理器】"""
 
     _events = []
-    _afters = []
+    _afters = {}
     _after = 0
 
     def __init__(self):

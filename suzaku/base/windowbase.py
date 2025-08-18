@@ -863,7 +863,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     visible = wm_visible
 
-    def show(self) -> "SkWindowBase":
+    def wm_show(self) -> "SkWindowBase":
         """Show the window.
 
         :return: cls
@@ -875,7 +875,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.update()  # 添加初始绘制触发
         return self
 
-    def hide(self) -> "SkWindowBase":
+    show = wm_show
+
+    def wm_hide(self) -> "SkWindowBase":
         """Hide the window.
 
         :return: cls
@@ -885,6 +887,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         hide_window(self.glfw_window)
         self.visible = False
         return self
+
+    hide = withdraw = wm_withdraw = wm_hide
 
     def wm_maximize(self) -> "SkWindowBase":
         """Maximize the window.

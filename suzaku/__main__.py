@@ -19,6 +19,7 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 460),
         )
+        # window.hide()
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkFrame(window, border=True)
