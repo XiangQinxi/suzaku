@@ -9,13 +9,13 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    app = SkApp(is_get_context_on_focus=True, is_always_update=True)
+    app = SkApp(is_get_context_on_focus=True, is_always_update=False)
     # print(glfw.default_window_hints())
 
     def create1window():
         window = SkToplevel(
             parent=None,
-            # theme=SkTheme.INTERNAL_THEMES["default.dark"],
+            theme=SkTheme.INTERNAL_THEMES["default.dark"],
             title="Suzaku GUI",
             size=(280, 460),
         )

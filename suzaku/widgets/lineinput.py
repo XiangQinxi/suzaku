@@ -47,6 +47,8 @@ class SkLineInput(SkWidget):
         self.attributes["text"] = text
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["placeholder"] = placeholder  # 占位文本
+        self.start_index = 0
+        self.end_index = 0
         self._cursor_index = 0  # 光标索引
         self.visible_start_index = 0  # 文本可显的初始索引（文本向左移的索引）
         self._left = 0  # 文本左边离画布的距离
@@ -69,13 +71,22 @@ class SkLineInput(SkWidget):
         self.bind("key_pressed", self._key)
         self.bind("key_repeated", self._key)
         self.bind("mouse_pressed", self._pressed)
+        self.bind("mouse_motion", self._motion)
 
     # endregion
 
     # region Text&Cursor 文本、光标操作
 
-    def _pressed(self, event: SkEvent):
-        self.index(event.x)
+    def is_selected(self) -> bool:
+        return self.start_index != self.end_index
+
+    def _motion(self, event: SkEvent) -> None:
+        if self.is_mouse_pressed:
+            self.end_index = self.index(event.x)
+            print(self.start_index, self.end_index)
+
+    def _pressed(self, event: SkEvent) -> None:
+        self.start_index = self.end_index = self.index(event.x)
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered."""
@@ -109,12 +120,27 @@ class SkLineInput(SkWidget):
                 """Paste Text"""
                 if event.mods == "control":
                     if isinstance(self.clipboard(), str):
-                        self.set(
-                            text[: self._cursor_index]
-                            + self.clipboard()
-                            + text[self._cursor_index :]
-                        )
-                        self.cursor_right(len(self.clipboard()))
+                        if not self.is_selected():
+                            self.set(
+                                text[: self._cursor_index]
+                                + self.clipboard()
+                                + text[self._cursor_index :]
+                            )
+                            self.cursor_right(len(self.clipboard()))
+                        else:
+                            clipboard = self.clipboard()
+                            if isinstance(clipboard, str):
+                                start, end = sorted([self.start_index, self.end_index])
+                                _text = text[:start] + clipboard + text[end:]
+                                self.set(_text)
+                                self.cursor_index(len(_text))
+                                self.start_index = len(_text)
+                                self.end_index = len(_text)
+            case glfw.KEY_A:
+                """Select All"""
+                if event.mods == "control":
+                    self.start_index = 0
+                    self.end_index = len(text)
             case glfw.KEY_HOME:
                 """Move the cursor to the start"""
                 self.cursor_home()
@@ -144,15 +170,20 @@ class SkLineInput(SkWidget):
     def index(self, mouse_x: int) -> int:
         if mouse_x >= self._right:
             self.cursor_end()
+            return len(self.get())
         elif mouse_x <= self._left:
             self.cursor_home()
+            return 0
         else:
             visible_text = self.get()[self.visible_start_index :]
             for index, _ in enumerate(visible_text):
                 _text = visible_text[:index]
                 if self.measure_text(_text) + self._left >= mouse_x:
-                    self.cursor_index(len(_text) + self.visible_start_index)
+                    _text2 = len(_text) + self.visible_start_index
+                    self.cursor_index(_text2)
+                    return _text2
                     break
+            return self.cursor_index()
 
     def cursor_index(self, index: int | None = None) -> Self | int:
         """Set cursor index"""
@@ -179,6 +210,8 @@ class SkLineInput(SkWidget):
         """Move the cursor to the right"""
         if self.cursor_index() < len(self.get()):
             self._cursor_index += move
+            if self._cursor_index >= len(self.get()):
+                self.cursor_index(len(self.get()))
             if (
                 self.measure_text(
                     self.get()[
