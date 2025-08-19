@@ -327,7 +327,7 @@ class SkWidget(SkEventHanding, SkMisc):
         else:  # left
             draw_x = canvas_x + padding
 
-        metrics = font.getMetrics()
+        metrics = self.metrics
         draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
 
         canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
@@ -437,6 +437,10 @@ class SkWidget(SkEventHanding, SkMisc):
     # endregion
 
     # region Widget attribute configs 组件属性配置
+
+    @property
+    def metrics(self):
+        return self.cget("font").getMetrics()
 
     def measure_text(self, text: str, *args) -> float | int:
         font: skia.Font = self.cget("font")

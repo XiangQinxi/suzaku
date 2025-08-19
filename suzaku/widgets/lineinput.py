@@ -134,11 +134,6 @@ class SkLineInput(SkWidget):
 
     def _update(self):
         text = self.get()
-        visible_text: str = text[self.visible_start_index :]
-        visible_text_to_the_left_of_the_cursor = text[: self.cursor_index()][
-            self.visible_start_index :
-        ]
-        font: skia.Font = self.cget("font")
 
     def get(self) -> str:
         """Get the input text"""
@@ -182,10 +177,12 @@ class SkLineInput(SkWidget):
             self._cursor_index += move
             if (
                 self.measure_text(
-                    self.get()[self.visible_start_index : self.cursor_index()]
+                    self.get()[
+                        self.visible_start_index : self.cursor_index()
+                    ]  # 光标左边的可显文本
                 )
-                + 10
-                >= self.width - 15
+                + self.padding
+                >= self.width - self.padding
             ):
                 self.visible_start_index += move
         return self
@@ -223,14 +220,14 @@ class SkLineInput(SkWidget):
         # Define the display area for text to prevent overflow
         # 【划定文本可以显示的区域，防止文本超出显示】
 
-        padding = 8
+        self.padding = 10
 
         canvas.save()
         canvas.clipRect(
             skia.Rect.MakeLTRB(
-                rect.left() + padding,
+                rect.left() + self.padding - 2,
                 rect.top(),
-                rect.right() - padding,
+                rect.right() - self.padding + 2,
                 rect.bottom(),
             )
         )
@@ -239,38 +236,38 @@ class SkLineInput(SkWidget):
 
         if text:
             # Draw the text
-            draw_x, draw_y = self._draw_text(
+            self._draw_text(
                 canvas=canvas,
                 text=text[self.visible_start_index :],
                 font=font,
                 fg=fg,
                 align="left",
-                padding=padding,
+                padding=self.padding,
                 canvas_x=self.canvas_x,
                 canvas_y=self.canvas_y,
                 width=self.width,
                 height=self.height,
             )
-            self._left = round(rect.left() + padding)
+            self._left = round(rect.left() + self.padding)
             # 如何计算右边的呢！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             # 左边缘加上可显文本索引后面文字的长度
             self._right = round(
                 self._left + self.measure_text(text[self.visible_start_index :])
             )
-        metrics = font.getMetrics()
+        metrics = self.metrics
 
         if self.is_focus:
             if self.cursor_visible:
                 # 计算text[:cursor_index]长度，减去text[visible_start_index:]
                 # Draw the cursor
-                t1 = text[: self.cursor_index()]
-                t2 = text[: self.visible_start_index]
-
                 cursor_x = (
                     rect.left()
-                    + padding
-                    + self.measure_text(t1)
-                    - self.measure_text(t2)
+                    + self.padding
+                    + self.measure_text(
+                        text[
+                            self.visible_start_index : self.cursor_index()
+                        ]  # 光标左边的可显文本
+                    )
                 )
                 draw_y = (
                     rect.top()
@@ -283,9 +280,9 @@ class SkLineInput(SkWidget):
                     x1=cursor_x,
                     y1=draw_y + metrics.fDescent,
                     paint=skia.Paint(
-                        AntiAlias=True,
+                        AntiAlias=False,
                         Color=style_to_color(fg, self.theme).color,
-                        StrokeWidth=1,
+                        StrokeWidth=1.5,
                     ),
                 )
         else:
@@ -297,7 +294,7 @@ class SkLineInput(SkWidget):
                     fg=placeholder,
                     font=font,
                     align="left",
-                    padding=padding,
+                    padding=self.padding,
                     canvas_x=self.canvas_x,
                     canvas_y=self.canvas_y,
                     width=self.width,
