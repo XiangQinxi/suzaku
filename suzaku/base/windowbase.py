@@ -4,9 +4,8 @@ import os.path
 import sys
 import typing
 
-import numpy as np
-
 import glfw
+import numpy as np
 import skia
 from OpenGL import GL
 
@@ -336,8 +335,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 raise RuntimeError("Failed to create Skia surface")
             yield surface
         finally:
-            if "context" in locals():
-                context.releaseResourcesAndAbandonContext()
+            context.releaseResourcesAndAbandonContext()
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.

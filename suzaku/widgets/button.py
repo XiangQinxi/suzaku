@@ -1,7 +1,7 @@
 import typing
 
-from .frame import SkFrame
 from .container import SkContainer
+from .frame import SkFrame
 
 
 class SkButton(SkFrame):

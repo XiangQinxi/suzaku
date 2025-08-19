@@ -51,6 +51,15 @@ class SkContainer:
     width: int | float
     height: int | float
 
+    def __enter__(self):
+        self._handle_layout()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._handle_layout()
+        # 触发更新事件
+        self.event_trigger("update", SkEvent(event_type="update"))
+
     def __init__(self, allowed_out_of_bounds: bool = False):
 
         # self.parent = None

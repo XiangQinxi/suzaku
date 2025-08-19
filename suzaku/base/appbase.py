@@ -151,7 +151,6 @@ class SkAppBase(SkEventHanding, SkMisc):
 
         match self.framework:
             case "glfw":
-                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
                 glfw.window_hint(glfw.SAMPLES, self.samples)
                 glfw.set_error_callback(self.error)
 
@@ -169,6 +168,34 @@ class SkAppBase(SkEventHanding, SkMisc):
         self.alive = True
         for window in self.windows:
             window.create_bind()
+
+        def draw(the_window):
+            if the_window.visible:
+                # Set the current context for each window
+                # 【为该窗口设置当前上下文】
+                glfw.make_context_current(the_window.glfw_window)
+                # Create a Surface and hand it over to this window.
+                # 【创建Surface，交给该窗口】
+                with the_window.skia_surface(the_window.glfw_window) as surface:
+                    if surface:
+                        with surface as canvas:
+                            # Determine and call the drawing function of this window.
+                            # 【判断并调用该窗口的绘制函数】
+
+                            the_window.event_trigger(
+                                "update", SkEvent(event_type="update")
+                            )
+
+                            if (
+                                hasattr(the_window, "draw_func")
+                                and the_window.draw_func
+                            ):
+                                the_window.draw_func(canvas)
+
+                        surface.flushAndSubmit()
+
+                        glfw.swap_buffers(the_window.glfw_window)
+                del surface
 
         # Start event loop
         # 【开始事件循环】
@@ -205,43 +232,18 @@ class SkAppBase(SkEventHanding, SkMisc):
                     if window.can_be_close():
                         window.destroy()
                         continue
+                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
 
                 # Draw window
                 # 【绘制窗口】
-                def draw(the_window=window):
-                    if the_window.visible:
-                        # Set the current context for each window
-                        # 【为该窗口设置当前上下文】
-                        glfw.make_context_current(the_window.glfw_window)
-                        # Create a Surface and hand it over to this window.
-                        # 【创建Surface，交给该窗口】
-                        with the_window.skia_surface(the_window.glfw_window) as surface:
-                            if surface:
-                                with surface as canvas:
-                                    # Determine and call the drawing function of this window.
-                                    # 【判断并调用该窗口的绘制函数】
-
-                                    the_window.event_trigger(
-                                        "update", SkEvent(event_type="update")
-                                    )
-
-                                    if (
-                                        hasattr(the_window, "draw_func")
-                                        and the_window.draw_func
-                                    ):
-                                        the_window.draw_func(canvas)
-
-                                surface.flushAndSubmit()
-
-                                glfw.swap_buffers(the_window.glfw_window)
 
                 if (
                     self.is_get_context_on_focus
                 ):  # Only draw the window that has gained focus.
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
-                        draw()
+                        draw(window)
                 else:
-                    draw()
+                    draw(window)
 
         self.cleanup()  # 【清理资源】
 

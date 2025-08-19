@@ -1,4 +1,5 @@
 import typing
+from functools import cache
 from typing import Any, Literal
 
 import glfw
@@ -139,11 +140,16 @@ class SkWidget(SkEventHanding, SkMisc):
     def _pos_update(self, event: SkEvent | None = None):
         # 更新组件的位置
         # 相对整个画布的坐标
-        self._canvas_x = self.parent.canvas_x + self._x
-        self._canvas_y = self.parent.canvas_y + self._y
-        # 相对整个窗口（除了标题栏）的坐标
-        self._root_x = self.canvas_x + self.window.root_x
-        self._root_y = self.canvas_y + self.window.root_y
+
+        @cache
+        def update_pos():
+            self._canvas_x = self.parent.canvas_x + self._x
+            self._canvas_y = self.parent.canvas_y + self._y
+            # 相对整个窗口（除了标题栏）的坐标
+            self._root_x = self.canvas_x + self.window.root_x
+            self._root_y = self.canvas_y + self.window.root_y
+
+        update_pos()
 
         self.event_trigger(
             "move",

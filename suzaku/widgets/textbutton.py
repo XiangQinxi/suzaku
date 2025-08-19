@@ -2,8 +2,8 @@ import typing
 
 import skia
 
-from .text import SkText
 from .button import SkButton
+from .text import SkText
 
 
 class SkTextButton(SkText):
