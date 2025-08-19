@@ -72,6 +72,7 @@ class SkAppBase(SkEventHanding, SkMisc):
 
     def __init__(
         self,
+        *,
         is_always_update: bool = False,
         is_get_context_on_focus: bool = True,
         framework: typing.Literal["glfw", "sdl2"] = "glfw",

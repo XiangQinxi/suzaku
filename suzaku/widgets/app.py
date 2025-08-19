@@ -1,3 +1,5 @@
+import typing
+
 from ..base.appbase import SkAppBase
 
 
@@ -13,10 +15,8 @@ class SkApp(SkAppBase):
 
     def __init__(
         self,
-        *args,
         **kwargs,
     ) -> None:
         super().__init__(
-            *args,
             **kwargs,
         )
