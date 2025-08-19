@@ -324,17 +324,17 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 skia.kRGBA_8888_ColorType,
                 skia.ColorSpace.MakeSRGB(),
             )
-            canvas = surface.getCanvas()
-
-            # 应用DPI缩放变换
-            canvas.save()
-            # canvas.scale(self.dpi_scale, self.dpi_scale)
+            with surface as canvas:
+                canvas.save()
+                # canvas.scale(self.dpi_scale, self.dpi_scale)
             # 将断言改为更友好的错误处理
             if surface is None:
                 raise RuntimeError("Failed to create Skia surface")
             yield surface
         finally:
+            context.freeGpuResources()
             context.releaseResourcesAndAbandonContext()
+            context.abandonContext()
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.

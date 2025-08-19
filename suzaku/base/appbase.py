@@ -1,7 +1,7 @@
 import typing
 import warnings
 
-import glfw
+import glfw, skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
@@ -192,7 +192,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                         surface.flushAndSubmit()
 
                         glfw.swap_buffers(the_window.glfw_window)
-                del surface
+                del surface, the_window
 
         # Start event loop
         # 【开始事件循环】
@@ -202,7 +202,7 @@ class SkAppBase(SkEventHanding, SkMisc):
 
             # 检查after事件，其中的事件是否到达时间，如到达则执行
             if self._afters:
-                for item, config in list(self._afters.items()):
+                for item, config in tuple(self._afters.items()):
                     if config[0] <= self.time():  # Time
                         config[1]()  # Function
                         if config[2]:  # Is Post
@@ -217,7 +217,8 @@ class SkAppBase(SkEventHanding, SkMisc):
                 # Make sure the window is created and bound
                 # 【确保新窗口绑定事件】
                 window.create_bind()
-
+                # Draw window
+                # 【绘制窗口】
                 if (
                     self.is_get_context_on_focus
                 ):  # Only draw the window that has gained focus.
@@ -235,9 +236,9 @@ class SkAppBase(SkEventHanding, SkMisc):
                     # print(window.id)
                     if window.can_be_close():
                         window.destroy()
+                        del window
                         continue
-                # Draw window
-                # 【绘制窗口】
+                del window
 
             if glfw.get_current_context():
                 glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步

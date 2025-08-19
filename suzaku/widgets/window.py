@@ -56,8 +56,6 @@ class SkWindow(SkWindowBase, SkContainer):
         self.bind("key_repeated", self._key_repected)
         self.bind("key_released", self._key_released)
 
-        self.bind("update", self.update_layout)
-
     # endregion
 
     # region Theme related 主题相关
@@ -86,19 +84,23 @@ class SkWindow(SkWindowBase, SkContainer):
         # print(cls.cget("focus_widget"))
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_pressed", event)
+        del event
 
     def _key_repected(self, event):
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_repeated", event)
+        del event
 
     def _key_released(self, event):
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_released", event)
+        del event
 
     def _char(self, event):
         # print(12)
         if self.focus_get() is not self:
             self.focus_get().event_trigger("char", event)
+        del event
 
     def _leave(self, event):
         event = SkEvent(
@@ -111,6 +113,7 @@ class SkWindow(SkWindowBase, SkContainer):
         for widget in self.children:
             widget.is_mouse_pressed = False
             widget.event_trigger("mouse_leave", event)
+        del event
 
     def _mouse(self, event) -> None:
         for widget in self.children:
@@ -172,6 +175,7 @@ class SkWindow(SkWindowBase, SkContainer):
                 self.previous_widget = current_widget
         else:
             self.previous_widget = None
+        del current_widget, event
 
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
