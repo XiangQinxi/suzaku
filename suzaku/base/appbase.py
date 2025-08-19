@@ -154,10 +154,10 @@ class SkAppBase(SkEventHanding, SkMisc):
                 glfw.window_hint(glfw.SAMPLES, self.samples)
                 glfw.set_error_callback(self.error)
 
-                if not self.is_always_update:
-                    deal_event = glfw.wait_events
-                else:
+                if self.is_always_update:
                     deal_event = glfw.poll_events
+                else:
+                    deal_event = glfw.wait_events
             case "sdl2":
                 from sdl2 import SDL_PollEvent
 

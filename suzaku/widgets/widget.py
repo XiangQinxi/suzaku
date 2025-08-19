@@ -418,12 +418,12 @@ class SkWidget(SkEventHanding, SkMisc):
 
         canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
-        del bg_paint, bd_paint
+        del bg_paint, bd_paint, shadow
 
     @staticmethod
     def _draw_image(
         canvas: skia.Canvas, rect: Any, uri: str | None = None, path: str | None = None
-    ):
+    ) -> None:
         if path:
             image = skia.Image.open(path)
         elif uri:
@@ -432,12 +432,13 @@ class SkWidget(SkEventHanding, SkMisc):
             image = None
         if image:
             canvas.drawImageRect(image, rect, skia.SamplingOptions(), skia.Paint())
+        del image
 
     # endregion
 
     # region Widget attribute configs 组件属性配置
 
-    def measure_text(self, text: str, *args):
+    def measure_text(self, text: str, *args) -> float | int:
         font: skia.Font = self.cget("font")
         return font.measureText(text, *args)
 
@@ -499,16 +500,21 @@ class SkWidget(SkEventHanding, SkMisc):
         self._root_y = value
         self._pos_update()
 
-    @property
-    def clipboard_get(self) -> str:
+    def clipboard(self, bytes_value: bytes | None = None) -> str | typing.Self:
         """Get string from clipboard
 
         anti images
         """
-        try:
-            return glfw.get_clipboard_string(None).decode("utf-8")
-        except:
-            return ""
+        if bytes_value is not None:
+            glfw.set_clipboard_string(self.window.glfw_window, bytes_value)
+            return self
+        else:
+            try:
+                return glfw.get_clipboard_string(self.window.glfw_window).decode(
+                    "utf-8"
+                )
+            except AttributeError:
+                return ""
 
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.

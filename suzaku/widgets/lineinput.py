@@ -117,13 +117,13 @@ class SkLineInput(SkWidget):
             case glfw.KEY_V:
                 """Paste Text"""
                 if event.mods == "control":
-                    if isinstance(self.clipboard_get(), str):
+                    if isinstance(self.clipboard(), str):
                         self.set(
                             text[: self._cursor_index]
-                            + self.clipboard_get()
+                            + self.clipboard()
                             + text[self._cursor_index :]
                         )
-                        self._cursor_index += len(self.clipboard_get())
+                        self._cursor_index += len(self.clipboard())
             case glfw.KEY_HOME:
                 """Move the cursor to the start"""
                 self.cursor_home()
@@ -172,7 +172,7 @@ class SkLineInput(SkWidget):
             self._cursor_index -= 1
             # 如何判定光标是否左移呢！！！！！！！！！！！！！！！
             print(self.visible_start_index, ":", self.cursor_index())
-            print(self.visible_start_index>=self.cursor_index())
+            print(self.visible_start_index >= self.cursor_index())
             if (
                 self.visible_start_index >= self.cursor_index()
                 and self.visible_start_index != 0
