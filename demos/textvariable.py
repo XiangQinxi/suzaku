@@ -1,7 +1,7 @@
 from suzaku import Sk, SkText, SkEntry, SkStringVar
 
 
-root = Sk(vsync=False, is_always_update=False)
+root = Sk(vsync=True, is_always_update=False)
 
 var = SkStringVar(default_value="Hello, world!")
 

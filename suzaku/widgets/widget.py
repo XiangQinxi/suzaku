@@ -284,13 +284,13 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def _draw_text(
         self,
-        canvas,
-        text,
-        fg,
-        canvas_x,
-        canvas_y,
-        width,
-        height,
+        canvas: skia.Canvas,
+        text: str | dict | None,
+        canvas_x: float | int,
+        canvas_y: float | int,
+        width: float | int,
+        height: float | int,
+        fg: None | str = None,
         padding: int | float = 5,
         align: typing.Literal["center", "right", "left"] = "center",
         font: skia.Font = None,
@@ -313,25 +313,28 @@ class SkWidget(SkEventHanding, SkMisc):
         if not font:
             font = self.attributes["font"]
 
-        # 绘制字体
-        text_paint = skia.Paint(
-            AntiAlias=True, Color=style_to_color(fg, self.theme).color
-        )
+        if isinstance(text, (str, int, float)):
+            text = str(text)
+            # 绘制字体
+            text_paint = skia.Paint(
+                AntiAlias=True, Color=style_to_color(fg, self.theme).color
+            )
 
-        text_width = font.measureText(text)
+            text_width = font.measureText(text)
 
-        if align == "center":
-            draw_x = canvas_x + (width - text_width) / 2
-        elif align == "right":
-            draw_x = canvas_x + width - text_width - padding
-        else:  # left
-            draw_x = canvas_x + padding
+            if align == "center":
+                draw_x = canvas_x + (width - text_width) / 2
+            elif align == "right":
+                draw_x = canvas_x + width - text_width - padding
+            else:  # left
+                draw_x = canvas_x + padding
 
-        metrics = self.metrics
-        draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+            metrics = self.metrics
+            draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
 
-        canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
-
+            canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
+        elif isinstance(text, dict):
+            return None
         return draw_x, draw_y
 
     def _draw_frame(
