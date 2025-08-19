@@ -72,19 +72,20 @@ class SkAppBase(SkEventHanding, SkMisc):
 
     def __init__(
         self,
-        is_always_update: bool = True,
+        is_always_update: bool = False,
         is_get_context_on_focus: bool = True,
         framework: typing.Literal["glfw", "sdl2"] = "glfw",
         vsync: bool = True,
         samples: int = 4,
     ) -> None:
+        super().__init__()
         from .windowbase import SkWindowBase
 
         self.windows: list[SkWindowBase] = (
             []
         )  # Windows that have been added to the event loop. 【被添加进事件循环的SkWindow】
-        self.is_always_update: bool = is_always_update
-        self.is_get_context_on_focus = is_get_context_on_focus
+        self.is_always_update: bool | typing.Literal["auto"] = is_always_update
+        self.is_get_context_on_focus: bool = is_get_context_on_focus
         self.vsync = vsync
         self.samples = samples
         self.alive: bool = (
@@ -99,8 +100,6 @@ class SkAppBase(SkEventHanding, SkMisc):
                 init_glfw()
             case "sdl2":
                 init_sdl2()
-            case _:
-                raise SkAppInitError(f"Unknown framework {self.framework}")
 
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -186,10 +185,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                                 "update", SkEvent(event_type="update")
                             )
 
-                            if (
-                                hasattr(the_window, "draw_func")
-                                and the_window.draw_func
-                            ):
+                            if the_window.draw_func:
                                 the_window.draw_func(canvas)
 
                         surface.flushAndSubmit()
@@ -214,13 +210,20 @@ class SkAppBase(SkEventHanding, SkMisc):
 
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】
-            current_windows = tuple(self.windows)
-            # Make sure the window is created and bound
-            # 【确保新窗口绑定事件】
-            for window in self.windows:
-                window.create_bind()
+            current_windows = set(self.windows)
 
             for window in current_windows:
+                # Make sure the window is created and bound
+                # 【确保新窗口绑定事件】
+                window.create_bind()
+
+                if (
+                    self.is_get_context_on_focus
+                ):  # Only draw the window that has gained focus.
+                    if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
+                        draw(window)
+                else:
+                    draw(window)
                 # Check if the window is valid
                 # 【检查窗口是否有效】
                 if window.can_be_close():
@@ -232,18 +235,11 @@ class SkAppBase(SkEventHanding, SkMisc):
                     if window.can_be_close():
                         window.destroy()
                         continue
-                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
-
                 # Draw window
                 # 【绘制窗口】
 
-                if (
-                    self.is_get_context_on_focus
-                ):  # Only draw the window that has gained focus.
-                    if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
-                        draw(window)
-                else:
-                    draw(window)
+            if glfw.get_current_context():
+                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
 
         self.cleanup()  # 【清理资源】
 
@@ -263,7 +259,7 @@ class SkAppBase(SkEventHanding, SkMisc):
     # endregion
     # region error 错误处理
     @staticmethod
-    def error(error_code: typing.Any, description: typing.Any):
+    def error(error_code: typing.Any, description: bytes):
         """
         处理GLFW错误
 
@@ -271,6 +267,6 @@ class SkAppBase(SkEventHanding, SkMisc):
         :param description: 错误信息
         :return: None
         """
-        print(f"GLFW Error {error_code}: {description}")
+        print(f"GLFW Error {error_code}: {description.decode()}")
 
     # endregion

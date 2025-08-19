@@ -9,9 +9,9 @@ class SkAppWindow(SkWindow):
     def __init__(
         self,
         *args,
-        is_always_update: bool = True,
-        is_get_context_on_focus: bool = True,
-        vsync: bool = True,
+        is_always_update: bool = ...,
+        is_get_context_on_focus: bool = ...,
+        vsync: bool = ...,
         **kwargs,
     ) -> None:
         """Main window that connects SkApp with SkWindow."""

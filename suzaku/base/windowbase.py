@@ -5,7 +5,6 @@ import sys
 import typing
 
 import glfw
-import numpy as np
 import skia
 from OpenGL import GL
 
@@ -17,7 +16,7 @@ from .appbase import SkAppBase
 class _GLFW_IMAGE:
     def __init__(self, path: str):
         self.path = path
-        self.image: skia.Image = skia.Image.open(self.path)
+        self.image: skia.Image = skia.Image.open(fp=self.path)
         self.image.convert()
 
     @property
@@ -301,7 +300,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # region Draw 绘制相关
 
     @contextlib.contextmanager
-    def skia_surface(self, window: typing.Any) -> skia.Surface | None:
+    def skia_surface(self, window: typing.Any) -> skia.Surface:
         """Create a Skia surface for the window.
 
         :param window: GLFW Window
@@ -555,7 +554,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
 
     def _on_mouse_button(
-        self, window: any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: any
+        self,
+        window: typing.Any,
+        button: typing.Literal[0, 1, 2],
+        is_pressed: bool,
+        mods: int,
     ) -> None:
         """Trigger mouse button event (triggered when the mouse button is pressed or released).
 
@@ -592,7 +595,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ),
         )
 
-    def _on_cursor_enter(self, window: any, is_enter: bool) -> None:
+    def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
 
         :param window: GLFW Window
@@ -631,7 +634,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 ),
             )
 
-    def _on_cursor_pos(self, window: any, x: int, y: int) -> None:
+    def _on_cursor_pos(self, window: typing.Any, x: int, y: int) -> None:
         """Trigger mouse motion event (triggered when the mouse enters the window and moves).
 
         :param window: GLFW Window
@@ -756,8 +759,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "visible",
             "border",
         ],
-        value: any = None,
-    ) -> any:
+        value: typing.Any = None,
+    ) -> typing.Any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -798,7 +801,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             | None
             | str
         ) = None,
-        custom_cursor: tuple[any, int, int] | None = None,
+        custom_cursor: tuple[typing.Any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 
