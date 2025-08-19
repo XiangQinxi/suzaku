@@ -75,16 +75,7 @@ class SkLineInput(SkWidget):
     # region Text&Cursor 文本、光标操作
 
     def _pressed(self, event: SkEvent):
-        canvas_mouse_x = event.x
-        canvas_left = self._left + self.canvas_x
-        canvas_right = self._right + self.canvas_x
-        if canvas_mouse_x >= canvas_right:
-            self.cursor_end()
-        elif canvas_mouse_x <= canvas_left:
-            self.cursor_home()
-        else:
-            # for item in self.get():
-            pass
+        self.index(event.x)
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered."""
@@ -149,6 +140,19 @@ class SkLineInput(SkWidget):
         else:
             self.attributes["text"] = text
         return self
+
+    def index(self, mouse_x: int) -> int:
+        if mouse_x >= self._right:
+            self.cursor_end()
+        elif mouse_x <= self._left:
+            self.cursor_home()
+        else:
+            visible_text = self.get()[self.visible_start_index :]
+            for index, _ in enumerate(visible_text):
+                _text = visible_text[:index]
+                if self.measure_text(_text) + self._left >= mouse_x:
+                    self.cursor_index(len(_text) + self.visible_start_index)
+                    break
 
     def cursor_index(self, index: int | None = None) -> Self | int:
         """Set cursor index"""
@@ -248,12 +252,11 @@ class SkLineInput(SkWidget):
                 width=self.width,
                 height=self.height,
             )
-            self._left = round(rect.left() + self.padding)
-            # 如何计算右边的呢！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-            # 左边缘加上可显文本索引后面文字的长度
+            self._left = round(rect.left() + self.padding)  # 文本左边缘
             self._right = round(
                 self._left + self.measure_text(text[self.visible_start_index :])
-            )
+            )  # 文本右边缘
+
         metrics = self.metrics
 
         if self.is_focus:
