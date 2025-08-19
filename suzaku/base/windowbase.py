@@ -324,6 +324,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 skia.kRGBA_8888_ColorType,
                 skia.ColorSpace.MakeSRGB(),
             )
+            context.setResourceCacheLimit(16 * 1024 * 1024)
             with surface as canvas:
                 canvas.save()
                 # canvas.scale(self.dpi_scale, self.dpi_scale)

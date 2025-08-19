@@ -21,6 +21,7 @@ class SkWindow(SkWindowBase, SkContainer):
         *args,
         theme: SkTheme = default_theme,
         size: tuple[int, int] = (300, 300),
+        anti_alias: bool = True,
         **kwargs,
     ) -> None:
         """SkWindow, inherited from SkWindowBase
@@ -32,13 +33,13 @@ class SkWindow(SkWindowBase, SkContainer):
         SkWindowBase.__init__(self, parent=parent, *args, size=size, **kwargs)
         SkContainer.__init__(self)
 
-        self.theme = theme
-        self.styles = self.theme.styles
+        self.theme: SkTheme = theme
 
         self.focus_widget = self
         self.draws: list[typing.Callable] = []
 
         self.window: SkWindow = self
+        self.anti_alias: bool = anti_alias
 
         self.previous_widget = None
 

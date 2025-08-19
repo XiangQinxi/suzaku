@@ -53,6 +53,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 f"Parent component is not a SkWindow-based object. {self.parent}"
             )
 
+        self.anti_alias = self.window.anti_alias
         self.id = (
             self.window.id
             + "."
@@ -317,7 +318,7 @@ class SkWidget(SkEventHanding, SkMisc):
             text = str(text)
             # 绘制字体
             text_paint = skia.Paint(
-                AntiAlias=True, Color=style_to_color(fg, self.theme).color
+                AntiAlias=self.anti_alias, Color=style_to_color(fg, self.theme).color
             )
 
             text_width = font.measureText(text)
@@ -364,27 +365,13 @@ class SkWidget(SkEventHanding, SkMisc):
 
         """
 
-        if bd_shadow and 1 == 0:
-            drop_shadow_rect = skia.Rect.MakeXYWH(
-                self.canvas_x, self.canvas_y, self.width, self.height
-            )
-            drop_shadow_paint = skia.Paint(
-                AntiAlias=True,
-                Style=skia.Paint.kStrokeAndFill_Style,
-                Color=make_color(bg),
-            )
-            shadow = SkDropShadow(config_list=bd_shadow)
-            shadow.draw(drop_shadow_paint)
-
-            canvas.drawRoundRect(drop_shadow_rect, radius, radius, drop_shadow_paint)
-
         bg_paint = skia.Paint(
-            AntiAlias=True,
+            AntiAlias=self.anti_alias,
             Style=skia.Paint.kStrokeAndFill_Style,
         )
 
         bd_paint = skia.Paint(
-            AntiAlias=True,
+            AntiAlias=self.anti_alias,
             Style=skia.Paint.kStroke_Style,
         )
 

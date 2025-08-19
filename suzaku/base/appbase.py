@@ -157,7 +157,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                 if self.is_always_update:
                     deal_event = glfw.poll_events
                 else:
-                    deal_event = glfw.wait_events
+                    deal_event = lambda: glfw.wait_events_timeout(1)
             case "sdl2":
                 from sdl2 import SDL_PollEvent
 
