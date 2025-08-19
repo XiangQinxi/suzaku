@@ -431,6 +431,10 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Widget attribute configs 组件属性配置
 
+    def measure_text(self, text: str, *args):
+        font: skia.Font = self.cget("font")
+        return font.measureText(text, *args)
+
     def update(self):
         self._pos_update()
         self.post()

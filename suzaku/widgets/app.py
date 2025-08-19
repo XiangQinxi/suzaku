@@ -16,11 +16,13 @@ class SkApp(SkAppBase):
         *args,
         is_always_update: bool = True,
         is_get_context_on_focus: bool = True,
+        vsync: bool = True,
         **kwargs,
     ) -> None:
         super().__init__(
             *args,
             is_always_update=is_always_update,
             is_get_context_on_focus=is_get_context_on_focus,
+            vsync=vsync,
             **kwargs,
         )

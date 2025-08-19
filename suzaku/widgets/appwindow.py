@@ -11,6 +11,7 @@ class SkAppWindow(SkWindow):
         *args,
         is_always_update: bool = True,
         is_get_context_on_focus: bool = True,
+        vsync: bool = True,
         **kwargs,
     ) -> None:
         """Main window that connects SkApp with SkWindow."""
@@ -23,6 +24,7 @@ class SkAppWindow(SkWindow):
         self.app = SkApp(
             is_always_update=is_always_update,
             is_get_context_on_focus=is_get_context_on_focus,
+            vsync=vsync,
         )
         super().__init__(parent=self.app, *args, **kwargs)
         if self.__class__._instance_count == 0:

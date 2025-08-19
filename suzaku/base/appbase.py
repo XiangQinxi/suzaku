@@ -75,6 +75,8 @@ class SkAppBase(SkEventHanding, SkMisc):
         is_always_update: bool = True,
         is_get_context_on_focus: bool = True,
         framework: typing.Literal["glfw", "sdl2"] = "glfw",
+        vsync: bool = True,
+        samples: int = 4,
     ) -> None:
         from .windowbase import SkWindowBase
 
@@ -83,6 +85,8 @@ class SkAppBase(SkEventHanding, SkMisc):
         )  # Windows that have been added to the event loop. 【被添加进事件循环的SkWindow】
         self.is_always_update: bool = is_always_update
         self.is_get_context_on_focus = is_get_context_on_focus
+        self.vsync = vsync
+        self.samples = samples
         self.alive: bool = (
             False  # Is the program currently running. 【程序是否正在运行】
         )
@@ -147,6 +151,8 @@ class SkAppBase(SkEventHanding, SkMisc):
 
         match self.framework:
             case "glfw":
+                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
+                glfw.window_hint(glfw.SAMPLES, self.samples)
                 glfw.set_error_callback(self.error)
 
                 if not self.is_always_update:
@@ -226,7 +232,6 @@ class SkAppBase(SkEventHanding, SkMisc):
                                         the_window.draw_func(canvas)
 
                                 surface.flushAndSubmit()
-                                # glfw.swap_interval(1)
 
                                 glfw.swap_buffers(the_window.glfw_window)
 
