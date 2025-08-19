@@ -83,8 +83,8 @@ class SkLineInput(SkWidget):
         elif canvas_mouse_x <= canvas_left:
             self.cursor_home()
         else:
-            for item in self.get():
-                pass
+            # for item in self.get():
+            pass
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered."""
@@ -92,7 +92,7 @@ class SkLineInput(SkWidget):
         text = self.get()
 
         self.set(text[:cursor_index] + event.char + text[cursor_index:])
-        self._cursor_index += 1
+        self.cursor_right()
 
     def _key(self, event: SkEvent):
         """Key event 按键事件触发
@@ -123,7 +123,7 @@ class SkLineInput(SkWidget):
                             + self.clipboard()
                             + text[self._cursor_index :]
                         )
-                        self._cursor_index += len(self.clipboard())
+                        self.cursor_right(len(self.clipboard()))
             case glfw.KEY_HOME:
                 """Move the cursor to the start"""
                 self.cursor_home()
@@ -139,9 +139,6 @@ class SkLineInput(SkWidget):
             self.visible_start_index :
         ]
         font: skia.Font = self.cget("font")
-
-        if self.measure_text(visible_text) + 10 >= self.width - 15:
-            self.visible_start_index += 1
 
     def get(self) -> str:
         """Get the input text"""
@@ -166,25 +163,31 @@ class SkLineInput(SkWidget):
             return self._cursor_index
         return self
 
-    def cursor_left(self) -> Self:
+    def cursor_left(self, move: int = 1) -> Self:
         """Move the cursor to the left"""
         if self.cursor_index() > 0:
-            self._cursor_index -= 1
-            # 如何判定光标是否左移呢！！！！！！！！！！！！！！！
-            print(self.visible_start_index, ":", self.cursor_index())
-            print(self.visible_start_index >= self.cursor_index())
+            self._cursor_index -= move
+            # 光标向左移动时，若文本可显的初始索引大于等于光标索引，且文本可显的初始索引不为0
             if (
                 self.visible_start_index >= self.cursor_index()
                 and self.visible_start_index != 0
             ):
-                self.visible_start_index -= 1
+                self.visible_start_index -= move
 
         return self
 
-    def cursor_right(self) -> Self:
+    def cursor_right(self, move: int = 1) -> Self:
         """Move the cursor to the right"""
         if self.cursor_index() < len(self.get()):
-            self._cursor_index += 1
+            self._cursor_index += move
+            if (
+                self.measure_text(
+                    self.get()[self.visible_start_index : self.cursor_index()]
+                )
+                + 10
+                >= self.width - 15
+            ):
+                self.visible_start_index += move
         return self
 
     def cursor_backspace(self) -> Self:
@@ -194,7 +197,7 @@ class SkLineInput(SkWidget):
                 self.get()[: self.cursor_index() - 1]
                 + self.get()[self.cursor_index() :]
             )
-            self._cursor_index -= 1
+            self.cursor_left()
         return self
 
     def cursor_home(self) -> Self:
