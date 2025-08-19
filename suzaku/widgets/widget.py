@@ -94,22 +94,22 @@ class SkWidget(SkEventHanding, SkMisc):
         self.visible: bool = False
 
         self.events = {
-            "resize": {},
-            "move": {},
-            "mouse_motion": {},
-            "mouse_enter": {},
-            "mouse_leave": {},
-            "mouse_pressed": {},
-            "mouse_released": {},
-            "focus_gain": {},
-            "focus_loss": {},
-            "key_pressed": {},
-            "key_released": {},
-            "key_repeated": {},
-            "char": {},
-            "click": {},
-            "configure": {},
-            "update": {},
+            "resize": dict(),
+            "move": dict(),
+            "mouse_motion": dict(),
+            "mouse_enter": dict(),
+            "mouse_leave": dict(),
+            "mouse_pressed": dict(),
+            "mouse_released": dict(),
+            "focus_gain": dict(),
+            "focus_loss": dict(),
+            "key_pressed": dict(),
+            "key_released": dict(),
+            "key_repeated": dict(),
+            "char": dict(),
+            "click": dict(),
+            "configure": dict(),
+            "update": dict(),
         }
 
         self.layout_config: dict[str, dict] = {"none": {}}
@@ -124,12 +124,12 @@ class SkWidget(SkEventHanding, SkMisc):
         self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
 
-        def _on_event(event: SkEvent):
+        def _on_mouse(event: SkEvent):
             self.mouse_x = event.x
             self.mouse_y = event.y
 
-        self.bind("mouse_enter", _on_event)
-        self.bind("mouse_motion", _on_event)
+        self.bind("mouse_enter", _on_mouse)
+        self.bind("mouse_motion", _on_mouse)
 
         self.bind("mouse_released", self._click)
 
@@ -238,7 +238,7 @@ class SkWidget(SkEventHanding, SkMisc):
     def _radial_shader(
         center: tuple[float | int, float | int],
         radius: float | int,
-        colors: list | tuple[skia.Color],
+        colors: list | tuple[skia.Color] | set,
     ):
         return skia.GradientShader.MakeRadial(
             center=center,

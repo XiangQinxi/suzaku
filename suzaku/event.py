@@ -7,13 +7,14 @@ from dataclasses import dataclass
 class SkEventHanding:
     """SkEvent binding manager.【事件绑定管理器】"""
 
-    _events = []
     _afters = {}
     _after = 0
 
     def __init__(self):
         # events = { event_name : { event_id : [event_func, whether_to_use_multithreading] } }
-        self.events: dict[str, dict[str, list[typing.Callable | bool]]] = {}
+        self.events: dict[
+            str, dict[str, list[typing.Callable | bool] | tuple[typing.Callable, bool]]
+        ] = dict()
 
     def event_generate(self, name: str) -> typing.Self:
         """Create a new event type.【创建一个新的事件类型】
@@ -25,15 +26,13 @@ class SkEventHanding:
         """
 
         if not name in self.events:  # Auto create widget`s event
-            self.events[name] = {}  # Create widget`s event
+            self.events[name] = dict()  # Create widget`s event
         else:
             warnings.warn(f"Widget {self.id}, Event {name} already exists.")
 
         return self
 
-    def event_trigger(
-        self, name: str, *args, **kwargs
-    ) -> typing.Union[bool, typing.Any]:
+    def event_trigger(self, name: str, *args, **kwargs) -> bool | typing.Any:
         """Send the event signal of the corresponding event type
         (trigger the corresponding event)
 
@@ -86,9 +85,9 @@ class SkEventHanding:
         _id = name + "." + str(len(self.events[name]) + 1)  # Create event ID
 
         if add:
-            self.events[name][_id] = [func, allow_multi]
+            self.events[name][_id] = (func, allow_multi)
         else:
-            self.events[name] = {_id: [func, allow_multi]}
+            self.events[name] = {_id: (func, allow_multi)}
         return _id
 
     event_bind = bind
@@ -116,6 +115,9 @@ class SkEventHanding:
 
         :param s: Delay in seconds
         :param func: Function to execute after delay
+        :param allow_multi: Whether to allow multiple threads to run the function at the same time.
+        :param post: Whether to execute the `post()` method after the method ends
+
         :return: ID of the timer
         """
 

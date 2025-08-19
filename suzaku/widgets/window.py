@@ -56,7 +56,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.bind("key_repeated", self._key_repected)
         self.bind("key_released", self._key_released)
 
-        self.bind("update", self._update)
+        self.bind("update", self.update_layout)
 
     # endregion
 

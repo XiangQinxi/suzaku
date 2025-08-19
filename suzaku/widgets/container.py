@@ -1,3 +1,4 @@
+import array
 import typing
 
 import skia
@@ -84,18 +85,6 @@ class SkContainer:
         self.bind("resize", lambda _: self.update_layout())
         # self.bind("update", lambda _: self.update_layout())
 
-    def _update(self, event=None):
-        """Organize the layout and send an `update` event message to the child components
-
-        :param event: SkEvent
-        :return:
-        """
-        self._handle_layout(event=event)
-        for widget in self.children:
-            from suzaku.event import SkEvent
-
-            widget.event_trigger("update", SkEvent(event_type="update"))
-
     # endregion
 
     # region add_child 添加子元素
@@ -141,7 +130,7 @@ class SkContainer:
                 self._box_direction = direction
 
         self.draw_list[0].append(child)
-        self._update()
+        self.update_layout()
 
     def add_floating_child(self, child):
         """Add floating child widget to window.
@@ -150,7 +139,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[1].append(child)
-        self._update()
+        self.update_layout()
 
     def add_fixed_child(self, child):
         """Add fixed child widget to window.
@@ -164,7 +153,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[2].append(child)
-        self._update()
+        self.update_layout()
 
     # endregion
 
@@ -207,8 +196,10 @@ class SkContainer:
 
     # region layout 布局
 
-    def update_layout(self):
-        self._update()
+    def update_layout(self, event: SkEvent | None = None):
+        self._handle_layout()
+        for widget in self.children:
+            widget.event_trigger("resize", SkEvent(event_type="resize"))
 
     def _handle_layout(self, event=None):
         """Handle layout of the container.
