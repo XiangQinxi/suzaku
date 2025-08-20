@@ -14,7 +14,7 @@ class SkEmpty(SkWidget):
         """
         super().__init__(*args, size=size, **kwargs)
 
-    def _draw(self, canvas, rect) -> None:
+    def draw_widget(self, canvas, rect) -> None:
         """Draw method, does nothing.
 
         :param canvas: skia.Surface to draw on

@@ -22,5 +22,5 @@ class SkCheckBox(SkWidget):
         if command:
             self.bind("click", lambda _: command())
 
-    def _draw(self, canvas: skia.Canvas, rect: skia.Rect):
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         pass

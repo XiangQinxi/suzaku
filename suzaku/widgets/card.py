@@ -6,7 +6,7 @@ from .frame import SkFrame
 class SkCard(SkFrame):
     """A card widget"""
 
-    def _draw(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Draw the Frame border（If self.attributes["border"] is True）
 
         :param canvas: skia.Canvas

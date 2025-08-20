@@ -76,6 +76,11 @@ class SkWindow(SkWindowBase, SkContainer):
 
     # region Event handlers 事件处理
 
+    def destroy(self) -> None:
+        super().destroy()
+        for child in self.children:
+            child.destroy()
+
     def _key_pressed(self, event):
         """Key press event for SkWindow.
 

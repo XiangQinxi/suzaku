@@ -26,7 +26,7 @@ class SkFrame(SkWidget, SkContainer):
 
     # region Draw
 
-    def _draw(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Draw the Frame border（If self.attributes["border"] is True）
 
         :param canvas: skia.Canvas

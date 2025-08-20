@@ -21,7 +21,7 @@ class SkImage(SkWidget):
         self.x: int = x
         self.y: int = y
 
-    def _draw(self, canvas, rect) -> None:
+    def draw_widget(self, canvas, rect) -> None:
         """Draw image
 
         :param canvas: skia.Surface to draw on

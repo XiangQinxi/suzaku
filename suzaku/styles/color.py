@@ -159,9 +159,26 @@ class SkGradient:
             case _:
                 return 0, 0
 
+    def draw(self, paint: skia.Paint) -> None:
+        paint.setShader(self.gradient)
+
     def linear(
         self,
         paint: skia.Paint,
+        config: (
+            dict | None
+        ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
+        widget=None,
+        start_pos: tuple[int | float, int | float] | None = None,
+        end_pos: tuple[int | float, int | float] | None = None,
+    ):
+        self.set_linear(
+            config=config, widget=widget, start_pos=start_pos, end_pos=end_pos
+        )
+        self.draw(paint)
+
+    def set_linear(
+        self,
         config: (
             dict | None
         ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
@@ -189,6 +206,7 @@ class SkGradient:
         :param start_pos: Start position
         :return: cls
         """
+        self.gradient = None
         if config:
 
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
@@ -226,8 +244,6 @@ class SkGradient:
                     points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
-
-            paint.setShader(self.gradient)
 
             return self
         else:

@@ -9,7 +9,7 @@ class SkEntry(SkLineInput):
 
     # region Draw 绘制
 
-    def _draw(self, canvas, rect) -> None:
+    def draw_widget(self, canvas, rect) -> None:
         if self.is_mouse_floating:
             if self.is_focus:
                 style_name = "SkEntry:focus"

@@ -36,7 +36,7 @@ class SkButton(SkFrame):
         if command:
             self.bind("click", lambda _: command())
 
-    def _draw(self, canvas, rect) -> None:
+    def draw_widget(self, canvas, rect) -> None:
         """Draw button
 
         :param canvas: skia.Surface to draw on

@@ -174,7 +174,6 @@ class SkAppBase(SkEventHanding, SkMisc):
         while self.alive and self.windows:
             # 处理事件
             deal_event()
-            print(124124)
 
             # 检查after事件，其中的事件是否到达时间，如到达则执行
             if self._afters:
@@ -214,7 +213,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                         window.destroy()
                         del window
                         continue
-
+            del current_windows
             if glfw.get_current_context():
                 glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
 

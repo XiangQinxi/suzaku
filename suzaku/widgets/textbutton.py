@@ -37,7 +37,7 @@ class SkTextButton(SkText):
 
     # region Draw
 
-    def _draw(self, canvas: skia.Canvas, rect: skia.Rect):
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """Draw the button
 
         :param canvas:

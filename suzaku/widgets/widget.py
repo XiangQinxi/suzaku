@@ -124,6 +124,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.is_mouse_floating: bool = False
         self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
+        self.gradient = SkGradient()
 
         def _on_mouse(event: SkEvent):
             self.mouse_x = event.x
@@ -185,15 +186,20 @@ class SkWidget(SkEventHanding, SkMisc):
         if self.width <= 0 or self.height <= 0:
             return
 
-        rect = skia.Rect.MakeXYWH(
-            x=self.canvas_x, y=self.canvas_y, w=self.width, h=self.height
-        )
-        self._draw(canvas, rect)
-        if hasattr(self, "draw_children"):
-            self.draw_children(canvas)
-            self._handle_layout(None)
+        @cache
+        def rect(x, y, w, h):
+            return skia.Rect.MakeXYWH(x, y, w, h)
 
-    def _draw(self, canvas: skia.Surface, rect: skia.Rect) -> None:
+        self.draw_widget(
+            canvas,
+            rect(self.canvas_x, self.canvas_y, self.width, self.height),
+        )
+
+        if hasattr(self, "draw_children"):
+            self.update_layout(None)
+            self.draw_children(canvas)
+
+    def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Execute the widget rendering
 
         :param canvas: skia.Surface
@@ -316,9 +322,14 @@ class SkWidget(SkEventHanding, SkMisc):
 
         if isinstance(text, (str, int, float)):
             text = str(text)
+
             # 绘制字体
-            text_paint = skia.Paint(
-                AntiAlias=self.anti_alias, Color=style_to_color(fg, self.theme).color
+            @cache
+            def cache_paint(anti_alias, _fg):
+                return skia.Paint(AntiAlias=anti_alias, Color=_fg)
+
+            text_paint = cache_paint(
+                self.anti_alias, style_to_color(fg, self.theme).color
             )
 
             text_width = font.measureText(text)
@@ -383,7 +394,7 @@ class SkWidget(SkEventHanding, SkMisc):
         if bg_shader:
             if isinstance(bg_shader, dict):
                 if "linear_gradient" in bg_shader:
-                    SkGradient().linear(
+                    self.gradient.linear(
                         widget=self, config=bg_shader["linear_gradient"], paint=bg_paint
                     )
             else:
@@ -396,8 +407,8 @@ class SkWidget(SkEventHanding, SkMisc):
         if bd_shader:
             if isinstance(bd_shader, dict):
                 if "linear_gradient" in bd_shader:
-                    SkGradient().linear(
-                        widget=self, config=bd_shader["linear_gradient"], paint=bd_paint
+                    self.gradient.linear(
+                        widget=self, config=bg_shader["linear_gradient"], paint=bd_paint
                     )
             else:
                 if bd_shader.lower() == "rainbow":
@@ -427,6 +438,10 @@ class SkWidget(SkEventHanding, SkMisc):
     # endregion
 
     # region Widget attribute configs 组件属性配置
+
+    def destroy(self) -> None:
+        self.gradient = None
+        del self
 
     @property
     def metrics(self):
