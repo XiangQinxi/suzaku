@@ -153,10 +153,6 @@ class SkLineInput(SkWidget):
             case glfw.KEY_END:
                 """Move the cursor to the end"""
                 self.cursor_end()
-        self._update()
-
-    def _update(self):
-        text = self.get()
 
     def get(self) -> str:
         """Get the input text"""
@@ -198,7 +194,6 @@ class SkLineInput(SkWidget):
                 _text2 = len(_text) + self.visible_start_index
                 self.cursor_index(_text2)
                 return _text2
-                break
         return self.cursor_index()
 
     def cursor_index(self, index: int | None = None) -> Self | int:

@@ -121,18 +121,19 @@
         "placeholder": [255, 255, 255, 165]
       },
       "hover": {
-        "bg": [0, 0, 0, 30],
+        "bg": [40, 40, 40, 245],
         "fg": {"color_palette": "default_fg"},
         "bd": [25, 125, 225, 235],
+        "bd_shadow": [0, 1, 4, 4, [25, 125, 225, 50]],
         "width": 2,
         "placeholder": [255, 255, 255, 165]
       },
       "focus": {
-        "bg": [0, 0, 0, 15],
+        "bg": [30, 30, 30, 240],
         "fg": {"color_palette": "default_fg"},
         "bd": [25, 125, 225, 235],
+        "bd_shadow": [0, 1, 3, 3, [25, 125, 225, 100]],
         "width": 3,
-        "placeholder": [0, 0, 0, 0],
         "cursor": [255, 255, 255, 100],
         "selected_bg": [25, 125, 225, 245],
         "selected_fg": [0, 0, 0, 255]

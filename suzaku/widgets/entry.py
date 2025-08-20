@@ -24,6 +24,20 @@ class SkEntry(SkLineInput):
 
         style = self.theme.get_style(style_name)
 
+        if "bg_shader" in style:
+            bg_shader = style["bg_shader"]
+        else:
+            bg_shader = None
+
+        if "bd_shadow" in style:
+            bd_shadow = style["bd_shadow"]
+        else:
+            bd_shadow = None
+        if "bd_shader" in style:
+            bd_shader = style["bd_shader"]
+        else:
+            bd_shader = None
+
         if "selected_bg" in style:
             selected_bg = style["selected_bg"]
         else:
@@ -36,6 +50,10 @@ class SkEntry(SkLineInput):
             cursor = style["cursor"]
         else:
             cursor = None
+        if "placeholder" in style:
+            placeholder = style["placeholder"]
+        else:
+            placeholder = None
 
         # Draw the border
         self._draw_frame(
@@ -45,6 +63,9 @@ class SkEntry(SkLineInput):
             bg=style["bg"],
             bd=style["bd"],
             width=style["width"],
+            bd_shader=bd_shader,
+            bg_shader=bg_shader,
+            bd_shadow=bd_shadow,
         )
 
         # Draw the text input
@@ -52,7 +73,7 @@ class SkEntry(SkLineInput):
             canvas,
             rect,
             fg=style["fg"],
-            placeholder=style["placeholder"],
+            placeholder=placeholder,
             selected_bg=selected_bg,
             selected_fg=selected_fg,
             cursor=cursor,
