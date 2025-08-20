@@ -15,6 +15,7 @@ from typing import Self
 import glfw
 import skia
 
+from .. import SkColor
 from ..event import SkEvent
 from ..styles.color import skcolor2color, style_to_color
 from ..var import SkStringVar
@@ -113,7 +114,7 @@ class SkLineInput(SkWidget):
         key = event.key
 
         match key:
-            case glfw.KEY_BACKSPACE:
+            case glfw.KEY_BACKSPACE | glfw.KEY_DELETE:
                 """Delete the text before the cursor"""
                 self.cursor_backspace()
             case glfw.KEY_LEFT:
@@ -142,6 +143,11 @@ class SkLineInput(SkWidget):
                                 self.cursor_index(len(_text))
                                 self.start_index = len(_text)
                                 self.end_index = len(_text)
+            case glfw.KEY_C:
+                if event.mods == "control":
+                    if self.is_selected():
+                        start, end = sorted([self.start_index, self.end_index])
+                        self.clipboard(text[start:end])
             case glfw.KEY_A:
                 """Select All"""
                 if event.mods == "control":
@@ -273,17 +279,34 @@ class SkLineInput(SkWidget):
         self,
         canvas: skia.Canvas,
         rect: skia.Rect,
-        fg,
-        placeholder,
+        fg: int | SkColor,
+        bg: int | SkColor = None,
+        placeholder: int | SkColor = None,
+        font: skia.Font = None,
+        cursor: int | SkColor = None,
         selected_bg=skia.ColorBLUE,
         selected_fg=skia.ColorWHITE,
     ) -> None:
         """Draw the text input"""
 
-        fg = skcolor2color(style_to_color(fg, self.theme))
-
-        # Draw text
-        font: skia.Font = self.attributes["font"]
+        fg = skcolor2color(style_to_color(fg, self.theme))  # 设置文本颜色
+        if bg:
+            bg = skcolor2color(style_to_color(bg, self.theme))  # 设置背景颜色
+        else:
+            bg = skia.ColorTRANSPARENT
+        if placeholder:
+            placeholder = skcolor2color(
+                style_to_color(placeholder, self.theme)
+            )  # 设置占位符颜色
+        else:
+            placeholder = fg
+        if cursor:
+            cursor = skcolor2color(style_to_color(cursor, self.theme))  # 设置光标颜色
+        else:
+            cursor = fg
+        # 设置文本字体
+        if font is None:
+            font: skia.Font = self.attributes["font"]
 
         # Define the display area for text to prevent overflow
         # 【划定文本可以显示的区域，防止文本超出显示】
@@ -302,10 +325,12 @@ class SkLineInput(SkWidget):
 
         text = self.get()
 
+        # 排序选择文本的起始、终点，使start<=end，不出错
         start, end = sorted([self.start_index, self.end_index])
 
         if text:
             # Draw the text
+            # 如果有选择文本，则使用特殊样式
             if self.is_selected():
                 _text = (
                     text[self.visible_start_index :],
@@ -321,6 +346,7 @@ class SkLineInput(SkWidget):
                     text=_text,
                     font=font,
                     fg=fg,
+                    bg=bg,
                     padding=self.padding,
                     canvas_x=self.canvas_x,
                     canvas_y=self.canvas_y,
@@ -334,6 +360,7 @@ class SkLineInput(SkWidget):
                     text=_text,
                     font=font,
                     fg=fg,
+                    bg=bg,
                     align="left",
                     padding=self.padding,
                     canvas_x=self.canvas_x,
@@ -370,13 +397,13 @@ class SkLineInput(SkWidget):
                 )
                 canvas.drawLine(
                     x0=cursor_x,
-                    y0=draw_y + metrics.fAscent,
+                    y0=draw_y + metrics.fAscent - self.padding / 4,
                     x1=cursor_x,
-                    y1=draw_y + metrics.fDescent,
+                    y1=draw_y + metrics.fDescent + self.padding / 4,
                     paint=skia.Paint(
                         AntiAlias=False,
-                        Color=fg,
-                        StrokeWidth=1.5,
+                        Color=cursor,
+                        StrokeWidth=2,
                     ),
                 )
         else:

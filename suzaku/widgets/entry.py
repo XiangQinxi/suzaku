@@ -32,6 +32,10 @@ class SkEntry(SkLineInput):
             selected_fg = style["selected_fg"]
         else:
             selected_fg = skia.ColorWHITE
+        if "cursor" in style:
+            cursor = style["cursor"]
+        else:
+            cursor = None
 
         # Draw the border
         self._draw_frame(
@@ -51,6 +55,7 @@ class SkEntry(SkLineInput):
             placeholder=style["placeholder"],
             selected_bg=selected_bg,
             selected_fg=selected_fg,
+            cursor=cursor,
         )
 
     # endregion

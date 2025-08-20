@@ -22,7 +22,7 @@ if __name__ == "__main__":
         window.apply_theme(
             SkTheme.INTERNAL_THEMES["default.dark"],
         )
-        window.apply_theme(default_theme)
+        # window.apply_theme(default_theme)
         # window.hide()
         window.bind("drop", lambda evt: print("drop", evt))
 

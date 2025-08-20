@@ -536,13 +536,13 @@ class SkWidget(SkEventHanding, SkMisc):
         self._root_y = value
         self._pos_update()
 
-    def clipboard(self, bytes_value: bytes | None = None) -> str | typing.Self:
+    def clipboard(self, value: str | None = None) -> str | typing.Self:
         """Get string from clipboard
 
         anti images
         """
-        if bytes_value is not None:
-            glfw.set_clipboard_string(self.window.glfw_window, bytes_value)
+        if value is not None:
+            glfw.set_clipboard_string(self.window.glfw_window, value)
             return self
         else:
             try:

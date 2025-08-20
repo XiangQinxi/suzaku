@@ -132,7 +132,10 @@
         "fg": {"color_palette": "default_fg"},
         "bd": [25, 125, 225, 235],
         "width": 3,
-        "placeholder": [0, 0, 0, 0]
+        "placeholder": [0, 0, 0, 0],
+        "cursor": [255, 255, 255, 100],
+        "selected_bg": [25, 125, 225, 245],
+        "selected_fg": [0, 0, 0, 255]
       }
     }
   }
