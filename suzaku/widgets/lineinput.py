@@ -37,7 +37,7 @@ class SkLineInput(SkWidget):
         cursor="ibeam",
         **kwargs,
     ) -> None:
-        """Text input widget
+        """Text input widget (no border)
 
         :param text: 初始文本
         :param textvariable: 绑定的字符串变量
@@ -127,49 +127,63 @@ class SkLineInput(SkWidget):
 
         # 快捷键
         match event.key:
+            # Backspace 删除光标前面文本
             case glfw.KEY_BACKSPACE:
                 """Delete the text before the cursor"""
                 self.cursor_backspace()
+            # Delete 删除光标后面文本
             case glfw.KEY_DELETE:
                 """Delete the text after the cursor"""
                 self.cursor_delete()
-            case glfw.KEY_LEFT:
-                """Move the cursor to the left"""
-                self.cursor_left()
-            case glfw.KEY_RIGHT:
-                """Move the cursor to the right"""
-                self.cursor_right()
+            # Ctrl + V 粘贴
             case glfw.KEY_V:
                 """Paste Text"""
                 if event.mods == "control":
                     self.cursor_paste()
+            # Ctrl + C 复制
             case glfw.KEY_C:
                 if event.mods == "control":
                     self.cursor_copy()
+            # Ctrl + A 全选
             case glfw.KEY_A:
                 """Select All"""
                 if event.mods == "control":
                     self.cursor_select_all()
+            # Ctrl + X 剪切
             case glfw.KEY_X:
                 """Cut Text"""
                 if event.mods == "control":
                     self.cursor_cut()
+            # Home ↑ 光标移至最左
             case glfw.KEY_HOME | glfw.KEY_UP:
                 """Move the cursor to the start"""
                 self.cursor_home()
+            # End ↓ 光标移至最有
             case glfw.KEY_END | glfw.KEY_DOWN:
                 """Move the cursor to the end"""
                 self.cursor_end()
+            # Left ← 光标左移
+            case glfw.KEY_LEFT:
+                """Move the cursor to the left"""
+                self.cursor_left()
+            # Right → 光标右移
+            case glfw.KEY_RIGHT:
+                """Move the cursor to the right"""
+                self.cursor_right()
 
     def get(self) -> str:
-        """Get the input text"""
+        """Get the input text
+        【获取输入框中文本】
+        """
         if self.attributes["textvariable"]:
             return self.attributes["textvariable"].get()
         else:
             return self.attributes["text"]
 
     def set(self, text) -> Self:
-        """Set the input text"""
+        """Set the input text
+        【设置输入框文本】
+        """
         if self.attributes["textvariable"]:
             self.attributes["textvariable"].set(text)
         else:
@@ -177,34 +191,43 @@ class SkLineInput(SkWidget):
         return self
 
     def index(self, mouse_x: int) -> int:
-        # 如果鼠标超出可见文本的范围
-        if mouse_x >= self._rect.left() + self._rect.width():
+        # 【如果鼠标超出可见文本的范围】
+        left = self._rect.left()
+        if mouse_x >= left + self._rect.width():
             self.cursor_right(cancel_selected=False)
-        # 如果鼠标超出画出的文本范围
+        # 【如果鼠标超出画出的文本范围】
         if mouse_x >= self._right:
             self.cursor_end()
             return len(self.get())
-        # 如果鼠标超出文本左边的范围
-        elif mouse_x <= self._rect.left():
+        # 【如果鼠标超出文本左边的范围】
+        if mouse_x <= left:
             if self.visible_start_index == 0:
                 self.cursor_home()
                 return 0
+            # 【如果文本向左滚动了】
             else:
-                # 如果文本向左滚动了
                 self.cursor_left(cancel_selected=False)
                 return self.visible_start_index
-        # 遍历可见文本，找到鼠标所在的位置
+        # 【遍历可见文本，找到鼠标所在的位置】
         visible_text = self.get()[self.visible_start_index :]
         for index, _ in enumerate(visible_text):
             _text = visible_text[:index]
-            if self.measure_text(_text) + self._rect.left() >= mouse_x:
+            if self.measure_text(_text) + left >= mouse_x:
                 _text2 = len(_text) + self.visible_start_index
                 self.cursor_index(_text2)
                 return _text2
         return self.cursor_index()
 
+    def check(self):
+        if self.visible_start_index >= self.cursor_index() > 0:
+            self.visible_start_index = self.cursor_index() - 2
+            if self.visible_start_index < 0:
+                self.visible_start_index = 0
+
     def cursor_index(self, index: int | None = None) -> Self | int:
-        """Set cursor index"""
+        """Set cursor index
+        【设置光标索引】
+        """
         if index and isinstance(index, int):
             self._cursor_index = index
         else:
@@ -212,9 +235,15 @@ class SkLineInput(SkWidget):
         return self
 
     def cursor_left(self, move: int = 1, cancel_selected: bool = True) -> Self:
-        """Move the cursor to the left"""
+        """Move the cursor to the left
+        【光标左移】
+
+        :param int move: 【光标左移的距离】
+        :param bool cancel_selected: 【是否取消光标的选择状态（点击左按键时建议启用）】
+        """
+        # 【光标在最左的时候不执行接下判断】
         if self.cursor_index() > 0:
-            # 如果文本被选中，则光标向左移动时，光标索引为选中文本的起始索引
+            # 【如果文本被选中，则光标向左移动时，光标索引为选中文本的起始索引】
             if cancel_selected:
                 if self.is_selected():
                     start, end = self.start_index, self.end_index
@@ -227,11 +256,11 @@ class SkLineInput(SkWidget):
                 self.start_index = self.end_index = self._cursor_index
             else:
                 self.end_index = self._cursor_index
-            # 光标向左移动时，若文本可显的初始索引大于等于光标索引，且文本可显的初始索引不为0
-            if (
+            # 【光标向左移动时，若文本可显的初始索引大于等于光标索引，且文本可显的初始索引不为0】
+            while (
                 self.visible_start_index
-                >= self.cursor_index()
-                - 1  # 当光标向左移动时，如果光标在可显文本的第二位
+                >= self._cursor_index
+                - 1  # 【当光标向左移动时，如果光标在可显文本的第二位】
                 and self.visible_start_index != 0
             ):
                 self.visible_start_index -= move
@@ -239,8 +268,15 @@ class SkLineInput(SkWidget):
         return self
 
     def cursor_right(self, move: int = 1, cancel_selected: bool = True) -> Self:
-        """Move the cursor to the right"""
+        """Move the cursor to the right
+        【光标右移】
+
+        :param int move: 【光标右移的距离】
+        :param bool cancel_selected: 【是否取消光标的选择状态（点击右按键时建议启用）】
+        """
+        # 【光标在最右的时候不执行接下判断】
         if self.cursor_index() < len(self.get()):
+            # 【如果文本被选中，则光标向左移动时，光标索引为选中文本的起始索引】
             if cancel_selected:
                 if self.is_selected():
                     start, end = self.start_index, self.end_index
@@ -255,19 +291,34 @@ class SkLineInput(SkWidget):
                 self.end_index = self._cursor_index
             if self._cursor_index >= len(self.get()):
                 self.cursor_index(len(self.get()))
-            if (
+            # 【光标向右移动时，若可显文本到光标大于等于可见文本范围】
+            while (
                 self.measure_text(
                     self.get()[
                         self.visible_start_index : self.cursor_index()
-                    ]  # 光标左边的可显文本
+                    ]  # 【光标左边的可显文本】
                 )
                 >= self._rect.width()
             ):
                 self.visible_start_index += move
         return self
 
+    def delete_selected(self):
+        """Delete the selected text
+        【删除选择文本】
+        """
+        if self.is_selected():
+            start, end = sorted([self.start_index, self.end_index])
+            self.start_index = self.end_index = self._cursor_index = len(
+                self.get()[:start]
+            )
+            self.set(self.get()[:start] + self.get()[end:])
+            self.check()
+
     def cursor_backspace(self) -> Self:
-        """Delete the text before the cursor"""
+        """Delete the text before the cursor
+        【删除光标前的文本】
+        """
         if not self.is_selected():
             if self.cursor_index() > 0:
                 self.set(
@@ -276,16 +327,13 @@ class SkLineInput(SkWidget):
                 )
                 self.cursor_left()
         else:
-            start, end = sorted([self.start_index, self.end_index])
-            self.start_index = self.end_index = self._cursor_index = len(
-                self.get()[:start]
-            )
-            self.set(self.get()[:start] + self.get()[end:])
-            self.cursor_left(0)
+            self.delete_selected()
         return self
 
     def cursor_delete(self) -> Self:
-        """Delete the text after the cursor"""
+        """Delete the text after the cursor
+        【删除光标后的文本】
+        """
         _index = self.cursor_index()
         _text = self.get()
         if not self.is_selected():
@@ -294,54 +342,78 @@ class SkLineInput(SkWidget):
             elif _index == len(_text) - 1:
                 self.set(_text[_index + 1 :])
         else:
-            start, end = sorted([self.start_index, self.end_index])
-            self.start_index = self.end_index = self._cursor_index = len(_text[:start])
-            self.set(_text[:start] + _text[end:])
+            self.delete_selected()
         return self
 
     def cursor_home(self) -> Self:
-        """Move the cursor to the start"""
+        """Move the cursor to the start
+        【将光标移至最前（左）】
+        """
         self._cursor_index = 0
+        self.visible_start_index = 0
+
         return self
 
     def cursor_end(self) -> Self:
-        """Move the cursor to the end"""
+        """Move the cursor to the end
+        【将光标移至最后（右）】
+        """
         self._cursor_index = len(self.get())
+        while (
+            self.measure_text(
+                self.get()[
+                    self.visible_start_index : self.cursor_index()
+                ]  # 光标左边的可显文本
+            )
+            >= self._rect.width()
+        ):
+            self.visible_start_index += 1
         return self
 
     def cursor_paste(self):
+        """Paste the selected text
+        【粘贴文本（如选中文本则覆盖）】
+        """
         text = self.get()
-        if isinstance(self.clipboard(), str):
+        clipboard = self.clipboard()
+        # 【检查剪切板是否保存的是文本（而非图片等）】
+        if isinstance(clipboard, str):
+            # 【如没有选中文本，则在光标后粘贴文本】
             if not self.is_selected():
                 self.set(
-                    text[: self._cursor_index]
-                    + self.clipboard()
-                    + text[self._cursor_index :]
+                    text[: self._cursor_index] + clipboard + text[self._cursor_index :]
                 )
-                self.cursor_right(len(self.clipboard()))
+                self.cursor_right(len(clipboard))
+            # 【如选中文本，则粘贴并覆盖选中文本】
             else:
-                clipboard = self.clipboard()
-                if isinstance(clipboard, str):
-                    start, end = sorted([self.start_index, self.end_index])
-                    _text = text[:start] + clipboard + text[end:]
-                    self.set(_text)
-                    index = start + len(clipboard)
-                    self.cursor_index(index)
-                    self.start_index = index
-                    self.end_index = index
+                start, end = sorted([self.start_index, self.end_index])
+                _text = text[:start] + clipboard + text[end:]
+                self.set(_text)
+                index = start + len(clipboard)
+                self.cursor_index(index)
+                self.start_index = self.end_index = index
 
     def cursor_copy(self):
+        """Copy the selected text
+        【复制选中的文本】
+        """
         text = self.get()
         if self.is_selected():
             start, end = sorted([self.start_index, self.end_index])
             self.clipboard(text[start:end])
 
     def cursor_cut(self):
-        self.cursor_copy()
-        self.cursor_backspace()
+        """Cut the selected text
+        【剪切选择文本】
+        """
+        if self.is_selected():
+            self.cursor_copy()
+            self.cursor_backspace()
 
     def cursor_select_all(self):
-        """Select all text"""
+        """Select all text
+        【全选文本】
+        """
         self.start_index = 0
         self._cursor_index = self.end_index = len(self.get())
 
@@ -358,27 +430,33 @@ class SkLineInput(SkWidget):
         cursor: int | SkColor = None,
         selected_bg=skia.ColorBLUE,
         selected_fg=skia.ColorWHITE,
+        radius: int | float = None,
     ) -> None:
-        """Draw the text input"""
+        """Draw the text input
+        【绘制输入框（不含边框）】
+        """
 
         self._rect = rect
 
-        fg = skcolor2color(style_to_color(fg, self.theme))  # 设置文本颜色
+        # 【各可选属性设置】
+        fg = skcolor2color(style_to_color(fg, self.theme))  # 【设置文本颜色】
         if bg:
-            bg = skcolor2color(style_to_color(bg, self.theme))  # 设置背景颜色
+            bg = skcolor2color(style_to_color(bg, self.theme))  # 【设置背景颜色】
         else:
             bg = skia.ColorTRANSPARENT
+
         if placeholder:
             placeholder = skcolor2color(
                 style_to_color(placeholder, self.theme)
-            )  # 设置占位符颜色
+            )  # 【设置占位符颜色】
         else:
             placeholder = fg
+
         if cursor:
             cursor = skcolor2color(style_to_color(cursor, self.theme))  # 设置光标颜色
         else:
             cursor = fg
-        # 设置文本字体
+
         if font is None:
             font: skia.Font = self.attributes["font"]
 
@@ -399,13 +477,19 @@ class SkLineInput(SkWidget):
 
         # 排序选择文本的起始、终点，使start<=end，不出错
         start, end = sorted([self.start_index, self.end_index])
+        _start = start - self.visible_start_index
+        # 防止为负数时，输入框消失
+        if _start < 0:
+            _start = 0
+        _end = end - self.visible_start_index
 
         def draw_with_selected_text():
+            # 【绘制文本（带文本选中框）】
             _text = (
                 text[self.visible_start_index :],
                 {
-                    "start": start - self.visible_start_index,
-                    "end": end - self.visible_start_index,
+                    "start": _start,
+                    "end": _end,
                     "fg": selected_fg,
                     "bg": selected_bg,
                 },
@@ -417,9 +501,11 @@ class SkLineInput(SkWidget):
                 font=font,
                 fg=fg,
                 bg=bg,
+                radius=radius,
             )
 
         def draw_text():
+            # 【绘制文本（不带文本选中框）】
             _text = text[self.visible_start_index :]
             self._draw_text(
                 canvas=canvas,
@@ -429,11 +515,12 @@ class SkLineInput(SkWidget):
                 fg=fg,
                 bg=bg,
                 align="left",
+                radius=radius,
             )
 
+        # Draw the text 【绘制文本呢】
         if text:
-            # Draw the text
-            # 如果有选择文本，则使用特殊样式
+            # 【如果选中文本，则使用draw_with_selected_text】
             if self.is_selected():
                 if self.is_focus:
                     draw_with_selected_text()
@@ -447,9 +534,9 @@ class SkLineInput(SkWidget):
             )  # 文本右边缘
 
         if self.is_focus:
+            # Draw the cursor 【绘制光标】
             if self.cursor_visible:
-                # 计算text[:cursor_index]长度，减去text[visible_start_index:]
-                # Draw the cursor
+                # 【计算出的光标位置】
                 cursor_x = self._rect.left() + self.measure_text(
                     text[
                         self.visible_start_index : self.cursor_index()
@@ -467,7 +554,7 @@ class SkLineInput(SkWidget):
                     ),
                 )
         else:
-            # Draw the placeholder
+            # Draw the placeholder 【绘制占位文本】
             if self.attributes["placeholder"] and not text:
                 self._draw_text(
                     canvas=canvas,
@@ -478,4 +565,5 @@ class SkLineInput(SkWidget):
                     align="left",
                 )
 
+        # 【关闭文本裁剪】
         canvas.restore()

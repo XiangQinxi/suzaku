@@ -28,6 +28,7 @@ class SkEntry(SkLineInput):
             style_name = "SkEntry"
 
         style = self.theme.get_style(style_name)
+        radius = self.theme.get_style_attr("SkEntry", "radius")
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]
@@ -59,12 +60,21 @@ class SkEntry(SkLineInput):
             placeholder = style["placeholder"]
         else:
             placeholder = None
+        if "selected_radius" in style:
+            selected_radius = style["selected_radius"]
+        else:
+            selected_radius = True
+        if isinstance(selected_radius, bool):
+            if selected_radius:
+                selected_radius = radius / 2
+            else:
+                selected_radius = 0
 
         # Draw the border
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.get_style_attr("SkEntry", "radius"),
+            radius=radius,
             bg=style["bg"],
             bd=style["bd"],
             width=style["width"],
@@ -77,9 +87,9 @@ class SkEntry(SkLineInput):
 
         input_rect = skia.Rect.MakeLTRB(
             rect.left() + self.padding,
-            rect.top() + self.padding,
+            rect.top() + self.padding - 2,
             rect.right() - self.padding,
-            rect.bottom() - self.padding,
+            rect.bottom() - self.padding + 2,
         )
 
         self._draw_text_input(
@@ -90,6 +100,7 @@ class SkEntry(SkLineInput):
             selected_bg=selected_bg,
             selected_fg=selected_fg,
             cursor=cursor,
+            radius=selected_radius,
         )
 
     # endregion

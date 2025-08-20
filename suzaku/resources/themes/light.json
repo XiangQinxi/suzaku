@@ -117,7 +117,8 @@
         "width": 3,
         "cursor": [0, 0, 0, 100],
         "selected_bg": [25, 125, 225, 245],
-        "selected_fg": [255, 255, 255, 255]
+        "selected_fg": [255, 255, 255, 255],
+        "selected_radius": true
       }
     },
 
