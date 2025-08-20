@@ -169,31 +169,6 @@ class SkAppBase(SkEventHanding, SkMisc):
         for window in self.windows:
             window.create_bind()
 
-        def draw(the_window):
-            if the_window.visible:
-                # Set the current context for each window
-                # 【为该窗口设置当前上下文】
-                glfw.make_context_current(the_window.glfw_window)
-                # Create a Surface and hand it over to this window.
-                # 【创建Surface，交给该窗口】
-                with the_window.skia_surface(the_window.glfw_window) as surface:
-                    if surface:
-                        with surface as canvas:
-                            # Determine and call the drawing function of this window.
-                            # 【判断并调用该窗口的绘制函数】
-
-                            the_window.event_trigger(
-                                "update", SkEvent(event_type="update")
-                            )
-
-                            if the_window.draw_func:
-                                the_window.draw_func(canvas)
-
-                        surface.flushAndSubmit()
-
-                        glfw.swap_buffers(the_window.glfw_window)
-                del surface, the_window
-
         # Start event loop
         # 【开始事件循环】
         while self.alive and self.windows:
@@ -212,7 +187,6 @@ class SkAppBase(SkEventHanding, SkMisc):
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】
             current_windows = set(self.windows)
-
             for window in current_windows:
                 # Make sure the window is created and bound
                 # 【确保新窗口绑定事件】
@@ -223,9 +197,9 @@ class SkAppBase(SkEventHanding, SkMisc):
                     self.is_get_context_on_focus
                 ):  # Only draw the window that has gained focus.
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
-                        draw(window)
+                        window.draw()
                 else:
-                    draw(window)
+                    window.draw()
                 # Check if the window is valid
                 # 【检查窗口是否有效】
                 if window.can_be_close():
@@ -238,7 +212,6 @@ class SkAppBase(SkEventHanding, SkMisc):
                         window.destroy()
                         del window
                         continue
-                del window
 
             if glfw.get_current_context():
                 glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步

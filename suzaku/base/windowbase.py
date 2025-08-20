@@ -337,6 +337,28 @@ class SkWindowBase(SkEventHanding, SkMisc):
             context.releaseResourcesAndAbandonContext()
             context.abandonContext()
 
+    def draw(self):
+        if self.visible:
+            # Set the current context for each window
+            # 【为该窗口设置当前上下文】
+            glfw.make_context_current(self.glfw_window)
+            # Create a Surface and hand it over to this window.
+            # 【创建Surface，交给该窗口】
+            with self.skia_surface(self.glfw_window) as surface:
+                if surface:
+                    with surface as canvas:
+                        # Determine and call the drawing function of this window.
+                        # 【判断并调用该窗口的绘制函数】
+
+                        self.event_trigger("update", SkEvent(event_type="update"))
+
+                        if self.draw_func:
+                            self.draw_func(canvas)
+
+                    surface.flushAndSubmit()
+
+                    glfw.swap_buffers(self.glfw_window)
+
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
 
@@ -476,14 +498,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
-        if self.draw_func:
-            # 确保设置当前窗口上下文
-            glfw.make_context_current(window)
-            with self.skia_surface(window) as surface:
-                with surface as canvas:
-                    self.draw_func(canvas)
-                surface.flushAndSubmit()
-                self.update()
+        self.update_layout()
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
