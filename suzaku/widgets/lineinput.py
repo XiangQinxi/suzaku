@@ -65,7 +65,6 @@ class SkLineInput(SkWidget):
         blink()
 
         self.textvariable = textvariable
-
         self.focusable = True
 
         self.bind("char", self._char)
@@ -328,46 +327,56 @@ class SkLineInput(SkWidget):
         # 排序选择文本的起始、终点，使start<=end，不出错
         start, end = sorted([self.start_index, self.end_index])
 
+        def draw_with_seletect_text():
+            _text = (
+                text[self.visible_start_index :],
+                {
+                    "start": start - self.visible_start_index,
+                    "end": end - self.visible_start_index,
+                    "fg": selected_fg,
+                    "bg": selected_bg,
+                },
+            )
+            self._draw_styled_text(
+                canvas=canvas,
+                text=_text,
+                font=font,
+                fg=fg,
+                bg=bg,
+                padding=self.padding,
+                canvas_x=self.canvas_x,
+                canvas_y=self.canvas_y,
+                width=self.width,
+                height=self.height,
+            )
+
+        def draw_text():
+            _text = text[self.visible_start_index :]
+            self._draw_text(
+                canvas=canvas,
+                text=_text,
+                font=font,
+                fg=fg,
+                bg=bg,
+                align="left",
+                padding=self.padding,
+                canvas_x=self.canvas_x,
+                canvas_y=self.canvas_y,
+                width=self.width,
+                height=self.height,
+            )
+
         if text:
             # Draw the text
             # 如果有选择文本，则使用特殊样式
             if self.is_selected():
-                _text = (
-                    text[self.visible_start_index :],
-                    {
-                        "start": start - self.visible_start_index,
-                        "end": end - self.visible_start_index,
-                        "fg": selected_fg,
-                        "bg": selected_bg,
-                    },
-                )
-                self._draw_styled_text(
-                    canvas=canvas,
-                    text=_text,
-                    font=font,
-                    fg=fg,
-                    bg=bg,
-                    padding=self.padding,
-                    canvas_x=self.canvas_x,
-                    canvas_y=self.canvas_y,
-                    width=self.width,
-                    height=self.height,
-                )
+                if self.is_focus:
+                    draw_with_seletect_text()
+                else:
+                    draw_text()
             else:
-                _text = text[self.visible_start_index :]
-                self._draw_text(
-                    canvas=canvas,
-                    text=_text,
-                    font=font,
-                    fg=fg,
-                    bg=bg,
-                    align="left",
-                    padding=self.padding,
-                    canvas_x=self.canvas_x,
-                    canvas_y=self.canvas_y,
-                    width=self.width,
-                    height=self.height,
-                )
+                draw_text()
+
             self._left = round(rect.left() + self.padding)  # 文本左边缘
             self._right = round(
                 self._left + self.measure_text(text[self.visible_start_index :])
