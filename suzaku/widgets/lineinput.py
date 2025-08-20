@@ -72,7 +72,7 @@ class SkLineInput(SkWidget):
         self.bind("key_pressed", self._key)
         self.bind("key_repeated", self._key)
         self.bind("mouse_pressed", self._pressed)
-        self.bind("mouse_motion", self._motion)
+        self.window.bind("mouse_motion", self._motion)
 
     # endregion
 
