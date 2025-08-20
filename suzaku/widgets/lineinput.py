@@ -79,19 +79,31 @@ class SkLineInput(SkWidget):
     # region Text&Cursor 文本、光标操作
 
     def is_selected(self) -> bool:
+        """Determine whether the text is selected.
+        【判断文本是否被选中】
+        :return: bool
+        """
         return self.start_index != self.end_index
 
     def _motion(self, event: SkEvent) -> None:
+        """Record the `end_index` when the text is pressed and moved.
+        【当文本被按住并移动时，记录end_index】
+        :param event: SkEvent
+        """
         if self.is_mouse_pressed:
             self.end_index = self.index(event.x)
 
     def _pressed(self, event: SkEvent) -> None:
+        """Record the `start_index` and `end_index` when the text is pressed.
+        【当文本被按住时，记录`start_index`与`end_index`。】
+        """
         self.start_index = self.end_index = self.index(event.x)
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered."""
         cursor_index = self._cursor_index
         text = self.get()
+        self.cursor_visible = True
 
         if not self.is_selected():
             self.set(text[:cursor_index] + event.char + text[cursor_index:])
@@ -131,6 +143,10 @@ class SkLineInput(SkWidget):
                 """Select All"""
                 if event.mods == "control":
                     self.cursor_select_all()
+            case glfw.KEY_X:
+                """Cut Text"""
+                if event.mods == "control":
+                    self.cursor_cut()
             case glfw.KEY_HOME:
                 """Move the cursor to the start"""
                 self.cursor_home()
@@ -264,6 +280,7 @@ class SkLineInput(SkWidget):
                 self.get()[:start]
             )
             self.set(self.get()[:start] + self.get()[end:])
+            self.cursor_left(0)
         return self
 
     def cursor_home(self) -> Self:
@@ -292,15 +309,20 @@ class SkLineInput(SkWidget):
                     start, end = sorted([self.start_index, self.end_index])
                     _text = text[:start] + clipboard + text[end:]
                     self.set(_text)
-                    self.cursor_index(len(_text))
-                    self.start_index = len(_text)
-                    self.end_index = len(_text)
+                    index = start + len(clipboard)
+                    self.cursor_index(index)
+                    self.start_index = index
+                    self.end_index = index
 
     def cursor_copy(self):
         text = self.get()
         if self.is_selected():
             start, end = sorted([self.start_index, self.end_index])
             self.clipboard(text[start:end])
+
+    def cursor_cut(self):
+        self.cursor_copy()
+        self.cursor_backspace()
 
     def cursor_select_all(self):
         """Select all text"""

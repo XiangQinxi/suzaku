@@ -307,7 +307,7 @@ class SkWidget(SkEventHanding, SkMisc):
                     draw_x,
                     draw_y + padding,
                     self.measure_text(text),
-                    metrics.fAscent - metrics.fDescent - padding,
+                    metrics.fAscent - metrics.fDescent - padding * 1.3,
                 ),
                 paint=bg_paint,
             )
