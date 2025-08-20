@@ -7,7 +7,12 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import SkGradient, make_color, style_to_color
+from ..styles.color import (
+    SkGradient,
+    style_to_color,
+    skcolor2color,
+    SkColor,
+)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
@@ -209,39 +214,6 @@ class SkWidget(SkEventHanding, SkMisc):
         ...
 
     @staticmethod
-    def _rainbow_shader(
-        rect, colors: list | tuple[skia.Color] | None, cx=None, cy=None
-    ):
-        """Draw the rainbow shader of the rect
-
-        :param color: The color of the rainbow shader
-        """
-        if not cx:
-            cx = rect.centerX()
-        if not cy:
-            cy = rect.centerY()
-        if not colors:
-            colors = (
-                skia.ColorCYAN,  # Cyan
-                skia.ColorMAGENTA,  # Magenta
-                skia.ColorYELLOW,  # Yellow
-                skia.ColorCYAN,  # Cyan
-            )
-        else:
-            colors2 = list
-            for _color in colors:
-                colors2.append(make_color(_color))
-            colors = tuple(colors2)
-        return skia.GradientShader.MakeSweep(
-            cx=cx,  # Center x position of the sweep
-            cy=cy,  # Center y position of the sweep
-            startAngle=0,  # Start angle of the sweep in degrees
-            endAngle=360,  # End angle of the sweep in degrees
-            colors=colors,
-            localMatrix=None,  # Local matrix for the gradient
-        )
-
-    @staticmethod
     def _radial_shader(
         center: tuple[float | int, float | int],
         radius: float | int,
@@ -272,22 +244,6 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def _draw_blur(self, paint: skia.Paint, style=None, sigma=None):
         paint.setMaskFilter(self._blur(style, sigma))
-
-    def _draw_rainbow_shader(
-        self,
-        paint,
-        rect,
-        colors: list | tuple[skia.Color] | None = None,
-        cx: float | int | None = None,
-        cy: float | int | None = None,
-    ):
-        """Set rainbow shader of the rect
-
-        :param paint: The paint of the rect
-        :param rect: The rect
-        :return: None
-        """
-        paint.setShader(self._rainbow_shader(rect=rect, colors=colors, cx=cx, cy=cy))
 
     def _draw_text(
         self,
@@ -325,8 +281,8 @@ class SkWidget(SkEventHanding, SkMisc):
 
             # 绘制字体
             @cache
-            def cache_paint(anti_alias, _fg):
-                return skia.Paint(AntiAlias=anti_alias, Color=_fg)
+            def cache_paint(anti_alias, fg_):
+                return skia.Paint(AntiAlias=anti_alias, Color=fg_)
 
             text_paint = cache_paint(
                 self.anti_alias, style_to_color(fg, self.theme).color
@@ -354,9 +310,9 @@ class SkWidget(SkEventHanding, SkMisc):
         canvas: skia.Canvas,
         rect: typing.Any,
         radius: int,
-        bg: str,
-        width: int,
-        bd: str,
+        bg: str | SkColor | int | None = None,
+        width: int | float = 0,
+        bd: str | SkColor | int | None = None,
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
@@ -376,50 +332,54 @@ class SkWidget(SkEventHanding, SkMisc):
 
         """
 
-        bg_paint = skia.Paint(
-            AntiAlias=self.anti_alias,
-            Style=skia.Paint.kStrokeAndFill_Style,
-        )
+        if bg:
+            bg_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStrokeAndFill_Style,
+            )
+            bg = skcolor2color(style_to_color(bg, self.theme))
 
-        bd_paint = skia.Paint(
-            AntiAlias=self.anti_alias,
-            Style=skia.Paint.kStroke_Style,
-        )
+            # Background
+            bg_paint.setStrokeWidth(width)
+            bg_paint.setColor(bg)
+            shadow = SkDropShadow(config_list=bd_shadow)
+            shadow.draw(bg_paint)
+            if bg_shader:
+                if isinstance(bg_shader, dict):
+                    if "linear_gradient" in bg_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bg_shader["linear_gradient"],
+                            paint=bg_paint,
+                        )
+                else:
+                    if bg_shader.lower() == "rainbow":
+                        self._draw_rainbow_shader(bg_paint, rect)
 
-        # Background
-        bg_paint.setStrokeWidth(width)
-        bg_paint.setColor(style_to_color(bg, self.theme).color)
-        shadow = SkDropShadow(config_list=bd_shadow)
-        shadow.draw(bg_paint)
-        if bg_shader:
-            if isinstance(bg_shader, dict):
-                if "linear_gradient" in bg_shader:
-                    self.gradient.linear(
-                        widget=self, config=bg_shader["linear_gradient"], paint=bg_paint
-                    )
-            else:
-                if bg_shader.lower() == "rainbow":
-                    self._draw_rainbow_shader(bg_paint, rect)
+            canvas.drawRoundRect(rect, radius, radius, bg_paint)
+        if bd:
+            bd_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStroke_Style,
+            )
+            bd = skcolor2color(style_to_color(bd, self.theme))
 
-        # Border
-        bd_paint.setStrokeWidth(width)
-        bd_paint.setColor(style_to_color(bd, self.theme).color)
-        if bd_shader:
-            if isinstance(bd_shader, dict):
-                if "linear_gradient" in bd_shader:
-                    self.gradient.linear(
-                        widget=self, config=bg_shader["linear_gradient"], paint=bd_paint
-                    )
-            else:
-                if bd_shader.lower() == "rainbow":
-                    self._draw_rainbow_shader(bd_paint, rect)
+            # Border
+            bd_paint.setStrokeWidth(width)
+            bd_paint.setColor(bd)
+            if bd_shader:
+                if isinstance(bd_shader, dict):
+                    if "linear_gradient" in bd_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bd_shader["linear_gradient"],
+                            paint=bd_paint,
+                        )
+                else:
+                    if bd_shader.lower() == "rainbow":
+                        self._draw_rainbow_shader(bd_paint, rect)
 
-        # Draw background first
-        canvas.drawRoundRect(rect, radius, radius, bg_paint)
-
-        canvas.drawRoundRect(rect, radius, radius, bd_paint)
-
-        del bg_paint, bd_paint, shadow
+            canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
     @staticmethod
     def _draw_image(

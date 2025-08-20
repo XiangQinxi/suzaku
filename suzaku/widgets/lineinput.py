@@ -16,7 +16,7 @@ import glfw
 import skia
 
 from ..event import SkEvent
-from ..styles.color import make_color, style_to_color
+from ..styles.color import style_to_color
 from ..var import SkStringVar
 from .widget import SkWidget
 
@@ -93,8 +93,15 @@ class SkLineInput(SkWidget):
         cursor_index = self._cursor_index
         text = self.get()
 
-        self.set(text[:cursor_index] + event.char + text[cursor_index:])
-        self.cursor_right()
+        if not self.is_selected():
+            self.set(text[:cursor_index] + event.char + text[cursor_index:])
+            self.cursor_right()
+        else:
+            start, end = sorted([self.start_index, self.end_index])
+            self.set(text[:start] + event.char + text[end:])
+            self.start_index = self.end_index = self._cursor_index = len(
+                text[:start] + event.char
+            )
 
     def _key(self, event: SkEvent):
         """Key event 按键事件触发
@@ -226,12 +233,16 @@ class SkLineInput(SkWidget):
 
     def cursor_backspace(self) -> Self:
         """Delete the text before the cursor"""
-        if self.cursor_index() > 0:
-            self.set(
-                self.get()[: self.cursor_index() - 1]
-                + self.get()[self.cursor_index() :]
-            )
-            self.cursor_left()
+        if not self.is_selected():
+            if self.cursor_index() > 0:
+                self.set(
+                    self.get()[: self.cursor_index() - 1]
+                    + self.get()[self.cursor_index() :]
+                )
+                self.cursor_left()
+        else:
+            start, end = sorted([self.start_index, self.end_index])
+            self.set(self.get()[:start] + self.get()[end:])
         return self
 
     def cursor_home(self) -> Self:
@@ -293,6 +304,8 @@ class SkLineInput(SkWidget):
         metrics = self.metrics
 
         if self.is_focus:
+            if self.is_selected():
+                pass
             if self.cursor_visible:
                 # 计算text[:cursor_index]长度，减去text[visible_start_index:]
                 # Draw the cursor

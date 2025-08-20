@@ -291,6 +291,8 @@ def style_to_color(
                     NotImplemented
                     return SkColor(ERR_COLOR)
             return None
+        case int():
+            return style_attr_value
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn(
@@ -299,17 +301,15 @@ def style_to_color(
             return SkColor(ERR_COLOR)
 
 
-def make_color(value: str | tuple | list | None) -> str | tuple | list | None:
-    """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
+def skcolor2color(color: SkColor | int | list) -> str | tuple | list | None:
+    """Convert skia.Color to color object.
 
-    Example
-    -------
-    .. code-block:: python
-        make_color("#ffffff")  # Supports _hex
-        make_color( (255, 255, 255, 255 ) )  # Supports RGBA format
-        make_color("white")  # Supports predefined color names (refer to color parameters in skia)
-
-    :param value: Color _value, can be _hex, rgba, or color name.
-    :type value: str | tuple | list | None
+    :param color: SkColor object or skia.Color object
+    :return: Color object
     """
-    return SkColor(value).color
+    if isinstance(color, SkColor):
+        return color.color
+    elif isinstance(color, list):
+        return SkColor(color).color
+    else:
+        return color
