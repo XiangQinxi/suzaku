@@ -7,6 +7,11 @@ class SkEntry(SkLineInput):
     """A single-line input box with a border 【带边框的单行输入框】"""
 
     # region Init 初始化
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.padding = 5
+
     # endregion
 
     # region Draw 绘制
@@ -69,9 +74,17 @@ class SkEntry(SkLineInput):
         )
 
         # Draw the text input
+
+        input_rect = skia.Rect.MakeLTRB(
+            rect.left() + self.padding,
+            rect.top() + self.padding,
+            rect.right() - self.padding,
+            rect.bottom() - self.padding,
+        )
+
         self._draw_text_input(
             canvas,
-            rect,
+            input_rect,
             fg=style["fg"],
             placeholder=placeholder,
             selected_bg=selected_bg,

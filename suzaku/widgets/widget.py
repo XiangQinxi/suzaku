@@ -245,31 +245,24 @@ class SkWidget(SkEventHanding, SkMisc):
     def _draw_text(
         self,
         canvas: skia.Canvas,
+        rect: skia.Rect,
         text: str | None = "",
-        canvas_x: float | int = 0,
-        canvas_y: float | int = 0,
-        width: float | int = 9,
-        height: float | int = 0,
         bg: None | str | int | SkColor = None,
         fg: None | str | int | SkColor = None,
-        padding: int | float = 5,
+        radius: float | int = 3,
         align: typing.Literal["center", "right", "left"] = "center",
         font: skia.Font = None,
-    ):
+    ) -> None:
         """Draw central text
 
         .. note::
             >>> self._draw_text(canvas, "Hello", skia.ColorBLACK, 0, 0, 100, 100)
 
         :param canvas: The canvas
+        :param rect: The skia Rect
         :param text: The text
         :param fg: The color of the text
-        :param x: The x of the text
-        :param y: The y of the text
-        :param width: The width of the text
-        :param height: The height of the text
         :return: None
-        :raises: None
         """
         if not font:
             font = self.attributes["font"]
@@ -287,28 +280,32 @@ class SkWidget(SkEventHanding, SkMisc):
             self.anti_alias, skcolor2color(style_to_color(fg, self.theme))
         )
 
-        text_width = font.measureText(text)
+        text_width = self.measure_text(text)
 
         if align == "center":
-            draw_x = canvas_x + (width - text_width) / 2
+            draw_x = rect.left() + (rect.width() - text_width) / 2
         elif align == "right":
-            draw_x = canvas_x + width - text_width - padding
+            draw_x = rect.left() + rect.width() - text_width
         else:  # left
-            draw_x = canvas_x + padding
+            draw_x = rect.left()
 
         metrics = self.metrics
-        draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+        draw_y = (
+            rect.top() + rect.height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
+        )
 
         if bg:
             bg = skcolor2color(style_to_color(bg, self.theme))
             bg_paint = skia.Paint(AntiAlias=self.anti_alias, Color=bg)
-            canvas.drawRect(
-                rect=skia.Rect.MakeXYWH(
+            canvas.drawRoundRect(
+                rect=skia.Rect.MakeLTRB(
                     draw_x,
-                    draw_y + padding,
-                    self.measure_text(text),
-                    metrics.fAscent - metrics.fDescent - padding * 1.3,
+                    rect.top(),
+                    draw_x + text_width,
+                    rect.bottom(),
                 ),
+                rx=radius,
+                ry=radius,
                 paint=bg_paint,
             )
 
@@ -319,13 +316,10 @@ class SkWidget(SkEventHanding, SkMisc):
     def _draw_styled_text(
         self,
         canvas: skia.Canvas,
-        canvas_x: float | int = 0,
-        canvas_y: float | int = 0,
-        width: float | int = 9,
-        height: float | int = 0,
+        rect: skia.Rect,
         bg: None | str | int | SkColor = None,
         fg: None | str | int | SkColor = None,
-        padding: int | float = 5,
+        radius: float | int = 3,
         # [ "Content", {"start": 5, "end": 10, "fg": skia.ColorRED, "bg": skia.ColorBLACK, "font": skia.Font} ]
         text: tuple[str, dict[str, str | int | SkColor | skia.Font]] = ("",),
         font: skia.Font = None,
@@ -338,13 +332,9 @@ class SkWidget(SkEventHanding, SkMisc):
         self._draw_text(
             canvas=canvas,
             text=_text,
-            canvas_x=canvas_x,
-            canvas_y=canvas_y,
-            width=width,
-            height=height,
+            rect=rect,
             bg=bg,
             fg=fg,
-            padding=padding,
             align="left",
             font=font,
         )
@@ -359,16 +349,20 @@ class SkWidget(SkEventHanding, SkMisc):
             if "bg" in item:
                 bg = item["bg"]
             if isinstance(item, dict):
+
+                _rect = skia.Rect.MakeLTRB(
+                    rect.left() + self.measure_text(_text[: item["start"]]),
+                    rect.top(),
+                    rect.right(),
+                    rect.bottom(),
+                )
                 self._draw_text(
                     canvas=canvas,
+                    rect=_rect,
                     text=_text[item["start"] : item["end"]],
-                    canvas_x=canvas_x + self.measure_text(_text[: item["start"]]),
-                    canvas_y=canvas_y,
-                    width=width,
-                    height=height,
                     bg=bg,
                     fg=fg,
-                    padding=padding,
+                    radius=radius,
                     align="left",
                     font=font,
                 )

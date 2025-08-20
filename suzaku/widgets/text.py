@@ -53,12 +53,9 @@ class SkText(SkWidget):
     def draw_widget(self, canvas: skia.Surfaces, rect: skia.Rect):
         self._draw_text(
             canvas,
+            rect,
             text=self.get(),
             fg=self.theme.get_style_attr("SkText", "fg"),
-            canvas_x=self.canvas_x,
-            canvas_y=self.canvas_y,
-            width=self.width,
-            height=self.height,
             font=self.attributes["font"],
         )
 

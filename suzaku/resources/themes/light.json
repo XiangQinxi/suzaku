@@ -8,31 +8,7 @@
     "default_fg": [0, 0, 0, 235]
   },
 
-  "styles":{
-    "SkWindow": {
-      "rest":{
-        "bg": {"color_palette": "default_bg"}
-      }
-    },
-
-    "SkFrame": {
-      "rest": {
-        "radius": 8,
-        "bg": "transparent",
-        "bd": "transparent",
-        "width": 0
-      }
-    },
-
-    "SkCard": {
-      "rest": {
-        "radius": 8,
-        "bg": [225, 225, 225, 245],
-        "bd": [200, 200, 200, 245],
-        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
-        "width": 2
-      }
-    },
+  "styles": {
 
     "SkBadge": {
       "rest": {
@@ -106,9 +82,13 @@
       }
     },
 
-    "SkText": {
+    "SkCard": {
       "rest": {
-        "fg": [0, 0, 0, 245]
+        "radius": 8,
+        "bg": [225, 225, 225, 245],
+        "bd": [200, 200, 200, 245],
+        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "width": 2
       }
     },
 
@@ -138,6 +118,27 @@
         "cursor": [0, 0, 0, 100],
         "selected_bg": [25, 125, 225, 245],
         "selected_fg": [255, 255, 255, 255]
+      }
+    },
+
+    "SkFrame": {
+      "rest": {
+        "radius": 8,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkText": {
+      "rest": {
+        "fg": [0, 0, 0, 245]
+      }
+    },
+
+    "SkWindow": {
+      "rest":{
+        "bg": {"color_palette": "default_bg"}
       }
     }
   }
