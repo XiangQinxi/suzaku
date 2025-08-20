@@ -72,6 +72,7 @@ class SkLineInput(SkWidget):
         self.bind("key_repeated", self._key)
         self.bind("mouse_pressed", self._pressed)
         self.window.bind("mouse_motion", self._motion)
+        self.bind("mouse_motion", self._motion)
 
     # endregion
 
@@ -159,7 +160,7 @@ class SkLineInput(SkWidget):
     def index(self, mouse_x: int) -> int:
         # 如果鼠标超出可见文本的范围
         if mouse_x >= self._left + self.width - self.padding * 2:
-            self.cursor_right()
+            self.cursor_right(cancel_selected=False)
         # 如果鼠标超出画出的文本范围
         if mouse_x >= self._right:
             self.cursor_end()
@@ -171,7 +172,7 @@ class SkLineInput(SkWidget):
                 return 0
             else:
                 # 如果文本向左滚动了
-                self.cursor_left()
+                self.cursor_left(cancel_selected=False)
                 return self.visible_start_index
         # 遍历可见文本，找到鼠标所在的位置
         visible_text = self.get()[self.visible_start_index :]
@@ -192,18 +193,22 @@ class SkLineInput(SkWidget):
             return self._cursor_index
         return self
 
-    def cursor_left(self, move: int = 1) -> Self:
+    def cursor_left(self, move: int = 1, cancel_selected: bool = True) -> Self:
         """Move the cursor to the left"""
         if self.cursor_index() > 0:
             # 如果文本被选中，则光标向左移动时，光标索引为选中文本的起始索引
-            if self.is_selected():
-                start, end = self.start_index, self.end_index
-                if end > start:
-                    move = end - start
-                else:
-                    move = 0
+            if cancel_selected:
+                if self.is_selected():
+                    start, end = self.start_index, self.end_index
+                    if end > start:
+                        move = end - start
+                    else:
+                        move = 0
             self._cursor_index -= move
-            self.start_index = self.end_index = self._cursor_index
+            if cancel_selected:
+                self.start_index = self.end_index = self._cursor_index
+            else:
+                self.end_index = self._cursor_index
             # 光标向左移动时，若文本可显的初始索引大于等于光标索引，且文本可显的初始索引不为0
             if (
                 self.visible_start_index
@@ -215,17 +220,21 @@ class SkLineInput(SkWidget):
 
         return self
 
-    def cursor_right(self, move: int = 1) -> Self:
+    def cursor_right(self, move: int = 1, cancel_selected: bool = True) -> Self:
         """Move the cursor to the right"""
         if self.cursor_index() < len(self.get()):
-            if self.is_selected():
-                start, end = self.start_index, self.end_index
-                if start > end:
-                    move = start - end
-                else:
-                    move = 0
+            if cancel_selected:
+                if self.is_selected():
+                    start, end = self.start_index, self.end_index
+                    if start > end:
+                        move = start - end
+                    else:
+                        move = 0
             self._cursor_index += move
-            self.start_index = self.end_index = self._cursor_index
+            if cancel_selected:
+                self.start_index = self.end_index = self._cursor_index
+            else:
+                self.end_index = self._cursor_index
             if self._cursor_index >= len(self.get()):
                 self.cursor_index(len(self.get()))
             if (

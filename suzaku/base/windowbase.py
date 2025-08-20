@@ -494,7 +494,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     def _on_refresh(self, window: typing.Any):
         self.draw()
-        self.update_layout()
+        if hasattr(self, "update_layout"):
+            self.update_layout()
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).

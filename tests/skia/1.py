@@ -1,5 +1,8 @@
-from tkinter import Tk
+from suzaku.base import SkWindowBase, SkAppBase
 
 
-root = Tk()
-root.mainloop()
+app = SkAppBase()
+
+win = SkWindowBase()
+
+app.run()
