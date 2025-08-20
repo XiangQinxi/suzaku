@@ -78,8 +78,6 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def destroy(self) -> None:
         super().destroy()
-        for child in self.children:
-            child.destroy()
 
     def _key_pressed(self, event):
         """Key press event for SkWindow.
@@ -131,6 +129,7 @@ class SkWindow(SkWindowBase, SkContainer):
                 if widget.focusable:
                     widget.focus_set()
                 widget.is_mouse_pressed = True
+                widget.button = event.button
                 widget.event_trigger("mouse_pressed", event)
 
     def _motion(self, event: SkEvent) -> None:

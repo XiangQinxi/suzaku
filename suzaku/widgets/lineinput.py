@@ -109,10 +109,7 @@ class SkLineInput(SkWidget):
         :return:
         """
 
-        text = self.get()
-        key = event.key
-
-        match key:
+        match event.key:
             case glfw.KEY_BACKSPACE | glfw.KEY_DELETE:
                 """Delete the text before the cursor"""
                 self.cursor_backspace()
@@ -125,33 +122,14 @@ class SkLineInput(SkWidget):
             case glfw.KEY_V:
                 """Paste Text"""
                 if event.mods == "control":
-                    if isinstance(self.clipboard(), str):
-                        if not self.is_selected():
-                            self.set(
-                                text[: self._cursor_index]
-                                + self.clipboard()
-                                + text[self._cursor_index :]
-                            )
-                            self.cursor_right(len(self.clipboard()))
-                        else:
-                            clipboard = self.clipboard()
-                            if isinstance(clipboard, str):
-                                start, end = sorted([self.start_index, self.end_index])
-                                _text = text[:start] + clipboard + text[end:]
-                                self.set(_text)
-                                self.cursor_index(len(_text))
-                                self.start_index = len(_text)
-                                self.end_index = len(_text)
+                    self.cursor_paste()
             case glfw.KEY_C:
                 if event.mods == "control":
-                    if self.is_selected():
-                        start, end = sorted([self.start_index, self.end_index])
-                        self.clipboard(text[start:end])
+                    self.cursor_copy()
             case glfw.KEY_A:
                 """Select All"""
                 if event.mods == "control":
-                    self.start_index = 0
-                    self.end_index = len(text)
+                    self.cursor_select_all()
             case glfw.KEY_HOME:
                 """Move the cursor to the start"""
                 self.cursor_home()
@@ -217,10 +195,20 @@ class SkLineInput(SkWidget):
     def cursor_left(self, move: int = 1) -> Self:
         """Move the cursor to the left"""
         if self.cursor_index() > 0:
+            # 如果文本被选中，则光标向左移动时，光标索引为选中文本的起始索引
+            if self.is_selected():
+                start, end = self.start_index, self.end_index
+                if end > start:
+                    move = end - start
+                else:
+                    move = 0
             self._cursor_index -= move
+            self.start_index = self.end_index = self._cursor_index
             # 光标向左移动时，若文本可显的初始索引大于等于光标索引，且文本可显的初始索引不为0
             if (
-                self.visible_start_index >= self.cursor_index()
+                self.visible_start_index
+                >= self.cursor_index()
+                - 1  # 当光标向左移动时，如果光标在可显文本的第二位
                 and self.visible_start_index != 0
             ):
                 self.visible_start_index -= move
@@ -230,7 +218,14 @@ class SkLineInput(SkWidget):
     def cursor_right(self, move: int = 1) -> Self:
         """Move the cursor to the right"""
         if self.cursor_index() < len(self.get()):
+            if self.is_selected():
+                start, end = self.start_index, self.end_index
+                if start > end:
+                    move = start - end
+                else:
+                    move = 0
             self._cursor_index += move
+            self.start_index = self.end_index = self._cursor_index
             if self._cursor_index >= len(self.get()):
                 self.cursor_index(len(self.get()))
             if (
@@ -271,6 +266,37 @@ class SkLineInput(SkWidget):
         """Move the cursor to the end"""
         self._cursor_index = len(self.get())
         return self
+
+    def cursor_paste(self):
+        text = self.get()
+        if isinstance(self.clipboard(), str):
+            if not self.is_selected():
+                self.set(
+                    text[: self._cursor_index]
+                    + self.clipboard()
+                    + text[self._cursor_index :]
+                )
+                self.cursor_right(len(self.clipboard()))
+            else:
+                clipboard = self.clipboard()
+                if isinstance(clipboard, str):
+                    start, end = sorted([self.start_index, self.end_index])
+                    _text = text[:start] + clipboard + text[end:]
+                    self.set(_text)
+                    self.cursor_index(len(_text))
+                    self.start_index = len(_text)
+                    self.end_index = len(_text)
+
+    def cursor_copy(self):
+        text = self.get()
+        if self.is_selected():
+            start, end = sorted([self.start_index, self.end_index])
+            self.clipboard(text[start:end])
+
+    def cursor_select_all(self):
+        """Select all text"""
+        self.start_index = 0
+        self._cursor_index = self.end_index = len(self.get())
 
     # endregion
 

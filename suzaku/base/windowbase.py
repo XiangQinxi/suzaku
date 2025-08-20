@@ -968,14 +968,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         :return: None
         """
-        if self.glfw_window:
-            self.can_be_close(True)
-            glfw.destroy_window(self.glfw_window)
-            self.glfw_window = None  # Clear the reference
-            # self._event_init = False
+        # self._event_init = False
         # print(self.id)
-        self.event_trigger("closed", SkEvent(event_type="closed"))
-        self.application.windows.remove(self)
+        self.can_be_close(True)
 
     def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.

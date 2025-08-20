@@ -211,7 +211,12 @@ class SkAppBase(SkEventHanding, SkMisc):
                     )
                     # print(window.id)
                     if window.can_be_close():
-                        window.destroy()
+                        glfw.destroy_window(window.glfw_window)
+                        window.draw_func = None
+                        window.glfw_window = None  # Clear the reference
+                        for child in window.children:
+                            child.destroy()
+                        self.destroy_window(window)
                         del window
                         continue
             del current_windows
@@ -221,6 +226,10 @@ class SkAppBase(SkEventHanding, SkMisc):
         self.cleanup()  # 【清理资源】
 
     mainloop = run
+
+    def destroy_window(self, window):
+        window.event_trigger("closed", SkEvent(event_type="closed", window=window))
+        self.windows.remove(window)
 
     def cleanup(self) -> None:
         """Clean up resources.【清理资源】"""

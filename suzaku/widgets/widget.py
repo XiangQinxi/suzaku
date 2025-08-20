@@ -125,6 +125,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
         self.gradient = SkGradient()
+        self.button: typing.Literal[0, 1, 2] = 0
 
         def _on_mouse(event: SkEvent):
             self.mouse_x = event.x
@@ -170,8 +171,9 @@ class SkWidget(SkEventHanding, SkMisc):
 
         :return: None
         """
-        if self.is_mouse_floating:
-            self.event_trigger("click", event)
+        if self.button != 1:
+            if self.is_mouse_floating:
+                self.event_trigger("click", event)
 
     # endregion
 
