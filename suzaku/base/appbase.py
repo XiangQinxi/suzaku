@@ -157,7 +157,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                 if self.is_always_update:
                     deal_event = glfw.poll_events
                 else:
-                    deal_event = lambda: glfw.wait_events_timeout(1)
+                    deal_event = lambda: glfw.wait_events_timeout(2)
             case "sdl2":
                 from sdl2 import SDL_PollEvent
 
@@ -174,6 +174,7 @@ class SkAppBase(SkEventHanding, SkMisc):
         while self.alive and self.windows:
             # 处理事件
             deal_event()
+            print(124124)
 
             # 检查after事件，其中的事件是否到达时间，如到达则执行
             if self._afters:
@@ -199,7 +200,8 @@ class SkAppBase(SkEventHanding, SkMisc):
                     if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
                         window.draw()
                 else:
-                    window.draw()
+                    if glfw.get_window_attrib(window.glfw_window, glfw.VISIBLE):
+                        window.draw()
                 # Check if the window is valid
                 # 【检查窗口是否有效】
                 if window.can_be_close():

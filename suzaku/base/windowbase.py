@@ -155,6 +155,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         SkWindowBase._instance_count += 1
 
         self.draw_func = None
+        self.context = None
 
         self.attributes["fullscreen"] = fullscreen
 
@@ -311,37 +312,35 @@ class SkWindowBase(SkEventHanding, SkMisc):
             yield None
             return None
 
-        try:
-            context = skia.GrDirectContext.MakeGL()
-            (fb_width, fb_height) = glfw.get_framebuffer_size(window)
-            backend_render_target = skia.GrBackendRenderTarget(
-                fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
-            )
-            surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
-                context,
-                backend_render_target,
-                skia.kBottomLeft_GrSurfaceOrigin,
-                skia.kRGBA_8888_ColorType,
-                skia.ColorSpace.MakeSRGB(),
-            )
-            context.setResourceCacheLimit(16 * 1024 * 1024)
-            with surface as canvas:
-                canvas.save()
-                # canvas.scale(self.dpi_scale, self.dpi_scale)
-            # 将断言改为更友好的错误处理
-            if surface is None:
-                raise RuntimeError("Failed to create Skia surface")
-            yield surface
-        finally:
-            context.freeGpuResources()
-            context.releaseResourcesAndAbandonContext()
-            context.abandonContext()
+        self.context = skia.GrDirectContext.MakeGL()
+        (fb_width, fb_height) = glfw.get_framebuffer_size(window)
+        backend_render_target = skia.GrBackendRenderTarget(
+            fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
+        )
+        surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
+            self.context,
+            backend_render_target,
+            skia.kBottomLeft_GrSurfaceOrigin,
+            skia.kRGBA_8888_ColorType,
+            skia.ColorSpace.MakeSRGB(),
+        )
+        self.context.setResourceCacheLimit(16 * 1024 * 1024)
+        with surface as canvas:
+            canvas.save()
+            # canvas.scale(self.dpi_scale, self.dpi_scale)
+        # 将断言改为更友好的错误处理
+        if surface is None:
+            raise RuntimeError("Failed to create Skia surface")
+        yield surface
 
     def draw(self):
         if self.visible:
             # Set the current context for each window
             # 【为该窗口设置当前上下文】
             glfw.make_context_current(self.glfw_window)
+            if self.context:
+                self.context.freeGpuResources()
+                self.context.releaseResourcesAndAbandonContext()
             # Create a Surface and hand it over to this window.
             # 【创建Surface，交给该窗口】
             with self.skia_surface(self.glfw_window) as surface:
@@ -349,8 +348,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
                     with surface as canvas:
                         # Determine and call the drawing function of this window.
                         # 【判断并调用该窗口的绘制函数】
-
-                        self.event_trigger("update", SkEvent(event_type="update"))
 
                         if self.draw_func:
                             self.draw_func(canvas)
@@ -375,9 +372,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if self.visible:
             self.event_trigger("update", SkEvent(event_type="update"))
-            glfw.swap_buffers(self.glfw_window)
-            if hasattr(self, "update_layout"):
-                self.update_layout()
+            self.update_layout()
             # self.post()
 
     # endregion
@@ -498,6 +493,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
+        self.draw()
         self.update_layout()
 
     def _on_scroll(self, window, x_offset, y_offset):
