@@ -1,7 +1,8 @@
 import typing
 import warnings
 
-import glfw, skia
+import glfw
+import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc

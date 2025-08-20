@@ -7,12 +7,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import (
-    SkGradient,
-    style_to_color,
-    skcolor2color,
-    SkColor,
-)
+from ..styles.color import SkColor, SkGradient, skcolor2color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkTheme, default_theme
@@ -248,12 +243,13 @@ class SkWidget(SkEventHanding, SkMisc):
     def _draw_text(
         self,
         canvas: skia.Canvas,
-        text: str | dict | None,
-        canvas_x: float | int,
-        canvas_y: float | int,
-        width: float | int,
-        height: float | int,
-        fg: None | str = None,
+        text: str | None = "",
+        canvas_x: float | int = 0,
+        canvas_y: float | int = 0,
+        width: float | int = 9,
+        height: float | int = 0,
+        bg: None | str | int | SkColor = None,
+        fg: None | str | int | SkColor = None,
         padding: int | float = 5,
         align: typing.Literal["center", "right", "left"] = "center",
         font: skia.Font = None,
@@ -276,34 +272,105 @@ class SkWidget(SkEventHanding, SkMisc):
         if not font:
             font = self.attributes["font"]
 
-        if isinstance(text, (str, int, float)):
-            text = str(text)
+        # bg = skia.ColorBLACK
 
-            # 绘制字体
-            @cache
-            def cache_paint(anti_alias, fg_):
-                return skia.Paint(AntiAlias=anti_alias, Color=fg_)
+        text = str(text)
 
-            text_paint = cache_paint(
-                self.anti_alias, style_to_color(fg, self.theme).color
+        # 绘制字体
+        @cache
+        def cache_paint(anti_alias, fg_):
+            return skia.Paint(AntiAlias=anti_alias, Color=fg_)
+
+        text_paint = cache_paint(
+            self.anti_alias, skcolor2color(style_to_color(fg, self.theme))
+        )
+
+        text_width = font.measureText(text)
+
+        if align == "center":
+            draw_x = canvas_x + (width - text_width) / 2
+        elif align == "right":
+            draw_x = canvas_x + width - text_width - padding
+        else:  # left
+            draw_x = canvas_x + padding
+
+        metrics = self.metrics
+        draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
+
+        if bg:
+            bg = skcolor2color(style_to_color(bg, self.theme))
+            bg_paint = skia.Paint(AntiAlias=self.anti_alias, Color=bg)
+            canvas.drawRect(
+                rect=skia.Rect.MakeXYWH(
+                    draw_x,
+                    draw_y + padding,
+                    self.measure_text(text),
+                    metrics.fAscent - metrics.fDescent - padding,
+                ),
+                paint=bg_paint,
             )
 
-            text_width = font.measureText(text)
+        canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
 
-            if align == "center":
-                draw_x = canvas_x + (width - text_width) / 2
-            elif align == "right":
-                draw_x = canvas_x + width - text_width - padding
-            else:  # left
-                draw_x = canvas_x + padding
-
-            metrics = self.metrics
-            draw_y = canvas_y + height / 2 - (metrics.fAscent + metrics.fDescent) / 2
-
-            canvas.drawSimpleText(text, draw_x, draw_y, font, text_paint)
-        elif isinstance(text, dict):
-            return None
         return draw_x, draw_y
+
+    def _draw_styled_text(
+        self,
+        canvas: skia.Canvas,
+        canvas_x: float | int = 0,
+        canvas_y: float | int = 0,
+        width: float | int = 9,
+        height: float | int = 0,
+        bg: None | str | int | SkColor = None,
+        fg: None | str | int | SkColor = None,
+        padding: int | float = 5,
+        # [ "Content", {"start": 5, "end": 10, "fg": skia.ColorRED, "bg": skia.ColorBLACK, "font": skia.Font} ]
+        text: tuple[str, dict[str, str | int | SkColor | skia.Font]] = ("",),
+        font: skia.Font = None,
+    ):
+        if isinstance(text, str):
+            _text = text
+            return None
+        else:
+            _text = text[0]
+        self._draw_text(
+            canvas=canvas,
+            text=_text,
+            canvas_x=canvas_x,
+            canvas_y=canvas_y,
+            width=width,
+            height=height,
+            bg=bg,
+            fg=fg,
+            padding=padding,
+            align="left",
+            font=font,
+        )
+        if isinstance(text, str):
+            return None
+
+        for item in text:
+            if "font" in item:
+                font = item["font"]
+            if "fg" in item:
+                fg = item["fg"]
+            if "bg" in item:
+                bg = item["bg"]
+            if isinstance(item, dict):
+                self._draw_text(
+                    canvas=canvas,
+                    text=_text[item["start"] : item["end"]],
+                    canvas_x=canvas_x + self.measure_text(_text[: item["start"]]),
+                    canvas_y=canvas_y,
+                    width=width,
+                    height=height,
+                    bg=bg,
+                    fg=fg,
+                    padding=padding,
+                    align="left",
+                    font=font,
+                )
+        return None
 
     def _draw_frame(
         self,
@@ -357,7 +424,7 @@ class SkWidget(SkEventHanding, SkMisc):
                         self._draw_rainbow_shader(bg_paint, rect)
 
             canvas.drawRoundRect(rect, radius, radius, bg_paint)
-        if bd:
+        if bd and width > 0:
             bd_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStroke_Style,

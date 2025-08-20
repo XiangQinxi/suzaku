@@ -1,3 +1,5 @@
+import skia
+
 from .lineinput import SkLineInput
 
 
@@ -22,6 +24,15 @@ class SkEntry(SkLineInput):
 
         style = self.theme.get_style(style_name)
 
+        if "selected_bg" in style:
+            selected_bg = style["selected_bg"]
+        else:
+            selected_bg = skia.ColorBLUE
+        if "selected_fg" in style:
+            selected_fg = style["selected_fg"]
+        else:
+            selected_fg = skia.ColorWHITE
+
         # Draw the border
         self._draw_frame(
             canvas,
@@ -34,7 +45,12 @@ class SkEntry(SkLineInput):
 
         # Draw the text input
         self._draw_text_input(
-            canvas, rect, fg=style["fg"], placeholder=style["placeholder"]
+            canvas,
+            rect,
+            fg=style["fg"],
+            placeholder=style["placeholder"],
+            selected_bg=selected_bg,
+            selected_fg=selected_fg,
         )
 
     # endregion

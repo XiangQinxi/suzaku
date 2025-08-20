@@ -16,7 +16,7 @@ import glfw
 import skia
 
 from ..event import SkEvent
-from ..styles.color import style_to_color
+from ..styles.color import skcolor2color, style_to_color
 from ..var import SkStringVar
 from .widget import SkWidget
 
@@ -83,7 +83,6 @@ class SkLineInput(SkWidget):
     def _motion(self, event: SkEvent) -> None:
         if self.is_mouse_pressed:
             self.end_index = self.index(event.x)
-            print(self.start_index, self.end_index)
 
     def _pressed(self, event: SkEvent) -> None:
         self.start_index = self.end_index = self.index(event.x)
@@ -175,26 +174,36 @@ class SkLineInput(SkWidget):
         return self
 
     def index(self, mouse_x: int) -> int:
+        # 如果鼠标超出可见文本的范围
+        if mouse_x >= self._left + self.width - self.padding * 2:
+            self.cursor_right()
+        # 如果鼠标超出画出的文本范围
         if mouse_x >= self._right:
             self.cursor_end()
             return len(self.get())
+        # 如果鼠标超出文本左边的范围
         elif mouse_x <= self._left:
-            self.cursor_home()
-            return 0
-        else:
-            visible_text = self.get()[self.visible_start_index :]
-            for index, _ in enumerate(visible_text):
-                _text = visible_text[:index]
-                if self.measure_text(_text) + self._left >= mouse_x:
-                    _text2 = len(_text) + self.visible_start_index
-                    self.cursor_index(_text2)
-                    return _text2
-                    break
-            return self.cursor_index()
+            if self.visible_start_index == 0:
+                self.cursor_home()
+                return 0
+            else:
+                # 如果文本向左滚动了
+                self.cursor_left()
+                return self.visible_start_index
+        # 遍历可见文本，找到鼠标所在的位置
+        visible_text = self.get()[self.visible_start_index :]
+        for index, _ in enumerate(visible_text):
+            _text = visible_text[:index]
+            if self.measure_text(_text) + self._left >= mouse_x:
+                _text2 = len(_text) + self.visible_start_index
+                self.cursor_index(_text2)
+                return _text2
+                break
+        return self.cursor_index()
 
     def cursor_index(self, index: int | None = None) -> Self | int:
         """Set cursor index"""
-        if index:
+        if index and isinstance(index, int):
             self._cursor_index = index
         else:
             return self._cursor_index
@@ -242,6 +251,9 @@ class SkLineInput(SkWidget):
                 self.cursor_left()
         else:
             start, end = sorted([self.start_index, self.end_index])
+            self.start_index = self.end_index = self._cursor_index = len(
+                self.get()[:start]
+            )
             self.set(self.get()[:start] + self.get()[end:])
         return self
 
@@ -258,9 +270,17 @@ class SkLineInput(SkWidget):
     # endregion
 
     def _draw_text_input(
-        self, canvas: skia.Canvas, rect: skia.Rect, fg, placeholder
+        self,
+        canvas: skia.Canvas,
+        rect: skia.Rect,
+        fg,
+        placeholder,
+        selected_bg=skia.ColorBLUE,
+        selected_fg=skia.ColorWHITE,
     ) -> None:
         """Draw the text input"""
+
+        fg = skcolor2color(style_to_color(fg, self.theme))
 
         # Draw text
         font: skia.Font = self.attributes["font"]
@@ -282,20 +302,45 @@ class SkLineInput(SkWidget):
 
         text = self.get()
 
+        start, end = sorted([self.start_index, self.end_index])
+
         if text:
             # Draw the text
-            self._draw_text(
-                canvas=canvas,
-                text=text[self.visible_start_index :],
-                font=font,
-                fg=fg,
-                align="left",
-                padding=self.padding,
-                canvas_x=self.canvas_x,
-                canvas_y=self.canvas_y,
-                width=self.width,
-                height=self.height,
-            )
+            if self.is_selected():
+                _text = (
+                    text[self.visible_start_index :],
+                    {
+                        "start": start - self.visible_start_index,
+                        "end": end - self.visible_start_index,
+                        "fg": selected_fg,
+                        "bg": selected_bg,
+                    },
+                )
+                self._draw_styled_text(
+                    canvas=canvas,
+                    text=_text,
+                    font=font,
+                    fg=fg,
+                    padding=self.padding,
+                    canvas_x=self.canvas_x,
+                    canvas_y=self.canvas_y,
+                    width=self.width,
+                    height=self.height,
+                )
+            else:
+                _text = text[self.visible_start_index :]
+                self._draw_text(
+                    canvas=canvas,
+                    text=_text,
+                    font=font,
+                    fg=fg,
+                    align="left",
+                    padding=self.padding,
+                    canvas_x=self.canvas_x,
+                    canvas_y=self.canvas_y,
+                    width=self.width,
+                    height=self.height,
+                )
             self._left = round(rect.left() + self.padding)  # 文本左边缘
             self._right = round(
                 self._left + self.measure_text(text[self.visible_start_index :])
@@ -330,7 +375,7 @@ class SkLineInput(SkWidget):
                     y1=draw_y + metrics.fDescent,
                     paint=skia.Paint(
                         AntiAlias=False,
-                        Color=style_to_color(fg, self.theme).color,
+                        Color=fg,
                         StrokeWidth=1.5,
                     ),
                 )
