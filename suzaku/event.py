@@ -1,24 +1,126 @@
-import threading
 import typing
+import threading
 import warnings
 from dataclasses import dataclass
 
 
-class BindedTask():
-    """A class to represent binded task when a event triggered."""
-    def __init__(self, binded_to: str, id_: str):
-        self.binded_to: str = binded_to
+class SkBindedTask():
+    """A class to represent binded task when a event is triggered."""
+    def __init__(self, id_: str, target: typing.Callable, multithread: bool=False, _keep_at_clear: bool=False):
+        """Each object is to represent a task binded to the event.
+
+        Example
+        -------
+        This is mostly for internal use of suzaku.
+        .. code-block:: python
+            class SkEventHandling():
+                def bind(self, ...):
+                    ...
+                    task = SkBindedTask(...)
+                    ...
+        This shows where this class is used in most cases.
+
+        :param id_: The task id of this task
+        :param target: A callable thing, what to do when this task is executed
+        :param multithread: If this task should be executed in another thread (False by default)
+        :param _keep_at_clear: If the task should be kept when clearning the event's binding
+        """
         self.id: str = id_
+        self.target: typing.Callable = target
+        self.multithread: bool = multithread
+        self.keep_at_clear: bool = _keep_at_clear
 
 
-class EventHandling():
+class SkEventHandling():
     """A class containing event handling abilities.
     
-    This class should be inherited by other classes with such abilities."""
+    This class should be inherited by other classes with such abilities.
+    """
+
+    EVENT_TYPES: list[str] = [
+        "resize", "move", "configure", "update", 
+        "mouse_move", "mouse_enter", "mouse_leave", "mouse_press", "mouse_release", 
+        "focus_gain", "focus_loss", 
+        "key_press", "key_release", "key_repeat", 
+        "char", "click", 
+    ]
+    multithread_tasks: list[SkBindedTask] = []
+    WORKING_THREAD: threading.Thread
+    instance_count = 0
+
+    @classmethod
+    def _working_thread_loop(cls):
+        return [task.target() for task in cls.multithread_tasks]
 
     def __init__(self):
-        self.event: dict[str, dict[str, list[typing.Any]]]
+        """A class containing event handling abilities.
+        
+        Example
+        -------
+        This is mostly for internal use of suzaku.
+        .. code-block:: python
+            class SkWidget(SkEventHandling, ...):
+                def __init__(self):
+                    super().__init__(self)
+            ...
+        This shows subclassing SkEventHandling to let SkWidget gain the ability of handling events.
+        """
+        self.events: list = []
+        self.tasks: dict[str, list[SkBindedTask]] = {}
+        # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
+        self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
+        ## Initialize tasks list
+        for event_type in self.__class__.EVENT_TYPES:
+            self.tasks[event_type] = []
+        ## Accumulate instance count
+        self.__class__.instance_count += 1
+    
+    def trigger(self, event_type: str) -> None:
+        """To trigger a type of event
 
+        Example
+        -------
+        .. code-block:: python
+            class SkWidget(SkEventHandling, ...):
+                ...
+            
+            my_widget = SkWidget()
+            my_widget.trigger("mouse_press")
+        This shows triggering a `mouse_press` event in a `SkWidget`, which inherited `SkEventHandling` so has the 
+        ability to handle events.
+        
+        :param event_type: The type of event to trigger
+        """
+        for task in self.tasks[event_type]:
+            if not task.multithread:
+                task.target()
+            else:
+                NotImplemented
+    
+    def bind(self, event_type: str, target: typing.Callable, 
+             multithread: bool, _keep_at_clear: bool) -> bool:
+        """To bind a task to the object when a specific type of event is triggered.
+
+        Example
+        -------
+        .. code-block
+        
+        :param event_type: The type of event to be binded to
+        :param target: A callable thing, what to do when this task is executed
+        :param multithread: If this task should be executed in another thread (False by default)
+        :param _keep_at_clear: If the task should be kept when clearning the event's binding
+        :return: If success
+        """
+        if event_type not in self.__class__.EVENT_TYPES:
+            warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
+                           "so the task cannot be binded as expected.")
+            return False
+        event_id = f"{len(self.tasks[event_type])}" # e.g. 
+        task = SkBindedTask(event_id, target, multithread, _keep_at_clear)
+
+
+# Initialize working thread
+SkEventHandling.WORKING_THREAD = threading.Thread(target = SkEventHandling._working_thread_loop)
 
 class SkEventHandingOld:
     """SkEvent binding manager.【事件绑定管理器】"""
@@ -30,6 +132,7 @@ class SkEventHandingOld:
     def __init__(self):
         # events = { event_name : { event_id : [event_func, whether_to_use_multithreading] } }
         self.events: dict[str, dict[str, list[typing.Callable | bool]]] = {}
+        warnings.warn("Old SkEventHanlding class will be deprecated.", DeprecationWarning)
 
     def event_generate(self, name: str) -> typing.Self:
         """Create a new event type.【创建一个新的事件类型】
