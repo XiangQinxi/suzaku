@@ -111,6 +111,7 @@ class SkWidget(SkEventHanding, SkMisc):
             "click": dict(),
             "configure": dict(),
             "update": dict(),
+            "scroll": dict(),
         }
 
         self.layout_config: dict[str, dict] = {"none": {}}

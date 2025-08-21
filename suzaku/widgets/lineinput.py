@@ -68,6 +68,7 @@ class SkLineInput(SkWidget):
         self.bind("mouse_pressed", self._pressed)
         self.window.bind("mouse_motion", self._motion)
         self.bind("mouse_motion", self._motion)
+        self.bind("scroll", self._scroll)
 
     # endregion
 
@@ -79,6 +80,18 @@ class SkLineInput(SkWidget):
         :return: bool
         """
         return self.start_index != self.end_index
+
+    def _scroll(self, event: SkEvent) -> None:
+        """Scroll the text with the mouse wheel.
+        【鼠标滚轮滚动文本】
+        :param event: SkEvent
+        :return: None
+        """
+        if event.y_offset > 0 or event.x_offset > 0:
+            self.cursor_right()
+        elif event.y_offset < 0 or event.x_offset < 0:
+            self.cursor_left()
+        self.cursor_visible = True
 
     def _focus_gain(self, event: SkEvent) -> None:
         """Triggered when the input box gains focus.

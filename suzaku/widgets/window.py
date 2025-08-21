@@ -57,6 +57,8 @@ class SkWindow(SkWindowBase, SkContainer):
         self.bind("key_repeated", self._key_repected)
         self.bind("key_released", self._key_released)
 
+        self.bind("scroll", self._scroll)
+
     # endregion
 
     # region Theme related 主题相关
@@ -90,23 +92,28 @@ class SkWindow(SkWindowBase, SkContainer):
             self.focus_get().event_trigger("key_pressed", event)
         del event
 
-    def _key_repected(self, event):
+    def _scroll(self, event: SkEvent) -> None:
+        if self.focus_get() is not self:
+            self.focus_get().event_trigger("scroll", event)
+        del event
+
+    def _key_repected(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_repeated", event)
         del event
 
-    def _key_released(self, event):
+    def _key_released(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_released", event)
         del event
 
-    def _char(self, event):
+    def _char(self, event: SkEvent) -> None:
         # print(12)
         if self.focus_get() is not self:
             self.focus_get().event_trigger("char", event)
         del event
 
-    def _leave(self, event):
+    def _leave(self, event: SkEvent) -> None:
         event = SkEvent(
             event_type="mouse_leave",
             x=event.x,
@@ -119,7 +126,7 @@ class SkWindow(SkWindowBase, SkContainer):
             widget.event_trigger("mouse_leave", event)
         del event
 
-    def _mouse(self, event) -> None:
+    def _mouse(self, event: SkEvent) -> None:
         for widget in self.children:
             if (
                 widget.canvas_x <= event.x <= widget.canvas_x + widget.width
@@ -192,7 +199,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         return None
 
-    def _mouse_released(self, event) -> None:
+    def _mouse_released(self, event: SkEvent) -> None:
         """Mouse release event for SkWindow.
 
         :param event:
