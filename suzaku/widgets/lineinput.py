@@ -285,6 +285,10 @@ class SkLineInput(SkWidget):
                 and self.visible_start_index != 0
             ):
                 self.visible_start_index -= move
+        elif self.cursor_index() == 0:
+            if cancel_selected:
+                if self.is_selected():
+                    self.start_index = self.end_index = 0
 
         return self
 
@@ -296,7 +300,8 @@ class SkLineInput(SkWidget):
         :param bool cancel_selected: 【是否取消光标的选择状态（点击右按键时建议启用）】
         """
         # 【光标在最右的时候不执行接下判断】
-        if self.cursor_index() < len(self.get()):
+        long = len(self.get())
+        if self.cursor_index() < long:
             # 【如果文本被选中，则光标向左移动时，光标索引为选中文本的起始索引】
             if cancel_selected:
                 if self.is_selected():
@@ -310,8 +315,8 @@ class SkLineInput(SkWidget):
                 self.start_index = self.end_index = self._cursor_index
             else:
                 self.end_index = self._cursor_index
-            if self._cursor_index >= len(self.get()):
-                self.cursor_index(len(self.get()))
+            if self._cursor_index >= long:
+                self.cursor_index(long)
             # 【光标向右移动时，若可显文本到光标大于等于可见文本范围】
             while (
                 self.measure_text(
@@ -322,6 +327,10 @@ class SkLineInput(SkWidget):
                 >= self._rect.width()
             ):
                 self.visible_start_index += move
+        elif self.cursor_index() == long:
+            if cancel_selected:
+                if self.is_selected():
+                    self.start_index = self.end_index = long
         return self
 
     def delete_selected(self):
