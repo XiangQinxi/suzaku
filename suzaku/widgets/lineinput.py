@@ -45,6 +45,7 @@ class SkLineInput(SkWidget):
         :param cursor: 光标样式
         """
         super().__init__(*args, size=size, cursor=cursor, **kwargs)
+
         self.attributes["text"] = text
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["placeholder"] = placeholder  # 占位文本
@@ -57,15 +58,10 @@ class SkLineInput(SkWidget):
         self.cursor_visible = True  # 文本光标是否可显
         self.attributes["blink_interval"] = 0.5  # 闪烁间隔 (毫秒)
 
-        def blink(_=None):
-            self.cursor_visible = not self.cursor_visible
-            self.after(self.cget("blink_interval"), blink)
-
-        blink()
-
         self.textvariable = textvariable
         self.focusable = True
 
+        self.bind("focus_gain", self._focus_gain)
         self.bind("char", self._char)
         self.bind("key_pressed", self._key)
         self.bind("key_repeated", self._key)
@@ -84,19 +80,31 @@ class SkLineInput(SkWidget):
         """
         return self.start_index != self.end_index
 
+    def _focus_gain(self, event: SkEvent) -> None:
+        """Triggered when the input box gains focus.
+        【当输入框获得焦点时触发】
+        :param event: SkEvent
+        """
+        self.blink()
+        self.cursor_visible = True
+
     def _motion(self, event: SkEvent) -> None:
         """Record the `end_index` when the text is pressed and moved.
         【当文本被按住并移动时，记录end_index】
         :param event: SkEvent
         """
-        if self.is_mouse_pressed:
-            self.end_index = self.index(event.x)
+        # 【只有在左键按下时，才记录end_index】
+        if self.button == 0:
+            if self.is_mouse_pressed:
+                self.end_index = self.index(event.x)
 
     def _pressed(self, event: SkEvent) -> None:
         """Record the `start_index` and `end_index` when the text is pressed.
         【当文本被按住时，记录`start_index`与`end_index`。】
         """
-        self.start_index = self.end_index = self.index(event.x)
+        # 【只有在左键按下时，才记录start_index】
+        if event.button == 0:
+            self.start_index = self.end_index = self.index(event.x)
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered.
@@ -419,17 +427,79 @@ class SkLineInput(SkWidget):
 
     # endregion
 
+    # region Draw 绘制
+
+    def blink(self, event=None):
+        self.cursor_visible = not self.cursor_visible
+        # 【仅当输入框获得焦点时光标闪烁】
+        # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
+        if self.is_focus:
+            self.after(self.cget("blink_interval"), self.blink)
+
+    def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
+        """Draw the text input
+        【绘制输入框（不含边框）】
+        """
+        if self.is_mouse_floating:
+            if self.is_focus:
+                style_name = "SkEntry:focus"
+            else:
+                style_name = "SkEntry:hover"
+        elif self.is_focus:
+            style_name = "SkEntry:focus"
+        else:
+            style_name = "SkEntry"
+
+        style = self.theme.get_style(style_name)
+        radius = self.theme.get_style_attr("SkEntry", "radius")
+
+        if "selected_bg" in style:
+            selected_bg = style["selected_bg"]
+        else:
+            selected_bg = skia.ColorBLUE
+        if "selected_fg" in style:
+            selected_fg = style["selected_fg"]
+        else:
+            selected_fg = skia.ColorWHITE
+        if "cursor" in style:
+            cursor = style["cursor"]
+        else:
+            cursor = None
+        if "placeholder" in style:
+            placeholder = style["placeholder"]
+        else:
+            placeholder = None
+        if "selected_radius" in style:
+            selected_radius = style["selected_radius"]
+        else:
+            selected_radius = True
+        if isinstance(selected_radius, bool):
+            if selected_radius:
+                selected_radius = radius
+            else:
+                selected_radius = 0
+        self._draw_text_input(
+            canvas,
+            rect,
+            fg=style["fg"],
+            placeholder=placeholder,
+            selected_bg=selected_bg,
+            selected_fg=selected_fg,
+            cursor=cursor,
+            radius=selected_radius,
+        )
+
     def _draw_text_input(
         self,
         canvas: skia.Canvas,
         rect: skia.Rect,
-        fg: int | SkColor,
-        bg: int | SkColor = None,
-        placeholder: int | SkColor = None,
+        fg: int | SkColor | tuple[int, int, int, int],
+        bg: int | SkColor | tuple[int, int, int, int] = None,
+        placeholder: int | SkColor | tuple[int, int, int, int] = None,
         font: skia.Font = None,
-        cursor: int | SkColor = None,
-        selected_bg=skia.ColorBLUE,
-        selected_fg=skia.ColorWHITE,
+        cursor: int | SkColor | tuple[int, int, int, int] = None,
+        selected_bg: int | SkColor | tuple[int, int, int, int] = skia.ColorBLUE,
+        selected_fg: int | SkColor | tuple[int, int, int, int] = skia.ColorWHITE,
         radius: int | float = None,
     ) -> None:
         """Draw the text input
@@ -544,9 +614,9 @@ class SkLineInput(SkWidget):
                 )
                 canvas.drawLine(
                     x0=cursor_x,
-                    y0=self._rect.top() + 2,
+                    y0=self._rect.top() + 3,
                     x1=cursor_x,
-                    y1=self._rect.bottom() - 2,
+                    y1=self._rect.bottom() - 3,
                     paint=skia.Paint(
                         AntiAlias=False,
                         Color=cursor,
@@ -567,3 +637,5 @@ class SkLineInput(SkWidget):
 
         # 【关闭文本裁剪】
         canvas.restore()
+
+    # endregion

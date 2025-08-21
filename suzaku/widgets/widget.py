@@ -767,13 +767,14 @@ class SkWidget(SkEventHanding, SkMisc):
         Set focus
         """
         if self.focusable:
-            self.window.focus_get().event_trigger(
-                "focus_loss", SkEvent(event_type="focus_loss")
-            )
-            self.window.focus_get().is_focus = False
-            self.window.focus_widget = self
-            self.is_focus = True
-            self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
+            if not self.is_focus:
+                self.window.focus_get().event_trigger(
+                    "focus_loss", SkEvent(event_type="focus_loss")
+                )
+                self.window.focus_get().is_focus = False
+                self.window.focus_widget = self
+                self.is_focus = True
+                self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:
         """
