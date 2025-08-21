@@ -156,6 +156,8 @@ class SkGradient:
                 return x + width / 2, y + height
             case "se":
                 return x + width, y + height
+            case "center":
+                return x + width / 2, y + height / 2
             case _:
                 return 0, 0
 

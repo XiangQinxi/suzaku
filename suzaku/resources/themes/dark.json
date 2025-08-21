@@ -28,7 +28,7 @@
         "bg": [40, 40, 40, 255],
         "bg_shader": {
           "linear_gradient": {
-            "start_anchor": "n",
+            "start_anchor": "center",
             "end_anchor": "s",
             "colors": [
               [35, 35, 35, 255],

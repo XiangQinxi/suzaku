@@ -126,12 +126,24 @@ class SkWindow(SkWindowBase, SkContainer):
             widget.event_trigger("mouse_leave", event)
         del event
 
+    @staticmethod
+    def is_entered_widget_bounds(widget, event: SkEvent) -> bool:
+        return (
+            widget.canvas_x <= event.x <= widget.canvas_x + widget.width
+            and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
+        )
+
+    def is_entered_widget(self, widget, event: SkEvent) -> bool:
+        parent = widget.parent
+        return (
+            parent.canvas_x <= event.x <= parent.canvas_x + parent.width
+            and parent.canvas_y <= event.y <= parent.canvas_y + parent.height
+            and self.is_entered_widget_bounds(widget, event)
+        )
+
     def _mouse(self, event: SkEvent) -> None:
         for widget in self.children:
-            if (
-                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
-                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
-            ):
+            if self.is_entered_widget(widget, event):
                 widget.is_mouse_floating = True
                 if widget.focusable:
                     widget.focus_set()
@@ -156,10 +168,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
         # 找到当前鼠标所在的视觉元素
         for widget in reversed(self.children):
-            if (
-                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
-                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
-            ):
+            if self.is_entered_widget(widget, event):
                 current_widget = widget
                 break
 

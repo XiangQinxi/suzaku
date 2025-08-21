@@ -19,10 +19,7 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 550),
         )
-        # window.bind("delete_window", lambda _: window.can_be_close(False))
         window.apply_theme(SkTheme.INTERNAL_THEMES["default.dark"])
-        # window.apply_theme(default_theme)
-        # window.hide()
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)
