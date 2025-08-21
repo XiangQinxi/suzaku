@@ -9,7 +9,7 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    app = SkApp(is_get_context_on_focus=True, is_always_update=True)
+    app = SkApp(is_get_context_on_focus=True, is_always_update=False)
     # print(glfw.default_window_hints())
 
     def create1window():
@@ -36,13 +36,6 @@ if __name__ == "__main__":
         SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var = SkStringVar()
-        SkLineInput(frame, placeholder="无边框输入框", textvariable=var).box(
-            padx=10, pady=(10, 0)
-        )
-
-        SkEntry(frame, placeholder="数值绑定", textvariable=var).box(
-            padx=10, pady=(10, 0)
-        )
         SkEntry(frame, placeholder="数值绑定", textvariable=var).box(
             padx=10, pady=(10, 0)
         )

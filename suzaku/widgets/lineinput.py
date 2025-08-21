@@ -117,6 +117,7 @@ class SkLineInput(SkWidget):
         """
         # 【只有在左键按下时，才记录start_index】
         if event.button == 0:
+            self.cursor_visible = True
             self.start_index = self.end_index = self.index(event.x)
 
     def _char(self, event: SkEvent):
@@ -366,11 +367,12 @@ class SkLineInput(SkWidget):
         """
         _index = self.cursor_index()
         _text = self.get()
+        # print(_index, len(_text))
         if not self.is_selected():
-            if +1 < len(_text):
-                self.set(_text[: _index + 1] + _text[_index + 2 :])
-            elif _index == len(_text) - 1:
-                self.set(_text[_index + 1 :])
+            if _index + 1 < len(_text):
+                self.set(_text[:_index] + _text[_index + 1 :])
+            elif _index + 1 == len(_text):
+                self.set(_text[:_index])
         else:
             self.delete_selected()
         return self
