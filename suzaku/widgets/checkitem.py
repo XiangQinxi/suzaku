@@ -11,13 +11,12 @@ class SkCheckItem(SkFrame):
     def __init__(
         self,
         *args,
-        size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         text: str = "",
         **kwargs,
     ) -> None:
-        super().__init__(*args, size=size, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.attributes["cursor"] = cursor
 

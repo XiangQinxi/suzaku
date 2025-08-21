@@ -21,6 +21,18 @@ class SkImage(SkWidget):
         self.x: int = x
         self.y: int = y
 
+    @property
+    def dwidth(self):
+        _width = self.width
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.text_height + 8
+        return _height
+
     def draw_widget(self, canvas, rect) -> None:
         """Draw image
 

@@ -12,6 +12,7 @@
 
     "SkBadge": {
       "rest": {
+        "size": [0, 35],
         "radius": 99,
         "bg": [5, 105, 200, 255],
         "fg": [255, 255, 255, 235],
@@ -22,6 +23,7 @@
 
     "SkButton": {
       "rest": {
+        "size": [0, 35],
         "radius": 5,
         "bg": [40, 40, 40, 255],
         "bg_shader": {
@@ -83,6 +85,7 @@
 
     "SkCard": {
       "rest": {
+        "size": [120, 200],
         "radius": 8,
         "bg": [25, 25, 25, 245],
         "bd": [35, 35, 35, 245],
@@ -93,6 +96,7 @@
 
     "SkEntry": {
       "rest": {
+        "size": [120, 35],
         "radius": 6,
         "bg": [30, 30, 30, 245],
         "fg": {"color_palette": "default_fg"},
@@ -123,6 +127,7 @@
 
     "SkFrame": {
       "rest": {
+        "size": [120, 200],
         "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
@@ -132,6 +137,7 @@
 
     "SkText": {
       "rest": {
+        "size": [0, 0],
         "fg": [255, 255, 255, 245]
       }
     },

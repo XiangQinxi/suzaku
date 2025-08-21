@@ -10,7 +10,7 @@ from ..misc import SkMisc
 from ..styles.color import SkColor, SkGradient, skcolor2color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
-from ..styles.theme import SkTheme, default_theme
+from ..styles.theme import SkTheme, default_theme, SkStyleNotFoundError
 from .appwindow import SkAppWindow
 from .window import SkWindow
 
@@ -26,8 +26,8 @@ class SkWidget(SkEventHanding, SkMisc):
     def __init__(
         self,
         parent,
-        size: tuple[int, int] = (100, 30),
         cursor: str = "arrow",
+        style: str = "SkWidget",
         font: skia.Font | None = default_font,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
@@ -40,6 +40,7 @@ class SkWidget(SkEventHanding, SkMisc):
         SkEventHanding.__init__(self)
 
         self.parent = parent
+        self.style = style
 
         try:
             self.window: SkWindow | SkAppWindow = (
@@ -52,7 +53,6 @@ class SkWidget(SkEventHanding, SkMisc):
             raise AttributeError(
                 f"Parent component is not a SkWindow-based object. {self.parent}"
             )
-
         self.anti_alias = self.window.anti_alias
         self.id = (
             self.window.id
@@ -61,38 +61,6 @@ class SkWidget(SkEventHanding, SkMisc):
             + str(self._instance_count + 1)
         )
         SkWidget._instance_count += 1
-
-        self.attributes: dict[str, Any] = {
-            "cursor": cursor,
-            "theme": None,
-            "dwidth": size[0],  # default width
-            "dheight": size[1],  # default height
-            "font": font,
-        }
-
-        self.theme: SkTheme = self.parent.theme
-        self.styles = self.theme.styles
-
-        # 相对于父组件的坐标
-        self._x: int | float = 0
-        self._y: int | float = 0
-        # 相对于整个画布、整个窗口（除了标题栏）的坐标
-        self._canvas_x: int | float = self.parent.x + self._x
-        self._canvas_y: int | float = self.parent.y + self._y
-        # 相对于整个屏幕的坐标
-        self._root_x: int | float = self.window.root_x
-        self._root_y: int | float = self.window.root_y
-        # 鼠标坐标
-        self.mouse_x = 0
-        self.mouse_y = 0
-        self.mouse_root_x = 0
-        self.mouse_root_y = 0
-
-        self.width: int | float = size[0]
-        self.height: int | float = size[1]
-
-        self.focusable: bool = False
-        self.visible: bool = False
 
         self.events = {
             "resize": dict(),
@@ -113,6 +81,38 @@ class SkWidget(SkEventHanding, SkMisc):
             "update": dict(),
             "scroll": dict(),
         }
+
+        self.attributes: dict[str, Any] = {
+            "cursor": cursor,
+            "theme": None,
+            "dwidth": 100,  # default width
+            "dheight": 30,  # default height
+            "font": font,
+        }
+
+        self.apply_theme(self.parent.theme)
+        self.styles = self.theme.styles
+
+        # 相对于父组件的坐标
+        self._x: int | float = 0
+        self._y: int | float = 0
+        # 相对于整个画布、整个窗口（除了标题栏）的坐标
+        self._canvas_x: int | float = self.parent.x + self._x
+        self._canvas_y: int | float = self.parent.y + self._y
+        # 相对于整个屏幕的坐标
+        self._root_x: int | float = self.window.root_x
+        self._root_y: int | float = self.window.root_y
+        # 鼠标坐标
+        self.mouse_x = 0
+        self.mouse_y = 0
+        self.mouse_root_x = 0
+        self.mouse_root_y = 0
+
+        self.width: int | float = 0
+        self.height: int | float = 0
+
+        self.focusable: bool = False
+        self.visible: bool = False
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
@@ -463,9 +463,23 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Widget attribute configs 组件属性配置
 
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        return _height
+
     def destroy(self) -> None:
         self.gradient = None
         del self
+
+    @property
+    def text_height(self):
+        return self.metrics.fDescent - self.metrics.fAscent
 
     @property
     def metrics(self):
@@ -597,6 +611,13 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Theme related 主题相关
 
+    def read_size(self, selector: str):
+        try:
+            size = self.theme.get_style_attr(selector, "size")
+            self.config(dwidth=size[0], dheight=size[1])
+        except SkStyleNotFoundError:
+            pass
+
     def apply_theme(self, new_theme: SkTheme):
         """Apply theme to the widget and its children.`
 
@@ -605,6 +626,7 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         self.theme = new_theme
         self.styles = self.theme.styles
+        self.read_size(self.style)
         if hasattr(self, "children"):
             for child in self.children:
                 child.apply_theme(new_theme)
@@ -642,20 +664,14 @@ class SkWidget(SkEventHanding, SkMisc):
         :param height:
         :return: self
         """
-        self.x = x
-        self.y = y
-        if width:
-            self.width = width
-        if height:
-            self.height = height
         self.visible = True
         self.layout_config = {
             "fixed": {
                 "layout": "fixed",
-                "x": self.x,
-                "y": self.y,
-                "width": self.width,
-                "height": self.height,
+                "x": x,
+                "y": y,
+                "width": width,
+                "height": height,
             }
         }
         self.parent.add_fixed_child(self)

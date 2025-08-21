@@ -9,13 +9,12 @@ class SkCheckBox(SkWidget):
     def __init__(
         self,
         *args,
-        size=(32, 32),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         selected: bool = False,
         **kwargs,
     ):
-        super().__init__(*args, size=size, cursor=cursor, **kwargs)
+        super().__init__(*args, cursor=cursor, **kwargs)
         self.attributes["selected"] = selected
         self.focusable = True
 

@@ -304,7 +304,7 @@ class SkContainer:
                     top = bottom = child.layout_config["box"]["pady"]
 
                 if not child.layout_config["box"]["expand"]:
-                    child.width = child.cget("dheight")
+                    child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
@@ -328,7 +328,7 @@ class SkContainer:
                     top = bottom = child.layout_config["box"]["pady"]
 
                 if not child.layout_config["box"]["expand"]:
-                    child.width = child.cget("dheight")
+                    child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
@@ -376,7 +376,7 @@ class SkContainer:
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.height = child.cget("dheight")
+                    child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
                 child.x = left
@@ -400,7 +400,7 @@ class SkContainer:
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.height = child.cget("dheight")
+                    child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
                 child.x = left
@@ -413,10 +413,20 @@ class SkContainer:
 
         :param child: The child widget
         """
-        child.x = child.layout_config["fixed"]["x"]
-        child.y = child.layout_config["fixed"]["y"]
-        child.width = child.layout_config["fixed"]["width"]
-        child.height = child.layout_config["fixed"]["height"]
+        config = child.layout_config["fixed"]
+        child.x = config["x"]
+        child.y = config["y"]
+
+        width = config["width"]
+        if not width:
+            width = child.dwidth
+
+        height = config["height"]
+        if not height:
+            height = child.dheight
+
+        child.width = width
+        child.height = height
 
     # endregion
 

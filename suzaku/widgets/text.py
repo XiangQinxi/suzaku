@@ -39,6 +39,8 @@ class SkText(SkWidget):
             self.attributes["textvariable"].set(text)
         else:
             self.attributes["text"] = text
+        if not self.cget("dwidth") or not self.cget("dheight"):
+            self.parent.update_layout()
         return self
 
     def get(self) -> str:
@@ -47,6 +49,20 @@ class SkText(SkWidget):
             return self.attributes["textvariable"].get()
         else:
             return self.attributes["text"]
+
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            _width = self.measure_text(self.get()) + 8
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.text_height + 8
+        return _height
 
     # region Draw
 

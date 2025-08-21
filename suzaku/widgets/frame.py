@@ -19,9 +19,9 @@ class SkFrame(SkWidget, SkContainer):
     """
 
     def __init__(
-        self, parent: SkContainer, *args, size: tuple[int, int] = (100, 100), **kwargs
+        self, parent: SkContainer, *args, style: str = "SkFrame", **kwargs
     ) -> None:
-        SkWidget.__init__(self, parent, *args, size=size, **kwargs)
+        SkWidget.__init__(self, parent, *args, style=style, **kwargs)
         SkContainer.__init__(self)
 
     # region Draw
@@ -33,7 +33,7 @@ class SkFrame(SkWidget, SkContainer):
         :param rect: skia.Rect
         :return: None
         """
-        style = self.theme.get_style("SkFrame")
+        style = self.theme.get_style(self.style)
         if "bd_shadow" in style:
             bd_shadow = style["bd_shadow"]
         else:

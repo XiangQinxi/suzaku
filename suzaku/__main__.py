@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     def create1window():
         window = SkWindow(
-            anti_alias=False,
+            anti_alias=True,
             parent=None,
             title="Suzaku GUI",
             size=(280, 550),
@@ -33,7 +33,7 @@ if __name__ == "__main__":
             padx=10, pady=(10, 0)
         )
         SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
-        SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
+        # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var = SkStringVar()
         SkEntry(frame, placeholder="数值绑定", textvariable=var).box(
