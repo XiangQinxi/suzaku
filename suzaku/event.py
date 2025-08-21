@@ -161,7 +161,8 @@ class SkEvent:
     rooty: Optional[int] = None  # 【相对y轴坐标】
     key: Union[int, str, None] = None  # 【键盘按键】
     keyname: Optional[str] = None  # 【键盘按键名】
-    mods: Optional[str] = None  # 【修饰键】
+    mods: Optional[str] = None  # 【修饰键名】
+    mods_key: Optional[int] = None  # 【修饰键值】
     char: Optional[str] = None  # 【输入文本值】
     width: Optional[int] = None  # 【宽度】
     height: Optional[int] = None  # 【高度】

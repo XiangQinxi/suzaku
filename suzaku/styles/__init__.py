@@ -4,4 +4,4 @@ from .drop_shadow import SkDropShadow
 from .font import SkFont, default_font
 from .point import point
 from .texture import SkAcrylic
-from .theme import SkStyleNotFoundError, SkTheme, default_theme
+from .theme import SkStyleNotFoundError, SkTheme, default_theme, dark_theme

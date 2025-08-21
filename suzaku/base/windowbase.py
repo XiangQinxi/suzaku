@@ -401,29 +401,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
             else:
                 return False
 
-    @staticmethod
-    def mods_name(_mods):
-        MOD_CTRL_SHIFT = 3
-        mods_dict = {
-            glfw.MOD_CONTROL: "control",
-            glfw.MOD_ALT: "alt",
-            glfw.MOD_SHIFT: "shift",
-            MOD_CTRL_SHIFT: "control+shift",
-            glfw.MOD_SUPER: "super",
-            glfw.MOD_NUM_LOCK: "num_lock",
-            glfw.MOD_CAPS_LOCK: "caps_lock",
-        }
-        # print(_mods)
-
-        # print(mods_dict[_mods])
-        try:
-            if _mods:
-                return mods_dict[_mods]
-            else:
-                return "none"
-        except KeyError:
-            return "none"
-
     def _on_char(self, window: typing.Any, char: int) -> None:
         """Trigger text input event
 
@@ -470,6 +447,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 key=key,
                 keyname=keyname,
                 mods=self.mods_name(mods),
+                mods_key=mods,
                 glfw_window=window,
             ),
         )

@@ -33,7 +33,9 @@ class SkWindow(SkWindowBase, SkContainer):
         SkWindowBase.__init__(self, parent=parent, *args, size=size, **kwargs)
         SkContainer.__init__(self)
 
-        self.theme: SkTheme = theme
+        self.theme: SkTheme | None = None
+        self.styles: dict | None = None
+        self.apply_theme(theme)
 
         self.focus_widget = self
         self.draws: list[typing.Callable] = []
@@ -128,12 +130,26 @@ class SkWindow(SkWindowBase, SkContainer):
 
     @staticmethod
     def is_entered_widget_bounds(widget, event: SkEvent) -> bool:
-        return (
-            widget.canvas_x <= event.x <= widget.canvas_x + widget.width
-            and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
-        )
+        """Check if within the widget's bounds.
+        【检查是否进入组件范围（即使超出父组件，其超出部分进入仍判定为True）】
+        :param widget: SkWidget
+        :param event: SkEvent
+        :return bool:
+        """
+        if widget.visible:
+            return (
+                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
+                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
+            )
+        return False
 
     def is_entered_widget(self, widget, event: SkEvent) -> bool:
+        """Check if within the widget.
+        【检查是否进入组件】
+        :param widget: SkWidget
+        :param event: SkEvent
+        :return bool:
+        """
         parent = widget.parent
         return (
             parent.canvas_x <= event.x <= parent.canvas_x + parent.width
