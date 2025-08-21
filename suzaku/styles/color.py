@@ -156,12 +156,31 @@ class SkGradient:
                 return x + width / 2, y + height
             case "se":
                 return x + width, y + height
+            case "center":
+                return x + width / 2, y + height / 2
             case _:
                 return 0, 0
+
+    def draw(self, paint: skia.Paint) -> None:
+        paint.setShader(self.gradient)
 
     def linear(
         self,
         paint: skia.Paint,
+        config: (
+            dict | None
+        ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
+        widget=None,
+        start_pos: tuple[int | float, int | float] | None = None,
+        end_pos: tuple[int | float, int | float] | None = None,
+    ):
+        self.set_linear(
+            config=config, widget=widget, start_pos=start_pos, end_pos=end_pos
+        )
+        self.draw(paint)
+
+    def set_linear(
+        self,
         config: (
             dict | None
         ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
@@ -189,6 +208,7 @@ class SkGradient:
         :param start_pos: Start position
         :return: cls
         """
+        self.gradient = None
         if config:
 
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
@@ -226,8 +246,6 @@ class SkGradient:
                     points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
-
-            paint.setShader(self.gradient)
 
             return self
         else:
@@ -275,6 +293,8 @@ def style_to_color(
                     NotImplemented
                     return SkColor(ERR_COLOR)
             return None
+        case int():
+            return style_attr_value
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn(
@@ -283,17 +303,15 @@ def style_to_color(
             return SkColor(ERR_COLOR)
 
 
-def make_color(value: str | tuple | list | None) -> str | tuple | list | None:
-    """A class for handling colors, encapsulating skia.Color, which will make things much simpler.
+def skcolor2color(color: SkColor | int | list) -> str | tuple | list | None:
+    """Convert skia.Color to color object.
 
-    Example
-    -------
-    .. code-block:: python
-        make_color("#ffffff")  # Supports _hex
-        make_color( (255, 255, 255, 255 ) )  # Supports RGBA format
-        make_color("white")  # Supports predefined color names (refer to color parameters in skia)
-
-    :param value: Color _value, can be _hex, rgba, or color name.
-    :type value: str | tuple | list | None
+    :param color: SkColor object or skia.Color object
+    :return: Color object
     """
-    return SkColor(value).color
+    if isinstance(color, SkColor):
+        return color.color
+    elif isinstance(color, list):
+        return SkColor(color).color
+    else:
+        return color

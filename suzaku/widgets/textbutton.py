@@ -2,8 +2,8 @@ import typing
 
 import skia
 
-from .text import SkText
 from .button import SkButton
+from .text import SkText
 
 
 class SkTextButton(SkText):
@@ -19,12 +19,12 @@ class SkTextButton(SkText):
     def __init__(
         self,
         *args,
-        size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
+        style: str = "SkButton",
         **kwargs,
     ) -> None:
-        super().__init__(*args, size=size, **kwargs)
+        super().__init__(*args, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
 
@@ -35,9 +35,23 @@ class SkTextButton(SkText):
         if command:
             self.bind("click", lambda _: command())
 
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            _width = self.measure_text(self.get()) + 8
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.text_height + 8
+        return _height
+
     # region Draw
 
-    def _draw(self, canvas: skia.Canvas, rect: skia.Rect):
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """Draw the button
 
         :param canvas:
@@ -46,14 +60,14 @@ class SkTextButton(SkText):
         """
         if self.is_mouse_floating:
             if self.is_mouse_pressed:
-                style_name = "SkButton:pressed"
+                style_name = self.style + ":pressed"
             else:
-                style_name = "SkButton:hover"
+                style_name = self.style + ":hover"
         else:
             if self.is_focus:
-                style_name = "SkButton:focus"
+                style_name = self.style + ":focus"
             else:
-                style_name = "SkButton"
+                style_name = self.style
 
         style = self.theme.get_style(style_name)
 
@@ -75,7 +89,7 @@ class SkTextButton(SkText):
         self._draw_frame(
             canvas,
             rect,
-            radius=self.theme.get_style("SkButton")["radius"],
+            radius=self.theme.get_style(self.style)["radius"],
             bg=style["bg"],
             width=style["width"],
             bd=style["bd"],
@@ -87,12 +101,9 @@ class SkTextButton(SkText):
         # Draw the button text
         self._draw_text(
             canvas,
+            rect=rect,
             text=self.get(),
             fg=style["fg"],
-            canvas_x=self.canvas_x,
-            canvas_y=self.canvas_y,
-            width=self.width,
-            height=self.height,
         )
 
     # endregion

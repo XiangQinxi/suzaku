@@ -4,8 +4,6 @@ import os.path
 import sys
 import typing
 
-import numpy as np
-
 import glfw
 import skia
 from OpenGL import GL
@@ -18,7 +16,7 @@ from .appbase import SkAppBase
 class _GLFW_IMAGE:
     def __init__(self, path: str):
         self.path = path
-        self.image: skia.Image = skia.Image.open(self.path)
+        self.image: skia.Image = skia.Image.open(fp=self.path)
         self.image.convert()
 
     @property
@@ -157,6 +155,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         SkWindowBase._instance_count += 1
 
         self.draw_func = None
+        self.context = None
 
         self.attributes["fullscreen"] = fullscreen
 
@@ -302,7 +301,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # region Draw 绘制相关
 
     @contextlib.contextmanager
-    def skia_surface(self, window: typing.Any) -> skia.Surface | None:
+    def skia_surface(self, window: typing.Any) -> skia.Surface:
         """Create a Skia surface for the window.
 
         :param window: GLFW Window
@@ -313,31 +312,49 @@ class SkWindowBase(SkEventHanding, SkMisc):
             yield None
             return None
 
-        try:
-            context = skia.GrDirectContext.MakeGL()
-            (fb_width, fb_height) = glfw.get_framebuffer_size(window)
-            backend_render_target = skia.GrBackendRenderTarget(
-                fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
-            )
-            surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
-                context,
-                backend_render_target,
-                skia.kBottomLeft_GrSurfaceOrigin,
-                skia.kRGBA_8888_ColorType,
-                skia.ColorSpace.MakeSRGB(),
-            )
-            canvas = surface.getCanvas()
-
-            # 应用DPI缩放变换
+        self.context = skia.GrDirectContext.MakeGL()
+        (fb_width, fb_height) = glfw.get_framebuffer_size(window)
+        backend_render_target = skia.GrBackendRenderTarget(
+            fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
+        )
+        surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
+            self.context,
+            backend_render_target,
+            skia.kBottomLeft_GrSurfaceOrigin,
+            skia.kRGBA_8888_ColorType,
+            skia.ColorSpace.MakeSRGB(),
+        )
+        self.context.setResourceCacheLimit(16 * 1024 * 1024)
+        with surface as canvas:
             canvas.save()
             # canvas.scale(self.dpi_scale, self.dpi_scale)
-            # 将断言改为更友好的错误处理
-            if surface is None:
-                raise RuntimeError("Failed to create Skia surface")
-            yield surface
-        finally:
-            if "context" in locals():
-                context.releaseResourcesAndAbandonContext()
+        # 将断言改为更友好的错误处理
+        if surface is None:
+            raise RuntimeError("Failed to create Skia surface")
+        yield surface
+
+    def draw(self):
+        if self.visible:
+            # Set the current context for each window
+            # 【为该窗口设置当前上下文】
+            glfw.make_context_current(self.glfw_window)
+            if self.context:
+                self.context.freeGpuResources()
+                self.context.releaseResourcesAndAbandonContext()
+            # Create a Surface and hand it over to this window.
+            # 【创建Surface，交给该窗口】
+            with self.skia_surface(self.glfw_window) as surface:
+                if surface:
+                    with surface as canvas:
+                        # Determine and call the drawing function of this window.
+                        # 【判断并调用该窗口的绘制函数】
+
+                        if self.draw_func:
+                            self.draw_func(canvas)
+
+                    surface.flushAndSubmit()
+
+                    glfw.swap_buffers(self.glfw_window)
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
@@ -355,9 +372,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if self.visible:
             self.event_trigger("update", SkEvent(event_type="update"))
-            glfw.swap_buffers(self.glfw_window)
-            if hasattr(self, "update_layout"):
-                self.update_layout()
+            self.update_layout()
             # self.post()
 
     # endregion
@@ -385,29 +400,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 return glfw.window_should_close(self.glfw_window)
             else:
                 return False
-
-    @staticmethod
-    def mods_name(_mods):
-        MOD_CTRL_SHIFT = 3
-        mods_dict = {
-            glfw.MOD_CONTROL: "control",
-            glfw.MOD_ALT: "alt",
-            glfw.MOD_SHIFT: "shift",
-            MOD_CTRL_SHIFT: "control+shift",
-            glfw.MOD_SUPER: "super",
-            glfw.MOD_NUM_LOCK: "num_lock",
-            glfw.MOD_CAPS_LOCK: "caps_lock",
-        }
-        # print(_mods)
-
-        # print(mods_dict[_mods])
-        try:
-            if _mods:
-                return mods_dict[_mods]
-            else:
-                return "none"
-        except KeyError:
-            return "none"
 
     def _on_char(self, window: typing.Any, char: int) -> None:
         """Trigger text input event
@@ -455,6 +447,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 key=key,
                 keyname=keyname,
                 mods=self.mods_name(mods),
+                mods_key=mods,
                 glfw_window=window,
             ),
         )
@@ -478,14 +471,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
-        if self.draw_func:
-            # 确保设置当前窗口上下文
-            glfw.make_context_current(window)
-            with self.skia_surface(window) as surface:
-                with surface as canvas:
-                    self.draw_func(canvas)
-                surface.flushAndSubmit()
-                self.update()
+        self.draw()
+        if hasattr(self, "update_layout"):
+            self.update_layout()
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
@@ -557,7 +545,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
 
     def _on_mouse_button(
-        self, window: any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: any
+        self,
+        window: typing.Any,
+        button: typing.Literal[0, 1, 2],
+        is_pressed: bool,
+        mods: int,
     ) -> None:
         """Trigger mouse button event (triggered when the mouse button is pressed or released).
 
@@ -594,7 +586,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ),
         )
 
-    def _on_cursor_enter(self, window: any, is_enter: bool) -> None:
+    def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
 
         :param window: GLFW Window
@@ -633,7 +625,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 ),
             )
 
-    def _on_cursor_pos(self, window: any, x: int, y: int) -> None:
+    def _on_cursor_pos(self, window: typing.Any, x: int, y: int) -> None:
         """Trigger mouse motion event (triggered when the mouse enters the window and moves).
 
         :param window: GLFW Window
@@ -758,8 +750,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "visible",
             "border",
         ],
-        value: any = None,
-    ) -> any:
+        value: typing.Any = None,
+    ) -> typing.Any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -800,7 +792,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             | None
             | str
         ) = None,
-        custom_cursor: tuple[any, int, int] | None = None,
+        custom_cursor: tuple[typing.Any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 
@@ -955,14 +947,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         :return: None
         """
-        if self.glfw_window:
-            self.can_be_close(True)
-            glfw.destroy_window(self.glfw_window)
-            self.glfw_window = None  # Clear the reference
-            # self._event_init = False
+        # self._event_init = False
         # print(self.id)
-        self.event_trigger("closed", SkEvent(event_type="closed"))
-        self.application.windows.remove(self)
+        self.can_be_close(True)
 
     def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.

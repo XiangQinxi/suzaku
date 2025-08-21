@@ -125,7 +125,6 @@ SkEventHandling.WORKING_THREAD = threading.Thread(target = SkEventHandling._work
 class SkEventHandingOld:
     """SkEvent binding manager.【事件绑定管理器】"""
 
-    _events = []
     _afters = {}
     _after = 0
 
@@ -144,15 +143,13 @@ class SkEventHandingOld:
         """
 
         if not name in self.events:  # Auto create widget`s event
-            self.events[name] = {}  # Create widget`s event
+            self.events[name] = dict()  # Create widget`s event
         else:
             warnings.warn(f"Widget {self.id}, Event {name} already exists.")
 
         return self
 
-    def event_trigger(
-        self, name: str, *args, **kwargs
-    ) -> typing.Union[bool, typing.Any]:
+    def event_trigger(self, name: str, *args, **kwargs) -> bool | typing.Any:
         """Send the event signal of the corresponding event type
         (trigger the corresponding event)
 
@@ -205,9 +202,9 @@ class SkEventHandingOld:
         _id = name + "." + str(len(self.events[name]) + 1)  # Create event ID
 
         if add:
-            self.events[name][_id] = [func, allow_multi]
+            self.events[name][_id] = (func, allow_multi)
         else:
-            self.events[name] = {_id: [func, allow_multi]}
+            self.events[name] = {_id: (func, allow_multi)}
         return _id
 
     event_bind = bind
@@ -235,6 +232,9 @@ class SkEventHandingOld:
 
         :param s: Delay in seconds
         :param func: Function to execute after delay
+        :param allow_multi: Whether to allow multiple threads to run the function at the same time.
+        :param post: Whether to execute the `post()` method after the method ends
+
         :return: ID of the timer
         """
 
@@ -278,7 +278,8 @@ class SkEvent:
     rooty: Optional[int] = None  # 【相对y轴坐标】
     key: Union[int, str, None] = None  # 【键盘按键】
     keyname: Optional[str] = None  # 【键盘按键名】
-    mods: Optional[str] = None  # 【修饰键】
+    mods: Optional[str] = None  # 【修饰键名】
+    mods_key: Optional[int] = None  # 【修饰键值】
     char: Optional[str] = None  # 【输入文本值】
     width: Optional[int] = None  # 【宽度】
     height: Optional[int] = None  # 【高度】
