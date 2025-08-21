@@ -1,6 +1,7 @@
 from .app import SkApp
 from .appwindow import Sk, SkAppWindow
 from .button import SkButton
+from .canvas import SkCanvas
 from .card import SkCard
 from .checkbox import SkCheckBox
 from .checkitem import SkCheckItem

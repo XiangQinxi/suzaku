@@ -44,6 +44,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.anti_alias: bool = anti_alias
 
         self.previous_widget = None
+        self.esc_to_close = True
 
         self.set_draw_func(self._draw)
         self.bind("mouse_motion", self._motion, add=True)
@@ -83,13 +84,16 @@ class SkWindow(SkWindowBase, SkContainer):
     def destroy(self) -> None:
         super().destroy()
 
-    def _key_pressed(self, event):
+    def _key_pressed(self, event: SkEvent):
         """Key press event for SkWindow.
 
         :param event: SkEvent
         :return:
         """
         # print(cls.cget("focus_widget"))
+        if self.esc_to_close:
+            if event.key == glfw.KEY_ESCAPE:
+                self.destroy()
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_pressed", event)
         del event

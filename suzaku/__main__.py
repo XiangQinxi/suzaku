@@ -17,7 +17,7 @@ if __name__ == "__main__":
             anti_alias=True,
             parent=None,
             title="Suzaku GUI",
-            size=(280, 550),
+            size=(280, 400),
         )
         window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
@@ -26,9 +26,6 @@ if __name__ == "__main__":
         # frame.allowed_out_of_bounds = True
 
         SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
-        SkTextButton(frame, text="Ask Notice", command=window.hongwen).box(
-            padx=10, pady=(10, 0)
-        )
         SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
         # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
 
