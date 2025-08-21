@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     def create1window():
         window = SkWindow(
-            anti_alias=True,
+            anti_alias=False,
             parent=None,
             title="Suzaku GUI",
             size=(280, 550),

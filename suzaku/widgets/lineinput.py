@@ -245,6 +245,11 @@ class SkLineInput(SkWidget):
             self.visible_start_index = self.cursor_index() - 2
             if self.visible_start_index < 0:
                 self.visible_start_index = 0
+        if self.visible_start_index > len(self.get()) or self.cursor_index() > len(
+            self.get()
+        ):
+            self.cursor_index(len(self.get()))
+            self.visible_start_index = self.cursor_index()
 
     def cursor_index(self, index: int | None = None) -> Self | int:
         """Set cursor index
