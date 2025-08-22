@@ -48,7 +48,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     def __init__(
         self,
-        parent=None,
+        parent: SkAppBase | None = None,
         *,
         title: str = "suzaku",
         size: tuple[int, int] = (300, 300),
@@ -63,7 +63,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.children = []
 
         SkEventHanding.__init__(self)
-        self.parent: SkAppBase | typing.Self = (
+        self.parent: SkAppBase | typing.Self | int = (
             parent if parent is not None else SkAppBase.get_instance()
         )
         if self.parent is None:
@@ -765,7 +765,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
 
-    def wm_maxsize(self, width: int | float = None, height: int | float = None):
+    def wm_maxsize(self, width: int | float | None = None, height: int | float | None = None):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
@@ -776,7 +776,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     maxsize = wm_maxsize
 
-    def wm_minsize(self, width: int | float = None, height: int | float = None):
+    def wm_minsize(self, width: int | float | None = None, height: int | float | None = None):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
@@ -787,7 +787,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     minsize = wm_minsize
 
-    def wm_resizable(self, value: bool = None) -> bool | typing.Self:
+    def wm_resizable(self, value: bool | None = None) -> bool | typing.Self:
         return self.window_attr("resizable", value)
 
     resizable = wm_resizable
@@ -893,7 +893,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
     cursor = wm_cursor
 
     def default_cursor(
-        self, cursor_name: str = None
+        self, cursor_name: str | None = None
     ) -> typing.Union[str, "SkWindowBase"]:
         """Set the default cursor style of the window.
 
@@ -909,7 +909,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.attributes["cursor"] = cursor_name
         return self
 
-    def wm_visible(self, is_visible: bool = None) -> typing.Union[bool, "SkWindowBase"]:
+    def wm_visible(self, is_visible: bool | None = None) -> typing.Union[bool, "SkWindowBase"]:
         """Get or set the visibility of the window.
 
         is_visible:
@@ -1005,7 +1005,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # print(self.id)
         self.can_be_close(True)
 
-    def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
+    def wm_title(self, text: str | None = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.
 
         text:
@@ -1027,7 +1027,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     title = wm_title
 
-    def resize(self, width: int = None, height: int = None) -> "SkWindowBase":
+    def resize(self, width: int | None = None, height: int | None = None) -> "SkWindowBase":
         """Resize the window.
 
         :param width: Width
@@ -1051,7 +1051,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         return self
 
-    def move(self, x: int = None, y: int = None) -> "SkWindowBase":
+    def move(self, x: int | None = None, y: int | None = None) -> "SkWindowBase":
         """Move the window.
 
         :param x: x position
