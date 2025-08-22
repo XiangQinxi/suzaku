@@ -48,13 +48,18 @@ def run():
         while sdl2.SDL_PollEvent(event):
             if event.type == sdl2.SDL_QUIT:
                 running = False
-            elif event.type == sdl2.SDL_WINDOWEVENT:
-                if event.window.event == sdl2.SDL_WINDOWEVENT_RESIZED:
-                    # 窗口大小变化 → 重新获取 SDL_Surface 和 Skia Surface
-                    surface = sdl2.SDL_GetWindowSurface(window).contents
-                    sk_surface = make_skia_surface(surface)
-                elif event.window.event == sdl2.SDL_WINDOWEVENT_CLOSE:
-                    running = False
+            if event.window.event == sdl2.SDL_WINDOWEVENT_RESIZED:
+                surface = sdl2.SDL_GetWindowSurface(window).contents
+                sk_surface = make_skia_surface(surface)
+
+                # ⚡ 立刻重绘一次，避免窗口空白
+                with sk_surface as canvas:
+                    canvas.clear(skia.ColorWHITE)
+                    paint = skia.Paint(Color=skia.ColorBLUE)
+                    canvas.drawRect(skia.Rect.MakeXYWH(100, 100, 200, 150), paint)
+                sdl2.SDL_UpdateWindowSurface(window)
+            elif event.window.event == sdl2.SDL_WINDOWEVENT_CLOSE:
+                running = False
 
         # 用 Skia 绘制
         with sk_surface as canvas:

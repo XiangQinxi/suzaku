@@ -160,7 +160,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.draw_func = None
         self.context = None
-
+        self.surface = None
         self.attributes["fullscreen"] = fullscreen
 
         if self.width <= 0 or self.height <= 0:
@@ -275,6 +275,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
                         | sdl2.SDL_WINDOW_SHOWN
                         | sdl2.SDL_WINDOW_RESIZABLE,
                     )
+
+                    self.visible = True
             return window
         else:
             raise RuntimeError(
@@ -318,62 +320,93 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # region Draw 绘制相关
 
     @contextlib.contextmanager
-    def skia_surface(self, window: typing.Any) -> skia.Surface:
+    def skia_surface(self, arg: typing.Any) -> skia.Surface:
         """Create a Skia surface for the window.
 
-        :param window: GLFW Window
+        :param arg: GLFW or SDL2 Window/Surface
         :return: Skia Surface
         """
-        # 添加窗口有效性检查
-        from OpenGL import GL
+        match self.framework:
+            case "glfw":
+                from OpenGL import GL
 
-        if not glfw.get_current_context() or glfw.window_should_close(window):
-            yield None
-            return None
+                if not glfw.get_current_context() or glfw.window_should_close(arg):
+                    yield None
+                    return
 
-        self.context = skia.GrDirectContext.MakeGL()
-        (fb_width, fb_height) = glfw.get_framebuffer_size(window)
-        backend_render_target = skia.GrBackendRenderTarget(
-            fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
-        )
-        surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
-            self.context,
-            backend_render_target,
-            skia.kBottomLeft_GrSurfaceOrigin,
-            skia.kRGBA_8888_ColorType,
-            skia.ColorSpace.MakeSRGB(),
-        )
-        self.context.setResourceCacheLimit(16 * 1024 * 1024)
-        with surface as canvas:
-            canvas.save()
-            # canvas.scale(self.dpi_scale, self.dpi_scale)
-        # 将断言改为更友好的错误处理
-        if surface is None:
-            raise RuntimeError("Failed to create Skia surface")
-        yield surface
+                self.context = skia.GrDirectContext.MakeGL()
+                fb_width, fb_height = glfw.get_framebuffer_size(arg)
+                backend_render_target = skia.GrBackendRenderTarget(
+                    fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
+                )
+                surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
+                    self.context,
+                    backend_render_target,
+                    skia.kBottomLeft_GrSurfaceOrigin,
+                    skia.kRGBA_8888_ColorType,
+                    skia.ColorSpace.MakeSRGB(),
+                )
+                self.context.setResourceCacheLimit(16 * 1024 * 1024)
+
+                if surface is None:
+                    raise RuntimeError("Failed to create Skia surface")
+
+                yield surface
+
+            case "sdl2":
+                import sdl2, ctypes
+
+                width, height = arg.w, arg.h
+                pixels_ptr = arg.pixels
+                pitch = arg.pitch
+
+                # SDL 像素包装成 buffer
+                buf_type = ctypes.c_uint8 * (pitch * height)
+                buf = buf_type.from_address(pixels_ptr)
+
+                imageinfo = skia.ImageInfo.MakeN32Premul(width, height)
+                surface = skia.Surface.MakeRasterDirect(imageinfo, buf, pitch)
+
+                if surface is None:
+                    raise RuntimeError("Failed to create Skia surface")
+
+                yield surface  # ⚠️ 必须用 yield，不要 return
 
     def draw(self):
         if self.visible:
-            # Set the current context for each window
+            # Set the current context for each arg
             # 【为该窗口设置当前上下文】
-            glfw.make_context_current(self.the_window)
-            if self.context:
-                self.context.freeGpuResources()
-                self.context.releaseResourcesAndAbandonContext()
-            # Create a Surface and hand it over to this window.
-            # 【创建Surface，交给该窗口】
-            with self.skia_surface(self.the_window) as surface:
-                if surface:
-                    with surface as canvas:
-                        # Determine and call the drawing function of this window.
-                        # 【判断并调用该窗口的绘制函数】
+            match self.framework:
+                case "glfw":
+                    glfw.make_context_current(self.the_window)
+                    if self.context:
+                        self.context.freeGpuResources()
+                        self.context.releaseResourcesAndAbandonContext()
+                    # Create a Surface and hand it over to this arg.
+                    # 【创建Surface，交给该窗口】
+                    with self.skia_surface(self.the_window) as surface:
+                        if surface:
+                            with surface as canvas:
+                                # Determine and call the drawing function of this arg.
+                                # 【判断并调用该窗口的绘制函数】
+                                if self.draw_func:
+                                    self.draw_func(canvas)
 
-                        if self.draw_func:
-                            self.draw_func(canvas)
-
-                    surface.flushAndSubmit()
+                            surface.flushAndSubmit()
 
                     glfw.swap_buffers(self.the_window)
+                case "sdl2":
+                    import sdl2
+
+                    surface = sdl2.SDL_GetWindowSurface(self.the_window).contents
+
+                    with self.skia_surface(surface) as sk_surface:
+                        if sk_surface:
+                            with sk_surface as canvas:
+                                if self.draw_func:
+                                    self.draw_func(canvas)
+
+                    sdl2.SDL_UpdateWindowSurface(self.the_window)
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.

@@ -49,7 +49,7 @@ def main():
     window = glfw.create_window(640, 480, "GLFW + Skia CPU (No OpenGL)", None, None)
     if not window:
         glfw.terminate()
-        raise RuntimeError("Failed to create window")
+        raise RuntimeError("Failed to create arg")
 
     hwnd = glfw.get_win32_window(window)  # 需要 pyGLFW 提供 get_win32_window 扩展
 

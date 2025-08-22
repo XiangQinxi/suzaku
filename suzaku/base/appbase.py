@@ -161,10 +161,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                 else:
                     deal_event = lambda: glfw.wait_events_timeout(0.5)
             case "sdl2":
-                from sdl2 import SDL_PollEvent, SDL_Event
-
-                self._event = SDL_Event()
-                deal_event = lambda: SDL_PollEvent(self._event)
+                deal_event = None
             case _:
                 raise SkAppInitError(f"Unknown framework {self.framework}")
 
@@ -176,7 +173,8 @@ class SkAppBase(SkEventHanding, SkMisc):
         # 【开始事件循环】
         while self.alive and self.windows:
             # 处理事件
-            deal_event()
+            if deal_event:
+                deal_event()
 
             # 检查after事件，其中的事件是否到达时间，如到达则执行
             if self._afters:
@@ -230,13 +228,18 @@ class SkAppBase(SkEventHanding, SkMisc):
                             )  # 是否启用垂直同步
                     case "sdl2":
                         import sdl2
+                        from sdl2 import SDL_PollEvent, SDL_Event
 
-                        if self._event.type == sdl2.SDL_QUIT:
-                            self.alive = False
-                            sdl2.SDL_DestroyWindow(window.the_window)
-                            break
+                        self._event = SDL_Event()
+                        while SDL_PollEvent(self._event):
+                            if self._event.type == sdl2.SDL_QUIT:
+                                self.alive = False
+                                sdl2.SDL_DestroyWindow(window.the_window)
+                                break
+                            if self._event.type == sdl2.SDL_WINDOWEVENT:
+                                window.draw()
 
-                        sdl2.SDL_UpdateWindowSurface(window.the_window)
+                            sdl2.SDL_UpdateWindowSurface(window.the_window)
 
         self.cleanup()  # 【清理资源】
 
