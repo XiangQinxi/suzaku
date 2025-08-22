@@ -37,12 +37,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     :param parent:
         Window parent class (if a window class is specified,
-        the child window will close when the parent window closes) 【窗口父类（如果填窗口类，则父窗口关闭，该窗口也会跟着关闭）】
-    :param title: Window title 【窗口标题】
-    :param size: Window size 【窗口大小】
-    :param fullscreen: Window fullscreen 【窗口是否全屏】
-    :param opacity: Window opacity 【窗口透明度】
-    :param border: Whether it has border and titlebar 【是否具有边框、标题栏】
+        the child window will close when the parent window closes)
+    :param title: Window title
+    :param size: Window size
+    :param fullscreen: Window fullscreen
+    :param opacity: Window opacity
+    :param border: Whether it has border and titlebar
     """
 
     _instance_count = 0
@@ -86,7 +86,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         else:
             raise TypeError("parent must be SkAppBase or SkWindowBase")
 
-        self._event_init = False  # 【是否使用create_bind方法】
+        self._event_init = False  #
         self._cursor = None
 
         # Always is 0
@@ -183,19 +183,19 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        """icon: skia.Image = skia.Image.open(self.icon1_path)
+        # icon: skia.Image = skia.Image.open(self.icon1_path)
 
-        info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
-        pixels = bytearray(icon.width() * icon.height() * 4)
-        print(pixels)
+        # info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
+        # pixels = bytearray(icon.width() * icon.height() * 4)
+        # print(pixels)
 
-        self.icon = (
-            icon.width(),
-            icon.height(),
-            pixels,
-        )
+        # self.icon = (
+        #     icon.width(),
+        #     icon.height(),
+        #     pixels,
+        # )
 
-        glfw.set_window_icon(self.glfw_window, 1, self.icon)"""
+        glfw.set_window_icon(self.glfw_window, 1, self.icon)
 
     @classmethod
     def get_instance_count(cls) -> int:
@@ -708,7 +708,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """Request window attention
 
         This method will request the window to gain focus and display the window icon in the taskbar.
-        【该方法会请求窗口获得焦点，并且在任务栏中显示窗口图标。】
+
 
         >>> window.hongwen()
         >>> window.ask_notice()

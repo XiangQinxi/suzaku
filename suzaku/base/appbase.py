@@ -104,7 +104,7 @@ class SkAppBase(SkEventHanding, SkMisc):
 
     @classmethod
     def get_instance(cls) -> int:
-        """Get the instance of the application. 【获取SkAppBase实例】"""
+        """Get the instance of the application."""
         if cls._instance is None:
             raise SkAppInitError("App not initialized")
         return cls._instance
@@ -115,7 +115,6 @@ class SkAppBase(SkEventHanding, SkMisc):
     def add_window(self, window) -> typing.Self:
         """Add the window to the event loop
         (normally SkWindow automatically adds it during initialization).
-        【添加窗口进入事件循环（一般情况下SkWindow初始化时就会自动添加）】
 
         :param SkWindowBase window: The window
 
@@ -134,7 +133,6 @@ class SkAppBase(SkEventHanding, SkMisc):
     # region about mainloop 事件循环相关
     def run(self) -> None:
         """Run the program (i.e., start the event loop).
-        【运行程序（即开始事件循环）】
 
         :return:
         """
@@ -243,14 +241,14 @@ class SkAppBase(SkEventHanding, SkMisc):
     mainloop = run
 
     def cleanup(self) -> None:
-        """Clean up resources.【清理资源】"""
+        """Clean up resources."""
         for window in self.windows:
             glfw.destroy_window(window.glfw_window)
         glfw.terminate()
         self.quit()
 
     def quit(self) -> None:
-        """Quit application.【退出应用】"""
+        """Quit application."""
         self.alive = False
 
     # endregion
