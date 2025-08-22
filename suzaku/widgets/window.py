@@ -93,7 +93,11 @@ class SkWindow(SkWindowBase, SkContainer):
         # print(cls.cget("focus_widget"))
         if self.esc_to_close:
             if event.key == glfw.KEY_ESCAPE:
-                self.destroy()
+                if self.focus_widget is not self:
+                    pass
+                    # self.focus_set()
+                else:
+                    self.destroy()
         if self.focus_get() is not self:
             self.focus_get().event_trigger("key_pressed", event)
         del event
@@ -263,7 +267,12 @@ class SkWindow(SkWindowBase, SkContainer):
 
         :return:
         """
-        self.focus_widget = self
+        if self.focus_widget is not self:
+            self.focus_widget.focus = False
+            self.focus_widget.event_trigger(
+                "focus_loss", SkEvent(event_type="focus_loss")
+            )
+            self.focus_widget = self
         glfw.focus_window(self.the_window)
 
     # endregion
