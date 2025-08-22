@@ -9,7 +9,7 @@ import skia
 
 if __name__ == "__main__":
     # 修改主窗口创建代码
-    app = SkApp(is_get_context_on_focus=True, is_always_update=False, framework="glfw")
+    app = SkApp(is_get_context_on_focus=True, is_always_update=False, framework="sdl2")
     # print(glfw.default_window_hints())
 
     def create1window():
@@ -19,7 +19,7 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 400),
         )
-        window.apply_theme(dark_theme)
+        # window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)

@@ -191,11 +191,11 @@ class SkAppBase(SkEventHanding, SkMisc):
             for window in current_windows:
                 # Make sure the window is created and bound
                 # 【确保新窗口绑定事件】
-                window.create_bind()
                 # Draw window
                 # 【绘制窗口】
                 match self.framework:
                     case "glfw":
+                        window.create_bind()
                         if (
                             self.is_get_context_on_focus
                         ):  # Only draw the window that has gained focus.
@@ -230,14 +230,27 @@ class SkAppBase(SkEventHanding, SkMisc):
                         import sdl2
                         from sdl2 import SDL_PollEvent, SDL_Event
 
-                        self._event = SDL_Event()
-                        while SDL_PollEvent(self._event):
-                            if self._event.type == sdl2.SDL_QUIT:
+                        event = SDL_Event()
+                        while SDL_PollEvent(event):
+                            if event.type == sdl2.SDL_QUIT:
                                 self.alive = False
                                 sdl2.SDL_DestroyWindow(window.the_window)
                                 break
-                            if self._event.type == sdl2.SDL_WINDOWEVENT:
+                            if event.type == sdl2.SDL_WINDOWEVENT:
                                 window.draw()
+                                if event.window.event == sdl2.SDL_WINDOWEVENT_CLOSE:
+                                    self.alive = False
+                                    sdl2.SDL_DestroyWindow(window.the_window)
+                                    break
+                                elif (
+                                    event.window.event
+                                    == sdl2.SDL_WINDOWEVENT_SIZE_CHANGED
+                                ):
+                                    window._on_resizing(
+                                        window.the_window,
+                                        event.window.data1,
+                                        event.window.data2,
+                                    )
 
                             sdl2.SDL_UpdateWindowSurface(window.the_window)
 
