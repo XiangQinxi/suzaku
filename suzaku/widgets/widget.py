@@ -553,13 +553,11 @@ class SkWidget(SkEventHanding, SkMisc):
         anti images
         """
         if value is not None:
-            glfw.set_clipboard_string(self.window.glfw_window, value)
+            glfw.set_clipboard_string(self.window.the_window, value)
             return self
         else:
             try:
-                return glfw.get_clipboard_string(self.window.glfw_window).decode(
-                    "utf-8"
-                )
+                return glfw.get_clipboard_string(self.window.the_window).decode("utf-8")
             except AttributeError:
                 return ""
 

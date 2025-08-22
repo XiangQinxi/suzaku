@@ -268,6 +268,8 @@ class SkLineInput(SkWidget):
             self.visible_start_index = self.cursor_index()
 
     def record_state(self) -> Self:
+        if len(self.undo_stack) > 40:
+            del self.undo_stack[0]
         self.undo_stack.append(self.get())
         self.redo_stack = []
         return self

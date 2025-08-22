@@ -264,6 +264,6 @@ class SkWindow(SkWindowBase, SkContainer):
         :return:
         """
         self.focus_widget = self
-        glfw.focus_window(self.glfw_window)
+        glfw.focus_window(self.the_window)
 
     # endregion
