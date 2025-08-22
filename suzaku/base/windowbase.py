@@ -6,7 +6,6 @@ import typing
 
 import glfw
 import skia
-from OpenGL import GL
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
@@ -326,6 +325,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: Skia Surface
         """
         # 添加窗口有效性检查
+        from OpenGL import GL
+
         if not glfw.get_current_context() or glfw.window_should_close(window):
             yield None
             return None
@@ -522,7 +523,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param height: Window height
         :return: None
         """
-        GL.glViewport(0, 0, width, height)
+        # GL.glViewport(0, 0, width, height)
         self._on_framebuffer_size(window, width, height)
         self.width = width
         self.height = height
