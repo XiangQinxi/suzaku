@@ -2,6 +2,7 @@ import typing
 import warnings
 
 import glfw
+import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
@@ -50,6 +51,16 @@ def init_sdl2() -> None:
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
 
+    from sdl2 import (SDL_GL_CONTEXT_MAJOR_VERSION,
+                      SDL_GL_CONTEXT_MINOR_VERSION,
+                      SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_SetAttribute)
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)
+    SDL_GL_SetAttribute(
+        SDL_GL_CONTEXT_PROFILE_MASK, 0x0001
+    )  # SDL_GL_CONTEXT_PROFILE_CORE
+
 
 class SkAppBase(SkEventHanding, SkMisc):
     """Base Application class.
@@ -72,17 +83,24 @@ class SkAppBase(SkEventHanding, SkMisc):
 
     def __init__(
         self,
-        is_always_update: bool = True,
+        *,
+        is_always_update: bool = False,
         is_get_context_on_focus: bool = True,
         framework: typing.Literal["glfw", "sdl2"] = "glfw",
+        vsync: bool = True,
+        samples: int = 4,
     ) -> None:
+        super().__init__()
         from .windowbase import SkWindowBase
 
+        self._event = None
         self.windows: list[SkWindowBase] = (
             []
         )  # Windows that have been added to the event loop. 【被添加进事件循环的SkWindow】
-        self.is_always_update: bool = is_always_update
-        self.is_get_context_on_focus = is_get_context_on_focus
+        self.is_always_update: bool | typing.Literal["auto"] = is_always_update
+        self.is_get_context_on_focus: bool = is_get_context_on_focus
+        self.vsync = vsync
+        self.samples = samples
         self.alive: bool = (
             False  # Is the program currently running. 【程序是否正在运行】
         )
@@ -95,8 +113,6 @@ class SkAppBase(SkEventHanding, SkMisc):
                 init_glfw()
             case "sdl2":
                 init_sdl2()
-            case _:
-                raise SkAppInitError(f"Unknown framework {self.framework}")
 
         if SkAppBase._instance is not None:
             raise RuntimeError("App is a singleton, use App.get_instance()")
@@ -145,16 +161,17 @@ class SkAppBase(SkEventHanding, SkMisc):
 
         match self.framework:
             case "glfw":
+                glfw.window_hint(glfw.SAMPLES, self.samples)
                 glfw.set_error_callback(self.error)
 
-                if not self.is_always_update:
-                    deal_event = glfw.wait_events
-                else:
+                if self.is_always_update:
                     deal_event = glfw.poll_events
+                else:
+                    deal_event = lambda: glfw.wait_events_timeout(0.5)
             case "sdl2":
                 from sdl2 import SDL_PollEvent
 
-                deal_event = SDL_PollEvent
+                deal_event = lambda: SDL_PollEvent(None)
             case _:
                 raise SkAppInitError(f"Unknown framework {self.framework}")
 
@@ -166,11 +183,12 @@ class SkAppBase(SkEventHanding, SkMisc):
         # 【开始事件循环】
         while self.alive and self.windows:
             # 处理事件
-            deal_event()
+            if deal_event:
+                deal_event()
 
             # 检查after事件，其中的事件是否到达时间，如到达则执行
             if self._afters:
-                for item, config in list(self._afters.items()):
+                for item, config in tuple(self._afters.items()):
                     if config[0] <= self.time():  # Time
                         config[1]()  # Function
                         if config[2]:  # Is Post
@@ -179,72 +197,94 @@ class SkAppBase(SkEventHanding, SkMisc):
 
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】
-            current_windows = tuple(self.windows)
-            # Make sure the window is created and bound
-            # 【确保新窗口绑定事件】
-            for window in self.windows:
-                window.create_bind()
-
+            current_windows = set(self.windows)
             for window in current_windows:
-                # Check if the window is valid
-                # 【检查窗口是否有效】
-                if window.can_be_close():
-                    window.event_trigger(
-                        "delete_window",
-                        SkEvent(event_type="delete_window", window=window),
-                    )
-                    # print(window.id)
-                    if window.can_be_close():
-                        window.destroy()
-                        continue
-
+                # Make sure the window is created and bound
+                # 【确保新窗口绑定事件】
                 # Draw window
                 # 【绘制窗口】
-                def draw(the_window=window):
-                    if the_window.visible:
-                        # Set the current context for each window
-                        # 【为该窗口设置当前上下文】
-                        glfw.make_context_current(the_window.glfw_window)
-                        # Create a Surface and hand it over to this window.
-                        # 【创建Surface，交给该窗口】
-                        with the_window.skia_surface(the_window.glfw_window) as surface:
-                            if surface:
-                                with surface as canvas:
-                                    # Determine and call the drawing function of this window.
-                                    # 【判断并调用该窗口的绘制函数】
+                match self.framework:
+                    case "glfw":
+                        window.create_bind()
+                        if (
+                            self.is_get_context_on_focus
+                        ):  # Only draw the window that has gained focus.
+                            if glfw.get_window_attrib(window.the_window, glfw.FOCUSED):
+                                window.draw()
+                        else:
+                            if glfw.get_window_attrib(window.the_window, glfw.VISIBLE):
+                                window.draw()
+                        # Check if the window is valid
+                        # 【检查窗口是否有效】
+                        if window.can_be_close():
+                            window.event_trigger(
+                                "delete_window",
+                                SkEvent(event_type="delete_window", window=window),
+                            )
+                            # print(window.id)
+                            if window.can_be_close():
+                                glfw.destroy_window(window.the_window)
+                                window.draw_func = None
+                                window.the_window = None  # Clear the reference
+                                for child in window.children:
+                                    child.destroy()
+                                self.destroy_window(window)
+                                del window
+                                continue
+                        if glfw.get_current_context():
+                            glfw.swap_interval(
+                                1 if self.vsync else 0
+                            )  # 是否启用垂直同步
+                    case "sdl2":
+                        import sdl2
+                        from sdl2 import (SDL_Event, SDL_PollEvent,
+                                          SDL_WaitEvent)
 
-                                    the_window.event_trigger(
-                                        "update", SkEvent(event_type="update")
+                        event = SDL_Event()
+                        while SDL_WaitEvent(event):
+                            if event.type == sdl2.SDL_QUIT:
+                                self.alive = False
+                                sdl2.SDL_DestroyWindow(window.the_window)
+                                break
+                            if event.type == sdl2.SDL_WINDOWEVENT:
+                                window.draw()
+                                if event.window.event == sdl2.SDL_WINDOWEVENT_CLOSE:
+                                    self.alive = False
+                                    sdl2.SDL_DestroyWindow(window.the_window)
+                                    break
+                                elif (
+                                    event.window.event
+                                    == sdl2.SDL_WINDOWEVENT_SIZE_CHANGED
+                                ):
+                                    window._on_resizing(
+                                        window.the_window,
+                                        event.window.data1,
+                                        event.window.data2,
                                     )
 
-                                    if (
-                                        hasattr(the_window, "draw_func")
-                                        and the_window.draw_func
-                                    ):
-                                        the_window.draw_func(canvas)
-
-                                surface.flushAndSubmit()
-                                # glfw.swap_interval(1)
-
-                                glfw.swap_buffers(the_window.glfw_window)
-
-                if (
-                    self.is_get_context_on_focus
-                ):  # Only draw the window that has gained focus.
-                    if glfw.get_window_attrib(window.glfw_window, glfw.FOCUSED):
-                        draw()
-                else:
-                    draw()
+                            sdl2.SDL_UpdateWindowSurface(window.the_window)
 
         self.cleanup()  # 【清理资源】
 
     mainloop = run
 
+    def destroy_window(self, window):
+        window.event_trigger("closed", SkEvent(event_type="closed", window=window))
+        self.windows.remove(window)
+
     def cleanup(self) -> None:
         """Clean up resources."""
-        for window in self.windows:
-            glfw.destroy_window(window.glfw_window)
-        glfw.terminate()
+        match self.framework:
+            case "glfw":
+                for window in self.windows:
+                    glfw.destroy_window(window.the_window)
+                glfw.terminate()
+            case "sdl2":
+                import sdl2
+
+                sdl2.SDL_Quit()
+            case _:
+                raise SkAppInitError(f"Unknown framework {self.framework}")
         self.quit()
 
     def quit(self) -> None:
@@ -254,7 +294,7 @@ class SkAppBase(SkEventHanding, SkMisc):
     # endregion
     # region error 错误处理
     @staticmethod
-    def error(error_code: typing.Any, description: typing.Any):
+    def error(error_code: typing.Any, description: bytes):
         """
         处理GLFW错误
 
@@ -262,6 +302,6 @@ class SkAppBase(SkEventHanding, SkMisc):
         :param description: 错误信息
         :return: None
         """
-        print(f"GLFW Error {error_code}: {description}")
+        print(f"GLFW Error {error_code}: {description.decode()}")
 
     # endregion

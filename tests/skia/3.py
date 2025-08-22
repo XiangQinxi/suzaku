@@ -18,7 +18,7 @@ class AdvancedTextLayout:
 
         # 绘制文本
         lines = self.wrap_text_to_height(text, width, height, **kwargs)
-        line_height = kwargs.get('line_height', kwargs.get('font_size', 24) * 1.2)
+        line_height = kwargs.get("line_height", kwargs.get("font_size", 24) * 1.2)
 
         for i, line in enumerate(lines):
             current_y = y + i * line_height
@@ -29,22 +29,25 @@ class AdvancedTextLayout:
 
     def wrap_text_to_height(self, text, max_width, max_height, **kwargs):
         """将文本包装到指定高度"""
-        font_size = kwargs.get('font_size', 24)
-        line_height = kwargs.get('line_height', font_size * 1.2)
+        font_size = kwargs.get("font_size", 24)
+        line_height = kwargs.get("line_height", font_size * 1.2)
         max_lines = int(max_height / line_height)
 
-        lines = self.auto_wrap_text(text, max_width, font_size,
-                                    kwargs.get('font_family', 'Microsoft Yahei'))
+        lines = self.auto_wrap_text(
+            text, max_width, font_size, kwargs.get("font_family", "Microsoft Yahei")
+        )
 
         return lines[:max_lines]  # 限制行数
 
-    def auto_wrap_text(self, text, max_width, font_size=24, font_family='Microsoft Yahei'):
+    def auto_wrap_text(
+        self, text, max_width, font_size=24, font_family="Microsoft Yahei"
+    ):
         """自动换行文本（优化版本）"""
         typeface = skia.Typeface(font_family)
         font = skia.Font(typeface, font_size)
 
         # 处理换行符
-        paragraphs = text.split('\n')
+        paragraphs = text.split("\n")
         all_lines = []
 
         for paragraph in paragraphs:
@@ -101,11 +104,21 @@ class AdvancedTextLayout:
 
         return lines if lines else [word]
 
-    def draw_styled_text(self, text, x, y, font_size=24, color=(0, 0, 0, 255),
-                         font_family='Microsoft Yahei', bold=False, italic=False):
+    def draw_styled_text(
+        self,
+        text,
+        x,
+        y,
+        font_size=24,
+        color=(0, 0, 0, 255),
+        font_family="Microsoft Yahei",
+        bold=False,
+        italic=False,
+    ):
         """绘制样式化文本"""
-        typeface = skia.Typeface(font_family,
-                                 skia.FontStyle.Bold() if bold else skia.FontStyle.Normal())
+        typeface = skia.Typeface(
+            font_family, skia.FontStyle.Bold() if bold else skia.FontStyle.Normal()
+        )
         font = skia.Font(typeface, font_size)
 
         paint = skia.Paint()
@@ -119,14 +132,15 @@ class AdvancedTextLayout:
         current_y = y
 
         for element in text_elements:
-            text = element['text']
-            font_size = element.get('font_size', 24)
-            color = element.get('color', (0, 0, 0, 255))
-            font_family = element.get('font_family', 'Microsoft Yahei')
-            bold = element.get('bold', False)
+            text = element["text"]
+            font_size = element.get("font_size", 24)
+            color = element.get("color", (0, 0, 0, 255))
+            font_family = element.get("font_family", "Microsoft Yahei")
+            bold = element.get("bold", False)
 
-            typeface = skia.Typeface(font_family,
-                                     skia.FontStyle.Bold() if bold else skia.FontStyle.Normal())
+            typeface = skia.Typeface(
+                font_family, skia.FontStyle.Bold() if bold else skia.FontStyle.Normal()
+            )
             font = skia.Font(typeface, font_size)
 
             paint = skia.Paint()
@@ -150,12 +164,12 @@ def rich_text_example():
 
     # 创建富文本元素
     rich_text = [
-        {'text': '这是', 'font_size': 24, 'color': (0, 0, 0, 255)},
-        {'text': '红色', 'font_size': 24, 'color': (255, 0, 0, 255), 'bold': True},
-        {'text': '的文本，', 'font_size': 24, 'color': (0, 0, 0, 255)},
-        {'text': '这是', 'font_size': 24, 'color': (0, 0, 0, 255)},
-        {'text': '蓝色', 'font_size': 24, 'color': (0, 0, 255, 255), 'bold': True},
-        {'text': '的文本。', 'font_size': 24, 'color': (0, 0, 0, 255)},
+        {"text": "这是", "font_size": 24, "color": (0, 0, 0, 255)},
+        {"text": "红色", "font_size": 24, "color": (255, 0, 0, 255), "bold": True},
+        {"text": "的文本，", "font_size": 24, "color": (0, 0, 0, 255)},
+        {"text": "这是", "font_size": 24, "color": (0, 0, 0, 255)},
+        {"text": "蓝色", "font_size": 24, "color": (0, 0, 255, 255), "bold": True},
+        {"text": "的文本。", "font_size": 24, "color": (0, 0, 0, 255)},
     ]
 
     layout.draw_rich_text(rich_text, 50, 50)
@@ -167,7 +181,7 @@ def rich_text_example():
 
     layout.create_text_block(long_text, 50, 100, 400, 200, font_size=16)
 
-    layout.save('rich_text.png')
+    layout.save("rich_text.png")
 
 
 rich_text_example()

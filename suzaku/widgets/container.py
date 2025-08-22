@@ -1,3 +1,4 @@
+import array
 import typing
 
 import skia
@@ -51,6 +52,15 @@ class SkContainer:
     width: int | float
     height: int | float
 
+    def __enter__(self):
+        self._handle_layout()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._handle_layout()
+        # 触发更新事件
+        self.event_trigger("update", SkEvent(event_type="update"))
+
     def __init__(self, allowed_out_of_bounds: bool = False):
 
         # self.parent = None
@@ -74,18 +84,6 @@ class SkContainer:
         # self.bind("resize", self._handle_layout)
         self.bind("resize", lambda _: self.update_layout())
         # self.bind("update", lambda _: self.update_layout())
-
-    def _update(self, event=None):
-        """Organize the layout and send an `update` event message to the child components
-
-        :param event: SkEvent
-        :return:
-        """
-        self._handle_layout(event=event)
-        for widget in self.children:
-            from suzaku.event import SkEvent
-
-            widget.event_trigger("update", SkEvent(event_type="update"))
 
     # endregion
 
@@ -132,7 +130,7 @@ class SkContainer:
                 self._box_direction = direction
 
         self.draw_list[0].append(child)
-        self._update()
+        self.update_layout()
 
     def add_floating_child(self, child):
         """Add floating child widget to window.
@@ -141,7 +139,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[1].append(child)
-        self._update()
+        self.update_layout()
 
     def add_fixed_child(self, child):
         """Add fixed child widget to window.
@@ -155,7 +153,7 @@ class SkContainer:
         :return: None
         """
         self.draw_list[2].append(child)
-        self._update()
+        self.update_layout()
 
     # endregion
 
@@ -198,8 +196,10 @@ class SkContainer:
 
     # region layout 布局
 
-    def update_layout(self):
-        self._update()
+    def update_layout(self, event: SkEvent | None = None):
+        self._handle_layout()
+        for widget in self.children:
+            widget.event_trigger("resize", SkEvent(event_type="resize"))
 
     def _handle_layout(self, event=None):
         """Handle layout of the container.
@@ -304,7 +304,7 @@ class SkContainer:
                     top = bottom = child.layout_config["box"]["pady"]
 
                 if not child.layout_config["box"]["expand"]:
-                    child.width = child.cget("dheight")
+                    child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
@@ -328,7 +328,7 @@ class SkContainer:
                     top = bottom = child.layout_config["box"]["pady"]
 
                 if not child.layout_config["box"]["expand"]:
-                    child.width = child.cget("dheight")
+                    child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
@@ -376,7 +376,7 @@ class SkContainer:
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.height = child.cget("dheight")
+                    child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
                 child.x = left
@@ -400,7 +400,7 @@ class SkContainer:
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.height = child.cget("dheight")
+                    child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
                 child.x = left
@@ -413,10 +413,20 @@ class SkContainer:
 
         :param child: The child widget
         """
-        child.x = child.layout_config["fixed"]["x"]
-        child.y = child.layout_config["fixed"]["y"]
-        child.width = child.layout_config["fixed"]["width"]
-        child.height = child.layout_config["fixed"]["height"]
+        config = child.layout_config["fixed"]
+        child.x = config["x"]
+        child.y = config["y"]
+
+        width = config["width"]
+        if not width:
+            width = child.dwidth
+
+        height = config["height"]
+        if not height:
+            height = child.dheight
+
+        child.width = width
+        child.height = height
 
     # endregion
 

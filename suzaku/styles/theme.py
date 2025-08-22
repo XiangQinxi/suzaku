@@ -587,3 +587,4 @@ SkTheme._load_internal_themes()
 
 # Alias for default theme
 default_theme = SkTheme.DEFAULT_THEME
+dark_theme = SkTheme.INTERNAL_THEMES["default.dark"]

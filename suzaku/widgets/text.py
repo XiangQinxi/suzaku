@@ -5,6 +5,7 @@ import skia
 from ..styles.color import style_to_color
 from ..styles.font import default_font
 from ..var import SkStringVar
+from .container import SkContainer
 from .widget import SkWidget
 
 
@@ -22,13 +23,13 @@ class SkText(SkWidget):
 
     def __init__(
         self,
-        parent=None,
-        *args,
+        parent: SkContainer,
         text: str | None = "",
+        *,
         textvariable: SkStringVar = None,
         **kwargs,
     ):
-        super().__init__(parent=parent, *args, **kwargs)
+        super().__init__(parent=parent, **kwargs)
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["text"]: str | None = text
         self.attributes["font"]: skia.Font = default_font
@@ -39,6 +40,8 @@ class SkText(SkWidget):
             self.attributes["textvariable"].set(text)
         else:
             self.attributes["text"] = text
+        if not self.cget("dwidth") or not self.cget("dheight"):
+            self.parent.update_layout()
         return self
 
     def get(self) -> str:
@@ -48,17 +51,28 @@ class SkText(SkWidget):
         else:
             return self.attributes["text"]
 
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            _width = self.measure_text(self.get()) + 8
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.text_height + 8
+        return _height
+
     # region Draw
 
-    def _draw(self, canvas: skia.Surfaces, rect: skia.Rect):
+    def draw_widget(self, canvas: skia.Surfaces, rect: skia.Rect):
         self._draw_text(
             canvas,
+            rect,
             text=self.get(),
             fg=self.theme.get_style_attr("SkText", "fg"),
-            canvas_x=self.canvas_x,
-            canvas_y=self.canvas_y,
-            width=self.width,
-            height=self.height,
             font=self.attributes["font"],
         )
 

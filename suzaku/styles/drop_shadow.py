@@ -1,6 +1,6 @@
 import skia
 
-from .color import make_color
+from .color import skcolor2color
 
 
 class SkDropShadow:
@@ -64,5 +64,5 @@ class SkDropShadow:
             dy=self.dy,
             sigmaX=self.sigmaX,
             sigmaY=self.sigmaY,
-            color=make_color(self.colr),
+            color=skcolor2color(self.colr),
         )

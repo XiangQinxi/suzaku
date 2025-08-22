@@ -4,11 +4,8 @@ import os.path
 import sys
 import typing
 
-import numpy as np
-
 import glfw
 import skia
-from OpenGL import GL
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
@@ -18,7 +15,7 @@ from .appbase import SkAppBase
 class _GLFW_IMAGE:
     def __init__(self, path: str):
         self.path = path
-        self.image: skia.Image = skia.Image.open(self.path)
+        self.image: skia.Image = skia.Image.open(fp=self.path)
         self.image.convert()
 
     @property
@@ -79,12 +76,13 @@ class SkWindowBase(SkEventHanding, SkMisc):
             self.parent.application.add_window(self)
 
             def _closed(_):
-                if self.glfw_window:
+                if self.the_window:
                     self.destroy()
 
             self.parent.bind("closed", _closed)
         else:
             raise TypeError("parent must be SkAppBase or SkWindowBase")
+        self.framework = self.parent.framework
 
         self._event_init = False  #
         self._cursor = None
@@ -106,7 +104,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.physical_width = size[0]
         self.physical_height = size[1]
 
-        self.glfw_window = None
+        self.the_window = None
         self.visible = False
         self.mouse_x = 0
         self.mouse_y = 0
@@ -116,7 +114,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.new_cursor = "arrow"
         self.focus = True
 
-        glfw.window_hint(glfw.DECORATED, border)
+        match self.framework:
+            case "glfw":
+                glfw.window_hint(glfw.DECORATED, border)
+            case "sdl2":
+                pass
 
         self.attributes = {
             "title": title,
@@ -157,7 +159,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         SkWindowBase._instance_count += 1
 
         self.draw_func = None
-
+        self.context = None
+        self.surface = None
         self.attributes["fullscreen"] = fullscreen
 
         if self.width <= 0 or self.height <= 0:
@@ -167,11 +170,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.is_mouse_pressed = False
 
-        self.glfw_window = self.create()
+        self.the_window = self.create()
 
-        self.cursor(self.default_cursor())
-
-        #
+        # self.cursor(self.default_cursor())
 
         self.icon1_path = os.path.abspath(
             os.path.join(
@@ -195,7 +196,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         #     pixels,
         # )
 
-        glfw.set_window_icon(self.glfw_window, 1, self.icon)
+        # glfw.set_window_icon(self.the_window, 1, self.icon)
 
     @classmethod
     def get_instance_count(cls) -> int:
@@ -214,56 +215,68 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
 
         if hasattr(self, "application") and self.application:
-            if self.attributes["fullscreen"]:
-                monitor = glfw.get_primary_monitor()
-            else:
-                monitor = None
+            match self.framework:
+                case "glfw":
+                    if self.attributes["fullscreen"]:
+                        monitor = glfw.get_primary_monitor()
+                    else:
+                        monitor = None
 
-            glfw.window_hint(glfw.STENCIL_BITS, 8)
-            glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
-            glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
+                    glfw.window_hint(glfw.STENCIL_BITS, 8)
+                    glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
+                    glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
 
-            # see https://www.glfw.org/faq#macos
-            if sys.platform.startswith("darwin"):
-                glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-                glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
-                glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
-                glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-            else:
-                if self.attributes["force_hardware_acceleration"]:
-                    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
-                    glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
-                    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-                    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
-                    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-            """
-            if isinstance(self.parent, self.__class__):
-                share = self.parent.glfw_window
-            else:
-                share = None
-            """
+                    # see https://www.glfw.org/faq#macos
+                    if sys.platform.startswith("darwin"):
+                        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
+                        glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
+                        glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+                    else:
+                        if self.attributes["force_hardware_acceleration"]:
+                            glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
+                            glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
+                            glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+                            glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+                            glfw.window_hint(
+                                glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE
+                            )
 
-            window = glfw.create_window(
-                self.width, self.height, self.attributes["title"], monitor, None
-            )
-            if not window:
-                raise RuntimeError("无法创建GLFW窗口")
+                    window = glfw.create_window(
+                        self.width, self.height, self.attributes["title"], monitor, None
+                    )
+                    if not window:
+                        raise RuntimeError("无法创建GLFW窗口")
 
-            self.visible = True
+                    self.visible = True
 
-            pos = glfw.get_window_pos(window)
+                    pos = glfw.get_window_pos(window)
 
-            self.root_x = pos[0]
-            self.root_y = pos[1]
+                    self.root_x = pos[0]
+                    self.root_y = pos[1]
 
-            glfw.set_window_opacity(window, self.cget("opacity"))
+                    glfw.set_window_opacity(window, self.cget("opacity"))
 
-            # _glfw.glfwSetWindowIcon(window, 1, [self.icon1])
+                    # _glfw.glfwSetWindowIcon(window, 1, [self.icon1])
 
-            # 初始化DPI缩放
-            if monitor:
-                self._update_dpi_scale()
+                    # 初始化DPI缩放
+                    if monitor:
+                        self._update_dpi_scale()
+                case "sdl2":
+                    import sdl2
 
+                    window = sdl2.SDL_CreateWindow(
+                        self.attributes["title"].encode("utf-8"),
+                        sdl2.SDL_WINDOWPOS_CENTERED,
+                        sdl2.SDL_WINDOWPOS_CENTERED,
+                        self.width,
+                        self.height,
+                        sdl2.SDL_WINDOW_OPENGL
+                        | sdl2.SDL_WINDOW_SHOWN
+                        | sdl2.SDL_WINDOW_RESIZABLE,
+                    )
+
+                    self.visible = True
             return window
         else:
             raise RuntimeError(
@@ -276,25 +289,30 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: None
         """
         if not self._event_init:
-            window = self.glfw_window
-            glfw.make_context_current(window)
-            glfw.set_window_size_callback(window, self._on_resizing)
-            glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
-            glfw.set_window_close_callback(window, self._on_closed)
-            glfw.set_mouse_button_callback(window, self._on_mouse_button)
-            glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
-            glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
-            glfw.set_window_pos_callback(window, self._on_window_pos)
-            glfw.set_window_focus_callback(window, self._on_focus)
-            glfw.set_key_callback(window, self._on_key)
-            glfw.set_char_callback(window, self._on_char)
-            glfw.set_window_refresh_callback(window, self._on_refresh)
-            glfw.set_window_maximize_callback(window, self._on_maximize)
-            glfw.set_drop_callback(window, self._on_drop)
-            glfw.set_window_iconify_callback(window, self._on_iconify)
-            glfw.set_scroll_callback(window, self._on_scroll)
-            glfw.set_window_content_scale_callback(window, self._on_dpi_change)
-
+            window = self.the_window
+            match self.framework:
+                case "glfw":
+                    glfw.make_context_current(window)
+                    glfw.set_window_size_callback(window, self._on_resizing)
+                    glfw.set_framebuffer_size_callback(
+                        window, self._on_framebuffer_size
+                    )
+                    glfw.set_window_close_callback(window, self._on_closed)
+                    glfw.set_mouse_button_callback(window, self._on_mouse_button)
+                    glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
+                    glfw.set_cursor_pos_callback(window, self._on_cursor_pos)
+                    glfw.set_window_pos_callback(window, self._on_window_pos)
+                    glfw.set_window_focus_callback(window, self._on_focus)
+                    glfw.set_key_callback(window, self._on_key)
+                    glfw.set_char_callback(window, self._on_char)
+                    glfw.set_window_refresh_callback(window, self._on_refresh)
+                    glfw.set_window_maximize_callback(window, self._on_maximize)
+                    glfw.set_drop_callback(window, self._on_drop)
+                    glfw.set_window_iconify_callback(window, self._on_iconify)
+                    glfw.set_scroll_callback(window, self._on_scroll)
+                    glfw.set_window_content_scale_callback(window, self._on_dpi_change)
+                case "sdl2":
+                    import sdl2
             self._event_init = True
 
     # endregion
@@ -302,42 +320,95 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # region Draw 绘制相关
 
     @contextlib.contextmanager
-    def skia_surface(self, window: typing.Any) -> skia.Surface | None:
+    def skia_surface(self, arg: typing.Any) -> skia.Surface:
         """Create a Skia surface for the window.
 
-        :param window: GLFW Window
+        :param arg: GLFW or SDL2 Window/Surface
         :return: Skia Surface
         """
-        # 添加窗口有效性检查
-        if not glfw.get_current_context() or glfw.window_should_close(window):
-            yield None
-            return None
+        match self.framework:
+            case "glfw":
+                from OpenGL import GL
 
-        try:
-            context = skia.GrDirectContext.MakeGL()
-            (fb_width, fb_height) = glfw.get_framebuffer_size(window)
-            backend_render_target = skia.GrBackendRenderTarget(
-                fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
-            )
-            surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
-                context,
-                backend_render_target,
-                skia.kBottomLeft_GrSurfaceOrigin,
-                skia.kRGBA_8888_ColorType,
-                skia.ColorSpace.MakeSRGB(),
-            )
-            canvas = surface.getCanvas()
+                if not glfw.get_current_context() or glfw.window_should_close(arg):
+                    yield None
+                    return
 
-            # 应用DPI缩放变换
-            canvas.save()
-            # canvas.scale(self.dpi_scale, self.dpi_scale)
-            # 将断言改为更友好的错误处理
-            if surface is None:
-                raise RuntimeError("Failed to create Skia surface")
-            yield surface
-        finally:
-            if "context" in locals():
-                context.releaseResourcesAndAbandonContext()
+                self.context = skia.GrDirectContext.MakeGL()
+                fb_width, fb_height = glfw.get_framebuffer_size(arg)
+                backend_render_target = skia.GrBackendRenderTarget(
+                    fb_width, fb_height, 0, 0, skia.GrGLFramebufferInfo(0, GL.GL_RGBA8)
+                )
+                surface: skia.Surface = skia.Surface.MakeFromBackendRenderTarget(
+                    self.context,
+                    backend_render_target,
+                    skia.kBottomLeft_GrSurfaceOrigin,
+                    skia.kRGBA_8888_ColorType,
+                    skia.ColorSpace.MakeSRGB(),
+                )
+                self.context.setResourceCacheLimit(16 * 1024 * 1024)
+
+                if surface is None:
+                    raise RuntimeError("Failed to create Skia surface")
+
+                yield surface
+
+            case "sdl2":
+                import ctypes
+
+                import sdl2
+
+                width, height = arg.w, arg.h
+                pixels_ptr = arg.pixels
+                pitch = arg.pitch
+
+                # SDL 像素包装成 buffer
+                buf_type = ctypes.c_uint8 * (pitch * height)
+                buf = buf_type.from_address(pixels_ptr)
+
+                imageinfo = skia.ImageInfo.MakeN32Premul(width, height)
+                surface = skia.Surface.MakeRasterDirect(imageinfo, buf, pitch)
+
+                if surface is None:
+                    raise RuntimeError("Failed to create Skia surface")
+
+                yield surface  # ⚠️ 必须用 yield，不要 return
+
+    def draw(self):
+        if self.visible:
+            # Set the current context for each arg
+            # 【为该窗口设置当前上下文】
+            match self.framework:
+                case "glfw":
+                    glfw.make_context_current(self.the_window)
+                    if self.context:
+                        self.context.freeGpuResources()
+                        self.context.releaseResourcesAndAbandonContext()
+                    # Create a Surface and hand it over to this arg.
+                    # 【创建Surface，交给该窗口】
+                    with self.skia_surface(self.the_window) as surface:
+                        if surface:
+                            with surface as canvas:
+                                # Determine and call the drawing function of this arg.
+                                # 【判断并调用该窗口的绘制函数】
+                                if self.draw_func:
+                                    self.draw_func(canvas)
+
+                            surface.flushAndSubmit()
+
+                    glfw.swap_buffers(self.the_window)
+                case "sdl2":
+                    import sdl2
+
+                    surface = sdl2.SDL_GetWindowSurface(self.the_window).contents
+
+                    with self.skia_surface(surface) as sk_surface:
+                        if sk_surface:
+                            with sk_surface as canvas:
+                                if self.draw_func:
+                                    self.draw_func(canvas)
+
+                    sdl2.SDL_UpdateWindowSurface(self.the_window)
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
@@ -355,9 +426,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if self.visible:
             self.event_trigger("update", SkEvent(event_type="update"))
-            glfw.swap_buffers(self.glfw_window)
-            if hasattr(self, "update_layout"):
-                self.update_layout()
+            self.update_layout()
             # self.post()
 
     # endregion
@@ -378,36 +447,13 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: None
         """
         if value is not None:
-            glfw.set_window_should_close(self.glfw_window, value)
+            glfw.set_window_should_close(self.the_window, value)
             return self
         else:
-            if self.glfw_window:
-                return glfw.window_should_close(self.glfw_window)
+            if self.the_window:
+                return glfw.window_should_close(self.the_window)
             else:
                 return False
-
-    @staticmethod
-    def mods_name(_mods):
-        MOD_CTRL_SHIFT = 3
-        mods_dict = {
-            glfw.MOD_CONTROL: "control",
-            glfw.MOD_ALT: "alt",
-            glfw.MOD_SHIFT: "shift",
-            MOD_CTRL_SHIFT: "control+shift",
-            glfw.MOD_SUPER: "super",
-            glfw.MOD_NUM_LOCK: "num_lock",
-            glfw.MOD_CAPS_LOCK: "caps_lock",
-        }
-        # print(_mods)
-
-        # print(mods_dict[_mods])
-        try:
-            if _mods:
-                return mods_dict[_mods]
-            else:
-                return "none"
-        except KeyError:
-            return "none"
 
     def _on_char(self, window: typing.Any, char: int) -> None:
         """Trigger text input event
@@ -455,6 +501,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 key=key,
                 keyname=keyname,
                 mods=self.mods_name(mods),
+                mods_key=mods,
                 glfw_window=window,
             ),
         )
@@ -478,14 +525,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
-        if self.draw_func:
-            # 确保设置当前窗口上下文
-            glfw.make_context_current(window)
-            with self.skia_surface(window) as surface:
-                with surface as canvas:
-                    self.draw_func(canvas)
-                surface.flushAndSubmit()
-                self.update()
+        self.draw()
+        if hasattr(self, "update_layout"):
+            self.update_layout()
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
@@ -516,7 +558,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param height: Window height
         :return: None
         """
-        GL.glViewport(0, 0, width, height)
+        # GL.glViewport(0, 0, width, height)
         self._on_framebuffer_size(window, width, height)
         self.width = width
         self.height = height
@@ -554,10 +596,14 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param window: GLFW Window
         :return: None
         """
-        # self.event_trigger("closed", SkEvent(event_type="closed", glfw_window=window))
+        # self.event_trigger("closed", SkEvent(event_type="closed", the_window=window))
 
     def _on_mouse_button(
-        self, window: any, button: typing.Literal[0, 1, 2], is_pressed: bool, mods: any
+        self,
+        window: typing.Any,
+        button: typing.Literal[0, 1, 2],
+        is_pressed: bool,
+        mods: int,
     ) -> None:
         """Trigger mouse button event (triggered when the mouse button is pressed or released).
 
@@ -594,7 +640,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ),
         )
 
-    def _on_cursor_enter(self, window: any, is_enter: bool) -> None:
+    def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
 
         :param window: GLFW Window
@@ -633,7 +679,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 ),
             )
 
-    def _on_cursor_pos(self, window: any, x: int, y: int) -> None:
+    def _on_cursor_pos(self, window: typing.Any, x: int, y: int) -> None:
         """Trigger mouse motion event (triggered when the mouse enters the window and moves).
 
         :param window: GLFW Window
@@ -686,11 +732,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         :return: Window frame size (left, top, right, bottom)
         """
-        return glfw.get_window_frame_size(self.glfw_window)
+        return glfw.get_window_frame_size(self.the_window)
 
     @property
     def monitor(self):
-        return glfw.get_window_monitor(self.glfw_window)
+        return glfw.get_window_monitor(self.the_window)
 
     @property
     def monitor_name(self) -> str:
@@ -715,7 +761,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         :return: None
         """
-        glfw.request_window_attention(self.glfw_window)
+        glfw.request_window_attention(self.the_window)
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
 
@@ -725,7 +771,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         if height is None:
             height = glfw.DONT_CARE
         glfw.set_window_size_limits(
-            self.glfw_window, glfw.DONT_CARE, glfw.DONT_CARE, width, height
+            self.the_window, glfw.DONT_CARE, glfw.DONT_CARE, width, height
         )
 
     maxsize = wm_maxsize
@@ -736,7 +782,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         if height is None:
             height = glfw.DONT_CARE
         glfw.set_window_size_limits(
-            self.glfw_window, width, height, glfw.DONT_CARE, glfw.DONT_CARE
+            self.the_window, width, height, glfw.DONT_CARE, glfw.DONT_CARE
         )
 
     minsize = wm_minsize
@@ -758,8 +804,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "visible",
             "border",
         ],
-        value: any = None,
-    ) -> any:
+        value: typing.Any = None,
+    ) -> typing.Any:
 
         attrib_names = {
             "topmost": glfw.FLOATING,
@@ -778,10 +824,10 @@ class SkWindowBase(SkEventHanding, SkMisc):
             attrib_name = name
 
         if value is not None:
-            glfw.set_window_attrib(self.glfw_window, attrib_name, value)
+            glfw.set_window_attrib(self.the_window, attrib_name, value)
             return self
         else:
-            return glfw.get_window_attrib(self.glfw_window, attrib_name)
+            return glfw.get_window_attrib(self.the_window, attrib_name)
 
     def wm_cursor(
         self,
@@ -800,7 +846,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             | None
             | str
         ) = None,
-        custom_cursor: tuple[any, int, int] | None = None,
+        custom_cursor: tuple[typing.Any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
 
@@ -822,7 +868,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             cursor = glfw.create_cursor(
                 custom_cursor[0], custom_cursor[1], custom_cursor[2]
             )
-            set_cursor(self.glfw_window, cursor)
+            set_cursor(self.the_window, cursor)
             return self
 
         if cursor_name is None:
@@ -838,9 +884,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             raise ValueError(f"Cursor {name} not found")
 
         self.new_cursor = name
-        if self.glfw_window:
+        if self.the_window:
             self._cursor = set_cursor(
-                self.glfw_window, create_standard_cursor(cursor_get)
+                self.the_window, create_standard_cursor(cursor_get)
             )
         return self
 
@@ -895,7 +941,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.visible = True
         if hasattr(self, "update_layout"):
             self.update_layout()  # 添加初始布局更新
-        glfw.show_window(self.glfw_window)
+        glfw.show_window(self.the_window)
         self.update()  # 添加初始绘制触发
         return self
 
@@ -908,7 +954,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         from glfw import hide_window
 
-        hide_window(self.glfw_window)
+        hide_window(self.the_window)
         self.visible = False
         return self
 
@@ -921,7 +967,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         from glfw import maximize_window
 
-        maximize_window(self.glfw_window)
+        maximize_window(self.the_window)
         return self
 
     maximize = wm_maximize
@@ -933,7 +979,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         from glfw import iconify_window
 
-        iconify_window(self.glfw_window)
+        iconify_window(self.the_window)
         return self
 
     iconify = wm_iconify
@@ -945,7 +991,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         from glfw import restore_window
 
-        restore_window(self.glfw_window)
+        restore_window(self.the_window)
         return self
 
     restore = wm_restore
@@ -955,14 +1001,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         :return: None
         """
-        if self.glfw_window:
-            self.can_be_close(True)
-            glfw.destroy_window(self.glfw_window)
-            self.glfw_window = None  # Clear the reference
-            # self._event_init = False
+        # self._event_init = False
         # print(self.id)
-        self.event_trigger("closed", SkEvent(event_type="closed"))
-        self.application.windows.remove(self)
+        self.can_be_close(True)
 
     def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.
@@ -980,7 +1021,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             self.attributes["title"] = text
             from glfw import set_window_title
 
-            set_window_title(self.glfw_window, text)
+            set_window_title(self.the_window, text)
 
         return self
 
@@ -1003,7 +1044,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         from glfw import set_window_size
 
-        set_window_size(self.glfw_window, width, height)
+        set_window_size(self.the_window, width, height)
         self.event_trigger(
             "resize", SkEvent(event_type="resize", width=width, height=height)
         )
@@ -1025,13 +1066,13 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.root_y = y
         from glfw import set_window_pos
 
-        set_window_pos(self.glfw_window, x, y)
+        set_window_pos(self.the_window, x, y)
         self.event_trigger("move", SkEvent(event_type="move", rootx=x, rooty=y))
 
         return self
 
     def mouse_pos(self):
-        return glfw.get_cursor_pos(self.glfw_window)
+        return glfw.get_cursor_pos(self.the_window)
 
     def get_attribute(self, attribute_name: str) -> typing.Any:
         """Get the window attribute with attribute name.
@@ -1040,11 +1081,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: Attribute _value
         """
         if attribute_name == "opacity":
-            if not hasattr(self, "glfw_window") or not self.glfw_window:
+            if not hasattr(self, "the_window") or not self.the_window:
                 return 1.0
             from glfw import get_window_opacity
 
-            return get_window_opacity(self.glfw_window)
+            return get_window_opacity(self.the_window)
         return self.attributes[attribute_name]
 
     cget = get_attribute
@@ -1057,7 +1098,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if "opacity" in kwargs:
 
-            if not hasattr(self, "glfw_window") or not self.glfw_window:
+            if not hasattr(self, "the_window") or not self.the_window:
                 return self
 
             opacity = kwargs.pop("opacity")
@@ -1067,7 +1108,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             try:
                 from glfw import set_window_opacity
 
-                set_window_opacity(self.glfw_window, float(opacity))
+                set_window_opacity(self.the_window, float(opacity))
             except Exception as e:
                 print(f"[ERROR] Failed to set opacity: {e}")
 
@@ -1079,7 +1120,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     @property
     def hwnd(self):
-        return glfw.get_win32_window(self.glfw_window)
+        return glfw.get_win32_window(self.the_window)
 
     # endregion
 

@@ -1,5 +1,6 @@
 from typing import Any
 
+from .container import SkContainer
 from .widget import SkWidget
 
 
@@ -11,9 +12,16 @@ class SkImage(SkWidget):
     """
 
     def __init__(
-        self, parent, path: str, x: int, y: int, width: int, height: int
+        self,
+        parent: SkContainer,
+        path: str,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        **kwargs,
     ) -> None:
-        super().__init__(parent, (width, height))
+        super().__init__(parent, **kwargs)
         self.parent = parent
         self.width: int = width
         self.height: int = height
@@ -21,7 +29,19 @@ class SkImage(SkWidget):
         self.x: int = x
         self.y: int = y
 
-    def _draw(self, canvas, rect) -> None:
+    @property
+    def dwidth(self):
+        _width = self.width
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.text_height + 8
+        return _height
+
+    def draw_widget(self, canvas, rect) -> None:
         """Draw image
 
         :param canvas: skia.Surface to draw on

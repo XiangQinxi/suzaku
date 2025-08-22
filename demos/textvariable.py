@@ -1,12 +1,11 @@
 from suzaku import Sk, SkText, SkEntry, SkStringVar
 
 
-root = Sk()
+root = Sk(vsync=True, is_always_update=True)
 
 var = SkStringVar(default_value="Hello, world!")
 
 entry = SkEntry(root, textvariable=var).box()
 text = SkText(root, textvariable=var).box()
-
 
 root.mainloop()
