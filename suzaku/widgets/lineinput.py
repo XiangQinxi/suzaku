@@ -19,6 +19,7 @@ from .. import SkColor
 from ..event import SkEvent
 from ..styles.color import skcolor2color, style_to_color
 from ..var import SkStringVar
+from .container import SkContainer
 from .widget import SkWidget
 
 
@@ -29,7 +30,8 @@ class SkLineInput(SkWidget):
 
     def __init__(
         self,
-        *args,
+        parent: SkContainer,
+        *,
         text: str = "",
         textvariable: SkStringVar | None = None,
         placeholder: str | None = None,
@@ -43,7 +45,7 @@ class SkLineInput(SkWidget):
         :param placeholder: 占位符
         :param cursor: 光标样式
         """
-        super().__init__(*args, cursor=cursor, **kwargs)
+        super().__init__(parent=parent, cursor=cursor, **kwargs)
 
         # Attributes
         self.attributes["text"] = text

@@ -1,10 +1,11 @@
+from .container import SkContainer
 from .widget import SkWidget
 
 
 class SkEmpty(SkWidget):
     """Empty element, used only as a placeholder in layouts."""
 
-    def __init__(self, *args, size=(0, 0), **kwargs) -> None:
+    def __init__(self, parent: SkContainer, **kwargs) -> None:
         """Initialize empty element.
 
         :param args: SkWidget arguments
@@ -12,7 +13,7 @@ class SkEmpty(SkWidget):
         :param kwargs: SkWidget arguments
         :return: None
         """
-        super().__init__(*args, size=size, **kwargs)
+        super().__init__(parent, **kwargs)
 
     def draw_widget(self, canvas, rect) -> None:
         """Draw method, does nothing.

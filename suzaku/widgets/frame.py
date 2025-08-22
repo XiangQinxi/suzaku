@@ -19,9 +19,9 @@ class SkFrame(SkWidget, SkContainer):
     """
 
     def __init__(
-        self, parent: SkContainer, *args, style: str = "SkFrame", **kwargs
+        self, parent: SkContainer, *, style: str = "SkFrame", **kwargs
     ) -> None:
-        SkWidget.__init__(self, parent, *args, style=style, **kwargs)
+        SkWidget.__init__(self, parent, style=style, **kwargs)
         SkContainer.__init__(self)
 
     # region Draw

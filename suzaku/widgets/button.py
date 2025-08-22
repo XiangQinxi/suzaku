@@ -1,8 +1,8 @@
 import typing
 
+from .. import SkTheme
 from .container import SkContainer
 from .frame import SkFrame
-from .. import SkTheme
 
 
 class SkButton(SkFrame):
@@ -22,14 +22,14 @@ class SkButton(SkFrame):
     def __init__(
         self,
         parent: SkContainer,
-        *args,
+        *,
         style: str = "SkButton",
         size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
-        super().__init__(parent, *args, style=style, size=size, **kwargs)
+        super().__init__(parent, style=style, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
         self.command = command

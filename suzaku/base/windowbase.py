@@ -354,7 +354,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 yield surface
 
             case "sdl2":
-                import sdl2, ctypes
+                import ctypes
+
+                import sdl2
 
                 width, height = arg.w, arg.h
                 pixels_ptr = arg.pixels

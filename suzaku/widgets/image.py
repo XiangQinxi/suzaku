@@ -1,5 +1,6 @@
 from typing import Any
 
+from .container import SkContainer
 from .widget import SkWidget
 
 
@@ -11,9 +12,16 @@ class SkImage(SkWidget):
     """
 
     def __init__(
-        self, parent, path: str, x: int, y: int, width: int, height: int
+        self,
+        parent: SkContainer,
+        path: str,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        **kwargs,
     ) -> None:
-        super().__init__(parent, (width, height))
+        super().__init__(parent, **kwargs)
         self.parent = parent
         self.width: int = width
         self.height: int = height

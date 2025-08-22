@@ -1,14 +1,14 @@
 import skia
 
-from .frame import SkFrame
 from .container import SkContainer
+from .frame import SkFrame
 
 
 class SkCard(SkFrame):
     """A card widget"""
 
-    def __init__(self, parent: SkContainer, *args, style: str = "SkCard", **kwargs):
-        super().__init__(parent, *args, style=style, **kwargs)
+    def __init__(self, parent: SkContainer, *, style: str = "SkCard", **kwargs):
+        super().__init__(parent, style=style, **kwargs)
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Draw the Frame border（If self.attributes["border"] is True）

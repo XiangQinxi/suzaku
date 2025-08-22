@@ -5,6 +5,7 @@ import skia
 from ..styles.color import style_to_color
 from ..styles.font import default_font
 from ..var import SkStringVar
+from .container import SkContainer
 from .widget import SkWidget
 
 
@@ -22,13 +23,13 @@ class SkText(SkWidget):
 
     def __init__(
         self,
-        parent=None,
-        *args,
+        parent: SkContainer,
         text: str | None = "",
+        *,
         textvariable: SkStringVar = None,
         **kwargs,
     ):
-        super().__init__(parent=parent, *args, **kwargs)
+        super().__init__(parent=parent, **kwargs)
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["text"]: str | None = text
         self.attributes["font"]: skia.Font = default_font

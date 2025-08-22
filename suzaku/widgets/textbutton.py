@@ -3,6 +3,7 @@ import typing
 import skia
 
 from .button import SkButton
+from .container import SkContainer
 from .text import SkText
 
 
@@ -18,13 +19,15 @@ class SkTextButton(SkText):
 
     def __init__(
         self,
-        *args,
+        parent: SkContainer,
+        text: str | None = "",
+        *,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         style: str = "SkButton",
         **kwargs,
     ) -> None:
-        super().__init__(*args, style=style, **kwargs)
+        super().__init__(parent=parent, text=text, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
 

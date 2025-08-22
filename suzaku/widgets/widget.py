@@ -10,7 +10,7 @@ from ..misc import SkMisc
 from ..styles.color import SkColor, SkGradient, skcolor2color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
-from ..styles.theme import SkTheme, default_theme, SkStyleNotFoundError
+from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
 from .appwindow import SkAppWindow
 from .window import SkWindow
 
@@ -26,6 +26,7 @@ class SkWidget(SkEventHanding, SkMisc):
     def __init__(
         self,
         parent,
+        *,
         cursor: str = "arrow",
         style: str = "SkWidget",
         font: skia.Font | None = default_font,
