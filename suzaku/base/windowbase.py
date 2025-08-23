@@ -55,7 +55,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
         fullscreen=False,
         opacity: float = 1.0,
         force_hardware_acceleration: bool = False,
-        border: bool = True,
     ):
         # glfw.default_window_hints()
 
@@ -115,12 +114,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.mouse_rooty = 0
 
         self.focus = True
-
-        match self.framework:
-            case "glfw":
-                glfw.window_hint(glfw.DECORATED, border)
-            case "sdl2":
-                pass
 
         self.attributes = {
             "title": title,
@@ -766,6 +759,27 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # endregion
 
     # region Configure 属性配置
+
+    def geometry(self, spec: str | None = None) -> str | typing.Self:
+        if spec is None:
+            return f"{self.width}x{self.height}+{self.root_x}+{self.root_y}"
+
+        width, height = None, None
+        x, y = None, None
+
+        if "x" in spec:
+            wh, _, rest = spec.partition("+")
+            width, height = map(int, wh.split("x"))
+            if rest:
+                x, y = map(int, rest.split("+"))
+        elif spec.startswith("+"):
+            x, y = map(int, spec[1:].split("+"))
+
+        if width and height:
+            self.resize(width, height)
+        if x is not None and y is not None:
+            self.move(x, y)
+        return self
 
     @property
     def window_frame_size(self) -> tuple[int, int, int, int]:

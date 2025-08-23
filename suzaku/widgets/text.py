@@ -26,6 +26,7 @@ class SkText(SkWidget):
         parent: SkContainer,
         text: str | None = "",
         *,
+        align="center",
         textvariable: SkStringVar = None,
         **kwargs,
     ):
@@ -33,6 +34,7 @@ class SkText(SkWidget):
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["text"]: str | None = text
         self.attributes["font"]: skia.Font = default_font
+        self.attributes["align"] = align
 
     def set(self, text: str) -> typing.Self:
         """Set the text"""
@@ -74,6 +76,7 @@ class SkText(SkWidget):
             text=self.get(),
             fg=self.theme.get_style_attr("SkText", "fg"),
             font=self.attributes["font"],
+            align=self.cget("align"),
         )
 
     # endregion

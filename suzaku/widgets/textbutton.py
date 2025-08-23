@@ -24,14 +24,12 @@ class SkTextButton(SkText):
         *,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
-        align: str = "center",
         style: str = "SkButton",
         **kwargs,
     ) -> None:
         super().__init__(parent=parent, text=text, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
-        self.attributes["align"] = align
 
         self.command = command
 
