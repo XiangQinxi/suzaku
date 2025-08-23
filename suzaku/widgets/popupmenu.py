@@ -8,8 +8,6 @@ from .window import SkWindow
 
 class SkPopupMenu(SkCard):
 
-    # TODO 弹出菜单仍有问题，当他下方有其他组件时，会同时触发两个的事件
-
     def __init__(self, parent: SkWindow = None, **kwargs):
         super().__init__(parent, **kwargs)
 

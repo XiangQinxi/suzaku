@@ -446,4 +446,14 @@ class SkContainer:
             + "SkWindow or SkWidget in normal cases."
         )
 
+    @property
+    def visible_children(self):
+        children = []
+        for layer in self.draw_list:
+            for child in layer:
+                children.append(child)
+                if hasattr(child, "visible_children"):
+                    children.extend(child.visible_children)
+        return children
+
     # endregion

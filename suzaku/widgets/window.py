@@ -7,7 +7,6 @@ import skia
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
 from ..styles.color import style_to_color
-from ..styles.texture import SkAcrylic
 from ..styles.theme import SkTheme, default_theme
 from .app import SkApp
 from .container import SkContainer
@@ -132,7 +131,9 @@ class SkWindow(SkWindowBase, SkContainer):
             rootx=event.rootx,
             rooty=event.rooty,
         )
-        for widget in self.children:
+        children = self.visible_children
+        children.reverse()
+        for widget in children:
             widget.is_mouse_pressed = False
             widget.event_trigger("mouse_leave", event)
         del event
@@ -167,7 +168,9 @@ class SkWindow(SkWindowBase, SkContainer):
         )
 
     def _mouse(self, event: SkEvent) -> None:
-        for widget in self.children:
+        children = self.visible_children
+        children.reverse()
+        for widget in children:
             if self.is_entered_widget(widget, event):
                 widget.is_mouse_floating = True
                 if widget.focusable:
@@ -181,6 +184,7 @@ class SkWindow(SkWindowBase, SkContainer):
                 ]
                 for name in names:
                     widget.event_trigger(name, event)
+                break
 
     def _motion(self, event: SkEvent) -> None:
         """Mouse motion event for SkWindow.
@@ -199,10 +203,12 @@ class SkWindow(SkWindowBase, SkContainer):
         )
 
         # 找到当前鼠标所在的视觉元素
-        for widget in reversed(self.children):
+        children = self.visible_children
+        children.reverse()
+
+        for widget in reversed(children):
             if self.is_entered_widget(widget, event):
                 current_widget = widget
-                break
 
         # 处理上一个元素的离开事件
         if self.previous_widget and self.previous_widget != current_widget:
@@ -264,8 +270,7 @@ class SkWindow(SkWindowBase, SkContainer):
         ]
 
         _widget = None
-
-        for widget in self.children:
+        for widget in self.visible_children:
             if widget.is_mouse_pressed:
                 _widget = widget
 
