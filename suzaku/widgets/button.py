@@ -52,8 +52,11 @@ class SkButton(SkFrame):
             else:
                 style_name = f"{self.style}:hover"
         else:
-            if self.is_focus:
-                style_name = f"{self.style}:focus"
+            if "focus" in self.styles[self.style]:
+                if self.is_focus:
+                    style_name = f"{self.style}:focus"
+                else:
+                    style_name = self.style
             else:
                 style_name = self.style
 
@@ -73,14 +76,27 @@ class SkButton(SkFrame):
         else:
             bd_shader = None
 
+        if "width" in style:
+            width = style["width"]
+        else:
+            width = 0
+        if "bd" in style:
+            bd = style["bd"]
+        else:
+            bd = None
+        if "bg" in style:
+            bg = style["bg"]
+        else:
+            bg = None
+
         # Draw the button border
         self._draw_frame(
             canvas,
             rect,
             radius=self.theme.get_style(self.style)["radius"],
-            bg=style["bg"],
-            width=style["width"],
-            bd=style["bd"],
+            bg=bg,
+            width=width,
+            bd=bd,
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
             bg_shader=bg_shader,

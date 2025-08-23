@@ -83,6 +83,27 @@
       }
     },
 
+    "SkMenuItem": {
+      "rest": {
+        "size": [0, 35],
+        "radius": 5,
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"}
+      },
+      "hover": {
+        "bg": [50, 50, 50, 200],
+        "fg": {"color_palette": "default_fg"},
+        "bd": [50, 50, 50, 255],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [30, 30, 30, 200],
+        "fg": {"color_palette": "default_fg"},
+        "bd": [40, 40, 40, 255],
+        "width": 2
+      }
+    },
+
     "SkCard": {
       "rest": {
         "size": [120, 200],

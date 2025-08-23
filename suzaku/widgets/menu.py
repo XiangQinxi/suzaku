@@ -8,8 +8,10 @@ from .card import SkCard
 
 
 class SkMenuItem(SkTextButton):
-    def __init__(self, parent: SkContainer, text: str = "", **kwargs):
-        super().__init__(parent, text=text, **kwargs)
+    def __init__(
+        self, parent: SkContainer, text: str = "", *, style="SkMenuItem", **kwargs
+    ):
+        super().__init__(parent, text=text, style=style, **kwargs)
 
         self.bind("click", self._on_click)
 
@@ -18,6 +20,9 @@ class SkMenuItem(SkTextButton):
 
 
 class SkPopupMenu(SkCard):
+
+    # TODO 弹出菜单仍有问题，当他下方有其他组件时，会同时触发两个的事件
+
     def __init__(self, parent: SkWindow = None, **kwargs):
         super().__init__(parent, **kwargs)
 
@@ -71,12 +76,17 @@ class SkPopupMenu(SkCard):
 
 class SkMenuButton(SkTextButton):
     def __init__(
-        self, parent: SkContainer, menu: SkPopupMenu, text: str = "", **kwargs
+        self,
+        parent: SkContainer,
+        text: str = "",
+        menu: SkPopupMenu = None,
+        **kwargs,
     ):
         super().__init__(parent, text=text, **kwargs)
 
-        self.popupmenu = menu
+        self.attributes["popupmenu"] = menu
         self.bind("click", self._on_click)
 
     def _on_click(self, event: SkEvent):
-        self.popupmenu.popup(self.canvas_x, self.canvas_y + self.height)
+        if self.cget("popupmenu"):
+            self.cget("popupmenu").popup(self.canvas_x, self.canvas_y + self.height)

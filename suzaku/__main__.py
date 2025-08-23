@@ -17,7 +17,7 @@ if __name__ == "__main__":
             anti_alias=True,
             parent=None,
             title="Suzaku GUI",
-            size=(280, 400),
+            size=(280, 450),
         )
         # window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
@@ -26,6 +26,22 @@ if __name__ == "__main__":
         # frame.allowed_out_of_bounds = True
 
         SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
+
+        popupmenu = SkPopupMenu(window)
+        popupmenu.add_command("文件")
+        popupmenu.add_command("编辑")
+        popupmenu.add_command("视图")
+        popupmenu.add_command("窗口")
+        popupmenu.add_command("帮助")
+        popupmenu.add_command("帮助")
+
+        menubutton = SkMenuButton(
+            frame,
+            "This is a SkMenuButton",
+            menu=popupmenu,
+        )
+        menubutton.box(padx=10, pady=(10, 0))
+
         SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
         # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
 
