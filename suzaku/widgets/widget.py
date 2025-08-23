@@ -153,7 +153,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.bind("mouse_enter", _on_mouse)
         self.bind("mouse_motion", _on_mouse)
 
-        self.bind("mouse_released", self._click)
+        self.bind("b1_released", self._click)
 
     # endregion
 

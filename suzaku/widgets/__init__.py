@@ -12,7 +12,7 @@ from .frame import SkFrame
 from .hynix import SkHynix
 from .image import SkImage
 from .lineinput import SkLineInput
-from .menu import SkMenuItem, SkPopupMenu
+from .menu import SkMenuItem, SkPopupMenu, SkMenuButton
 from .mutiline_input import SkMultiLineInput
 from .text import SkText
 from .textbutton import SkTextButton

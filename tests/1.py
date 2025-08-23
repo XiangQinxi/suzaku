@@ -15,10 +15,10 @@ popupmenu.add_command("窗口")
 popupmenu.add_command("帮助")
 popupmenu.add_command("帮助")
 
-window.bind("b2_released", lambda _: popupmenu.popup(_.x, _.y))
-
 btn = SkTextButton(window, "删除一个选项")
 btn.box(side="top")
 
+menubutton = SkMenuButton(window, popupmenu, "MenuButton")
+menubutton.box()
 
 app.mainloop()

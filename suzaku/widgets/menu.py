@@ -20,6 +20,9 @@ class SkMenuItem(SkTextButton):
 class SkPopupMenu(SkCard):
     def __init__(self, parent: SkWindow = None, **kwargs):
         super().__init__(parent, **kwargs)
+
+        self.focusable = True
+
         self.items: list[SkMenuItem] = []
         self.event_generate("hide")
         self.bind("hide", self._hide)
@@ -34,19 +37,17 @@ class SkPopupMenu(SkCard):
         x: int,
         y: int,
     ):
-        if not self.window.previous_widget:
-            self.focus_set()
-            self.fixed(x, y, width=self.content_width, height=self.content_height)
-            self.skip = True
+        self.focus_set()
+        self.fixed(x, y, width=self.content_width, height=self.content_height)
 
     def _mouse_released(self, event: SkEvent):
-        if not self.is_mouse_floating:
-            if self.skip:
-                self.skip = False
-                return
+        if not self.is_focus:
             self.hide()
 
     def _hide(self, event: SkEvent):
+        if self.skip:
+            self.skip = False
+            return
         self.hide()
 
     def add_command(self, text: str = None, command: typing.Callable = None):
@@ -66,3 +67,16 @@ class SkPopupMenu(SkCard):
                 self.items[_id].configure(**kwargs)
 
     config_item = configure_item
+
+
+class SkMenuButton(SkTextButton):
+    def __init__(
+        self, parent: SkContainer, menu: SkPopupMenu, text: str = "", **kwargs
+    ):
+        super().__init__(parent, text=text, **kwargs)
+
+        self.popupmenu = menu
+        self.bind("click", self._on_click)
+
+    def _on_click(self, event: SkEvent):
+        self.popupmenu.popup(self.canvas_x, self.canvas_y + self.height)
