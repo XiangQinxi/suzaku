@@ -86,7 +86,7 @@
 
     "SkMenuItem": {
       "rest": {
-        "size": [0, 35],
+        "size": [0, 0],
         "radius": 5,
         "bg": "transparent",
         "fg": [0, 0, 0, 235]

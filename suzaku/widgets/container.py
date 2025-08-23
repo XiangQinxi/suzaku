@@ -207,10 +207,8 @@ class SkContainer:
             widget.event_trigger("resize", SkEvent(event_type="resize"))
 
     def record_content_size(self, child, padx=0, pady=0):
-        if self.content_width < child.x + child.width + padx:
-            self.content_width = child.x + child.width + padx
-        if self.content_height < child.y + child.height + pady:
-            self.content_height = child.y + child.height + pady
+        self.content_width = max(child.x + child.dwidth + padx, self.content_width)
+        self.content_height = max(child.y + child.dheight + pady, self.content_height)
 
     def _handle_layout(self, event=None):
         """Handle layout of the container.

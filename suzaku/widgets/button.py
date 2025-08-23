@@ -32,6 +32,7 @@ class SkButton(SkFrame):
         super().__init__(parent, style=style, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
+
         self.command = command
         self.focusable = True
 

@@ -29,10 +29,9 @@ if __name__ == "__main__":
 
         popupmenu = SkPopupMenu(window)
         popupmenu.add_command("文件")
-        popupmenu.add_command("编辑")
-        popupmenu.add_command("视图")
-        popupmenu.add_command("窗口")
-        popupmenu.add_command("帮助")
+        popupmenu.add_command("打开文件从...")
+        popupmenu.add_command("保存为*.png")
+        popupmenu.add_command("另存为...")
         popupmenu.add_command("帮助")
 
         menubutton = SkMenuButton(

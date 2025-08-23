@@ -24,12 +24,14 @@ class SkTextButton(SkText):
         *,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
+        align: str = "center",
         style: str = "SkButton",
         **kwargs,
     ) -> None:
         super().__init__(parent=parent, text=text, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
+        self.attributes["align"] = align
 
         self.command = command
 
@@ -42,14 +44,14 @@ class SkTextButton(SkText):
     def dwidth(self):
         _width = self.cget("dwidth")
         if _width <= 0:
-            _width = self.measure_text(self.get()) + 8
+            _width = self.measure_text(self.get()) + self.ipadx
         return _width
 
     @property
     def dheight(self):
         _height = self.cget("dheight")
         if _height <= 0:
-            _height = self.text_height + 8
+            _height = self.text_height + 8 + self.ipady
         return _height
 
     # region Draw
@@ -123,6 +125,7 @@ class SkTextButton(SkText):
             rect=rect,
             text=self.get(),
             fg=style["fg"],
+            align=self.cget("align"),
         )
 
     # endregion

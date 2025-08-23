@@ -129,6 +129,9 @@ class SkWidget(SkEventHanding, SkMisc):
         self.width: int | float = 0
         self.height: int | float = 0
 
+        self.ipadx: int | float = 3
+        self.ipady: int | float = 3
+
         self.focusable: bool = False
         self.visible: bool = False
 
@@ -807,8 +810,8 @@ class SkWidget(SkEventHanding, SkMisc):
         side: Literal["top", "bottom", "left", "right"] = "top",
         padx: int | float | tuple[int | float, int | float] = 10,
         pady: int | float | tuple[int | float, int | float] = 10,
-        ipadx: int | float | tuple[int | float, int | float] = 0,
-        ipady: int | float | tuple[int | float, int | float] = 0,
+        ipadx: int | float | tuple[int | float, int | float] | None = None,
+        ipady: int | float | tuple[int | float, int | float] | None = None,
         expand: bool | tuple[bool, bool] = False,
     ):
         """Position the widget with box layout.
@@ -829,8 +832,6 @@ class SkWidget(SkEventHanding, SkMisc):
                     "side": side,
                     "padx": padx,
                     "pady": pady,
-                    "ipadx": ipadx,
-                    "ipady": ipady,
                     "expand": expand,
                 }
             )
@@ -840,12 +841,14 @@ class SkWidget(SkEventHanding, SkMisc):
                     "side": side,
                     "padx": padx,
                     "pady": pady,
-                    "ipadx": ipadx,
-                    "ipady": ipady,
                     "expand": expand,
                 }
             }
             self.parent.add_layout_child(self)
+        if ipadx:
+            self.ipadx = ipadx
+        if ipady:
+            self.ipady = ipady
         return self
 
     # endregion

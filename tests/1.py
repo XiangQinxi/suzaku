@@ -18,7 +18,7 @@ popupmenu.add_command("帮助")
 btn = SkTextButton(window, "删除一个选项")
 btn.box(side="top")
 
-menubutton = SkMenuButton(
+menubutton = SkMenu(
     window,
     "MenuButton",
     menu=popupmenu,
