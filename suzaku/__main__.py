@@ -19,7 +19,7 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 450),
         )
-        # window.apply_theme(dark_theme)
+        window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)
@@ -27,10 +27,13 @@ if __name__ == "__main__":
 
         SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
 
-        popupmenu = SkPopupMenu(window)
-        popupmenu.add_command("文件")
-        popupmenu.add_command("打开文件从...")
-        popupmenu.add_command("保存为*.png")
+        popupmenu = SkPopupMenu(frame)
+        popupmenu.add_command(
+            "新建", command=lambda: show_message(window, message="Hello")
+        )
+        popupmenu.add_command("打开文件")
+        popupmenu.add_command("打开文件夹")
+        popupmenu.add_command("保存")
         popupmenu.add_command("另存为...")
         popupmenu.add_command("帮助")
 

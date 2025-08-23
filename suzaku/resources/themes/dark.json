@@ -85,7 +85,7 @@
 
     "SkMenuItem": {
       "rest": {
-        "size": [0, 35],
+        "size": [0, 0],
         "radius": 5,
         "bg": "transparent",
         "fg": {"color_palette": "default_fg"}
@@ -108,7 +108,7 @@
       "rest": {
         "size": [120, 200],
         "radius": 8,
-        "bg": [25, 25, 25, 245],
+        "bg": [30, 30, 30, 255],
         "bd": [35, 35, 35, 245],
         "bd_shadow": [0, 3, 2, 2, [200, 200, 200, 20]],
         "width": 2

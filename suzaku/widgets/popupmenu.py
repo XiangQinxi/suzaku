@@ -4,11 +4,12 @@ from ..event import SkEvent
 from .card import SkCard
 from .menuitem import SkMenuItem
 from .window import SkWindow
+from .container import SkContainer
 
 
 class SkPopupMenu(SkCard):
 
-    def __init__(self, parent: SkWindow = None, **kwargs):
+    def __init__(self, parent: SkWindow | SkContainer, **kwargs):
         super().__init__(parent, **kwargs)
 
         self.focusable = True

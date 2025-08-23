@@ -71,7 +71,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         if isinstance(self.parent, SkAppBase):  # parent=SkAppBase
             self.application = self.parent
             self.parent.add_window(self)
-        elif isinstance(self.parent, self.__class__):  # parent=SkWindowBase
+        elif isinstance(self.parent, SkWindowBase):  # parent=SkWindowBase
             self.application = self.parent.application
             self.parent.application.add_window(self)
 

@@ -19,7 +19,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self,
         parent: typing.Self | SkApp = None,
         *args,
-        theme: SkTheme = default_theme,
+        theme: SkTheme = None,
         size: tuple[int, int] = (300, 300),
         anti_alias: bool = True,
         **kwargs,
@@ -35,7 +35,13 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.theme: SkTheme | None = None
         self.styles: dict | None = None
-        self.apply_theme(theme)
+
+        if isinstance(self.parent, SkWindow):
+            self.apply_theme(self.parent.theme if self.parent.theme else theme)
+        else:
+            if theme is None:
+                theme = default_theme
+            self.apply_theme(theme)
 
         self.focus_widget = self
         self.draws: list[typing.Callable] = []

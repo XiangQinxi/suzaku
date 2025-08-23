@@ -14,6 +14,7 @@ from .image import SkImage
 from .lineinput import SkLineInput
 from .menu import SkMenu
 from .menuitem import SkMenuItem
+from .messagebox import SkMessageBox, show_message
 from .mutiline_input import SkMultiLineInput
 from .popupmenu import SkPopupMenu
 from .text import SkText

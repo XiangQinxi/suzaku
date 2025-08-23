@@ -15,6 +15,8 @@ class SkMenuItem(SkTextButton):
     ):
         super().__init__(parent, text=text, style=style, align=align, **kwargs)
 
+        self.focusable = False
+
         self.bind("click", self._on_click)
 
     def _on_click(self, event: SkEvent):

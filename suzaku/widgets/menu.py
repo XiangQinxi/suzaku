@@ -19,9 +19,7 @@ class SkMenu(SkTextButton):
 
     def _on_click(self, event: SkEvent):
         if self.cget("popupmenu"):
-            self.cget("popupmenu").popup(
-                x=self.canvas_x, y=self.canvas_y + self.height, width=100
-            )
+            self.cget("popupmenu").popup(x=self.x, y=self.y + self.height, width=100)
             """from tkinter import Menu
 
             Menu.add_cascade()"""
