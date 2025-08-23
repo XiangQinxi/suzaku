@@ -34,12 +34,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     :param parent:
         Window parent class (if a window class is specified,
-        the child window will close when the parent window closes) 【窗口父类（如果填窗口类，则父窗口关闭，该窗口也会跟着关闭）】
-    :param title: Window title 【窗口标题】
-    :param size: Window size 【窗口大小】
-    :param fullscreen: Window fullscreen 【窗口是否全屏】
-    :param opacity: Window opacity 【窗口透明度】
-    :param border: Whether it has border and titlebar 【是否具有边框、标题栏】
+        the child window will close when the parent window closes)
+    :param title: Window title
+    :param size: Window size
+    :param fullscreen: Window fullscreen
+    :param opacity: Window opacity
+    :param border: Whether it has border and titlebar
     """
 
     _instance_count = 0
@@ -48,7 +48,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     def __init__(
         self,
-        parent=None,
+        parent: SkAppBase | None = None,
         *,
         title: str = "suzaku",
         size: tuple[int, int] = (300, 300),
@@ -63,7 +63,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.children = []
 
         SkEventHanding.__init__(self)
-        self.parent: SkAppBase | typing.Self = (
+        self.parent: SkAppBase | typing.Self | int = (
             parent if parent is not None else SkAppBase.get_instance()
         )
         if self.parent is None:
@@ -84,7 +84,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             raise TypeError("parent must be SkAppBase or SkWindowBase")
         self.framework = self.parent.framework
 
-        self._event_init = False  # 【是否使用create_bind方法】
+        self._event_init = False  #
         self._cursor = None
 
         # Always is 0
@@ -200,19 +200,19 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        """icon: skia.Image = skia.Image.open(self.icon1_path)
+        # icon: skia.Image = skia.Image.open(self.icon1_path)
 
-        info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
-        pixels = bytearray(icon.width() * icon.height() * 4)
-        print(pixels)
+        # info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
+        # pixels = bytearray(icon.width() * icon.height() * 4)
+        # print(pixels)
 
-        self.icon = (
-            icon.width(),
-            icon.height(),
-            pixels,
-        )
+        # self.icon = (
+        #     icon.width(),
+        #     icon.height(),
+        #     pixels,
+        # )
 
-        glfw.set_window_icon(self.the_window, 1, self.icon)"""
+        # glfw.set_window_icon(self.the_window, 1, self.icon)
 
     @classmethod
     def get_instance_count(cls) -> int:
@@ -795,7 +795,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """Request window attention
 
         This method will request the window to gain focus and display the window icon in the taskbar.
-        【该方法会请求窗口获得焦点，并且在任务栏中显示窗口图标。】
+
 
         >>> window.hongwen()
         >>> window.ask_notice()
@@ -806,7 +806,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
 
-    def wm_maxsize(self, width: int | float = None, height: int | float = None):
+    def wm_maxsize(self, width: int | float | None = None, height: int | float | None = None):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
@@ -817,7 +817,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     maxsize = wm_maxsize
 
-    def wm_minsize(self, width: int | float = None, height: int | float = None):
+    def wm_minsize(self, width: int | float | None = None, height: int | float | None = None):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
@@ -828,7 +828,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     minsize = wm_minsize
 
-    def wm_resizable(self, value: bool = None) -> bool | typing.Self:
+    def wm_resizable(self, value: bool | None = None) -> bool | typing.Self:
         return self.window_attr("resizable", value)
 
     resizable = wm_resizable
@@ -934,7 +934,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
     cursor = wm_cursor
 
     def default_cursor(
-        self, cursor_name: str = None
+        self, cursor_name: str | None = None
     ) -> typing.Union[str, "SkWindowBase"]:
         """Set the default cursor style of the window.
 
@@ -950,7 +950,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.attributes["cursor"] = cursor_name
         return self
 
-    def wm_visible(self, is_visible: bool = None) -> typing.Union[bool, "SkWindowBase"]:
+    def wm_visible(self, is_visible: bool | None = None) -> typing.Union[bool, "SkWindowBase"]:
         """Get or set the visibility of the window.
 
         is_visible:
@@ -1046,7 +1046,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # print(self.id)
         self.can_be_close(True)
 
-    def wm_title(self, text: str = None) -> typing.Union[str, "SkWindowBase"]:
+    def wm_title(self, text: str | None = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.
 
         text:
@@ -1068,7 +1068,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     title = wm_title
 
-    def resize(self, width: int = None, height: int = None) -> "SkWindowBase":
+    def resize(self, width: int | None = None, height: int | None = None) -> "SkWindowBase":
         """Resize the window.
 
         :param width: Width
@@ -1092,7 +1092,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         return self
 
-    def move(self, x: int = None, y: int = None) -> "SkWindowBase":
+    def move(self, x: int | None = None, y: int | None = None) -> "SkWindowBase":
         """Move the window.
 
         :param x: x position
