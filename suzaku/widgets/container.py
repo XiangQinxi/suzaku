@@ -76,6 +76,9 @@ class SkContainer:
         self.layout_names = [None, None, None]
         # self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
 
+        self.content_width = 0
+        self.content_height = 0
+
         self._grid_lists = []  # [ [row1, ], [] ]
         self._box_direction = None  # h(horizontal) or v(vertical)
         self._flow_row = 0
@@ -95,9 +98,10 @@ class SkContainer:
         """
         from .app import SkApp
 
-        if not isinstance(self.parent, SkApp):
-            self.parent.add_child(child)
-        self.children.append(child)
+        if not child in self.children:
+            if not isinstance(self.parent, SkApp):
+                self.parent.add_child(child)
+            self.children.append(child)
 
     def add_layout_child(self, child):
         """Add layout child widget to window.
@@ -138,6 +142,7 @@ class SkContainer:
         :arg child: SkWidget
         :return: None
         """
+
         self.draw_list[1].append(child)
         self.update_layout()
 
@@ -201,6 +206,12 @@ class SkContainer:
         for widget in self.children:
             widget.event_trigger("resize", SkEvent(event_type="resize"))
 
+    def record_content_size(self, child, padx=0, pady=0):
+        if self.content_width < child.x + child.width + padx:
+            self.content_width = child.x + child.width + padx
+        if self.content_height < child.y + child.height + pady:
+            self.content_height = child.y + child.height + pady
+
     def _handle_layout(self, event=None):
         """Handle layout of the container.
 
@@ -234,6 +245,27 @@ class SkContainer:
 
     def _handle_grid(self):
         pass
+
+    @staticmethod
+    def unpack_padding(padx, pady):
+        """Unpack padding.
+        【左上右下】
+        :param padx:
+        :param pady:
+        :return:
+        """
+        if type(padx) is tuple:
+            left = padx[0]
+            right = padx[1]
+        else:
+            left = right = padx
+
+        if type(pady) is tuple:
+            top = pady[0]
+            bottom = pady[1]
+        else:
+            top = bottom = pady
+        return left, top, right, bottom
 
     def _handle_box(self) -> None:
         """Process box layout.
@@ -291,49 +323,39 @@ class SkContainer:
             # Left side
             last_child_left_x = 0
             for child in start_children:
-                if type(child.layout_config["box"]["padx"]) is tuple:
-                    left = child.layout_config["box"]["padx"][0]
-                    right = child.layout_config["box"]["padx"][1]
-                else:
-                    left = right = child.layout_config["box"]["padx"]
+                child_layout_config = child.layout_config["box"]
+                left, top, right, bottom = self.unpack_padding(
+                    child_layout_config["padx"],
+                    child_layout_config["pady"],
+                )
 
-                if type(child.layout_config["box"]["pady"]) is tuple:
-                    top = child.layout_config["box"]["pady"][0]
-                    bottom = child.layout_config["box"]["pady"][1]
-                else:
-                    top = bottom = child.layout_config["box"]["pady"]
-
-                if not child.layout_config["box"]["expand"]:
+                if not child_layout_config["expand"]:
                     child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
                 child.x = last_child_left_x + left
                 child.y = top
+                self.record_content_size(child, right, bottom)
                 last_child_left_x = child.x + child.width + right
 
             # Right side
             last_child_right_x = width
             for child in end_children:
-                if type(child.layout_config["box"]["padx"]) is tuple:
-                    left = child.layout_config["box"]["padx"][0]
-                    right = child.layout_config["box"]["padx"][1]
-                else:
-                    left = right = child.layout_config["box"]["padx"]
+                child_layout_config = child.layout_config["box"]
+                left, top, right, bottom = self.unpack_padding(
+                    child_layout_config["padx"],
+                    child_layout_config["pady"],
+                )
 
-                if type(child.layout_config["box"]["pady"]) is tuple:
-                    top = child.layout_config["box"]["pady"][0]
-                    bottom = child.layout_config["box"]["pady"][1]
-                else:
-                    top = bottom = child.layout_config["box"]["pady"]
-
-                if not child.layout_config["box"]["expand"]:
+                if not child_layout_config["expand"]:
                     child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
                 child.x = last_child_right_x - child.width - right
                 child.y = top
+                self.record_content_size(child, right, bottom)
                 last_child_right_x = last_child_right_x - child.width - left * 2
         else:  # Vertical Layout
             # Calculate the height of the fixed children
@@ -362,17 +384,10 @@ class SkContainer:
             last_child_bottom_y = 0  # Last bottom y position of the child component
             for child in start_children:  # Top side
                 child_layout_config = child.layout_config["box"]
-                if type(child_layout_config["padx"]) is tuple:
-                    left = child_layout_config["padx"][0]
-                    right = child_layout_config["padx"][1]
-                else:
-                    left = right = child_layout_config["padx"]
-
-                if type(child_layout_config["pady"]) is tuple:
-                    top = child_layout_config["pady"][0]
-                    bottom = child_layout_config["pady"][1]
-                else:
-                    top = bottom = child_layout_config["pady"]
+                left, top, right, bottom = self.unpack_padding(
+                    child.layout_config["box"]["padx"],
+                    child.layout_config["box"]["pady"],
+                )
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
@@ -381,22 +396,16 @@ class SkContainer:
                     child.height = expanded_height - top - bottom
                 child.x = left
                 child.y = last_child_bottom_y + top
+                self.record_content_size(child, right, bottom)
                 last_child_bottom_y = child.y + child.height + bottom
 
             last_child_top_y = height  # Last top y position of the child component
             for child in end_children:  # Bottom side
                 child_layout_config = child.layout_config["box"]
-                if type(child_layout_config["padx"]) is tuple:
-                    left = child_layout_config["padx"][0]
-                    right = child_layout_config["padx"][1]
-                else:
-                    left = right = child_layout_config["padx"]
-
-                if type(child_layout_config["pady"]) is tuple:
-                    top = child_layout_config["pady"][0]
-                    bottom = child_layout_config["pady"][1]
-                else:
-                    top = bottom = child_layout_config["pady"]
+                left, top, right, bottom = self.unpack_padding(
+                    child.layout_config["box"]["padx"],
+                    child.layout_config["box"]["pady"],
+                )
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
@@ -405,6 +414,7 @@ class SkContainer:
                     child.height = expanded_height - top - bottom
                 child.x = left
                 child.y = last_child_top_y - child.height - bottom
+                self.record_content_size(child, right, bottom)
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
     @staticmethod

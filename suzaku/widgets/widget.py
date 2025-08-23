@@ -20,6 +20,8 @@ class SkWidget(SkEventHanding, SkMisc):
     _instance_count = 0
 
     theme = default_theme
+    debug = False
+    debug_border = skia.ColorBLUE
 
     # region __init__ 初始化
 
@@ -82,6 +84,21 @@ class SkWidget(SkEventHanding, SkMisc):
             "update": dict(),
             "scroll": dict(),
         }
+
+        # Mouse events
+        buttons = [
+            "button1",
+            "button2",
+            "button3",
+            "b1",
+            "b2",
+            "b3",
+        ]  # Left Right Middle
+        button_states = ["pressed", "released", "motion"]
+
+        for button in buttons:
+            for state in button_states:
+                self.event_generate(f"{button}_{state}")
 
         self.attributes: dict[str, Any] = {
             "cursor": cursor,
@@ -181,7 +198,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Draw the widget 绘制组件
 
-    def draw(self, canvas: skia.Surfaces) -> None:
+    def draw(self, canvas: skia.Canvas) -> None:
         """Execute the widget rendering and subwidget rendering
 
         :param canvas:
@@ -194,10 +211,21 @@ class SkWidget(SkEventHanding, SkMisc):
         def rect(x, y, w, h):
             return skia.Rect.MakeXYWH(x, y, w, h)
 
-        self.draw_widget(
-            canvas,
-            rect(self.canvas_x, self.canvas_y, self.width, self.height),
-        )
+        _rect = rect(self.canvas_x, self.canvas_y, self.width, self.height)
+
+        self.draw_widget(canvas, _rect)
+
+        if self.debug:
+            canvas.drawRoundRect(
+                _rect,
+                0,
+                0,
+                skia.Paint(
+                    Style=skia.Paint.kStroke_Style,
+                    Color=self.debug_border,
+                    StrokeWidth=3,
+                ),
+            )
 
         if hasattr(self, "draw_children"):
             self.update_layout(None)
@@ -374,10 +402,10 @@ class SkWidget(SkEventHanding, SkMisc):
         self,
         canvas: skia.Canvas,
         rect: typing.Any,
-        radius: int,
-        bg: str | SkColor | int | None = None,
+        radius: int = 0,
+        bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
         width: int | float = 0,
-        bd: str | SkColor | int | None = None,
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
@@ -583,22 +611,6 @@ class SkWidget(SkEventHanding, SkMisc):
 
     configure = config = set_attribute
 
-    def show(self):
-        """Make the component visible
-
-        :return: self
-        """
-        self.visible = True
-        return self
-
-    def hide(self):
-        """Make the component invisible
-
-        :return: self
-        """
-        self.visible = False
-        return self
-
     def mouse_pos(self) -> tuple[int | float, int | float]:
         """Get the mouse pos
 
@@ -634,13 +646,41 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Layout related 布局相关
 
+    def show(self):
+        """Make the component visible
+        【将自己、有布局的子类的visible设为True】
+        :return: self
+        """
+        self.visible = True
+
+        if hasattr(self, "children"):
+            for child in self.children:
+                if not child.layout_config.get("none"):
+                    child.visible = True
+
+        return self
+
+    def hide(self):
+        """Make the component invisible
+
+        :return: self
+        """
+        self.visible = False
+        if hasattr(self, "children"):
+            for child in self.children:
+                child.visible = False
+        return self
+
     def layout_forget(self):
         """Remove widget from parent layout.
 
         :return: self
         """
-        self.visible = False
+        self.hide()
         self.layout_config = {"none": None}
+        for layer in self.parent.draw_list:
+            if self in layer:
+                layer.remove(self)
         return self
 
     def fixed(
@@ -663,17 +703,31 @@ class SkWidget(SkEventHanding, SkMisc):
         :param height:
         :return: self
         """
-        self.visible = True
-        self.layout_config = {
-            "fixed": {
-                "layout": "fixed",
-                "x": x,
-                "y": y,
-                "width": width,
-                "height": height,
+
+        self.show()
+
+        if self.layout_config.get("fixed"):
+            self.layout_config["fixed"].update(
+                {
+                    "x": x,
+                    "y": y,
+                    "width": width,
+                    "height": height,
+                }
+            )
+            self.parent.update_layout()
+        else:
+            self.layout_config = {
+                "fixed": {
+                    "layout": "fixed",
+                    "x": x,
+                    "y": y,
+                    "width": width,
+                    "height": height,
+                }
             }
-        }
-        self.parent.add_fixed_child(self)
+            self.parent.add_fixed_child(self)
+
         return self
 
     def place(self, anchor: str = "nw", x: int = 0, y: int = 0) -> "SkWidget":
@@ -684,7 +738,9 @@ class SkWidget(SkEventHanding, SkMisc):
         :param anchor:
         :return: self
         """
-        self.visible = True
+
+        self.show()
+
         self.layout_config = {
             "place": {
                 "anchor": anchor,
@@ -693,6 +749,7 @@ class SkWidget(SkEventHanding, SkMisc):
             }
         }
         self.parent.add_floating_child(self)
+
         return self
 
     def grid(
@@ -702,7 +759,8 @@ class SkWidget(SkEventHanding, SkMisc):
         rowspan: int = 1,
         columnspan: int = 1,
     ):
-        self.visible = True
+
+        self.show()
         self.layout_config = {
             "grid": {
                 "row": row,
@@ -712,6 +770,7 @@ class SkWidget(SkEventHanding, SkMisc):
             }
         }
         self.parent.add_layout_child(self)
+
         return self
 
     def pack(
@@ -729,7 +788,8 @@ class SkWidget(SkEventHanding, SkMisc):
         :param expand: Whether to expand the widget
         :return: self
         """
-        self.visible = True
+
+        self.show()
         self.layout_config = {
             "pack": {
                 "direction": direction,
@@ -739,6 +799,7 @@ class SkWidget(SkEventHanding, SkMisc):
             }
         }
         self.parent.add_layout_child(self)
+
         return self
 
     def box(
@@ -760,18 +821,31 @@ class SkWidget(SkEventHanding, SkMisc):
         :param expand: Whether to expand the widget
         :return: self
         """
-        self.visible = True
-        self.layout_config = {
-            "box": {
-                "side": side,
-                "padx": padx,
-                "pady": pady,
-                "ipadx": ipadx,
-                "ipady": ipady,
-                "expand": expand,
+
+        self.show()
+        if self.layout_config.get("box"):
+            self.layout_config["box"].update(
+                {
+                    "side": side,
+                    "padx": padx,
+                    "pady": pady,
+                    "ipadx": ipadx,
+                    "ipady": ipady,
+                    "expand": expand,
+                }
+            )
+        else:
+            self.layout_config = {
+                "box": {
+                    "side": side,
+                    "padx": padx,
+                    "pady": pady,
+                    "ipadx": ipadx,
+                    "ipady": ipady,
+                    "expand": expand,
+                }
             }
-        }
-        self.parent.add_layout_child(self)
+            self.parent.add_layout_child(self)
         return self
 
     # endregion

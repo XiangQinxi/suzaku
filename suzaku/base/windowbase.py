@@ -99,6 +99,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.width: int | float = size[0]
         self.height: int | float = size[1]
 
+        self.button = -1
+
         # 添加DPI相关属性
         self.dpi_scale = 1.0
         self.physical_width = size[0]
@@ -155,6 +157,20 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "move": {},
             "update": {},
         }
+
+        buttons = [
+            "button1",
+            "button2",
+            "button3",
+            "b1",
+            "b2",
+            "b3",
+        ]  # Left Right Middle
+        button_states = ["pressed", "released", "motion"]
+
+        for button in buttons:
+            for state in button_states:
+                self.event_generate(f"{button}_{state}")
 
         SkWindowBase._instance_count += 1
 
@@ -624,21 +640,29 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.mouse_rooty = pos[1] + self.root_y
 
         if is_pressed:
-            name = "mouse_pressed"
+            state = "pressed"
         else:
-            name = "mouse_released"
-        self.event_trigger(
-            name,
-            SkEvent(
-                event_type=name,
-                x=pos[0],
-                y=pos[1],
-                rootx=self.mouse_rootx,
-                rooty=self.mouse_rooty,
-                button=button,
-                mods=self.mods_name(mods),
-            ),
-        )
+            state = "released"
+
+        names = [f"mouse_{state}", f"button{button+1}_{state}", f"b{button+1}_{state}"]
+
+        self.button = button
+
+        for name in names:
+            self.event_trigger(
+                name,
+                SkEvent(
+                    event_type=name,
+                    x=pos[0],
+                    y=pos[1],
+                    rootx=self.mouse_rootx,
+                    rooty=self.mouse_rooty,
+                    button=button,
+                    mods=self.mods_name(mods),
+                ),
+            )
+        if not is_pressed:
+            self.button = -1
 
     def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
@@ -693,17 +717,34 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.mouse_rootx = x + self.root_x
         self.mouse_rooty = y + self.root_y
 
-        self.event_trigger(
-            "mouse_motion",
-            SkEvent(
-                event_type="mouse_motion",
-                x=self.mouse_x,
-                y=self.mouse_y,
-                rootx=self.mouse_rootx,
-                rooty=self.mouse_rooty,
-                glfw_window=window,
-            ),
-        )
+        button = self.button
+        if button >= 0:
+            names = ["mouse_motion", f"button{button+1}_motion", f"b{button+1}_motion"]
+
+            for name in names:
+                self.event_trigger(
+                    name,
+                    SkEvent(
+                        event_type=name,
+                        x=self.mouse_x,
+                        y=self.mouse_y,
+                        rootx=self.mouse_rootx,
+                        rooty=self.mouse_rooty,
+                        glfw_window=window,
+                    ),
+                )
+        else:
+            self.event_trigger(
+                "mouse_motion",
+                SkEvent(
+                    event_type="mouse_motion",
+                    x=self.mouse_x,
+                    y=self.mouse_y,
+                    rootx=self.mouse_rootx,
+                    rooty=self.mouse_rooty,
+                    glfw_window=window,
+                ),
+            )
 
     def _on_maximize(self, window, maximized: bool):
         self.event_trigger(

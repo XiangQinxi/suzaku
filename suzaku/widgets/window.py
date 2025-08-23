@@ -1,3 +1,4 @@
+import copy
 import typing
 
 import glfw
@@ -173,7 +174,13 @@ class SkWindow(SkWindowBase, SkContainer):
                     widget.focus_set()
                 widget.is_mouse_pressed = True
                 widget.button = event.button
-                widget.event_trigger("mouse_pressed", event)
+                names = [
+                    "mouse_pressed",
+                    f"button{event.button+1}_pressed",
+                    f"b{event.button + 1}_pressed",
+                ]
+                for name in names:
+                    widget.event_trigger(name, event)
 
     def _motion(self, event: SkEvent) -> None:
         """Mouse motion event for SkWindow.
@@ -184,6 +191,7 @@ class SkWindow(SkWindowBase, SkContainer):
         current_widget = None
         event = SkEvent(
             event_type="mouse_motion",
+            button=self.button,
             x=event.x,
             y=event.y,
             rootx=event.rootx,
@@ -214,9 +222,19 @@ class SkWindow(SkWindowBase, SkContainer):
                     current_widget.is_mouse_floating = True
                 else:
                     event.event_type = "mouse_motion"
+                    if self.button >= 0:
+                        names = [
+                            "mouse_motion",
+                            f"button{self.button+1}_motion",
+                            f"b{self.button+1}_motion",
+                        ]
+
+                        for name in names:
+                            current_widget.event_trigger(name, event)
+                    else:
+                        current_widget.event_trigger("mouse_motion", event)
                     self.cursor(current_widget.attributes["cursor"])
                     current_widget.is_floating = True
-                    current_widget.event_trigger("mouse_motion", event)
                 self.previous_widget = current_widget
         else:
             self.previous_widget = None
@@ -238,17 +256,33 @@ class SkWindow(SkWindowBase, SkContainer):
         :param event:
         :return:
         """
-        event = SkEvent(
-            event_type="mouse_released",
-            x=event.x,
-            y=event.y,
-            rootx=self.mouse_rootx,
-            rooty=self.mouse_rooty,
-        )
+        button = self.button
+        names = [
+            "mouse_released",
+            f"button{button+1}_released",
+            f"b{button+1}_released",
+        ]
+
+        _widget = None
+
         for widget in self.children:
             if widget.is_mouse_pressed:
-                widget.is_mouse_pressed = False
-                widget.event_trigger("mouse_released", event)
+                _widget = widget
+
+        if _widget:
+            if button >= 0:
+                for name in names:
+                    event = SkEvent(
+                        event_type=name,
+                        button=button,
+                        x=event.x,
+                        y=event.y,
+                        rootx=self.mouse_rootx,
+                        rooty=self.mouse_rooty,
+                    )
+                    if _widget:
+                        _widget.is_mouse_pressed = False
+                        _widget.event_trigger(name, event)
         return None
 
     # endregion
