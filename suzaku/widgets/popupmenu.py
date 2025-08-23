@@ -1,10 +1,9 @@
 import typing
 
-from .window import SkWindow
-from .card import SkCard
-
-from .menuitem import SkMenuItem
 from ..event import SkEvent
+from .card import SkCard
+from .menuitem import SkMenuItem
+from .window import SkWindow
 
 
 class SkPopupMenu(SkCard):

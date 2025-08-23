@@ -86,6 +86,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self._event_init = False  #
         self._cursor = None
+        self.cursors = {}
 
         # Always is 0
         self.x: int | float = 0
@@ -113,7 +114,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.mouse_rootx = 0
         self.mouse_rooty = 0
 
-        self.new_cursor = "arrow"
         self.focus = True
 
         match self.framework:
@@ -806,7 +806,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
 
-    def wm_maxsize(self, width: int | float | None = None, height: int | float | None = None):
+    def wm_maxsize(
+        self, width: int | float | None = None, height: int | float | None = None
+    ):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
@@ -817,7 +819,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     maxsize = wm_maxsize
 
-    def wm_minsize(self, width: int | float | None = None, height: int | float | None = None):
+    def wm_minsize(
+        self, width: int | float | None = None, height: int | float | None = None
+    ):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
@@ -886,7 +890,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             ]
             | None
             | str
-        ) = None,
+        ),
         custom_cursor: tuple[typing.Any, int, int] | None = None,
     ) -> typing.Self | str:
         """Set the mouse pointer style of the window.
@@ -900,35 +904,32 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: Cursor style name or cls
         """
 
-        from glfw import create_standard_cursor, destroy_cursor, set_cursor
-
-        if self._cursor is not None:
-            destroy_cursor(self._cursor)
-
-        if custom_cursor is not None:
-            cursor = glfw.create_cursor(
-                custom_cursor[0], custom_cursor[1], custom_cursor[2]
-            )
-            set_cursor(self.the_window, cursor)
-            return self
+        from glfw import create_standard_cursor, set_cursor
 
         if cursor_name is None:
-            return self.new_cursor
+            return self._cursor
 
         name = cursor_name.upper()
 
-        # cursor_get = vars()[f"{name.upper()}_CURSOR"] # e.g. cross chair -> CROSSHAIR_CURSOR
-        cursor_get = getattr(
-            __import__("glfw", fromlist=[f"{name}_CURSOR"]), f"{name}_CURSOR"
-        )
-        if cursor_get is None:
-            raise ValueError(f"Cursor {name} not found")
+        if name not in self.cursors:
+            if custom_cursor is not None:
+                # 【自定义光标样式】
+                cursor = glfw.create_cursor(
+                    custom_cursor[0], custom_cursor[1], custom_cursor[2]
+                )
+            else:
+                cursor_get = getattr(
+                    __import__("glfw", fromlist=[f"{name}_CURSOR"]), f"{name}_CURSOR"
+                )  # e.g. crosschair -> CROSSHAIR_CURSOR
 
-        self.new_cursor = name
-        if self.the_window:
-            self._cursor = set_cursor(
-                self.the_window, create_standard_cursor(cursor_get)
-            )
+                if cursor_get is None:
+                    raise ValueError(f"Cursor {name} not found")
+
+                cursor = create_standard_cursor(cursor_get)
+            set_cursor(self.the_window, cursor)
+            self.cursors[name] = cursor
+        else:
+            set_cursor(self.the_window, self.cursors[name])
         return self
 
     cursor = wm_cursor
@@ -950,7 +951,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.attributes["cursor"] = cursor_name
         return self
 
-    def wm_visible(self, is_visible: bool | None = None) -> typing.Union[bool, "SkWindowBase"]:
+    def wm_visible(
+        self, is_visible: bool | None = None
+    ) -> typing.Union[bool, "SkWindowBase"]:
         """Get or set the visibility of the window.
 
         is_visible:
@@ -1068,7 +1071,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     title = wm_title
 
-    def resize(self, width: int | None = None, height: int | None = None) -> "SkWindowBase":
+    def resize(
+        self, width: int | None = None, height: int | None = None
+    ) -> "SkWindowBase":
         """Resize the window.
 
         :param width: Width

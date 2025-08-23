@@ -34,7 +34,7 @@ if __name__ == "__main__":
         popupmenu.add_command("另存为...")
         popupmenu.add_command("帮助")
 
-        menubutton = SkMenuButton(
+        menubutton = SkMenu(
             frame,
             "This is a SkMenuButton",
             menu=popupmenu,

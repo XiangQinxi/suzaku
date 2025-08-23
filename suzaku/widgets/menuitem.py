@@ -1,5 +1,5 @@
-from .container import SkContainer
 from ..event import SkEvent
+from .container import SkContainer
 from .textbutton import SkTextButton
 
 

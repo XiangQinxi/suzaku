@@ -1,7 +1,7 @@
-from .textbutton import SkTextButton
+from ..event import SkEvent
 from .container import SkContainer
 from .popupmenu import SkPopupMenu
-from ..event import SkEvent
+from .textbutton import SkTextButton
 
 
 class SkMenu(SkTextButton):
