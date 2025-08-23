@@ -1,6 +1,5 @@
-from .window import SkWindow
 from .text import SkText
-
+from .window import SkWindow
 
 ACTION_OK = "ok"
 

@@ -1165,8 +1165,18 @@ class SkWindowBase(SkEventHanding, SkMisc):
     config = configure = set_attribute
 
     @property
-    def hwnd(self):
-        return glfw.get_win32_window(self.the_window)
+    def window_id(self):
+        if sys.platform == "win32":
+            return glfw.get_win32_window(self.the_window)
+        elif sys.platform.startswith("linux"):
+            try:
+                return glfw.get_wayland_window(self.the_window)
+            except Exception:
+                return glfw.get_x11_window(self.the_window)
+        elif sys.platform == "darwin":
+            return glfw.get_cocoa_window(self.the_window)
+        else:
+            return None
 
     # endregion
 
