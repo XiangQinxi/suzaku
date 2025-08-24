@@ -10,6 +10,20 @@ class SkCard(SkFrame):
     def __init__(self, parent: SkContainer, *, style: str = "SkCard", **kwargs):
         super().__init__(parent, style=style, **kwargs)
 
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.content_height
+        return _height
+
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            _width = self.content_width
+        return _width
+
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Draw the Frame border（If self.attributes["border"] is True）
 
@@ -26,7 +40,7 @@ class SkCard(SkFrame):
             bd_shader = style["bd_shader"]
         else:
             bd_shader = None
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=style["radius"],

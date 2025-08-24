@@ -83,7 +83,7 @@
       }
     },
 
-    "SkMenuItem": {
+    "SkMenu.Button": {
       "rest": {
         "size": [0, 0],
         "radius": 5,
@@ -106,7 +106,7 @@
 
     "SkCard": {
       "rest": {
-        "size": [120, 200],
+        "size": [0, 0],
         "radius": 8,
         "bg": [30, 30, 30, 255],
         "bd": [35, 35, 35, 245],
@@ -148,7 +148,7 @@
 
     "SkFrame": {
       "rest": {
-        "size": [120, 200],
+        "size": [0, 0],
         "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
@@ -175,5 +175,6 @@
         "bg": {"color_palette": "default_bg"}
       }
     }
+
   }
 }

@@ -403,7 +403,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
-    def _draw_frame(
+    def _draw_rect(
         self,
         canvas: skia.Canvas,
         rect: typing.Any,

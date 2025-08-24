@@ -105,7 +105,7 @@ class SkTextButton(SkText):
             bg = None
 
         # Draw the button border
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=self.theme.get_style(self.style)["radius"],

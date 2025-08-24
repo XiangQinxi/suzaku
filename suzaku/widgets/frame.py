@@ -42,7 +42,7 @@ class SkFrame(SkWidget, SkContainer):
             bd_shader = style["bd_shader"]
         else:
             bd_shader = None
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=style["radius"],

@@ -72,7 +72,7 @@ class SkEntry(SkLineInput):
                 selected_radius = 0
 
         # Draw the border
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=radius,

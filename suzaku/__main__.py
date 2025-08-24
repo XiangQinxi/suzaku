@@ -19,12 +19,10 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 500),
         )
-        # window.window_attr("border", False)
-        # window.apply_theme(dark_theme)
+        window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)
-        # frame.allowed_out_of_bounds = True
 
         SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
 
@@ -47,7 +45,7 @@ if __name__ == "__main__":
         )
         menubutton.box(padx=10, pady=(10, 0))
 
-        SkSeparator(frame).box()
+        SkSeparator(frame).box(padx=0, pady=(15, 0))
 
         SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
         # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
@@ -71,9 +69,9 @@ if __name__ == "__main__":
             frame2,
             text="Switch to Dark Theme",
             command=lambda: window.apply_theme(dark_theme),
-        ).box(padx=10, pady=(10, 0))
+        ).box(padx=10, pady=(10, 10))
 
-        frame2.box(padx=10, pady=10, expand=True)
+        frame2.box(padx=10, pady=10)
 
         frame.box(padx=10, pady=10, expand=True)
 

@@ -13,7 +13,7 @@ from .hynix import SkHynix  # ✅
 from .image import SkImage  # ⛔ 各种颜色处理未实现
 from .lineinput import SkLineInput  # ✅
 from .menu import SkMenu  # ✅
-from .menuitem import SkMenuItem  # ✅
+from .menubutton import SkMenuButton  # ✅
 from .messagebox import SkMessageBox, show_message  # ⛔
 from .mutiline_input import SkMultiLineInput  # ⛔ 无任何功能
 from .popupmenu import SkPopupMenu  # ✅ 但是不是很完善

@@ -7,6 +7,8 @@ class SkSeparator(SkWidget):
     def __init__(self, master=None, *, style: str = "SkSeparator", **kwargs):
         super().__init__(master, style=style, **kwargs)
 
+        self.configure(dheight=self.theme.get_style_attr(self.style, "width"))
+
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         self._draw_line(
             canvas,

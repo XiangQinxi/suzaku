@@ -1,10 +1,10 @@
 import typing
 
-from .separator import SkSeparator
 from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
-from .menuitem import SkMenuItem
+from .menubutton import SkMenuButton
+from .separator import SkSeparator
 from .window import SkWindow
 
 
@@ -15,7 +15,7 @@ class SkPopupMenu(SkCard):
 
         self.focusable = True
 
-        self.items: list[SkMenuItem | SkSeparator] = []
+        self.items: list[SkMenuButton | SkSeparator] = []
         self.event_generate("hide")
         self.bind("hide", self._hide)
 
@@ -29,11 +29,11 @@ class SkPopupMenu(SkCard):
         if "width" in kwargs:
             width = kwargs.pop("width")
         else:
-            width = self.content_width
+            width = None
         if "height" in kwargs:
             height = kwargs.pop("height")
         else:
-            height = self.content_height
+            height = None
         self.fixed(**kwargs, width=width, height=height)
 
     def _mouse_released(self, event: SkEvent):
@@ -47,7 +47,7 @@ class SkPopupMenu(SkCard):
         self.hide()
 
     def add_command(self, text: str = None, command: typing.Callable = None):
-        button = SkMenuItem(self, text=text, command=command)
+        button = SkMenuButton(self, text=text, command=command)
         button.box(side="top", padx=5, pady=(1, 3), ipadx=10)
         self.items.append(button)
         return button.id

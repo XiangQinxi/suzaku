@@ -3,13 +3,13 @@ from .container import SkContainer
 from .textbutton import SkTextButton
 
 
-class SkMenuItem(SkTextButton):
+class SkMenuButton(SkTextButton):
     def __init__(
         self,
         parent: SkContainer,
         text: str = "",
         *,
-        style="SkMenuItem",
+        style="SkMenu.Button",
         align="left",
         **kwargs,
     ):
