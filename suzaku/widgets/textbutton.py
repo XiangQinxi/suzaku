@@ -32,8 +32,8 @@ class SkTextButton(SkText):
         self.attributes["cursor"] = cursor
 
         self.command = command
-
         self.focusable = True
+        self.ipadx = 10
 
         if command:
             self.bind("click", lambda _: command())
@@ -42,14 +42,14 @@ class SkTextButton(SkText):
     def dwidth(self):
         _width = self.cget("dwidth")
         if _width <= 0:
-            _width = self.measure_text(self.get()) + self.ipadx
+            _width = self.measure_text(self.get()) + self.ipadx * 2
         return _width
 
     @property
     def dheight(self):
         _height = self.cget("dheight")
         if _height <= 0:
-            _height = self.text_height + 8 + self.ipady
+            _height = self.text_height + 8 + self.ipady * 2
         return _height
 
     # region Draw
@@ -120,7 +120,12 @@ class SkTextButton(SkText):
         # Draw the button text
         self._draw_text(
             canvas,
-            rect=rect,
+            skia.Rect.MakeLTRB(
+                rect.left() + self.ipadx,
+                rect.top(),
+                rect.right() - self.ipadx,
+                rect.bottom(),
+            ),
             text=self.get(),
             fg=style["fg"],
             align=self.cget("align"),

@@ -157,6 +157,13 @@
       }
     },
 
+    "SkSeparator": {
+      "rest": {
+        "fg": [200,200,200,255],
+        "width": 2
+      }
+    },
+
     "SkText": {
       "rest": {
         "size": [0, 0],

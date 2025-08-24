@@ -85,6 +85,8 @@ class SkWidget(SkEventHanding, SkMisc):
             "scroll": dict(),
         }
 
+        # TODO 制作个双击&三击事件
+
         # Mouse events
         buttons = [
             "button1",
@@ -234,7 +236,7 @@ class SkWidget(SkEventHanding, SkMisc):
             self.update_layout(None)
             self.draw_children(canvas)
 
-    def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Execute the widget rendering
 
         :param canvas: skia.Surface
@@ -476,6 +478,14 @@ class SkWidget(SkEventHanding, SkMisc):
                         self._draw_rainbow_shader(bd_paint, rect)
 
             canvas.drawRoundRect(rect, radius, radius, bd_paint)
+
+    def _draw_line(
+        self, canvas: skia.Canvas, x0, y0, x1, y1, fg=skia.ColorGRAY, width: int = 1
+    ):
+        fg = skcolor2color(style_to_color(fg, self.theme))
+        paint = skia.Paint(Color=fg, StrokeWidth=width)
+
+        canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod
     def _draw_image(

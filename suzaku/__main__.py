@@ -20,14 +20,15 @@ if __name__ == "__main__":
             size=(280, 450),
         )
         # window.window_attr("border", False)
-        window.apply_theme(dark_theme)
-        window.geometry("+0+0")
+        # window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)
         # frame.allowed_out_of_bounds = True
 
         SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
+
+        SkSeparator(frame).box()
 
         popupmenu = SkPopupMenu(frame)
         popupmenu.add_command(

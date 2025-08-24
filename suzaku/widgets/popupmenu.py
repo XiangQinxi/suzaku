@@ -47,9 +47,15 @@ class SkPopupMenu(SkCard):
 
     def add_command(self, text: str = None, command: typing.Callable = None):
         button = SkMenuItem(self, text=text, command=command)
-        button.box(side="top", padx=5, pady=(5, 0))
+        button.box(side="top", padx=5, pady=(5, 0), ipadx=10)
         self.items.append(button)
         return button.id
+
+    def add_cascade(self):
+        pass
+
+    def add_separator(self):
+        pass
 
     def remove_item(self, _id):
         for item in self.items:

@@ -66,6 +66,7 @@ class SkLineInput(SkWidget):
         self.focusable = True
         self.undo_stack = []
         self.redo_stack = []
+        self.max_undo_stack = 30
 
         # Event binding
         self.bind("focus_gain", self._focus_gain)
@@ -270,7 +271,7 @@ class SkLineInput(SkWidget):
             self.visible_start_index = self.cursor_index()
 
     def record_state(self) -> Self:
-        if len(self.undo_stack) > 40:
+        if len(self.undo_stack) > self.max_undo_stack:
             del self.undo_stack[0]
         self.undo_stack.append(self.get())
         self.redo_stack = []

@@ -57,22 +57,27 @@ class SkText(SkWidget):
     def dwidth(self):
         _width = self.cget("dwidth")
         if _width <= 0:
-            _width = self.measure_text(self.get()) + 8
+            _width = self.measure_text(self.get()) + self.ipadx * 2
         return _width
 
     @property
     def dheight(self):
         _height = self.cget("dheight")
         if _height <= 0:
-            _height = self.text_height + 8
+            _height = self.text_height + self.ipady * 2
         return _height
 
     # region Draw
 
-    def draw_widget(self, canvas: skia.Surfaces, rect: skia.Rect):
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         self._draw_text(
             canvas,
-            rect,
+            skia.Rect.MakeLTRB(
+                rect.left() + self.ipadx,
+                rect.top(),
+                rect.right() - self.ipadx,
+                rect.bottom(),
+            ),
             text=self.get(),
             fg=self.theme.get_style_attr("SkText", "fg"),
             font=self.attributes["font"],

@@ -3,5 +3,5 @@ from .color import SkColor, SkGradient, style_to_color
 from .drop_shadow import SkDropShadow
 from .font import SkFont, default_font
 from .point import point
-from .texture import SkAcrylic
+from .texture import SkAcrylic  # ⛔ 暂时停止制作
 from .theme import SkStyleNotFoundError, SkTheme, dark_theme, default_theme
