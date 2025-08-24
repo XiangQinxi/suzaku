@@ -479,6 +479,43 @@ class SkWidget(SkEventHanding, SkMisc):
 
             canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
+    def _draw_rect_new(
+        self,
+        canvas: skia.Canvas,
+        rect: typing.Any,
+        radius: int = 0,
+        bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        # bg: {"color": "white", "linear_gradient(lg)": ...}
+        bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        width: int | float = 0,
+    ):
+        return
+        shadow = SkDropShadow(config_list=bd_shadow)
+        shadow.draw(bg_paint)
+        if bg:
+            bg_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStrokeAndFill_Style,
+            )
+            bg_paint.setStrokeWidth(width)
+            match bg:
+                case dict():
+                    for key, value in bg.items():
+                        match key.lower():
+                            case "color":
+                                _bg = skcolor2color(style_to_color(value, self.theme))
+                                bg_paint.setColor(_bg)
+                            case "lg" | "linear_gradient":
+                                self.gradient.linear(
+                                    widget=self,
+                                    config=value,
+                                    paint=bg_paint,
+                                )
+                case None:
+                    pass
+
+            canvas.drawRoundRect(rect, radius, radius, bg_paint)
+
     def _draw_line(
         self, canvas: skia.Canvas, x0, y0, x1, y1, fg=skia.ColorGRAY, width: int = 1
     ):

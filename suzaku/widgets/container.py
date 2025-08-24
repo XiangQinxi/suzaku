@@ -74,21 +74,59 @@ class SkContainer:
             [],  # Fixed layer [SkWidget1, SkWidget2, ...]
         ]
         self.layout_names = [None, None, None]
-        # self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
 
+        # 【内部组件统计总占大小】
         self.content_width = 0
         self.content_height = 0
+
+        # 【内部组件偏移，用于实现容器内部的滚动】
+        self._x_offset = 0
+        self._y_offset = 0
+        self.allowed_scrolled: bool = False
 
         self._grid_lists = []  # [ [row1, ], [] ]
         self._box_direction = None  # h(horizontal) or v(vertical)
         self._flow_row = 0
-        self.allowed_out_of_bounds = allowed_out_of_bounds
+        self.allowed_out_of_bounds = (
+            allowed_out_of_bounds  # 【是否允许组件超出容器范围】
+        )
 
-        # self.bind("resize", self._handle_layout)
+        # Events
         self.bind("resize", lambda _: self.update_layout())
-        # self.bind("update", lambda _: self.update_layout())
 
     # endregion
+
+    def bind_scroll_event(self):
+        # 容器绑定滚动事件，鼠标滚轮滚动可以滚动容器
+        self.allowed_scrolled = True
+        self.window.bind("scroll", self.scroll_event)
+
+    def scroll_event(self, event: SkEvent):
+        if self.allowed_scrolled:
+            if self.is_mouse_floating:
+                self.scroll(event.x_offset * 15, event.y_offset * 15)
+            for child in self.children:
+                if child.is_mouse_floating:
+                    break
+
+    def _check_scroll(self, x_offset: int, y_offset: int):
+        if y_offset < 0:
+            # 总体向上
+            if self.content_height + self.y_offset >= self.height:
+                return True
+        else:
+            # 总体向下
+            if self.y_offset <= - y_offset:
+                return True
+        return False
+
+    def scroll(
+        self,
+        x_offset: int | float,
+        y_offset: int | float,
+    ):
+        if self._check_scroll(x_offset, y_offset):
+            self.y_offset = min(y_offset + self.y_offset, self.content_height)
 
     # region add_child 添加子元素
     def add_child(self, child):
@@ -333,9 +371,10 @@ class SkContainer:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
                 child.x = last_child_left_x + left
-                child.y = top
+                child.y = top + self.y_offset
                 self.record_content_size(child, right, bottom)
                 last_child_left_x = child.x + child.width + right
+                child.x += self.x_offset
 
             # Right side
             last_child_right_x = width
@@ -351,8 +390,8 @@ class SkContainer:
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
-                child.x = last_child_right_x - child.width - right
-                child.y = top
+                child.x = last_child_right_x - child.width - right + self.x_offset
+                child.y = top + self.y_offset
                 self.record_content_size(child, right, bottom)
                 last_child_right_x = last_child_right_x - child.width - left * 2
         else:  # Vertical Layout
@@ -392,10 +431,11 @@ class SkContainer:
                     child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = left
+                child.x = left + self.x_offset
                 child.y = last_child_bottom_y + top
                 self.record_content_size(child, right, bottom)
                 last_child_bottom_y = child.y + child.height + bottom
+                child.y += self.y_offset
 
             last_child_top_y = height  # Last top y position of the child component
             for child in end_children:  # Bottom side
@@ -410,20 +450,19 @@ class SkContainer:
                     child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = left
-                child.y = last_child_top_y - child.height - bottom
+                child.x = left + self.x_offset
+                child.y = last_child_top_y - child.height - bottom + self.x_offset
                 self.record_content_size(child, right, bottom)
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
-    @staticmethod
-    def _handle_fixed(child):
+    def _handle_fixed(self, child):
         """Process fixed layout.
 
         :param child: The child widget
         """
         config = child.layout_config["fixed"]
-        child.x = config["x"]
-        child.y = config["y"]
+        child.x = config["x"] + self.x_offset
+        child.y = config["y"] + self.y_offset
 
         width = config["width"]
         if not width:
@@ -455,5 +494,32 @@ class SkContainer:
                 if hasattr(child, "visible_children"):
                     children.extend(child.visible_children)
         return children
+
+    # endregion
+
+    # region Configure 属性配置
+    @property
+    def x_offset(self) -> int | float:
+        """
+        【x方向内部偏移，用于实现容器内部的滚动】
+        """
+        return self._x_offset
+
+    @x_offset.setter
+    def x_offset(self, value: int | float):
+        self._x_offset = value
+        self.update_layout(None)
+
+    @property
+    def y_offset(self) -> int | float:
+        """
+        【y方向内部偏移，用于实现容器内部的滚动】
+        """
+        return self._y_offset
+
+    @y_offset.setter
+    def y_offset(self, value: int | float):
+        self._y_offset = value
+        self.update_layout(None)
 
     # endregion

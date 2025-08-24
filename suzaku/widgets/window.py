@@ -52,6 +52,8 @@ class SkWindow(SkWindowBase, SkContainer):
         self.previous_widget = None
         self.esc_to_close = True
 
+        self.entered_widgets = []
+
         self.set_draw_func(self._draw)
         self.bind("mouse_motion", self._motion, add=True)
         self.bind("mouse_pressed", self._mouse)
@@ -111,7 +113,6 @@ class SkWindow(SkWindowBase, SkContainer):
     def _scroll(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
             self.focus_get().event_trigger("scroll", event)
-        del event
 
     def _key_repected(self, event: SkEvent) -> None:
         if self.focus_get() is not self:

@@ -171,6 +171,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.context = None
         self.surface = None
         self.attributes["fullscreen"] = fullscreen
+        self.is_mouse_floating = False
 
         if self.width <= 0 or self.height <= 0:
             raise ValueError("The window size must be positive")
@@ -674,6 +675,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.mouse_rooty = pos[1] + self.root_y
 
         if is_enter:
+            self.is_mouse_floating = True
             self.event_trigger(
                 "mouse_enter",
                 SkEvent(
@@ -685,6 +687,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 ),
             )
         else:
+            self.is_mouse_floating = False
             self.event_trigger(
                 "mouse_leave",
                 SkEvent(

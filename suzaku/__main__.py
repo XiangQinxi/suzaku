@@ -72,8 +72,10 @@ if __name__ == "__main__":
         ).box(padx=10, pady=(10, 10))
 
         frame2.box(padx=10, pady=10)
+        frame2.bind_scroll_event()
 
         frame.box(padx=10, pady=10, expand=True)
+        frame.bind_scroll_event()
 
         SkTextButton(window, text="Close the window", command=window.destroy).box(
             side="bottom"
