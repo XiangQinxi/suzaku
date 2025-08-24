@@ -6,7 +6,8 @@ from dataclasses import dataclass
 
 class SkBindedTask():
     """A class to represent binded task when a event is triggered."""
-    def __init__(self, id_: str, target: typing.Callable, multithread: bool=False, _keep_at_clear: bool=False):
+    def __init__(self, id_: str, target: typing.Callable, multithread: bool=False, 
+                 _keep_at_clear: bool=False):
         """Each object is to represent a task binded to the event.
 
         Example
@@ -16,9 +17,9 @@ class SkBindedTask():
             class SkEventHandling():
                 def bind(self, ...):
                     ...
-                    task = SkBindedTask(...)
+                    task = SkBindedTask(event_id, target, multithread, _keep_at_clear)
                     ...
-        This shows where this class is used in most cases.
+        This shows where this class is used for storing task properties in most cases.
 
         :param id_: The task id of this task
         :param target: A callable thing, what to do when this task is executed
@@ -43,6 +44,7 @@ class SkEventHandling():
         "focus_gain", "focus_loss", 
         "key_press", "key_release", "key_repeat", 
         "char", "click", 
+        "after", 
     ]
     multithread_tasks: list[SkBindedTask] = []
     WORKING_THREAD: threading.Thread
@@ -92,10 +94,15 @@ class SkEventHandling():
         :param event_type: The type of event to trigger
         """
         for task in self.tasks[event_type]:
+            # Add the Event object to the global list
+            NotImplemented
+            # To execute all tasks binded under this event
             if not task.multithread:
+                # If not multitask, execute dirctly
                 task.target()
             else:
-                NotImplemented
+                # Otherwise add to multithread tasks list and let the working thread to deal with it
+                SkEventHandling.multithread_tasks.append(task)
     
     def bind(self, event_type: str, target: typing.Callable, 
              multithread: bool, _keep_at_clear: bool) -> bool:
@@ -115,7 +122,8 @@ class SkEventHandling():
             warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
                            "so the task cannot be binded as expected.")
             return False
-        event_id = f"{len(self.tasks[event_type])}" # e.g. 
+        event_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
+        # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
         task = SkBindedTask(event_id, target, multithread, _keep_at_clear)
 
 
