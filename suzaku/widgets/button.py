@@ -35,6 +35,7 @@ class SkButton(SkFrame):
 
         self.command = command
         self.focusable = True
+        self.help_parent_scroll = True
 
         if command:
             self.bind("click", lambda _: command())

@@ -136,6 +136,9 @@ class SkWidget(SkEventHanding, SkMisc):
 
         self.focusable: bool = False
         self.visible: bool = False
+        self.help_parent_scroll: bool = (
+            False  # 当鼠标放在该组件上，并且鼠标滚轮滚动、父组件支持滚动，也会滚动父组件
+        )
 
         self.layout_config: dict[str, dict] = {"none": {}}
 

@@ -24,7 +24,7 @@ class SkText(SkWidget):
     def __init__(
         self,
         parent: SkContainer,
-        text: str | None = "",
+        text: str | None | int | float = "",
         *,
         align="center",
         textvariable: SkStringVar = None,
@@ -32,9 +32,10 @@ class SkText(SkWidget):
     ):
         super().__init__(parent=parent, **kwargs)
         self.attributes["textvariable"]: SkStringVar = textvariable
-        self.attributes["text"]: str | None = text
+        self.attributes["text"]: str | None = str(text)
         self.attributes["font"]: skia.Font = default_font
         self.attributes["align"] = align
+        self.help_parent_scroll = True
 
     def set(self, text: str) -> typing.Self:
         """Set the text"""

@@ -8,6 +8,7 @@ class SkSeparator(SkWidget):
         super().__init__(master, style=style, **kwargs)
 
         self.configure(dheight=self.theme.get_style_attr(self.style, "width"))
+        self.help_parent_scroll = True
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         self._draw_line(

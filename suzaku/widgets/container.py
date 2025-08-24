@@ -83,6 +83,7 @@ class SkContainer:
         self._x_offset = 0
         self._y_offset = 0
         self.allowed_scrolled: bool = False
+        self.scroll_speed: float | int = 18  # 滚动距离：滚动量x滚动速度
 
         self._grid_lists = []  # [ [row1, ], [] ]
         self._box_direction = None  # h(horizontal) or v(vertical)
@@ -104,10 +105,12 @@ class SkContainer:
     def scroll_event(self, event: SkEvent):
         if self.allowed_scrolled:
             if self.is_mouse_floating:
-                self.scroll(event.x_offset * 15, event.y_offset * 15)
+                self.scroll(event.x_offset * 18, event.y_offset * 18)
+                return
             for child in self.children:
-                if child.is_mouse_floating:
-                    break
+                if child.is_mouse_floating and child.help_parent_scroll:
+                    self.scroll(event.x_offset * 18, event.y_offset * 18)
+                    return
 
     def _check_scroll(self, x_offset: int, y_offset: int):
         if y_offset < 0:

@@ -24,6 +24,20 @@ class SkFrame(SkWidget, SkContainer):
         SkWidget.__init__(self, parent, style=style, **kwargs)
         SkContainer.__init__(self)
 
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            _width = self.content_width
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.content_height
+        return _height
+
     # region Draw
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:

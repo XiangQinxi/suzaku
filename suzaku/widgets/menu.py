@@ -16,6 +16,7 @@ class SkMenu(SkTextButton):
 
         self.attributes["popupmenu"] = menu
         self.bind("click", self._on_click)
+        self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
         if self.cget("popupmenu"):

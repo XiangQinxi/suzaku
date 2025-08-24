@@ -18,6 +18,7 @@ class SkMenuButton(SkTextButton):
         self.focusable = False
 
         self.bind("click", self._on_click)
+        self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
         self.parent.event_trigger("hide", SkEvent(event_type="hide"))

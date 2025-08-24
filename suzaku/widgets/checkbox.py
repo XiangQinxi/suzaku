@@ -17,6 +17,7 @@ class SkCheckBox(SkWidget):
         super().__init__(*args, cursor=cursor, **kwargs)
         self.attributes["selected"] = selected
         self.focusable = True
+        self.help_parent_scroll = True
 
         if command:
             self.bind("click", lambda _: command())

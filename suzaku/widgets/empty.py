@@ -14,6 +14,7 @@ class SkEmpty(SkWidget):
         :return: None
         """
         super().__init__(parent, **kwargs)
+        self.help_parent_scroll = True
 
     def draw_widget(self, canvas, rect) -> None:
         """Draw method, does nothing.

@@ -20,7 +20,7 @@ class SkTextButton(SkText):
     def __init__(
         self,
         parent: SkContainer,
-        text: str | None = "",
+        text: str | None | int | float = "",
         *,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
@@ -34,6 +34,7 @@ class SkTextButton(SkText):
         self.command = command
         self.focusable = True
         self.ipadx = 10
+        self.help_parent_scroll = True
 
         if command:
             self.bind("click", lambda _: command())
