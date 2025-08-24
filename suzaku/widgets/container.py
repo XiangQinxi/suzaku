@@ -116,7 +116,7 @@ class SkContainer:
                 return True
         else:
             # 总体向下
-            if self.y_offset <= - y_offset:
+            if self.y_offset <= -y_offset:
                 return True
         return False
 
@@ -240,6 +240,11 @@ class SkContainer:
     # region layout 布局
 
     def update_layout(self, event: SkEvent | None = None):
+        if self.allowed_scrolled and self.y_offset < 0:
+            if not self._check_scroll(0, -5):
+                self._y_offset = self.height - self.content_height
+                if self._y_offset > 0:
+                    self._y_offset = 0
         self._handle_layout()
         for widget in self.children:
             widget.event_trigger("resize", SkEvent(event_type="resize"))
