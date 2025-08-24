@@ -122,9 +122,17 @@ class SkEventHandling():
             warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
                            "so the task cannot be binded as expected.")
             return False
-        event_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
+        task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
-        task = SkBindedTask(event_id, target, multithread, _keep_at_clear)
+        task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
+        self.tasks[event_type].append(task)
+
+    def find_task(self, task_id: str):
+        """To find a binded task using task ID"""
+        NotImplemented
+
+    def unbind(self, task_id: str):
+        NotImplemented
 
 
 # Initialize working thread
