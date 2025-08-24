@@ -16,8 +16,8 @@ from .menu import SkMenu  # ✅
 from .menuitem import SkMenuItem  # ✅
 from .messagebox import SkMessageBox, show_message  # ⛔
 from .mutiline_input import SkMultiLineInput  # ⛔ 无任何功能
-from .popupmenu import SkPopupMenu  # ✅
-from .separator import SkSeparator
+from .popupmenu import SkPopupMenu  # ✅ 但是不是很完善
+from .separator import SkSeparator  # ✅
 from .text import SkText  # ✅
 from .textbutton import SkTextButton  # ✅
 from .widget import SkWidget  # ✅

@@ -1,5 +1,6 @@
 import typing
 
+from .separator import SkSeparator
 from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
@@ -14,7 +15,7 @@ class SkPopupMenu(SkCard):
 
         self.focusable = True
 
-        self.items: list[SkMenuItem] = []
+        self.items: list[SkMenuItem | SkSeparator] = []
         self.event_generate("hide")
         self.bind("hide", self._hide)
 
@@ -47,7 +48,7 @@ class SkPopupMenu(SkCard):
 
     def add_command(self, text: str = None, command: typing.Callable = None):
         button = SkMenuItem(self, text=text, command=command)
-        button.box(side="top", padx=5, pady=(5, 0), ipadx=10)
+        button.box(side="top", padx=5, pady=(1, 3), ipadx=10)
         self.items.append(button)
         return button.id
 
@@ -55,7 +56,10 @@ class SkPopupMenu(SkCard):
         pass
 
     def add_separator(self):
-        pass
+        separator = SkSeparator(self)
+        separator.box(side="top", padx=0, pady=0, ipadx=10)
+        self.items.append(separator)
+        return separator.id
 
     def remove_item(self, _id):
         for item in self.items:
