@@ -19,10 +19,24 @@ class SkFrame(SkWidget, SkContainer):
     """
 
     def __init__(
-        self, parent: SkContainer, *args, style: str = "SkFrame", **kwargs
+        self, parent: SkContainer, *, style: str = "SkFrame", **kwargs
     ) -> None:
-        SkWidget.__init__(self, parent, *args, style=style, **kwargs)
+        SkWidget.__init__(self, parent, style=style, **kwargs)
         SkContainer.__init__(self)
+
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            _width = self.content_width
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.content_height
+        return _height
 
     # region Draw
 
@@ -42,7 +56,7 @@ class SkFrame(SkWidget, SkContainer):
             bd_shader = style["bd_shader"]
         else:
             bd_shader = None
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=style["radius"],

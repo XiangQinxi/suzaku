@@ -1,8 +1,8 @@
 import typing
 
+from .. import SkTheme
 from .container import SkContainer
 from .frame import SkFrame
-from .. import SkTheme
 
 
 class SkButton(SkFrame):
@@ -22,18 +22,20 @@ class SkButton(SkFrame):
     def __init__(
         self,
         parent: SkContainer,
-        *args,
+        *,
         style: str = "SkButton",
         size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
-        super().__init__(parent, *args, style=style, size=size, **kwargs)
+        super().__init__(parent, style=style, size=size, **kwargs)
 
         self.attributes["cursor"] = cursor
+
         self.command = command
         self.focusable = True
+        self.help_parent_scroll = True
 
         if command:
             self.bind("click", lambda _: command())
@@ -52,8 +54,11 @@ class SkButton(SkFrame):
             else:
                 style_name = f"{self.style}:hover"
         else:
-            if self.is_focus:
-                style_name = f"{self.style}:focus"
+            if "focus" in self.styles[self.style]:
+                if self.is_focus:
+                    style_name = f"{self.style}:focus"
+                else:
+                    style_name = self.style
             else:
                 style_name = self.style
 
@@ -73,14 +78,27 @@ class SkButton(SkFrame):
         else:
             bd_shader = None
 
+        if "width" in style:
+            width = style["width"]
+        else:
+            width = 0
+        if "bd" in style:
+            bd = style["bd"]
+        else:
+            bd = None
+        if "bg" in style:
+            bg = style["bg"]
+        else:
+            bg = None
+
         # Draw the button border
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=self.theme.get_style(self.style)["radius"],
-            bg=style["bg"],
-            width=style["width"],
-            bd=style["bd"],
+            bg=bg,
+            width=width,
+            bd=bd,
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
             bg_shader=bg_shader,

@@ -83,13 +83,34 @@
       }
     },
 
+    "SkMenu.Button": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 5,
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"}
+      },
+      "hover": {
+        "bg": [50, 50, 50, 200],
+        "fg": {"color_palette": "default_fg"},
+        "bd": [50, 50, 50, 255],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [30, 30, 30, 200],
+        "fg": {"color_palette": "default_fg"},
+        "bd": [40, 40, 40, 255],
+        "width": 2
+      }
+    },
+
     "SkCard": {
       "rest": {
-        "size": [120, 200],
+        "size": [0, 0],
         "radius": 8,
-        "bg": [25, 25, 25, 245],
-        "bd": [35, 35, 35, 245],
-        "bd_shadow": [0, 3, 2, 2, [200, 200, 200, 20]],
+        "bg": [30, 30, 30, 255],
+        "bd": [50, 50, 50, 245],
+        "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]],
         "width": 2
       }
     },
@@ -127,11 +148,18 @@
 
     "SkFrame": {
       "rest": {
-        "size": [120, 200],
+        "size": [0, 0],
         "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
         "width": 0
+      }
+    },
+
+    "SkSeparator": {
+      "rest": {
+        "fg": [40,40,40,255],
+        "width": 2
       }
     },
 
@@ -147,5 +175,6 @@
         "bg": {"color_palette": "default_bg"}
       }
     }
+
   }
 }

@@ -84,9 +84,30 @@
       }
     },
 
+    "SkMenu.Button": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 5,
+        "bg": "transparent",
+        "fg": [0, 0, 0, 235]
+      },
+      "hover": {
+        "bg": [200, 200, 200, 200],
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [180, 180, 180, 200],
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "width": 2
+      }
+    },
+
     "SkCard": {
       "rest": {
-        "size": [120, 200],
+        "size": [0, 0],
         "radius": 8,
         "bg": [225, 225, 225, 245],
         "bd": [200, 200, 200, 245],
@@ -128,11 +149,18 @@
 
     "SkFrame": {
       "rest": {
-        "size": [120, 200],
+        "size": [0, 0],
         "radius": 8,
         "bg": "transparent",
         "bd": "transparent",
         "width": 0
+      }
+    },
+
+    "SkSeparator": {
+      "rest": {
+        "fg": [200,200,200,255],
+        "width": 2
       }
     },
 
@@ -148,5 +176,6 @@
         "bg": {"color_palette": "default_bg"}
       }
     }
+
   }
 }

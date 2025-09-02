@@ -74,18 +74,62 @@ class SkContainer:
             [],  # Fixed layer [SkWidget1, SkWidget2, ...]
         ]
         self.layout_names = [None, None, None]
-        # self.layers_layout_type = ["none" for i in range(len(self.draw_list))]  # ['none', 'none', 'none']
+
+        # 【内部组件统计总占大小】
+        self.content_width = 0
+        self.content_height = 0
+
+        # 【内部组件偏移，用于实现容器内部的滚动】
+        self._x_offset = 0
+        self._y_offset = 0
+        self.allowed_scrolled: bool = False
+        self.scroll_speed: float | int = 18  # 滚动距离：滚动量x滚动速度
 
         self._grid_lists = []  # [ [row1, ], [] ]
         self._box_direction = None  # h(horizontal) or v(vertical)
         self._flow_row = 0
-        self.allowed_out_of_bounds = allowed_out_of_bounds
+        self.allowed_out_of_bounds = (
+            allowed_out_of_bounds  # 【是否允许组件超出容器范围】
+        )
 
-        # self.bind("resize", self._handle_layout)
+        # Events
         self.bind("resize", lambda _: self.update_layout())
-        # self.bind("update", lambda _: self.update_layout())
 
     # endregion
+
+    def bind_scroll_event(self):
+        # 容器绑定滚动事件，鼠标滚轮滚动可以滚动容器
+        self.allowed_scrolled = True
+        self.window.bind("scroll", self.scroll_event)
+
+    def scroll_event(self, event: SkEvent):
+        if self.allowed_scrolled:
+            if self.is_mouse_floating:
+                self.scroll(event.x_offset * 18, event.y_offset * 18)
+                return
+            for child in self.children:
+                if child.is_mouse_floating and child.help_parent_scroll:
+                    self.scroll(event.x_offset * 18, event.y_offset * 18)
+                    return
+
+    def _check_scroll(self, x_offset: int, y_offset: int):
+        if y_offset < 0:
+            # 总体向上
+            if self.content_height + self.y_offset >= self.height:
+                return True
+        else:
+            # 总体向下
+            if self.y_offset <= -y_offset:
+                return True
+        return False
+
+    def scroll(
+        self,
+        x_offset: int | float,
+        y_offset: int | float,
+    ):
+        if self._check_scroll(x_offset, y_offset):
+            self.y_offset = min(y_offset + self.y_offset, self.content_height)
 
     # region add_child 添加子元素
     def add_child(self, child):
@@ -95,9 +139,10 @@ class SkContainer:
         """
         from .app import SkApp
 
-        if not isinstance(self.parent, SkApp):
-            self.parent.add_child(child)
-        self.children.append(child)
+        if not child in self.children:
+            if not isinstance(self.parent, SkApp):
+                self.parent.add_child(child)
+            self.children.append(child)
 
     def add_layout_child(self, child):
         """Add layout child widget to window.
@@ -138,6 +183,7 @@ class SkContainer:
         :arg child: SkWidget
         :return: None
         """
+
         self.draw_list[1].append(child)
         self.update_layout()
 
@@ -197,9 +243,18 @@ class SkContainer:
     # region layout 布局
 
     def update_layout(self, event: SkEvent | None = None):
+        if self.allowed_scrolled and self.y_offset < 0:
+            if not self._check_scroll(0, -5):
+                self._y_offset = self.height - self.content_height
+                if self._y_offset > 0:
+                    self._y_offset = 0
         self._handle_layout()
         for widget in self.children:
             widget.event_trigger("resize", SkEvent(event_type="resize"))
+
+    def record_content_size(self, child, padx=0, pady=0):
+        self.content_width = max(child.x + child.dwidth + padx, self.content_width)
+        self.content_height = max(child.y + child.dheight + pady, self.content_height)
 
     def _handle_layout(self, event=None):
         """Handle layout of the container.
@@ -234,6 +289,27 @@ class SkContainer:
 
     def _handle_grid(self):
         pass
+
+    @staticmethod
+    def unpack_padding(padx, pady):
+        """Unpack padding.
+        【左上右下】
+        :param padx:
+        :param pady:
+        :return:
+        """
+        if type(padx) is tuple:
+            left = padx[0]
+            right = padx[1]
+        else:
+            left = right = padx
+
+        if type(pady) is tuple:
+            top = pady[0]
+            bottom = pady[1]
+        else:
+            top = bottom = pady
+        return left, top, right, bottom
 
     def _handle_box(self) -> None:
         """Process box layout.
@@ -291,49 +367,40 @@ class SkContainer:
             # Left side
             last_child_left_x = 0
             for child in start_children:
-                if type(child.layout_config["box"]["padx"]) is tuple:
-                    left = child.layout_config["box"]["padx"][0]
-                    right = child.layout_config["box"]["padx"][1]
-                else:
-                    left = right = child.layout_config["box"]["padx"]
+                child_layout_config = child.layout_config["box"]
+                left, top, right, bottom = self.unpack_padding(
+                    child_layout_config["padx"],
+                    child_layout_config["pady"],
+                )
 
-                if type(child.layout_config["box"]["pady"]) is tuple:
-                    top = child.layout_config["box"]["pady"][0]
-                    bottom = child.layout_config["box"]["pady"][1]
-                else:
-                    top = bottom = child.layout_config["box"]["pady"]
-
-                if not child.layout_config["box"]["expand"]:
+                if not child_layout_config["expand"]:
                     child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
                 child.x = last_child_left_x + left
-                child.y = top
+                child.y = top + self.y_offset
+                self.record_content_size(child, right, bottom)
                 last_child_left_x = child.x + child.width + right
+                child.x += self.x_offset
 
             # Right side
             last_child_right_x = width
             for child in end_children:
-                if type(child.layout_config["box"]["padx"]) is tuple:
-                    left = child.layout_config["box"]["padx"][0]
-                    right = child.layout_config["box"]["padx"][1]
-                else:
-                    left = right = child.layout_config["box"]["padx"]
+                child_layout_config = child.layout_config["box"]
+                left, top, right, bottom = self.unpack_padding(
+                    child_layout_config["padx"],
+                    child_layout_config["pady"],
+                )
 
-                if type(child.layout_config["box"]["pady"]) is tuple:
-                    top = child.layout_config["box"]["pady"][0]
-                    bottom = child.layout_config["box"]["pady"][1]
-                else:
-                    top = bottom = child.layout_config["box"]["pady"]
-
-                if not child.layout_config["box"]["expand"]:
+                if not child_layout_config["expand"]:
                     child.width = child.dheight
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
-                child.x = last_child_right_x - child.width - right
-                child.y = top
+                child.x = last_child_right_x - child.width - right + self.x_offset
+                child.y = top + self.y_offset
+                self.record_content_size(child, right, bottom)
                 last_child_right_x = last_child_right_x - child.width - left * 2
         else:  # Vertical Layout
             # Calculate the height of the fixed children
@@ -362,60 +429,48 @@ class SkContainer:
             last_child_bottom_y = 0  # Last bottom y position of the child component
             for child in start_children:  # Top side
                 child_layout_config = child.layout_config["box"]
-                if type(child_layout_config["padx"]) is tuple:
-                    left = child_layout_config["padx"][0]
-                    right = child_layout_config["padx"][1]
-                else:
-                    left = right = child_layout_config["padx"]
-
-                if type(child_layout_config["pady"]) is tuple:
-                    top = child_layout_config["pady"][0]
-                    bottom = child_layout_config["pady"][1]
-                else:
-                    top = bottom = child_layout_config["pady"]
+                left, top, right, bottom = self.unpack_padding(
+                    child.layout_config["box"]["padx"],
+                    child.layout_config["box"]["pady"],
+                )
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
                     child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = left
+                child.x = left + self.x_offset
                 child.y = last_child_bottom_y + top
+                self.record_content_size(child, right, bottom)
                 last_child_bottom_y = child.y + child.height + bottom
+                child.y += self.y_offset
 
             last_child_top_y = height  # Last top y position of the child component
             for child in end_children:  # Bottom side
                 child_layout_config = child.layout_config["box"]
-                if type(child_layout_config["padx"]) is tuple:
-                    left = child_layout_config["padx"][0]
-                    right = child_layout_config["padx"][1]
-                else:
-                    left = right = child_layout_config["padx"]
-
-                if type(child_layout_config["pady"]) is tuple:
-                    top = child_layout_config["pady"][0]
-                    bottom = child_layout_config["pady"][1]
-                else:
-                    top = bottom = child_layout_config["pady"]
+                left, top, right, bottom = self.unpack_padding(
+                    child.layout_config["box"]["padx"],
+                    child.layout_config["box"]["pady"],
+                )
 
                 child.width = width - left - right
                 if not child_layout_config["expand"]:
                     child.height = child.dheight
                 else:
                     child.height = expanded_height - top - bottom
-                child.x = left
-                child.y = last_child_top_y - child.height - bottom
+                child.x = left + self.x_offset
+                child.y = last_child_top_y - child.height - bottom + self.x_offset
+                self.record_content_size(child, right, bottom)
                 last_child_top_y = last_child_top_y - child.height - top * 2
 
-    @staticmethod
-    def _handle_fixed(child):
+    def _handle_fixed(self, child):
         """Process fixed layout.
 
         :param child: The child widget
         """
         config = child.layout_config["fixed"]
-        child.x = config["x"]
-        child.y = config["y"]
+        child.x = config["x"] + self.x_offset
+        child.y = config["y"] + self.y_offset
 
         width = config["width"]
         if not width:
@@ -437,5 +492,42 @@ class SkContainer:
             + "This error should be overrode by the actual bind function of "
             + "SkWindow or SkWidget in normal cases."
         )
+
+    @property
+    def visible_children(self):
+        children = []
+        for layer in self.draw_list:
+            for child in layer:
+                children.append(child)
+                if hasattr(child, "visible_children"):
+                    children.extend(child.visible_children)
+        return children
+
+    # endregion
+
+    # region Configure 属性配置
+    @property
+    def x_offset(self) -> int | float:
+        """
+        【x方向内部偏移，用于实现容器内部的滚动】
+        """
+        return self._x_offset
+
+    @x_offset.setter
+    def x_offset(self, value: int | float):
+        self._x_offset = value
+        self.update_layout(None)
+
+    @property
+    def y_offset(self) -> int | float:
+        """
+        【y方向内部偏移，用于实现容器内部的滚动】
+        """
+        return self._y_offset
+
+    @y_offset.setter
+    def y_offset(self, value: int | float):
+        self._y_offset = value
+        self.update_layout(None)
 
     # endregion

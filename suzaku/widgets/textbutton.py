@@ -3,6 +3,7 @@ import typing
 import skia
 
 from .button import SkButton
+from .container import SkContainer
 from .text import SkText
 
 
@@ -18,19 +19,22 @@ class SkTextButton(SkText):
 
     def __init__(
         self,
-        *args,
+        parent: SkContainer,
+        text: str | None | int | float = "",
+        *,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         style: str = "SkButton",
         **kwargs,
     ) -> None:
-        super().__init__(*args, style=style, **kwargs)
+        super().__init__(parent=parent, text=text, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
 
         self.command = command
-
         self.focusable = True
+        self.ipadx = 10
+        self.help_parent_scroll = True
 
         if command:
             self.bind("click", lambda _: command())
@@ -39,14 +43,14 @@ class SkTextButton(SkText):
     def dwidth(self):
         _width = self.cget("dwidth")
         if _width <= 0:
-            _width = self.measure_text(self.get()) + 8
+            _width = self.measure_text(self.get()) + self.ipadx * 2
         return _width
 
     @property
     def dheight(self):
         _height = self.cget("dheight")
         if _height <= 0:
-            _height = self.text_height + 8
+            _height = self.text_height + 8 + self.ipady * 2
         return _height
 
     # region Draw
@@ -60,12 +64,15 @@ class SkTextButton(SkText):
         """
         if self.is_mouse_floating:
             if self.is_mouse_pressed:
-                style_name = self.style + ":pressed"
+                style_name = f"{self.style}:pressed"
             else:
-                style_name = self.style + ":hover"
+                style_name = f"{self.style}:hover"
         else:
-            if self.is_focus:
-                style_name = self.style + ":focus"
+            if "focus" in self.styles[self.style]:
+                if self.is_focus:
+                    style_name = f"{self.style}:focus"
+                else:
+                    style_name = self.style
             else:
                 style_name = self.style
 
@@ -85,14 +92,27 @@ class SkTextButton(SkText):
         else:
             bd_shader = None
 
+        if "width" in style:
+            width = style["width"]
+        else:
+            width = 0
+        if "bd" in style:
+            bd = style["bd"]
+        else:
+            bd = None
+        if "bg" in style:
+            bg = style["bg"]
+        else:
+            bg = None
+
         # Draw the button border
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=self.theme.get_style(self.style)["radius"],
-            bg=style["bg"],
-            width=style["width"],
-            bd=style["bd"],
+            bg=bg,
+            width=width,
+            bd=bd,
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
             bg_shader=bg_shader,
@@ -101,9 +121,15 @@ class SkTextButton(SkText):
         # Draw the button text
         self._draw_text(
             canvas,
-            rect=rect,
+            skia.Rect.MakeLTRB(
+                rect.left() + self.ipadx,
+                rect.top(),
+                rect.right() - self.ipadx,
+                rect.bottom(),
+            ),
             text=self.get(),
             fg=style["fg"],
+            align=self.cget("align"),
         )
 
     # endregion

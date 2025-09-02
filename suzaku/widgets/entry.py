@@ -1,5 +1,6 @@
 import skia
 
+from .container import SkContainer
 from .lineinput import SkLineInput
 
 
@@ -7,8 +8,8 @@ class SkEntry(SkLineInput):
     """A single-line input box with a border 【带边框的单行输入框】"""
 
     # region Init 初始化
-    def __init__(self, *args, style: str = "SkEntry", **kwargs):
-        super().__init__(*args, style=style, **kwargs)
+    def __init__(self, parent: SkContainer, *, style: str = "SkEntry", **kwargs):
+        super().__init__(parent=parent, style=style, **kwargs)
 
         self.padding = 5
 
@@ -71,7 +72,7 @@ class SkEntry(SkLineInput):
                 selected_radius = 0
 
         # Draw the border
-        self._draw_frame(
+        self._draw_rect(
             canvas,
             rect,
             radius=radius,
