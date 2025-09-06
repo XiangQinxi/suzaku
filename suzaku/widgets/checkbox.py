@@ -3,6 +3,8 @@ import typing
 import skia
 
 from .widget import SkWidget
+from ..event import SkEvent
+from ..styles.color import skcolor2color, style_to_color
 
 
 class SkCheckBox(SkWidget):
@@ -12,15 +14,48 @@ class SkCheckBox(SkWidget):
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         selected: bool = False,
+        style: str = "SkCheckBox",
         **kwargs,
     ):
-        super().__init__(*args, cursor=cursor, **kwargs)
+        super().__init__(*args, cursor=cursor, style=style, **kwargs)
         self.attributes["selected"] = selected
         self.focusable = True
+        self.checked: bool = False
         self.help_parent_scroll = True
+        self.bind("click", self._on_click)
 
         if command:
             self.bind("click", lambda _: command())
+
+    def invoke(self):
+        self.checked = not self.checked
+
+    def _on_click(self, event: SkEvent):
+        self.invoke()
+
+    def _draw_checkmark(self, canvas: skia.Canvas, rect: skia.Rect, fg: skia.Color):
+        left, top = rect.left(), rect.top()
+        width, height = rect.width(), rect.height()
+
+        points = [
+            (0.2, 0.6),  # 起点
+            (0.4, 0.8),  # 中间拐点
+            (0.8, 0.2),  # 终点
+        ]
+
+        # 转换为实际坐标
+        real_points = [(left + p[0] * width, top + p[1] * height) for p in points]
+
+        paint = skia.Paint(
+            Color=skcolor2color(style_to_color(fg, self.theme)),
+            StrokeWidth=2,  # 动态线条粗细
+            Style=skia.Paint.kStroke_Style,
+            AntiAlias=self.anti_alias,
+        )
+
+        # 分段绘制线条
+        canvas.drawLine(*real_points[0], *real_points[1], paint)  # 左下到中间
+        canvas.drawLine(*real_points[1], *real_points[2], paint)  # 中间到右上
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """if self.is_mouse_floating:
@@ -31,8 +66,11 @@ class SkCheckBox(SkWidget):
         else:
             if self.is_focus:
                 style_name = "SkCheckBox:focus"
-            else:
-                style_name = "SkCheckBox"
+            else:"""
+        if self.checked:
+            style_name = "SkCheckBox:checked-rest"
+        else:
+            style_name = "SkCheckBox:unchecked-rest"
 
         style = self.theme.get_style(style_name)
 
@@ -40,7 +78,7 @@ class SkCheckBox(SkWidget):
             bg_shader = style["bg_shader"]
         else:
             bg_shader = None
-
+        skia.ColorGREEN
         if "bd_shadow" in style:
             bd_shadow = style["bd_shadow"]
         else:
@@ -50,4 +88,34 @@ class SkCheckBox(SkWidget):
         else:
             bd_shader = None
 
-        self._draw_frame(canvas, rect)"""
+        if "width" in style:
+            width = style["width"]
+        else:
+            width = 0
+        if "bd" in style:
+            bd = style["bd"]
+        else:
+            bd = None
+        if "bg" in style:
+            bg = style["bg"]
+        else:
+            bg = None
+        if "fg" in style:
+            fg = style["fg"]
+        else:
+            fg = None
+
+        self._draw_rect(
+            canvas,
+            rect,
+            radius=self.theme.get_style(self.style)["radius"],
+            bg=bg,
+            width=width,
+            bd=bd,
+            bd_shadow=bd_shadow,
+            bd_shader=bd_shader,
+            bg_shader=bg_shader,
+        )
+
+        if self.checked:
+            self._draw_checkmark(canvas, rect, fg)

@@ -7,7 +7,7 @@ from .container import SkContainer
 from .text import SkText
 
 
-class SkTextButton(SkText):
+class SkTextButton(SkButton, SkText):
     """A Button with Text
 
     :param args:
@@ -27,9 +27,10 @@ class SkTextButton(SkText):
         style: str = "SkButton",
         **kwargs,
     ) -> None:
-        super().__init__(parent=parent, text=text, style=style, **kwargs)
-
-        self.attributes["cursor"] = cursor
+        SkButton.__init__(self, parent=parent)
+        SkText.__init__(
+            self, parent=parent, text=text, style=style, cursor=cursor, **kwargs
+        )
 
         self.command = command
         self.focusable = True
@@ -37,7 +38,7 @@ class SkTextButton(SkText):
         self.help_parent_scroll = True
 
         if command:
-            self.bind("click", lambda _: command())
+            self.bind("click", lambda _: self.invoke())
 
     @property
     def dwidth(self):
@@ -78,45 +79,8 @@ class SkTextButton(SkText):
 
         style = self.theme.get_style(style_name)
 
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in style:
-            width = style["width"]
-        else:
-            width = 0
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
-
         # Draw the button border
-        self._draw_rect(
-            canvas,
-            rect,
-            radius=self.theme.get_style(self.style)["radius"],
-            bg=bg,
-            width=width,
-            bd=bd,
-            bd_shadow=bd_shadow,
-            bd_shader=bd_shader,
-            bg_shader=bg_shader,
-        )
+        SkButton.draw_widget(self, canvas, rect)
 
         # Draw the button text
         self._draw_text(

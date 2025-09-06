@@ -1,6 +1,6 @@
 import typing
 
-from .. import SkTheme
+from ..event import SkEvent
 from .container import SkContainer
 from .frame import SkFrame
 
@@ -24,12 +24,11 @@ class SkButton(SkFrame):
         parent: SkContainer,
         *,
         style: str = "SkButton",
-        size: tuple[int, int] = (105, 35),
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
-        super().__init__(parent, style=style, size=size, **kwargs)
+        super().__init__(parent, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
 
@@ -38,7 +37,10 @@ class SkButton(SkFrame):
         self.help_parent_scroll = True
 
         if command:
-            self.bind("click", lambda _: command())
+            self.bind("click", lambda _: self.invoke)
+
+    def invoke(self) -> None:
+        self.command()
 
     def draw_widget(self, canvas, rect) -> None:
         """Draw button

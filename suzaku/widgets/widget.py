@@ -219,13 +219,13 @@ class SkWidget(SkEventHanding, SkMisc):
         def rect(x, y, w, h):
             return skia.Rect.MakeXYWH(x, y, w, h)
 
-        _rect = rect(self.canvas_x, self.canvas_y, self.width, self.height)
+        self.rect = rect(self.canvas_x, self.canvas_y, self.width, self.height)
 
-        self.draw_widget(canvas, _rect)
+        self.draw_widget(canvas, self.rect)
 
         if self.debug:
             canvas.drawRoundRect(
-                _rect,
+                self.rect,
                 0,
                 0,
                 skia.Paint(
@@ -409,7 +409,7 @@ class SkWidget(SkEventHanding, SkMisc):
     def _draw_rect(
         self,
         canvas: skia.Canvas,
-        rect: typing.Any,
+        rect: skia.Rect,
         radius: int = 0,
         bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
         bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
