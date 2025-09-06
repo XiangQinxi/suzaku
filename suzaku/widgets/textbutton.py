@@ -37,8 +37,7 @@ class SkTextButton(SkButton, SkText):
         self.ipadx = 10
         self.help_parent_scroll = True
 
-        if command:
-            self.bind("click", lambda _: self.invoke())
+        self.bind("click", lambda _: self.invoke())
 
     @property
     def dwidth(self):

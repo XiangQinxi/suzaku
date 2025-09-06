@@ -36,11 +36,11 @@ class SkButton(SkFrame):
         self.focusable = True
         self.help_parent_scroll = True
 
-        if command:
-            self.bind("click", lambda _: self.invoke)
+        self.bind("click", lambda _: self.invoke)
 
     def invoke(self) -> None:
-        self.command()
+        if self.command:
+            self.command()
 
     def draw_widget(self, canvas, rect) -> None:
         """Draw button

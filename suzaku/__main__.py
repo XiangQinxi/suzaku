@@ -17,7 +17,7 @@ if __name__ == "__main__":
             anti_alias=True,
             parent=None,
             title="Suzaku GUI",
-            size=(280, 500),
+            size=(280, 550),
         )
         window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
@@ -29,15 +29,15 @@ if __name__ == "__main__":
         ).box(padx=10, pady=(10, 0))
 
         popupmenu = SkPopupMenu(frame)
-        popupmenu.add_command(
-            "New window", command=lambda: show_message(window, message="Hello")
-        )
+        popupmenu.add_command("New window", command=create1window)
         popupmenu.add_command("New project")
         popupmenu.add_command("Open project")
         popupmenu.add_command("Save changes")
         popupmenu.add_command("Save as...")
         popupmenu.add_separator()
-        popupmenu.add_command("Help")
+        popupmenu.add_command(
+            "Help", command=lambda: show_message(window, message="Hello")
+        )
         popupmenu.add_command("Exit", command=window.destroy)
 
         menubutton = SkMenu(
@@ -50,6 +50,7 @@ if __name__ == "__main__":
         checkbox = SkCheckItem(
             frame,
             text="This is a CheckBox",
+            command=lambda: print("Checked:", checkbox.checked),
         )
         checkbox.box(padx=10, pady=(10, 0))
 

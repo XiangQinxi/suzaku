@@ -11,8 +11,8 @@ class SkCheckBox(SkWidget):
     def __init__(
         self,
         *args,
-        cursor: typing.Union[str, None] = "hand",
-        command: typing.Union[typing.Callable, None] = None,
+        cursor: str | None = "hand",
+        command: typing.Callable | None = None,
         selected: bool = False,
         style: str = "SkCheckBox",
         **kwargs,
@@ -22,13 +22,15 @@ class SkCheckBox(SkWidget):
         self.focusable = True
         self.checked: bool = False
         self.help_parent_scroll = True
+        self.command = command
         self.bind("b1_pressed", self._on_click)
 
-        if command:
-            self.bind("b1_pressed", lambda _: command())
+        self.bind("b1_pressed", lambda _: self.invoke())
 
     def invoke(self):
         self.checked = not self.checked
+        if self.command:
+            self.command()
 
     def _on_click(self, event: SkEvent):
         self.invoke()

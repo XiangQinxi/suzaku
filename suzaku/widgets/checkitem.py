@@ -40,6 +40,10 @@ class SkCheckItem(SkFrame):
         if command:
             self.label.bind("b1_pressed", lambda _: command())
 
+    @property
+    def checked(self):
+        return self.checkbox.checked
+
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         self.checkbox.fixed(2, 5, width=self.height - 10, height=self.height - 10)
         self.label.fixed(
