@@ -26,7 +26,7 @@ class SkCheckItem(SkFrame):
         self.focusable = True
         self.help_parent_scroll = True
 
-        self.checkbox = SkCheckBox(self)
+        self.checkbox = SkCheckBox(self, command=command)
         # self.checkbox.box(side="left", padx=2, pady=2)
         self.label = SkText(self, text=text, align="left", cursor="hand")
         # self.label.box(side="right", expand=True, padx=2, pady=2)
@@ -36,9 +36,12 @@ class SkCheckItem(SkFrame):
             self.checkbox.focus_set()
 
         self.label.bind("b1_pressed", _)
+        self.bind("b1_pressed", _)
 
-        if command:
-            self.label.bind("b1_pressed", lambda _: command())
+        self.command = command
+
+    def invoke(self):
+        pass
 
     @property
     def checked(self):

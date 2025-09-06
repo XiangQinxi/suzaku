@@ -23,8 +23,6 @@ class SkCheckBox(SkWidget):
         self.checked: bool = False
         self.help_parent_scroll = True
         self.command = command
-        self.bind("b1_pressed", self._on_click)
-
         self.bind("b1_pressed", lambda _: self.invoke())
 
     def invoke(self):
