@@ -83,13 +83,12 @@ if __name__ == "__main__":
         listbox.selected_index(1)
         listbox.box(padx=10, pady=(10, 0))
 
-        SkTextButton(frame, text="Create 1 New window", command=create1window).box(
-            padx=10, pady=(10, 0)
-        )
-
         frame.box(padx=10, pady=10, expand=True)
         frame.bind_scroll_event()
 
+        SkTextButton(window, text="Create New window", command=create1window).box(
+            padx=10, pady=(5, 0)
+        )
         SkTextButton(window, text="Close the window", command=window.destroy).box(
             side="bottom"
         )

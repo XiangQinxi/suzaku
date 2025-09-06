@@ -25,6 +25,8 @@ class SkListBox(SkCard):
         for item in items:
             self.append(item)
 
+        self.bind_scroll_event()
+
     def selected(
         self, item: SkListItem | None = None
     ) -> SkListItem | typing.Self | None:
