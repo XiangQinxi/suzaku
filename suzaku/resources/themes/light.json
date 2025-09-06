@@ -120,7 +120,7 @@
     "SkCheckBox": {
       "rest": {
         "radius": 5,
-        "size": [20, 20]
+        "size": [22, 22]
       },
       "unchecked-rest": {
         "bg": [240, 240, 240, 240],
@@ -190,6 +190,42 @@
         "radius": 8,
         "bg": "transparent",
         "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkListBox": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [225, 225, 225, 245],
+        "bd": [200, 200, 200, 245],
+        "bd_shadow": [0, 3, 2, 2, [0, 0, 0, 20]],
+        "width": 2
+      }
+    },
+
+    "SkListBox.Item": {
+      "rest": {
+        "size": [0, 28],
+        "radius": 6,
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [0, 0, 0, 15],
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "pressed": {
+        "bg": [0, 0, 0, 30],
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "selected": {
+        "bg": [0, 0, 0, 25],
+        "fg": {"color_palette": "default_fg"},
         "width": 0
       }
     },

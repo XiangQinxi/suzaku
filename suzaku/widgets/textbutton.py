@@ -55,31 +55,35 @@ class SkTextButton(SkButton, SkText):
 
     # region Draw
 
-    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
+    def draw_widget(
+        self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
+    ):
         """Draw the button
 
         :param canvas:
         :param rect:
+        :param style_name:
         :return:
         """
-        if self.is_mouse_floating:
-            if self.is_mouse_pressed:
-                style_name = f"{self.style}:pressed"
+        if style_name is None:
+            if self.is_mouse_floating:
+                if self.is_mouse_pressed:
+                    style_name = f"{self.style}:pressed"
+                else:
+                    style_name = f"{self.style}:hover"
             else:
-                style_name = f"{self.style}:hover"
-        else:
-            if "focus" in self.styles[self.style]:
-                if self.is_focus:
-                    style_name = f"{self.style}:focus"
+                if "focus" in self.styles[self.style]:
+                    if self.is_focus:
+                        style_name = f"{self.style}:focus"
+                    else:
+                        style_name = self.style
                 else:
                     style_name = self.style
-            else:
-                style_name = self.style
 
         style = self.theme.get_style(style_name)
 
         # Draw the button border
-        SkButton.draw_widget(self, canvas, rect)
+        SkButton.draw_widget(self, canvas, rect, style_name)
 
         # Draw the button text
         self._draw_text(

@@ -42,27 +42,29 @@ class SkButton(SkFrame):
         if self.command:
             self.command()
 
-    def draw_widget(self, canvas, rect) -> None:
+    def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
         """Draw button
 
         :param canvas: skia.Surface to draw on
         :param rect: Rectangle to draw in
+        :param style_name: Style name
 
         :return: None
         """
-        if self.is_mouse_floating:
-            if self.is_mouse_pressed:
-                style_name = f"{self.style}:pressed"
+        if style_name is None:
+            if self.is_mouse_floating:
+                if self.is_mouse_pressed:
+                    style_name = f"{self.style}:pressed"
+                else:
+                    style_name = f"{self.style}:hover"
             else:
-                style_name = f"{self.style}:hover"
-        else:
-            if "focus" in self.styles[self.style]:
-                if self.is_focus:
-                    style_name = f"{self.style}:focus"
+                if "focus" in self.styles[self.style]:
+                    if self.is_focus:
+                        style_name = f"{self.style}:focus"
+                    else:
+                        style_name = self.style
                 else:
                     style_name = self.style
-            else:
-                style_name = self.style
 
         style = self.theme.get_style(style_name)
 

@@ -19,7 +19,7 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 550),
         )
-        window.apply_theme(dark_theme)
+        # window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         )
         checkbox.box(padx=10, pady=(10, 0))
 
-        SkSeparator(frame).box(padx=0, pady=(15, 0))
+        SkSeparator(frame).box(padx=0, pady=(10, 0))
 
         SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
         # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
@@ -64,6 +64,13 @@ if __name__ == "__main__":
             padx=10, pady=(10, 0)
         )
         SkText(frame, textvariable=var).box(padx=10, pady=(10, 0))
+
+        SkSeparator(frame).box(padx=0, pady=(10, 0))
+
+        listbox = SkListBox(frame, lists=["1", "2", "3"])
+        listbox.box(padx=10, pady=(10, 0))
+
+        SkSeparator(frame).box(padx=0, pady=(10, 0))
 
         frame2 = SkCard(frame)
         SkTextButton(frame2, text="Create 1 New window", command=create1window).box(

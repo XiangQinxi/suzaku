@@ -176,6 +176,42 @@
       }
     },
 
+    "SkListBox": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [30, 30, 30, 255],
+        "bd": [50, 50, 50, 255],
+        "bd_shadow": [0, 3, 2, 2, [255, 255, 255, 20]],
+        "width": 2
+      }
+    },
+
+    "SkListBox.Item": {
+      "rest": {
+        "size": [0, 28],
+        "radius": 6,
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [255, 255, 255, 15],
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 25],
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "selected": {
+        "bg": [255, 255, 255, 30],
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      }
+    },
+
     "SkSeparator": {
       "rest": {
         "fg": [40,40,40,255],
