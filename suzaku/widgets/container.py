@@ -107,8 +107,12 @@ class SkContainer:
             if self.is_mouse_floating:
                 self.scroll(event.x_offset * 18, event.y_offset * 18)
                 return
-            for child in self.children:  # TODO 记得改下 子组件的子组件不能包含在内
+
+            for child in self.children:
                 if child.is_mouse_floating and child.help_parent_scroll:
+                    if hasattr(child, "allowed_scrolled"):
+                        if not child.allowed_scrolled:
+                            return
                     self.scroll(event.x_offset * 18, event.y_offset * 18)
                     return
 
