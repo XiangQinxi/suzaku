@@ -4,9 +4,10 @@
   "friendly_name": "Default Light",
 
   "color_palette": {
-    "default_bg": [240, 240, 240, 255],
-    "default_fg": [0, 0, 0, 235],
-    "default_bd": [200, 200, 200, 255]
+    "bg": [240, 240, 240, 255],
+    "second_bg": [225, 225, 225, 245],
+    "fg": [0, 0, 0, 235],
+    "bd": [200, 200, 200, 255]
   },
 
   "styles": {
@@ -110,8 +111,8 @@
       "rest": {
         "size": [0, 0],
         "radius": 8,
-        "bg": [225, 225, 225, 245],
-        "bd": [200, 200, 200, 245],
+        "bg": {"color_palette": "second_bg"},
+        "bd": {"color_palette": "bd"},
         "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
         "width": 2
       }
@@ -187,7 +188,7 @@
     "SkFrame": {
       "rest": {
         "size": [0, 0],
-        "radius": 8,
+        "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
         "width": 0
@@ -197,7 +198,7 @@
     "SkListBox": {
       "rest": {
         "size": [0, 0],
-        "radius": 8,
+        "radius": 5,
         "bg": [225, 225, 225, 245],
         "bd": [200, 200, 200, 245],
         "bd_shadow": [0, 3, 2, 2, [0, 0, 0, 20]],
@@ -207,32 +208,32 @@
 
     "SkListBox.Item": {
       "rest": {
-        "size": [0, 28],
-        "radius": 6,
+        "size": [0, 32],
+        "radius": 5,
         "bg": "transparent",
-        "fg": {"color_palette": "default_fg"},
+        "fg": {"color_palette": "fg"},
         "width": 0
       },
       "hover": {
-        "bg": [0, 0, 0, 15],
-        "fg": {"color_palette": "default_fg"},
+        "bg": [0, 0, 0, 25],
+        "fg": {"color_palette": "fg"},
         "width": 0
       },
       "pressed": {
-        "bg": [0, 0, 0, 30],
-        "fg": {"color_palette": "default_fg"},
+        "bg": [0, 0, 0, 45],
+        "fg": {"color_palette": "fg"},
         "width": 0
       },
       "selected": {
-        "bg": [0, 0, 0, 25],
-        "fg": {"color_palette": "default_fg"},
+        "bg": [0, 0, 0, 35],
+        "fg": {"color_palette": "fg"},
         "width": 0
       }
     },
 
     "SkSeparator": {
       "rest": {
-        "fg": [200,200,200,255],
+        "fg": {"color_palette": "bd"},
         "width": 2
       }
     },
@@ -240,13 +241,13 @@
     "SkText": {
       "rest": {
         "size": [0, 0],
-        "fg": [0, 0, 0, 245]
+        "fg": {"color_palette": "fg"}
       }
     },
 
     "SkWindow": {
       "rest":{
-        "bg": {"color_palette": "default_bg"}
+        "bg": {"color_palette": "bg"}
       }
     }
 

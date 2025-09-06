@@ -2,7 +2,8 @@ import skia
 
 from .container import SkContainer
 from .textbutton import SkTextButton
-from .. import SkStringVar
+from ..var import SkBooleanVar
+from ..event import SkEvent
 
 
 class SkListItem(SkTextButton):
@@ -30,7 +31,7 @@ class SkListItem(SkTextButton):
         return self.parent.selected_item == self
 
     def _on_click(self):
-        self.parent.selected_item = self
+        self.parent.selected(self)
 
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None

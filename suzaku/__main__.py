@@ -19,7 +19,6 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 550),
         )
-        # window.apply_theme(dark_theme)
         window.bind("drop", lambda evt: print("drop", evt))
 
         frame = SkCard(window)
@@ -67,28 +66,26 @@ if __name__ == "__main__":
 
         SkSeparator(frame).box(padx=0, pady=(10, 0))
 
-        listbox = SkListBox(frame, lists=["1", "2", "3"])
+        def change_theme(event: SkEvent):
+            _text = event.widget.cget("text")
+            if _text == "Light":
+                window.apply_theme(default_theme)
+            elif _text == "Dark":
+                window.apply_theme(dark_theme)
+
+        SkText(frame, text="Theme Mode", align="left").box(padx=10, pady=(10, 0))
+
+        listbox = SkListBox(frame, items=["Light", "Dark"])
+        listbox.bind(
+            "changed",
+            change_theme,
+        )
+        listbox.selected_index(1)
         listbox.box(padx=10, pady=(10, 0))
 
-        SkSeparator(frame).box(padx=0, pady=(10, 0))
-
-        frame2 = SkCard(frame)
-        SkTextButton(frame2, text="Create 1 New window", command=create1window).box(
+        SkTextButton(frame, text="Create 1 New window", command=create1window).box(
             padx=10, pady=(10, 0)
         )
-        SkTextButton(
-            frame2,
-            text="Switch to Light Theme",
-            command=lambda: window.apply_theme(default_theme),
-        ).box(padx=10, pady=(10, 0))
-        SkTextButton(
-            frame2,
-            text="Switch to Dark Theme",
-            command=lambda: window.apply_theme(dark_theme),
-        ).box(padx=10, pady=(10, 10))
-
-        frame2.box(padx=10, pady=10)
-        frame2.bind_scroll_event()
 
         frame.box(padx=10, pady=10, expand=True)
         frame.bind_scroll_event()
