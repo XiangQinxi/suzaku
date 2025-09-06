@@ -24,7 +24,9 @@ if __name__ == "__main__":
 
         frame = SkCard(window)
 
-        SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
+        SkTextButton(
+            frame, text="This is a SkTextButton", command=window.keyboard_open
+        ).box(padx=10, pady=(10, 0))
 
         popupmenu = SkPopupMenu(frame)
         popupmenu.add_command(
@@ -71,7 +73,7 @@ if __name__ == "__main__":
             command=lambda: window.apply_theme(dark_theme),
         ).box(padx=10, pady=(10, 10))
 
-        frame2.box(padx=10, pady=10, expand=True)
+        frame2.box(padx=10, pady=10)
         frame2.bind_scroll_event()
 
         frame.box(padx=10, pady=10, expand=True)

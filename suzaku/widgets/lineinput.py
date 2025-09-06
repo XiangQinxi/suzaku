@@ -353,7 +353,7 @@ class SkLineInput(SkWidget):
             if cancel_selected:
                 if self.is_selected():
                     self.start_index = self.end_index = 0
-
+        self.cursor_visible = True
         return self
 
     def cursor_right(self, move: int = 1, cancel_selected: bool = True) -> Self:
@@ -395,6 +395,7 @@ class SkLineInput(SkWidget):
             if cancel_selected:
                 if self.is_selected():
                     self.start_index = self.end_index = long
+        self.cursor_visible = True
         return self
 
     def delete_selected(self):
@@ -423,6 +424,7 @@ class SkLineInput(SkWidget):
                 self.cursor_left()
         else:
             self.delete_selected()
+        self.cursor_visible = True
         return self
 
     def cursor_delete(self) -> Self:
@@ -445,6 +447,7 @@ class SkLineInput(SkWidget):
             # 记录当前状态用于撤销
             self.record_state()
             self.delete_selected()
+        self.cursor_visible = True
         return self
 
     def cursor_home(self) -> Self:
@@ -453,7 +456,7 @@ class SkLineInput(SkWidget):
         """
         self._cursor_index = 0
         self.visible_start_index = 0
-
+        self.cursor_visible = True
         return self
 
     def cursor_end(self) -> Self:
@@ -470,6 +473,7 @@ class SkLineInput(SkWidget):
             >= self._rect.width()
         ):
             self.visible_start_index += 1
+        self.cursor_visible = True
         return self
 
     def cursor_paste(self):

@@ -629,20 +629,6 @@ class SkWidget(SkEventHanding, SkMisc):
         self._root_y = value
         self._pos_update()
 
-    def clipboard(self, value: str | None = None) -> str | typing.Self:
-        """Get string from clipboard
-
-        anti images
-        """
-        if value is not None:
-            glfw.set_clipboard_string(self.window.the_window, value)
-            return self
-        else:
-            try:
-                return glfw.get_clipboard_string(self.window.the_window).decode("utf-8")
-            except AttributeError:
-                return ""
-
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
 
