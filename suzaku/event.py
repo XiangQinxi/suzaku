@@ -105,18 +105,21 @@ class SkEventHandling():
                 SkEventHandling.multithread_tasks.append(task)
     
     def bind(self, event_type: str, target: typing.Callable, 
-             multithread: bool, _keep_at_clear: bool) -> bool:
+             multithread: bool, _keep_at_clear: bool) -> SkBindedTask | bool:
         """To bind a task to the object when a specific type of event is triggered.
 
         Example
         -------
         .. code-block
+            my_button = SkButton(...).pack()
+            press_down_event = my_button.bind("mouse_press", lambda _: print("Hello world!"))
+        This shows binding a hello world to the button when it's pressed.
         
         :param event_type: The type of event to be binded to
         :param target: A callable thing, what to do when this task is executed
         :param multithread: If this task should be executed in another thread (False by default)
         :param _keep_at_clear: If the task should be kept when clearning the event's binding
-        :return: If success
+        :return: SkBindedTask that is binded to the task if success, otherwise False
         """
         if event_type not in self.__class__.EVENT_TYPES:
             warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
@@ -126,12 +129,55 @@ class SkEventHandling():
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
         task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
+        return task
 
-    def find_task(self, task_id: str):
-        """To find a binded task using task ID"""
-        NotImplemented
+    def find_task(self, task_id: str) -> SkBindedTask | bool:
+        """To find a binded task using task ID.
 
-    def unbind(self, task_id: str):
+        Example
+        -------
+        .. code-block:: python
+            my_button = SkButton(...)
+            press_task = my_button.find_task("SkButton114.mouse_press.514")
+        This shows getting the `SkBindedTask` object of task with ID `SkButton114.mouse_press.514` 
+        from binded tasks of `my_button`. 
+        
+        :return: The SkBindedTask object of the task, or False if not found
+        """
+        task_id_parsed = task_id.split(".")
+        for task in self.tasks[task_id_parsed[1]]:
+            if task.id == task_id:
+                return task
+        else:
+            return False
+
+    def unbind(self, task_id: str) -> bool:
+        """To unbind the task with specified task ID.
+
+        Example
+        -------
+        .. code-block:: python
+            my_button = SkButton(...)
+            my_button.unbind("SkButton114.mouse_press.514")
+        This show unbinding the task with ID `SkButton114.mouse_press.514` from `my_button`. 
+
+        .. code-block:: python
+            my_button = SkButton(...)
+            my_button.unbind("SkButton114.mouse_press.*")
+        This show unbinding all tasks under `mouse_press` event from `my_button`.
+
+        :param task_id: The task ID to unbind.
+        :return: If success
+        """
+        task_id_parsed = task_id.split(".")
+        for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
+            if task.id == task_id:
+                self.tasks[task_id_parsed[1]].pop(task_index)
+                return True
+        else:
+            return False
+    
+    def update(self):
         NotImplemented
 
 
