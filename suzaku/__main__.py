@@ -48,7 +48,8 @@ if __name__ == "__main__":
         menubutton.box(padx=10, pady=(10, 0))
 
         checkbox = SkCheckItem(
-            frame, text="This is a CheckBox", command=lambda: print()
+            frame,
+            text="This is a CheckBox",
         )
         checkbox.box(padx=10, pady=(10, 0))
 

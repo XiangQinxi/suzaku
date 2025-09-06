@@ -24,6 +24,7 @@ class SkCheckItem(SkFrame):
         self.attributes["cursor"] = cursor
 
         self.focusable = True
+        self.help_parent_scroll = True
 
         self.checkbox = SkCheckBox(self)
         # self.checkbox.box(side="left", padx=2, pady=2)
@@ -34,10 +35,10 @@ class SkCheckItem(SkFrame):
             self.checkbox.invoke()
             self.checkbox.focus_set()
 
-        self.label.bind("click", _)
+        self.label.bind("b1_pressed", _)
 
         if command:
-            self.label.bind("click", lambda _: command())
+            self.label.bind("b1_pressed", lambda _: command())
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         self.checkbox.fixed(2, 5, width=self.height - 10, height=self.height - 10)

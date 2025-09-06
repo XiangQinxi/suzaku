@@ -117,20 +117,14 @@
     },
 
     "SkCheckBox": {
-      "rest": {
-        "radius": 5,
-        "size": [20, 20]
-      },
       "unchecked-rest": {
         "bg": {"color_palette": "default_bg"},
         "bd": {"color_palette": "default_bd"},
         "width": 2
       },
-      "checked-rest": {
-        "bg": [40, 130, 255, 255],
-        "fg": [250, 250, 250, 255],
-
-        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 100]],
+      "unchecked-hover": {
+        "bg": [40, 40, 40, 255],
+        "bd": [50, 50, 50, 255],
         "width": 2
       }
     },

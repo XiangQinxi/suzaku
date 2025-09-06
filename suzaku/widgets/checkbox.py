@@ -22,10 +22,10 @@ class SkCheckBox(SkWidget):
         self.focusable = True
         self.checked: bool = False
         self.help_parent_scroll = True
-        self.bind("click", self._on_click)
+        self.bind("b1_pressed", self._on_click)
 
         if command:
-            self.bind("click", lambda _: command())
+            self.bind("b1_pressed", lambda _: command())
 
     def invoke(self):
         self.checked = not self.checked
@@ -68,9 +68,17 @@ class SkCheckBox(SkWidget):
                 style_name = "SkCheckBox:focus"
             else:"""
         if self.checked:
-            style_name = "SkCheckBox:checked-rest"
+            style_name = "SkCheckBox:checked"
         else:
-            style_name = "SkCheckBox:unchecked-rest"
+            style_name = "SkCheckBox:unchecked"
+        if self.is_mouse_floating:
+            style_name = style_name + "-hover"
+        else:
+            """if self.is_focus:
+                style_name = style_name + "-focus"
+            else:
+                style_name = style_name + "-rest"""
+            style_name = style_name + "-rest"
 
         style = self.theme.get_style(style_name)
 
@@ -78,7 +86,6 @@ class SkCheckBox(SkWidget):
             bg_shader = style["bg_shader"]
         else:
             bg_shader = None
-        skia.ColorGREEN
         if "bd_shadow" in style:
             bd_shadow = style["bd_shadow"]
         else:
