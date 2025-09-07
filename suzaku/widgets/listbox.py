@@ -1,10 +1,11 @@
 import typing
+
 import skia
 
+from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
 from .listitem import SkListItem
-from ..event import SkEvent
 
 
 class SkListBox(SkCard):

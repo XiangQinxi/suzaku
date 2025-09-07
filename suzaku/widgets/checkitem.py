@@ -15,13 +15,15 @@ class SkCheckItem(SkFrame):
         *args,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
-        text: str = "",
+        text: str | None = None,
         style: str = "SkCheckItem",
+        border: bool = False,
         **kwargs,
     ) -> None:
         super().__init__(*args, style=style, **kwargs)
 
-        # $self.attributes["cursor"] = cursor
+        self.attributes["cursor"] = cursor
+        self.attributes["border"] = border
 
         self.focusable = True
         self.help_parent_scroll = True
@@ -35,10 +37,17 @@ class SkCheckItem(SkFrame):
             self.checkbox.invoke()
             self.checkbox.focus_set()
 
-        self.label.bind("b1_pressed", _)
-        # self.bind("b1_pressed", _)
+        self.label.bind("click", _)
+        self.bind("click", _)
 
         self.command = command
+
+    def set_attribute(self, **kwargs):
+        if "cursor" in kwargs:
+            self.attributes["cursor"] = kwargs.pop("cursor")
+            self.label.attributes["cursor"] = kwargs.pop("cursor")
+            self.checkbox.attributes["cursor"] = kwargs.pop("cursor")
+        super().set_attribute(**kwargs)
 
     def invoke(self):
         pass

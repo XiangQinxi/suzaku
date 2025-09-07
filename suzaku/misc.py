@@ -1,6 +1,8 @@
+import ctypes
+import os
+import sys
 import threading
 import typing
-import os, ctypes, sys
 
 import glfw
 

@@ -32,6 +32,7 @@ class SkWidget(SkEventHanding, SkMisc):
         cursor: str = "arrow",
         style: str = "SkWidget",
         font: skia.Font | None = default_font,
+        disabled: bool = False,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -78,14 +79,13 @@ class SkWidget(SkEventHanding, SkMisc):
             "key_pressed": dict(),
             "key_released": dict(),
             "key_repeated": dict(),
+            "double_click": dict(),
             "char": dict(),
             "click": dict(),
             "configure": dict(),
             "update": dict(),
             "scroll": dict(),
         }
-
-        # TODO 制作个双击&三击事件
 
         # Mouse events
         buttons = [
@@ -108,6 +108,8 @@ class SkWidget(SkEventHanding, SkMisc):
             "dwidth": 100,  # default width
             "dheight": 30,  # default height
             "font": font,
+            "double_click_interval": 0.24,
+            "disabled": disabled,
         }
 
         self.apply_theme(self.parent.theme)
@@ -153,6 +155,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.is_focus: bool = False
         self.gradient = SkGradient()
         self.button: typing.Literal[0, 1, 2] = 0
+        self.click_time: float | int = 0
 
         def _on_mouse(event: SkEvent):
             self.mouse_x = event.x
@@ -200,7 +203,15 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         if self.button != 1:
             if self.is_mouse_floating:
+
                 self.event_trigger("click", event)
+                time = self.time()
+
+                if self.click_time + self.cget("double_click_interval") > time:
+                    self.event_trigger("double_click", event)
+                    self.click_time = 0
+                else:
+                    self.click_time = time
 
     # endregion
 

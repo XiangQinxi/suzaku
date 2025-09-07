@@ -1,9 +1,9 @@
 import skia
 
+from ..event import SkEvent
+from ..var import SkBooleanVar
 from .container import SkContainer
 from .textbutton import SkTextButton
-from ..var import SkBooleanVar
-from ..event import SkEvent
 
 
 class SkListItem(SkTextButton):

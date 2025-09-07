@@ -66,19 +66,22 @@ class SkTextButton(SkButton, SkText):
         :return:
         """
         if style_name is None:
-            if self.is_mouse_floating:
-                if self.is_mouse_pressed:
-                    style_name = f"{self.style}:pressed"
+            if not self.cget("disabled"):
+                if self.is_mouse_floating:
+                    if self.is_mouse_pressed:
+                        style_name = f"{self.style}:pressed"
+                    else:
+                        style_name = f"{self.style}:hover"
                 else:
-                    style_name = f"{self.style}:hover"
-            else:
-                if "focus" in self.styles[self.style]:
-                    if self.is_focus:
-                        style_name = f"{self.style}:focus"
+                    if "focus" in self.styles[self.style]:
+                        if self.is_focus:
+                            style_name = f"{self.style}:focus"
+                        else:
+                            style_name = self.style
                     else:
                         style_name = self.style
-                else:
-                    style_name = self.style
+            else:
+                style_name = f"{self.style}:disabled"
 
         style = self.theme.get_style(style_name)
 

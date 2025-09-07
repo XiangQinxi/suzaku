@@ -2,6 +2,7 @@ import typing
 
 from ..event import SkEvent
 from .card import SkCard
+from .checkitem import SkCheckItem
 from .container import SkContainer
 from .menubutton import SkMenuButton
 from .separator import SkSeparator
@@ -46,19 +47,28 @@ class SkPopupMenu(SkCard):
             return
         self.hide()
 
+    def add(self, item: SkMenuButton | SkCheckItem):
+        self.items.append(item)
+
     def add_command(self, text: str = None, command: typing.Callable = None):
         button = SkMenuButton(self, text=text, command=command)
         button.box(side="top", padx=5, pady=(1, 3), ipadx=10)
-        self.items.append(button)
+        self.add(button)
         return button.id
 
     def add_cascade(self):
         pass
 
+    def add_checkitem(self, text: str = None, command: typing.Callable = None):
+        checkitem = SkCheckItem(self, text=text, command=command)
+        checkitem.box(side="top", padx=5, pady=(1, 3), ipadx=10)
+        self.add(checkitem)
+        return checkitem.id
+
     def add_separator(self):
         separator = SkSeparator(self)
         separator.box(side="top", padx=0, pady=0, ipadx=10)
-        self.items.append(separator)
+        self.add(separator)
         return separator.id
 
     def remove_item(self, _id):

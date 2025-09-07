@@ -37,6 +37,7 @@ class SkLineInput(SkWidget):
         placeholder: str | None = None,
         readonly: bool = False,
         cursor="ibeam",
+        show: str | None = None,
         **kwargs,
     ) -> None:
         """Text input widget (no border)
@@ -51,6 +52,7 @@ class SkLineInput(SkWidget):
         # Attributes
         self.attributes["readonly"] = readonly
         self.attributes["text"] = text
+        self.attributes["show"] = show
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["placeholder"] = placeholder  # 占位文本
 
@@ -71,6 +73,7 @@ class SkLineInput(SkWidget):
         self.max_undo_stack = 30
 
         # Event binding
+        self.bind("double_click", self._double_click)
         self.bind("focus_gain", self._focus_gain)
         self.bind("char", self._char)
         self.bind("key_pressed", self._key)
@@ -83,6 +86,13 @@ class SkLineInput(SkWidget):
     # endregion
 
     # region Text&Cursor 文本、光标操作
+
+    def _double_click(self, event: SkEvent) -> None:
+        """Triggered when the input box is double-clicked.
+        【当输入框被双击时触发】
+        :param event: SkEvent
+        """
+        self.cursor_select_all()
 
     def is_selected(self) -> bool:
         """Determine whether the text is selected.
@@ -253,7 +263,7 @@ class SkLineInput(SkWidget):
                 self.cursor_left(cancel_selected=False)
                 return self.visible_start_index
         # 【遍历可见文本，找到鼠标所在的位置】
-        visible_text = self.get()[self.visible_start_index :]
+        visible_text = self.show_text[self.visible_start_index :]
         for index, _ in enumerate(visible_text):
             _text = visible_text[:index]
             if self.measure_text(_text) + left >= mouse_x:
@@ -414,7 +424,7 @@ class SkLineInput(SkWidget):
         if self.is_selected():
             start, end = self.sort_select()
             self.start_index = self.end_index = self._cursor_index = len(
-                self.get()[:start]
+                self.show_text[:start]
             )
             self.set(self.get()[:start] + self.get()[end:])
             self.check()
@@ -480,7 +490,7 @@ class SkLineInput(SkWidget):
         self._cursor_index = len(self.get())
         while (
             self.measure_text(
-                self.get()[
+                self.show_text[
                     self.visible_start_index : self.cursor_index()
                 ]  # 光标左边的可显文本
             )
@@ -669,6 +679,9 @@ class SkLineInput(SkWidget):
         )
 
         text = self.get()
+        if self.cget("show"):
+            text = self.cget("show") * len(text)
+        self.show_text = text
 
         # 排序选择文本的起始、终点，使start<=end，不出错
         start, end = sorted([self.start_index, self.end_index])

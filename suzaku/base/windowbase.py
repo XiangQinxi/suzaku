@@ -3,7 +3,6 @@ import os
 import os.path
 import sys
 import typing
-import sys
 
 import glfw
 import skia
@@ -397,15 +396,15 @@ class SkWindowBase(SkEventHanding, SkMisc):
                         self.context.releaseResourcesAndAbandonContext()
                     # Create a Surface and hand it over to this arg.
                     # 【创建Surface，交给该窗口】
-                    with self.skia_surface(self.the_window) as surface:
-                        if surface:
-                            with surface as canvas:
+                    with self.skia_surface(self.the_window) as self.surface:
+                        if self.surface:
+                            with self.surface as canvas:
                                 # Determine and call the drawing function of this arg.
                                 # 【判断并调用该窗口的绘制函数】
                                 if self.draw_func:
                                     self.draw_func(canvas)
 
-                            surface.flushAndSubmit()
+                            self.surface.flushAndSubmit()
 
                     glfw.swap_buffers(self.the_window)
                 case "sdl2":
@@ -420,6 +419,10 @@ class SkWindowBase(SkEventHanding, SkMisc):
                                     self.draw_func(canvas)
 
                     sdl2.SDL_UpdateWindowSurface(self.the_window)
+
+    def save(self, path: str = "skwindowbase.png", format: str = "png"):
+        if self.surface:
+            self.surface.makeImageSnapshot().save(path, skia.kPNG)
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.

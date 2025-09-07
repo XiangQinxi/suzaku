@@ -2,9 +2,9 @@ import typing
 
 import skia
 
-from .widget import SkWidget
 from ..event import SkEvent
 from ..styles.color import skcolor2color, style_to_color
+from .widget import SkWidget
 
 
 class SkCheckBox(SkWidget):
@@ -23,7 +23,7 @@ class SkCheckBox(SkWidget):
         self.checked: bool = False
         self.help_parent_scroll = True
         self.command = command
-        self.bind("b1_pressed", lambda _: self.invoke())
+        self.bind("click", lambda _: self.invoke())
 
     def invoke(self):
         self.checked = not self.checked

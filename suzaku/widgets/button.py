@@ -39,7 +39,7 @@ class SkButton(SkFrame):
         self.bind("click", lambda _: self.invoke)
 
     def invoke(self) -> None:
-        if self.command:
+        if self.command and self.cget("disabled") is False:
             self.command()
 
     def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
@@ -52,19 +52,22 @@ class SkButton(SkFrame):
         :return: None
         """
         if style_name is None:
-            if self.is_mouse_floating:
-                if self.is_mouse_pressed:
-                    style_name = f"{self.style}:pressed"
+            if not self.cget("disabled"):
+                if self.is_mouse_floating:
+                    if self.is_mouse_pressed:
+                        style_name = f"{self.style}:pressed"
+                    else:
+                        style_name = f"{self.style}:hover"
                 else:
-                    style_name = f"{self.style}:hover"
-            else:
-                if "focus" in self.styles[self.style]:
-                    if self.is_focus:
-                        style_name = f"{self.style}:focus"
+                    if "focus" in self.styles[self.style]:
+                        if self.is_focus:
+                            style_name = f"{self.style}:focus"
+                        else:
+                            style_name = self.style
                     else:
                         style_name = self.style
-                else:
-                    style_name = self.style
+            else:
+                style_name = f"{self.style}:disabled"
 
         style = self.theme.get_style(style_name)
 
