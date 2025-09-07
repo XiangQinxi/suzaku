@@ -39,13 +39,13 @@ if __name__ == "__main__":
         popupmenu.add_command("Save changes")
         popupmenu.add_command("Save as...")
         popupmenu.add_separator()
-        popupmenu.add_checkitem("Dark theme")
+        popupmenu.add_checkitem("Agreed")
         popupmenu.add_command(
             "Help", command=lambda: show_message(window, message="Hello")
         )
         popupmenu.add_command("Exit", command=window.destroy)
 
-        menubutton = SkMenu(frame, "This is a SkMenuButton", menu=popupmenu)
+        menubutton = SkMenu(frame, "This is a SkMenuItem", menu=popupmenu)
         menubutton.box(padx=10, pady=(10, 0))
 
         checkbox = SkCheckItem(
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         SkEntry(frame, placeholder="TextVariable", textvariable=var).box(
             padx=10, pady=(10, 0)
         )
-        SkEntry(frame, placeholder="Password", textvariable=var, show="*").box(
+        SkEntry(frame, placeholder="Password", textvariable=var, show="●").box(
             padx=10, pady=(10, 0)
         )
         SkText(frame, textvariable=var).box(padx=10, pady=(10, 0))

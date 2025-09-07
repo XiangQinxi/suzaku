@@ -3,7 +3,7 @@ from .container import SkContainer
 from .textbutton import SkTextButton
 
 
-class SkMenuButton(SkTextButton):
+class SkMenuItem(SkTextButton):
     def __init__(
         self,
         parent: SkContainer,
