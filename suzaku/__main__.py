@@ -17,7 +17,7 @@ if __name__ == "__main__":
             anti_alias=True,
             parent=None,
             title="Suzaku GUI",
-            size=(280, 550),
+            size=(280, 630),
         )
         window.bind("drop", lambda evt: print("drop", evt))
 
@@ -32,14 +32,20 @@ if __name__ == "__main__":
 
         SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
 
+        var1 = SkBooleanVar()
+        var1.bind("change", lambda evt: print("Changed:", evt))
+
         popupmenu = SkPopupMenu(frame)
         popupmenu.add_command("New window", command=create1window)
-        popupmenu.add_command("New project")
+        """popupmenu.add_command("New project")
         popupmenu.add_command("Open project")
         popupmenu.add_command("Save changes")
-        popupmenu.add_command("Save as...")
+        popupmenu.add_command("Save as...")"""
         popupmenu.add_separator()
-        popupmenu.add_checkitem("Agreed")
+        popupmenu.add_checkitem("Agreed", variable=var1)
+        popupmenu.add_radioitem("Simple", value=False, variable=var1)
+        popupmenu.add_radioitem("Complex", value=True, variable=var1)
+        popupmenu.add_separator()
         popupmenu.add_command(
             "Help", command=lambda: show_message(window, message="Hello")
         )
@@ -48,26 +54,32 @@ if __name__ == "__main__":
         menubutton = SkMenu(frame, "This is a SkMenuItem", menu=popupmenu)
         menubutton.box(padx=10, pady=(10, 0))
 
-        checkbox = SkCheckItem(
+        SkCheckButton(
             frame,
             text="This is a CheckBox",
-            command=lambda: print("Checked:", checkbox.checked),
+            variable=var1,
+        ).box(padx=10, pady=(10, 0))
+
+        SkRadioButton(frame, text="SkRadioItem 1", value=False, variable=var1).box(
+            padx=10, pady=(10, 0)
         )
-        checkbox.box(padx=10, pady=(10, 0))
+        SkRadioButton(frame, text="SkRadioItem 2", value=True, variable=var1).box(
+            padx=10, pady=(10, 0)
+        )
 
         SkSeparator(frame).box(padx=0, pady=(10, 0))
 
         SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
         # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
 
-        var = SkStringVar()
-        SkEntry(frame, placeholder="TextVariable", textvariable=var).box(
+        var2 = SkStringVar()
+        SkEntry(frame, placeholder="TextVariable", textvariable=var2).box(
             padx=10, pady=(10, 0)
         )
-        SkEntry(frame, placeholder="Password", textvariable=var, show="●").box(
+        SkEntry(frame, placeholder="Password", textvariable=var2, show="●").box(
             padx=10, pady=(10, 0)
         )
-        SkText(frame, textvariable=var).box(padx=10, pady=(10, 0))
+        SkText(frame, textvariable=var2).box(padx=10, pady=(10, 0))
 
         SkSeparator(frame).box(padx=0, pady=(10, 0))
 

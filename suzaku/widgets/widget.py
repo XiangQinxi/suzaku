@@ -493,6 +493,62 @@ class SkWidget(SkEventHanding, SkMisc):
 
             canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
+    def _draw_circle(
+        self,
+        canvas: skia.Canvas,
+        cx: float | int,
+        cy: float | int,
+        radius: int | float = 0,
+        bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        width: int | float = 0,
+        bd_shadow: (
+            None | tuple[int | float, int | float, int | float, int | float, str]
+        ) = None,
+        bd_shader: None | Literal["rainbow"] = None,
+        bg_shader: None | Literal["rainbow"] = None,
+    ):
+        if bg:
+            bg_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStrokeAndFill_Style,
+            )
+            bg = skcolor2color(style_to_color(bg, self.theme))
+
+            # Background
+            bg_paint.setStrokeWidth(width)
+            bg_paint.setColor(bg)
+            shadow = SkDropShadow(config_list=bd_shadow)
+            shadow.draw(bg_paint)
+            if bg_shader:
+                if isinstance(bg_shader, dict):
+                    if "linear_gradient" in bg_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bg_shader["linear_gradient"],
+                            paint=bg_paint,
+                        )
+            canvas.drawCircle(cx, cy, radius, bg_paint)
+        if bd and width > 0:
+            bd_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStroke_Style,
+            )
+            bd = skcolor2color(style_to_color(bd, self.theme))
+
+            # Border
+            bd_paint.setStrokeWidth(width)
+            bd_paint.setColor(bd)
+            if bd_shader:
+                if isinstance(bd_shader, dict):
+                    if "linear_gradient" in bd_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bd_shader["linear_gradient"],
+                            paint=bd_paint,
+                        )
+            canvas.drawCircle(cx, cy, radius, bd_paint)
+
     def _draw_rect_new(
         self,
         canvas: skia.Canvas,

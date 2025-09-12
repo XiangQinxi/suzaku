@@ -134,7 +134,33 @@
         "width": 2
       }
     },
-    
+    "SkRadioBox": {
+      "unchecked-rest": {
+        "bg": {"color_palette": "bg"},
+        "bd": {"color_palette": "bd"},
+        "width": 2
+      },
+      "unchecked-hover": {
+        "bg": [40, 40, 40, 255],
+        "bd": [50, 50, 50, 255],
+        "width": 2
+      },
+      "checked-rest": {
+        "bg": [40, 130, 255, 255],
+        "fg": [40, 40, 40, 255],
+        "width": 2,
+        "inner_width": 4
+      },
+      "checked-hover": {
+        "bg": [40, 130, 255, 215],
+        "fg": [40, 40, 40, 255],
+
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 100]],
+        "width": 2,
+        "inner_width": 5
+      }
+    },
+
     "SkEntry": {
       "rest": {
         "size": [120, 35],
