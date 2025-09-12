@@ -19,8 +19,12 @@ class SkMenu(SkTextButton):
         self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
-        if self.cget("popupmenu") and not self.cget("disabled"):
-            self.cget("popupmenu").popup(
-                x=self.x - self.parent.x_offset,
-                y=self.y - self.parent.y_offset + self.height + 10,
-            )
+        popupmenu: SkPopupMenu = self.cget("popupmenu")
+        if popupmenu and not self.cget("disabled"):
+            if popupmenu.is_popup:
+                popupmenu.hide()
+            else:
+                self.cget("popupmenu").popup(
+                    x=self.x - self.parent.x_offset,
+                    y=self.y - self.parent.y_offset + self.height + 10,
+                )

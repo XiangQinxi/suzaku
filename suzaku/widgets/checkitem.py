@@ -57,5 +57,10 @@ class SkCheckItem(SkFrame):
         return self.checkbox.checked
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        self.checkbox.fixed(2, 5, width=self.height - 10, height=self.height - 10)
-        self.label.fixed(self.height - 5, 0, height=self.height)
+        padx = 3
+        ipadx = 5
+        pady = 7
+        self.checkbox.fixed(
+            padx, pady, width=self.height - pady * 2, height=self.height - pady * 2
+        )
+        self.label.fixed(self.height - pady * 2 + ipadx, 0, height=self.height)

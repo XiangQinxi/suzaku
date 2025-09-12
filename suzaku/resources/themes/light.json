@@ -126,7 +126,7 @@
 
     "SkCheckBox": {
       "rest": {
-        "radius": 5,
+        "radius": 3,
         "size": [22, 22]
       },
       "unchecked-rest": {

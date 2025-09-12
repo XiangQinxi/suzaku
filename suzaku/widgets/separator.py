@@ -1,8 +1,8 @@
-import skia
 import typing
 
-from .widget import SkWidget
+import skia
 
+from .widget import SkWidget
 
 H = HORIZONTAL = "horizontal"
 V = VERTICAL = "vertical"

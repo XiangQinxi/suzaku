@@ -1,9 +1,9 @@
 import typing
 
-from .popup import SkPopup
 from .checkitem import SkCheckItem
 from .container import SkContainer
 from .menuitem import SkMenuItem
+from .popup import SkPopup
 from .separator import SkSeparator
 from .window import SkWindow
 

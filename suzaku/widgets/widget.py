@@ -706,7 +706,7 @@ class SkWidget(SkEventHanding, SkMisc):
         if hasattr(self, "children"):
             for child in self.children:
                 if not child.layout_config.get("none"):
-                    child.visible = True
+                    child.show()
 
         return self
 
