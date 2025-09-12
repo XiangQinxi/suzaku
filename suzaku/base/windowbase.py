@@ -194,6 +194,18 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
+        try:
+            import PIL
+            from PIL import Image
+
+            icon = Image.open(self.icon1_path)
+            if self.framework == "glfw":
+                from glfw import set_window_icon
+
+                set_window_icon(self.the_window, 1, icon)
+        except ImportError:
+            pass
+
         # icon: skia.Image = skia.Image.open(self.icon1_path)
 
         # info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())

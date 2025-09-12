@@ -9,16 +9,17 @@ class SkMenuItem(SkTextButton):
         parent: SkContainer,
         text: str = "",
         *,
-        style="SkMenu.Button",
+        style="SkMenu",
         align="left",
         **kwargs,
     ):
         super().__init__(parent, text=text, style=style, align=align, **kwargs)
 
-        self.focusable = False
+        self.focusable = True
 
         self.bind("click", self._on_click)
         self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
-        self.parent.event_trigger("hide", SkEvent(event_type="hide"))
+        if "hide" in self.parent.events:
+            self.parent.event_trigger("hide", SkEvent(event_type="hide"))

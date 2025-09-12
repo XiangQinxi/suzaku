@@ -378,8 +378,9 @@ class SkContainer:
                     child_layout_config["pady"],
                 )
 
+                child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.width = child.dheight
+                    child.width = child.dwidth
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
@@ -398,8 +399,9 @@ class SkContainer:
                     child_layout_config["pady"],
                 )
 
+                child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.width = child.dheight
+                    child.width = child.dwidth
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom

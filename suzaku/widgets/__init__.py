@@ -26,6 +26,8 @@ from .listbox import SkListBox as SkListbox
 from .listitem import SkListItem  # ⛔
 from .menu import SkMenu  # ✅
 
+from .menubar import SkMenuBar  # ⛔
+
 from .menuitem import SkMenuItem  # ✅
 from .menuitem import SkMenuItem as SkMenuitem
 
@@ -44,7 +46,7 @@ from .radioitem import SkRadioItem as SkRadioitem
 from .radioitem import SkRadioItem as SkRadioButton
 from .radioitem import SkRadioItem as SkRadiobutton
 
-from .separator import SkSeparator  # ✅
+from .separator import SkSeparator, H, HORIZONTAL, V, VERTICAL  # ✅
 from .text import SkText  # ✅
 from .textbutton import SkTextButton  # ✅
 from .widget import SkWidget  # ✅

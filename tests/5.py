@@ -1,58 +1,69 @@
-import glfw
+import tkinter as tk
+from tkinter import ttk
+
+root = tk.Tk()
+root.geometry("600x400+200+200")
+root.title("Ttk 主题小部件演示")
+
+text = tk.StringVar()
+style = ttk.Style(root)
 
 
-class Window:
-    def __init__(self, width=800, height=600, title="Demo"):
-        if not glfw.init():
-            raise RuntimeError("GLFW init failed")
-
-        self._win = glfw.create_window(width, height, title, None, None)
-        if not self._win:
-            glfw.terminate()
-            raise RuntimeError("GLFW window creation failed")
-
-    def geometry(self, spec: str | None = None) -> str | None:
-        """
-        Tkinter 风格 geometry 方法:
-          - 设置: "WIDTHxHEIGHT+X+Y" / "WIDTHxHEIGHT" / "+X+Y"
-          - 获取: 返回 "WIDTHxHEIGHT+X+Y"
-        """
-        if spec is None:
-            # --- 获取 ---
-            width, height = glfw.get_window_size(self._win)
-            x, y = glfw.get_window_pos(self._win)
-            return f"{width}x{height}+{x}+{y}"
-
-        # --- 设置 ---
-        width, height = None, None
-        x, y = None, None
-
-        # 判断是否包含大小
-        if "x" in spec:
-            wh, _, rest = spec.partition("+")
-            width, height = map(int, wh.split("x"))
-            if rest:
-                x, y = map(int, rest.split("+"))
-        elif spec.startswith("+"):
-            x, y = map(int, spec[1:].split("+"))
-
-        # 设置窗口大小
-        if width and height:
-            glfw.set_window_size(self._win, width, height)
-        # 设置窗口位置
-        if x is not None and y is not None:
-            glfw.set_window_pos(self._win, x, y)
-
-    def mainloop(self):
-        while not glfw.window_should_close(self._win):
-            glfw.poll_events()
-        glfw.terminate()
+def change_theme():
+    style.theme_use(selected_theme.get())
 
 
-if __name__ == "__main__":
-    win = Window()
-    # win.geometry("300x300")  # 只设置大小
-    win.geometry("+200+150")  # 只设置位置
-    # win.geometry("640x480+100+50")  # 大小+位置
-    print("当前几何信息:", win.geometry())  # 获取
-    win.mainloop()
+def callback():
+    pass
+
+
+left_frame = tk.Frame(root, width=300, height=400)
+left_frame.pack(side="left", fill="both", padx=10, pady=5, expand=True)
+
+right_frame = tk.Frame(root, width=300, height=400)
+right_frame.pack(side="right", fill="both", padx=10, pady=5, expand=True)
+
+selected_theme = tk.StringVar()
+theme_frame = ttk.LabelFrame(left_frame, text="Themes")
+theme_frame.pack(padx=10, pady=10, ipadx=20, ipady=20)
+
+for theme_name in style.theme_names():
+    rb = ttk.Radiobutton(
+        theme_frame,
+        text=theme_name,
+        value=theme_name,
+        variable=selected_theme,
+        command=change_theme,
+    )
+    rb.pack(expand=True, fill="both")
+
+label = ttk.Label(right_frame, text="ttk标签")
+label.pack(pady=5)
+button = ttk.Button(right_frame, text="ttk按钮", command=callback)
+button.pack(pady=5)
+entry = ttk.Entry(right_frame, textvariable=text, text="文本框")
+entry.pack(pady=5)
+entry.insert(0, "ttk单行文本框")
+frame2 = ttk.LabelFrame(right_frame, text="ttk复选框")
+frame2.pack(pady=5)
+cb3 = ttk.Checkbutton(frame2, text="Number 3")
+cb3.pack()
+cb4 = ttk.Checkbutton(frame2, text="Number 4")
+cb4.pack()
+frame4 = ttk.LabelFrame(right_frame, text="ttk单选按钮")
+frame4.pack(pady=5)
+r1 = ttk.Radiobutton(frame4, text="option 1", value=1)
+r1.pack()
+r2 = ttk.Radiobutton(frame4, text="option 2", value=2)
+r2.pack()
+scale2 = ttk.Scale(right_frame, from_=0, to=100, orient="horizontal", length=100)
+scale2.pack(pady=5)
+menubttn = ttk.Menubutton(right_frame, text="ttk菜单按钮")
+menu = tk.Menu(menubttn, tearoff=0)
+menu.add_checkbutton(label="Python")
+menu.add_checkbutton(label="Java")
+menubttn["menu"] = menu
+menubttn.pack(pady=5)
+spinbox2 = ttk.Spinbox(right_frame, from_=0, to=10, wrap=True)
+spinbox2.pack(pady=5)
+root.mainloop()

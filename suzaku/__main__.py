@@ -21,21 +21,13 @@ if __name__ == "__main__":
         )
         window.bind("drop", lambda evt: print("drop", evt))
 
-        def change_theme(event: SkEvent):
-            _text = event.widget.cget("text")
-            if _text == "Light":
-                window.apply_theme(default_theme)
-            elif _text == "Dark":
-                window.apply_theme(dark_theme)
-
-        frame = SkCard(window)
-
-        SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
-
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
-        popupmenu = SkPopupMenu(frame)
+        menubar = SkMenuBar(window)
+        menubar.box(side="top", padx=0, pady=0)
+
+        popupmenu = SkPopupMenu(window)
         popupmenu.add_command("New window", command=create1window)
         """popupmenu.add_command("New project")
         popupmenu.add_command("Open project")
@@ -51,8 +43,20 @@ if __name__ == "__main__":
         )
         popupmenu.add_command("Exit", command=window.destroy)
 
-        menubutton = SkMenu(frame, "This is a SkMenuItem", menu=popupmenu)
-        menubutton.box(padx=10, pady=(10, 0))
+        menubar.add_cascade("File", menu=popupmenu)
+        menubar.add_separator()
+        menubar.add_command("Exit", command=window.destroy)
+
+        def change_theme(event: SkEvent):
+            _text = event.widget.cget("text")
+            if _text == "Light":
+                window.apply_theme(default_theme)
+            elif _text == "Dark":
+                window.apply_theme(dark_theme)
+
+        frame = SkCard(window)
+
+        SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
 
         SkCheckButton(
             frame,
@@ -90,7 +94,7 @@ if __name__ == "__main__":
             "changed",
             change_theme,
         )
-        listbox.selected_index(1)
+        listbox.selected_index(0)
         listbox.box(padx=10, pady=(10, 0))
 
         frame.box(padx=10, pady=10, expand=True)

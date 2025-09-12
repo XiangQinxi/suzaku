@@ -10,9 +10,10 @@ class SkMenu(SkTextButton):
         parent: SkContainer,
         text: str = "",
         menu: SkPopupMenu = None,
+        style: str = "SkMenu",
         **kwargs,
     ):
-        super().__init__(parent, text=text, **kwargs)
+        super().__init__(parent, text=text, style=style, **kwargs)
 
         self.attributes["popupmenu"] = menu
         self.bind("click", self._on_click)

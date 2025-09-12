@@ -14,22 +14,36 @@ class SkSeparator(SkWidget):
         master=None,
         *,
         style: str = "SkSeparator",
-        orient: typing.Literal["horizontal", "vertical"] = "horizontal",
+        orient: typing.Literal["horizontal", "vertical"] | None = None,
         **kwargs,
     ):
         super().__init__(master, style=style, **kwargs)
 
+        if orient is None:
+            orient = HORIZONTAL
+
+        width = self.theme.get_style_attr(self.style, "width")
+        if orient == HORIZONTAL:
+            self.configure(dheight=width)
+        else:
+            self.configure(dwidth=width)
+
         self.attributes["orient"] = orient
 
-        if orient == HORIZONTAL:
-            self.configure(dheight=self.theme.get_style_attr(self.style, "width"))
-        else:
-            self.configure(dwidth=self.theme.get_style_attr(self.style, "height"))
         self.help_parent_scroll = True
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         style = self.theme.get_style(self.style)
-        if self.attributes["orient"] == HORIZONTAL:
+        orient = self.cget("orient")
+        width = self.theme.get_style_attr(self.style, "width")
+        # print(self.id, orient)
+
+        if orient == HORIZONTAL:
+            self.configure(dheight=width)
+        else:
+            self.configure(dwidth=width)
+
+        if orient == HORIZONTAL:
             self._draw_line(
                 canvas,
                 x0=rect.left(),
