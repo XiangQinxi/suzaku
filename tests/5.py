@@ -1,9 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
+from sv_ttk import use_dark_theme
 
 root = tk.Tk()
 root.geometry("600x400+200+200")
 root.title("Ttk 主题小部件演示")
+
+use_dark_theme()
 
 text = tk.StringVar()
 style = ttk.Style(root)
@@ -25,7 +28,7 @@ right_frame.pack(side="right", fill="both", padx=10, pady=5, expand=True)
 
 selected_theme = tk.StringVar()
 theme_frame = ttk.LabelFrame(left_frame, text="Themes")
-theme_frame.pack(padx=10, pady=10, ipadx=20, ipady=20)
+theme_frame.pack(padx=10, pady=10, ipadx=30, ipady=30)
 
 for theme_name in style.theme_names():
     rb = ttk.Radiobutton(
@@ -35,7 +38,7 @@ for theme_name in style.theme_names():
         variable=selected_theme,
         command=change_theme,
     )
-    rb.pack(expand=True, fill="both")
+    rb.pack(expand=True, fill="both", padx=5, pady=5)
 
 label = ttk.Label(right_frame, text="ttk标签")
 label.pack(pady=5)

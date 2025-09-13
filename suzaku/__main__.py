@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
         SkSeparator(frame).box(padx=0, pady=(10, 0))
 
-        SkText(frame, text="This is a SkLabel").box(padx=10, pady=(10, 0))
+        SkText(frame, text="This is a SkText").box(padx=10, pady=(10, 0))
         # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
 
         var2 = SkStringVar()
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         SkEntry(frame, placeholder="Password", textvariable=var2, show="●").box(
             padx=10, pady=(10, 0)
         )
-        SkText(frame, textvariable=var2).box(padx=10, pady=(10, 0))
+        SkLabel(frame, textvariable=var2).box(padx=10, pady=(10, 0))
 
         SkSeparator(frame).box(padx=0, pady=(10, 0))
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
             "changed",
             change_theme,
         )
-        listbox.selected_index(0)
+        listbox.selected_index(1)
         listbox.box(padx=10, pady=(10, 0))
 
         frame.box(padx=10, pady=10, expand=True)

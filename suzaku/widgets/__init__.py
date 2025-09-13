@@ -18,6 +18,7 @@ from .entry import SkEntry  # ✅
 from .frame import SkFrame  # ✅
 from .hynix import SkHynix  # ✅
 from .image import SkImage  # ⛔ 各种颜色处理未实现
+from .label import SkLabel
 from .lineinput import SkLineInput  # ✅
 
 from .listbox import SkListBox  # ⛔

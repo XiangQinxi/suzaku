@@ -169,7 +169,6 @@
         "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 100]],
         "width": 2
       }
-
     },
 
     "SkCheckItem": {
@@ -216,6 +215,17 @@
         "bg": "transparent",
         "bd": "transparent",
         "width": 0
+      }
+    },
+
+    "SkLabel": {
+      "rest": {
+        "size": [0, 0],
+        "fg": {"color_palette": "fg"},
+        "bg": [0, 0, 0, 20],
+        "bd": [0, 0, 0, 30],
+        "width": 2,
+        "radius": 4
       }
     },
 
@@ -279,8 +289,6 @@
       "checked-hover": {
         "bg": [40, 130, 255, 215],
         "fg": [250, 250, 250, 255],
-
-        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 100]],
         "width": 2,
         "inner_width": 5
       }

@@ -144,8 +144,21 @@
         "bg": [40, 40, 40, 255],
         "bd": [50, 50, 50, 255],
         "width": 2
+      },
+      "checked-rest": {
+        "bg": [40, 130, 255, 255],
+        "fg": [10, 10, 10, 255],
+        "width": 2
+      },
+      "checked-hover": {
+        "bg": [40, 130, 255, 215],
+        "fg": [10, 10, 10, 255],
+
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 100]],
+        "width": 2
       }
     },
+
     "SkRadioBox": {
       "unchecked-rest": {
         "bg": {"color_palette": "bg"},
@@ -166,8 +179,6 @@
       "checked-hover": {
         "bg": [40, 130, 255, 215],
         "fg": [40, 40, 40, 255],
-
-        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 100]],
         "width": 2,
         "inner_width": 5
       }
@@ -201,6 +212,17 @@
         "selected_bg": [25, 125, 225, 245],
         "selected_fg": [0, 0, 0, 255],
         "selected_radius": true
+      }
+    },
+
+    "SkLabel": {
+      "rest": {
+        "size": [0, 0],
+        "fg": {"color_palette": "fg"},
+        "bg": [255, 255, 252, 20],
+        "bd": [255, 255, 255, 30],
+        "width": 2,
+        "radius": 4
       }
     },
 

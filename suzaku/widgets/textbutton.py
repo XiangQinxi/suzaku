@@ -89,6 +89,8 @@ class SkTextButton(SkButton, SkText):
         SkButton.draw_widget(self, canvas, rect, style_name)
 
         # Draw the button text
+        canvas.save()
+        canvas.clipRect(rect)
         self._draw_text(
             canvas,
             skia.Rect.MakeLTRB(
@@ -101,5 +103,6 @@ class SkTextButton(SkButton, SkText):
             fg=style["fg"],
             align=self.cget("align"),
         )
+        canvas.restore()
 
     # endregion

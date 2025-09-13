@@ -73,6 +73,8 @@ class SkText(SkWidget):
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         style = self.theme.get_style(self.style)
+        canvas.save()
+        canvas.clipRect(rect)
         self._draw_text(
             canvas,
             skia.Rect.MakeLTRB(
@@ -86,5 +88,6 @@ class SkText(SkWidget):
             font=self.attributes["font"],
             align=self.cget("align"),
         )
+        canvas.restore()
 
     # endregion
