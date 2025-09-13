@@ -1,4 +1,4 @@
-from ..constants import Orient
+from ..const import Orient
 from .card import SkCard
 from .container import SkContainer
 from .frame import SkFrame

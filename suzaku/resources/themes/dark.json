@@ -294,7 +294,7 @@
     "SkTabBar.Button": {
       "rest": {
         "size": [0, 32],
-        "radius": 5,
+        "radius": [4, 4, 0, 0],
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
         "width": 0

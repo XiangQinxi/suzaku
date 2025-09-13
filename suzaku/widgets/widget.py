@@ -418,11 +418,32 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
+    @staticmethod
+    def unpacking_radius(
+        radius: (
+            int
+            | tuple[
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+            ]
+        ),
+    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
+        _radius: list[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = list(radius)
+        for i, r in enumerate(_radius):
+            if isinstance(r, int):
+                _radius[i] = (r, r)
+        radius = tuple(_radius)
+        return radius
+
     def _draw_rect(
         self,
         canvas: skia.Canvas,
         rect: skia.Rect,
-        radius: int = 0,
+        radius: int | tuple[int, int, int, int] = 0,
         bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
         bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
         width: int | float = 0,
@@ -444,6 +465,25 @@ class SkWidget(SkEventHanding, SkMisc):
         :param bd_shader: The shader of the border
 
         """
+        is_custom_radius = isinstance(radius, tuple | list)
+        if is_custom_radius:
+            rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
+            radii: tuple[
+                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+            ] = self.unpacking_radius(radius)
+            # 设置每个角的半径（支持X/Y不对称）
+            rrect.setRectRadii(
+                skia.Rect.MakeLTRB(*rect),
+                [
+                    skia.Point(*radii[0]),  # 左上
+                    skia.Point(*radii[1]),  # 右上
+                    skia.Point(*radii[2]),  # 右下
+                    skia.Point(*radii[3]),  # 左下
+                ],
+            )
+
+            path = skia.Path()
+            path.addRRect(rrect)
 
         if bg:
             bg_paint = skia.Paint(
@@ -468,8 +508,10 @@ class SkWidget(SkEventHanding, SkMisc):
                 else:
                     if bg_shader.lower() == "rainbow":
                         self._draw_rainbow_shader(bg_paint, rect)
-
-            canvas.drawRoundRect(rect, radius, radius, bg_paint)
+            if is_custom_radius:
+                canvas.drawPath(path, bg_paint)
+            else:
+                canvas.drawRoundRect(rect, radius, radius, bg_paint)
         if bd and width > 0:
             bd_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
@@ -491,8 +533,10 @@ class SkWidget(SkEventHanding, SkMisc):
                 else:
                     if bd_shader.lower() == "rainbow":
                         self._draw_rainbow_shader(bd_paint, rect)
-
-            canvas.drawRoundRect(rect, radius, radius, bd_paint)
+            if is_custom_radius:
+                canvas.drawPath(path, bd_paint)
+            else:
+                canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
     def _draw_circle(
         self,
