@@ -1,11 +1,11 @@
 from typing import Callable
 
+from .card import SkFrame
+from .checkitem import SkCheckItem
 from .menu import SkMenu
 from .menuitem import SkMenuItem
-from .separator import SkSeparator
-from .checkitem import SkCheckItem
 from .radioitem import SkRadioItem
-from .card import SkFrame
+from .separator import SkSeparator
 from .window import SkWindow
 
 

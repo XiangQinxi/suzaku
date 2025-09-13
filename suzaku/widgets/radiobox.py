@@ -3,8 +3,8 @@ import typing
 import skia
 
 from ..event import SkEvent
+from ..styles.color import skcolor_to_color, style_to_color
 from ..var import SkVar
-from ..styles.color import skcolor2color, style_to_color
 from .widget import SkWidget
 
 

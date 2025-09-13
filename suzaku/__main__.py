@@ -104,7 +104,7 @@ if __name__ == "__main__":
             padx=10, pady=(5, 0)
         )
         SkTextButton(window, text="Close the window", command=window.destroy).box(
-            side="bottom"
+            side="bottom", padx=10, pady=10
         )
 
     create1window()

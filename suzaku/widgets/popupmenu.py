@@ -1,10 +1,10 @@
 import typing
 
 from .checkitem import SkCheckItem
-from .radioitem import SkRadioItem
 from .container import SkContainer
 from .menuitem import SkMenuItem
 from .popup import SkPopup
+from .radioitem import SkRadioItem
 from .separator import SkSeparator
 from .window import SkWindow
 
@@ -16,12 +16,36 @@ class SkPopupMenu(SkPopup):
 
         self.items: list[SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem] = []
 
-    def add(self, item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem):
-        self.items.append(item)
+    def add(
+        self,
+        item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem,
+        index: int = -1,
+    ) -> None:
+        if index == -1:
+            self.items.append(item)
+        else:
+            self.items.insert(index, item)
+        self.update_order()
+
+    def update_order(self):
+        for index, item in enumerate(self.items):
+            padx = 0
+            pady = 0
+            ipadx = 10
+            if isinstance(item, SkSeparator):
+                pady = 2
+            else:
+                padx = 3
+                if index != len(self.items):
+                    pady = (2, 0)
+                elif ipadx == 0:
+                    pady = (0, 2)
+                else:
+                    pady = (2, 4)
+            item.box(side="top", padx=padx, pady=pady, ipadx=ipadx)
 
     def add_command(self, text: str | None = None, **kwargs):
         button = SkMenuItem(self, text=text, **kwargs)
-        button.box(side="top", padx=5, pady=(1, 3), ipadx=10)
         self.add(button)
         return button.id
 
@@ -30,7 +54,6 @@ class SkPopupMenu(SkPopup):
 
     def add_checkitem(self, text: str | None = None, **kwargs):
         checkitem = SkCheckItem(self, text=text, **kwargs)
-        checkitem.box(side="top", padx=5, pady=(1, 3), ipadx=10)
         self.add(checkitem)
         return checkitem.id
 
@@ -38,7 +61,6 @@ class SkPopupMenu(SkPopup):
 
     def add_radioitem(self, text: str | None = None, **kwargs):
         radioitem = SkRadioItem(self, text=text, **kwargs)
-        radioitem.box(side="top", padx=5, pady=(1, 3), ipadx=10)
         self.add(radioitem)
         return radioitem.id
 
@@ -46,7 +68,6 @@ class SkPopupMenu(SkPopup):
 
     def add_separator(self, **kwargs):
         separator = SkSeparator(self, **kwargs)
-        separator.box(side="top", padx=0, pady=0, ipadx=10)
         self.add(separator)
         return separator.id
 

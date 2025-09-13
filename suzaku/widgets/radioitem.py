@@ -3,8 +3,8 @@ import typing
 import skia
 
 from ..var import SkVar
-from .radiobox import SkRadioBox
 from .frame import SkFrame
+from .radiobox import SkRadioBox
 from .text import SkText
 
 

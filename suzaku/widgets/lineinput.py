@@ -17,7 +17,7 @@ import skia
 
 from .. import SkColor
 from ..event import SkEvent
-from ..styles.color import skcolor2color, style_to_color
+from ..styles.color import skcolor_to_color, style_to_color
 from ..var import SkStringVar
 from .container import SkContainer
 from .widget import SkWidget
@@ -644,21 +644,23 @@ class SkLineInput(SkWidget):
         self._rect = rect
 
         # 【各可选属性设置】
-        fg = skcolor2color(style_to_color(fg, self.theme))  # 【设置文本颜色】
+        fg = skcolor_to_color(style_to_color(fg, self.theme))  # 【设置文本颜色】
         if bg:
-            bg = skcolor2color(style_to_color(bg, self.theme))  # 【设置背景颜色】
+            bg = skcolor_to_color(style_to_color(bg, self.theme))  # 【设置背景颜色】
         else:
             bg = skia.ColorTRANSPARENT
 
         if placeholder:
-            placeholder = skcolor2color(
+            placeholder = skcolor_to_color(
                 style_to_color(placeholder, self.theme)
             )  # 【设置占位符颜色】
         else:
             placeholder = fg
 
         if cursor:
-            cursor = skcolor2color(style_to_color(cursor, self.theme))  # 设置光标颜色
+            cursor = skcolor_to_color(
+                style_to_color(cursor, self.theme)
+            )  # 设置光标颜色
         else:
             cursor = fg
 

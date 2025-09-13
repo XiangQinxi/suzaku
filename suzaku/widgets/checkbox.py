@@ -2,9 +2,9 @@ import typing
 
 import skia
 
-from ..var import SkBooleanVar
 from ..event import SkEvent
-from ..styles.color import skcolor2color, style_to_color
+from ..styles.color import skcolor_to_color, style_to_color
+from ..var import SkBooleanVar
 from .widget import SkWidget
 
 
@@ -60,7 +60,7 @@ class SkCheckBox(SkWidget):
         real_points = [(left + p[0] * width, top + p[1] * height) for p in points]
 
         paint = skia.Paint(
-            Color=skcolor2color(style_to_color(fg, self.theme)),
+            Color=skcolor_to_color(style_to_color(fg, self.theme)),
             StrokeWidth=2,  # 动态线条粗细
             Style=skia.Paint.kStroke_Style,
             AntiAlias=self.anti_alias,

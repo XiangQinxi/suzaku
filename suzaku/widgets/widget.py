@@ -7,7 +7,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor2color, style_to_color
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -326,7 +326,7 @@ class SkWidget(SkEventHanding, SkMisc):
             return skia.Paint(AntiAlias=anti_alias, Color=fg_)
 
         text_paint = cache_paint(
-            self.anti_alias, skcolor2color(style_to_color(fg, self.theme))
+            self.anti_alias, skcolor_to_color(style_to_color(fg, self.theme))
         )
 
         text_width = self.measure_text(text)
@@ -344,7 +344,7 @@ class SkWidget(SkEventHanding, SkMisc):
         )
 
         if bg:
-            bg = skcolor2color(style_to_color(bg, self.theme))
+            bg = skcolor_to_color(style_to_color(bg, self.theme))
             bg_paint = skia.Paint(AntiAlias=self.anti_alias, Color=bg)
             canvas.drawRoundRect(
                 rect=skia.Rect.MakeLTRB(
@@ -449,7 +449,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStrokeAndFill_Style,
             )
-            bg = skcolor2color(style_to_color(bg, self.theme))
+            bg = skcolor_to_color(style_to_color(bg, self.theme))
 
             # Background
             bg_paint.setStrokeWidth(width)
@@ -474,7 +474,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStroke_Style,
             )
-            bd = skcolor2color(style_to_color(bd, self.theme))
+            bd = skcolor_to_color(style_to_color(bd, self.theme))
 
             # Border
             bd_paint.setStrokeWidth(width)
@@ -513,7 +513,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStrokeAndFill_Style,
             )
-            bg = skcolor2color(style_to_color(bg, self.theme))
+            bg = skcolor_to_color(style_to_color(bg, self.theme))
 
             # Background
             bg_paint.setStrokeWidth(width)
@@ -534,7 +534,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStroke_Style,
             )
-            bd = skcolor2color(style_to_color(bd, self.theme))
+            bd = skcolor_to_color(style_to_color(bd, self.theme))
 
             # Border
             bd_paint.setStrokeWidth(width)
@@ -573,7 +573,9 @@ class SkWidget(SkEventHanding, SkMisc):
                     for key, value in bg.items():
                         match key.lower():
                             case "color":
-                                _bg = skcolor2color(style_to_color(value, self.theme))
+                                _bg = skcolor_to_color(
+                                    style_to_color(value, self.theme)
+                                )
                                 bg_paint.setColor(_bg)
                             case "lg" | "linear_gradient":
                                 self.gradient.linear(
@@ -589,7 +591,7 @@ class SkWidget(SkEventHanding, SkMisc):
     def _draw_line(
         self, canvas: skia.Canvas, x0, y0, x1, y1, fg=skia.ColorGRAY, width: int = 1
     ):
-        fg = skcolor2color(style_to_color(fg, self.theme))
+        fg = skcolor_to_color(style_to_color(fg, self.theme))
         paint = skia.Paint(Color=fg, StrokeWidth=width)
 
         canvas.drawLine(x0, y0, x1, y1, paint)
@@ -911,8 +913,8 @@ class SkWidget(SkEventHanding, SkMisc):
     def box(
         self,
         side: Literal["top", "bottom", "left", "right"] = "top",
-        padx: int | float | tuple[int | float, int | float] = 10,
-        pady: int | float | tuple[int | float, int | float] = 10,
+        padx: int | float | tuple[int | float, int | float] = 5,
+        pady: int | float | tuple[int | float, int | float] = 5,
         ipadx: int | float | tuple[int | float, int | float] | None = None,
         ipady: int | float | tuple[int | float, int | float] | None = None,
         expand: bool | tuple[bool, bool] = False,
