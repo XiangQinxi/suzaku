@@ -46,6 +46,22 @@ class SkTabButton(SkTextButton):
         super().draw_widget(canvas, rect, style_name)
 
         style = self.theme.get_style(style_name)
+        if "underline" in style:
+            underline = style["underline"]
+        else:
+            underline = "transparent"
+        if "underline_width" in style:
+            underline_width = style["underline_width"]
+        else:
+            underline_width = 0
+        if "underline_shader" in style:
+            underline_shader = style["underline_shader"]
+        else:
+            underline_shader = None
+        if "underline_shadow" in style:
+            underline_shadow = style["underline_shadow"]
+        else:
+            underline_shadow = None
 
         if self.selected:
             self._draw_line(
@@ -54,6 +70,8 @@ class SkTabButton(SkTextButton):
                 self.canvas_y + self.height,
                 self.canvas_x + self.width,
                 self.canvas_y + self.height,
-                width=style["underline_width"],
-                fg=style["underline"],
+                width=underline_width,
+                fg=underline,
+                shader=underline_shader,
+                shadow=underline_shadow,
             )

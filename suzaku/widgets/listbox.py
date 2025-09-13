@@ -2,10 +2,12 @@ import typing
 
 import skia
 
+from ..const import Orient
 from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
 from .listitem import SkListItem
+from .separator import SkSeparator
 
 
 class SkListBox(SkCard):
@@ -27,6 +29,23 @@ class SkListBox(SkCard):
             self.append(item)
 
         self.bind_scroll_event()
+
+    def update_order(self):
+        for index, item in enumerate(self.items):
+            padx = 0
+            pady = 0
+            ipadx = 10
+            if isinstance(item, SkSeparator):
+                pady = 2
+            else:
+                padx = 3
+                if index != len(self.items) - 1:
+                    pady = (2, 0)
+                elif ipadx == 0:
+                    pady = (0, 2)
+                else:
+                    pady = (2, 4)
+            item.box(side="top", padx=padx, pady=pady, ipadx=ipadx)
 
     def selected(
         self, item: SkListItem | None = None
@@ -51,4 +70,4 @@ class SkListBox(SkCard):
         elif isinstance(item, str):
             item = SkListItem(self, text=item)
             self.items.append(item)
-        item.box(side="top", padx=2, pady=(2, 0))
+        self.update_order()

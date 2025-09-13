@@ -450,8 +450,8 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["rainbow"] = None,
-        bg_shader: None | Literal["rainbow"] = None,
+        bd_shader: None | Literal["linear_gradient"] = None,
+        bg_shader: None | Literal["linear_gradient"] = None,
     ):
         """Draw the frame
 
@@ -505,9 +505,6 @@ class SkWidget(SkEventHanding, SkMisc):
                             config=bg_shader["linear_gradient"],
                             paint=bg_paint,
                         )
-                else:
-                    if bg_shader.lower() == "rainbow":
-                        self._draw_rainbow_shader(bg_paint, rect)
             if is_custom_radius:
                 canvas.drawPath(path, bg_paint)
             else:
@@ -530,9 +527,6 @@ class SkWidget(SkEventHanding, SkMisc):
                             config=bd_shader["linear_gradient"],
                             paint=bd_paint,
                         )
-                else:
-                    if bd_shader.lower() == "rainbow":
-                        self._draw_rainbow_shader(bd_paint, rect)
             if is_custom_radius:
                 canvas.drawPath(path, bd_paint)
             else:
@@ -550,8 +544,8 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["rainbow"] = None,
-        bg_shader: None | Literal["rainbow"] = None,
+        bd_shader: None | Literal["linear_gradient"] = None,
+        bg_shader: None | Literal["linear_gradient"] = None,
     ):
         if bg:
             bg_paint = skia.Paint(
@@ -634,11 +628,32 @@ class SkWidget(SkEventHanding, SkMisc):
             canvas.drawRoundRect(rect, radius, radius, bg_paint)
 
     def _draw_line(
-        self, canvas: skia.Canvas, x0, y0, x1, y1, fg=skia.ColorGRAY, width: int = 1
+        self,
+        canvas: skia.Canvas,
+        x0,
+        y0,
+        x1,
+        y1,
+        fg=skia.ColorGRAY,
+        width: int = 1,
+        shader: None | typing.Literal["linear_gradient"] = None,
+        shadow: (
+            None | tuple[int | float, int | float, int | float, int | float, str]
+        ) = None,
     ):
         fg = skcolor_to_color(style_to_color(fg, self.theme))
         paint = skia.Paint(Color=fg, StrokeWidth=width)
-
+        if shader:
+            if isinstance(shader, dict):
+                if "linear_gradient" in shader:
+                    self.gradient.linear(
+                        widget=self,
+                        config=shader["linear_gradient"],
+                        paint=paint,
+                    )
+        if shadow:
+            shadow = SkDropShadow(config_list=shadow)
+            shadow.draw(paint)
         canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod

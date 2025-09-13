@@ -36,7 +36,7 @@ class SkPopupMenu(SkPopup):
                 pady = 2
             else:
                 padx = 3
-                if index != len(self.items):
+                if index != len(self.items) - 1:
                     pady = (2, 0)
                 elif ipadx == 0:
                     pady = (0, 2)

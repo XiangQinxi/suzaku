@@ -13,7 +13,7 @@ class SkTabs(SkCard):
         self.tabs = []
         self.selected: SkFrame | None = None
         self.tabbar: SkTabBar = SkTabBar(self)
-        self.tabbar.box(side="top", padx=2, pady=2)
+        self.tabbar.box(side="top", padx=2, pady=(2, 0))
         self.tabbar.bind("selected", self._select)
         self.separator = SkSeparator(self, orient=Orient.H)
         self.separator.box(side="top", padx=0, pady=0)

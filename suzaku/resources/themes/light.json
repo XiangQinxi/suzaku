@@ -249,7 +249,7 @@
     "SkListBox.Item": {
       "rest": {
         "size": [0, 32],
-        "radius": 5,
+        "radius": 3,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
         "width": 0
@@ -265,9 +265,10 @@
         "width": 0
       },
       "selected": {
-        "bg": [0, 0, 0, 35],
+        "bg": [0, 0, 0, 10],
+        "bd": [25, 125, 225, 235],
         "fg": {"color_palette": "fg"},
-        "width": 0
+        "width": 2
       }
     },
 
