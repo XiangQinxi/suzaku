@@ -6,7 +6,8 @@
   "color_palette": {
     "bg": [20, 20, 20, 255],
     "bd": [50, 50, 50, 255],
-    "fg": [255, 255, 255, 245]
+    "fg": [255, 255, 255, 245],
+    "second_bg": [30, 30, 30, 255]
   },
 
   "styles": {
@@ -123,12 +124,22 @@
       }
     },
 
+    "SkMenuBar": {
+      "rest": {
+        "size": [0, 38],
+        "fg": {"color_palette": "bd"},
+        "radius": 0,
+        "bg": {"color_palette": "second_bg"},
+        "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]],
+        "width": 2
+      }
+    },
+
     "SkCard": {
       "rest": {
         "size": [0, 0],
-        "radius": 8,
-        "bg": [30, 30, 30, 255],
-        "bd": [50, 50, 50, 245],
+        "bg": {"color_palette": "second_bg"},
+        "fg": {"color_palette": "bd"},
         "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]],
         "width": 2
       }
@@ -266,6 +277,55 @@
       "rest": {
         "fg": {"color_palette": "bd"},
         "width": 2
+      }
+    },
+
+    "SkTabs": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [30, 30, 30, 255],
+        "bd": [50, 50, 50, 245],
+        "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]],
+        "width": 2
+      }
+    },
+
+    "SkTabBar.Button": {
+      "rest": {
+        "size": [0, 32],
+        "radius": 5,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [255, 255, 255, 15],
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 25],
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "selected": {
+        "bg": [40, 40, 40, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": [
+              [35, 35, 35, 255],
+              [50, 50, 50, 255]
+            ]
+          }
+        },
+        "fg": {"color_palette": "fg"},
+        "width": 0,
+        "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 50]],
+        "underline": [40, 130, 255, 255],
+        "underline_width": 3
       }
     },
 

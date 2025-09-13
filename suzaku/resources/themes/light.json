@@ -128,7 +128,11 @@
 
     "SkMenuBar": {
       "rest": {
-        "size": [0, 38]
+        "size": [0, 38],
+        "fg": {"color_palette": "bd"},
+        "bg": {"color_palette": "second_bg"},
+        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "width": 2
       }
     },
 
@@ -318,6 +322,16 @@
         "bd": {"color_palette": "bd"},
         "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
         "width": 2
+      }
+    },
+
+    "SkTabBar": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 0,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
       }
     },
 

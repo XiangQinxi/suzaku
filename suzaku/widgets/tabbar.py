@@ -1,12 +1,12 @@
-from .widget import SkWidget
 from .container import SkContainer
 from .frame import SkFrame
 from .tabbutton import SkTabButton
+from .widget import SkWidget
 
 
 class SkTabBar(SkFrame):
-    def __init__(self, parent: SkContainer, **kwargs):
-        super().__init__(parent, **kwargs)
+    def __init__(self, parent: SkContainer, style: str = "SkTabBar", **kwargs):
+        super().__init__(parent, style=style, **kwargs)
 
         self.event_generate("selected")
 

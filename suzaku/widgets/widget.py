@@ -7,7 +7,8 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme

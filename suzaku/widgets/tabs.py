@@ -13,11 +13,16 @@ class SkTabs(SkCard):
         self.selected: SkFrame | None = None
         self.tabbar: SkTabBar = SkTabBar(self)
         self.tabbar.box(side="top", padx=2, pady=2)
-        self.tabbar.bind("selected", self.select)
+        self.tabbar.bind("selected", self._select)
         self.separator = SkSeparator(self, orient="horizontal")
         self.separator.box(side="top", padx=0, pady=0)
 
     def select(self, index: int) -> None:
+        self.tabbar.select(index)
+
+    def _select(self, index: int) -> None:
+        if self.tabbar.items[index] == self.selected:
+            return
         if self.selected:
             self.selected.layout_forget()
         self.selected = self.tabs[index]
@@ -26,4 +31,3 @@ class SkTabs(SkCard):
     def add(self, tab: SkContainer, text: str | None = "") -> None:
         self.tabs.append(tab)
         self.tabbar.add(text)
-        self.select(0)

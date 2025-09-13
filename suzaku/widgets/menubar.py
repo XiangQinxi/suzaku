@@ -1,6 +1,9 @@
 from typing import Callable
 
-from .card import SkFrame
+import skia
+
+from ..styles.color import skcolor_to_color
+from .card import SkCard
 from .checkitem import SkCheckItem
 from .menu import SkMenu
 from .menuitem import SkMenuItem
@@ -9,13 +12,26 @@ from .separator import SkSeparator
 from .window import SkWindow
 
 
-class SkMenuBar(SkFrame):
+class SkMenuBar(SkCard):
     def __init__(self, parent: SkWindow, *, style: str = "SkMenuBar", **kwargs):
         super().__init__(parent, style=style, **kwargs)
 
         self.items: list[
             SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem | SkMenu
         ] = []
+
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
+        super().draw_widget(canvas, rect)
+        style = self.theme.get_style(self.style)
+        self._draw_line(
+            canvas,
+            self.canvas_x,
+            self.canvas_y + self.height,
+            self.canvas_x + self.width,
+            self.canvas_y + self.height,
+            fg=style["fg"],
+            width=style["width"],
+        )
 
     def add(self, item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem | SkMenu):
         self.items.append(item)

@@ -47,58 +47,79 @@ if __name__ == "__main__":
         menubar.add_separator()
         menubar.add_command("Exit", command=window.destroy)
 
-        def change_theme(event: SkEvent):
-            _text = event.widget.cget("text")
-            if _text == "Light":
-                window.apply_theme(default_theme)
-            elif _text == "Dark":
-                window.apply_theme(dark_theme)
+        tabs = SkTabs(window)
 
-        frame = SkCard(window)
+        def tab1():
+            tab_widgets = SkFrame(tabs)
+            tab_widgets.bind_scroll_event()
+            tabs.add(tab_widgets, text="Widgets")
 
-        SkTextButton(frame, text="This is a SkTextButton").box(padx=10, pady=(10, 0))
+            SkTextButton(tab_widgets, text="This is a SkTextButton").box(
+                padx=10, pady=(10, 0)
+            )
 
-        SkCheckButton(
-            frame,
-            text="This is a CheckBox",
-            variable=var1,
-        ).box(padx=10, pady=(10, 0))
+            SkCheckButton(
+                tab_widgets,
+                text="This is a CheckBox",
+                variable=var1,
+            ).box(padx=10, pady=(10, 0))
 
-        SkRadioButton(frame, text="SkRadioItem 1", value=False, variable=var1).box(
-            padx=10, pady=(10, 0)
-        )
-        SkRadioButton(frame, text="SkRadioItem 2", value=True, variable=var1).box(
-            padx=10, pady=(10, 0)
-        )
+            SkRadioButton(
+                tab_widgets, text="SkRadioItem 1", value=False, variable=var1
+            ).box(padx=10, pady=(10, 0))
+            SkRadioButton(
+                tab_widgets, text="SkRadioItem 2", value=True, variable=var1
+            ).box(padx=10, pady=(10, 0))
 
-        SkSeparator(frame).box(padx=0, pady=(10, 0))
+            SkSeparator(tab_widgets).box(padx=0, pady=(10, 0))
 
-        SkText(frame, text="This is a SkText").box(padx=10, pady=(10, 0))
-        # SkCheckItem(frame, text="这是一个复选框").box(padx=10, pady=10)
+            SkText(tab_widgets, text="This is a SkText").box(padx=10, pady=(10, 0))
+            # SkCheckItem(tab_widgets, text="这是一个复选框").box(padx=10, pady=10)
 
-        var2 = SkStringVar()
-        SkEntry(frame, placeholder="TextVariable", textvariable=var2).box(
-            padx=10, pady=(10, 0)
-        )
-        SkEntry(frame, placeholder="Password", textvariable=var2, show="●").box(
-            padx=10, pady=(10, 0)
-        )
-        SkLabel(frame, textvariable=var2).box(padx=10, pady=(10, 0))
+            var2 = SkStringVar()
+            SkEntry(tab_widgets, placeholder="TextVariable", textvariable=var2).box(
+                padx=10, pady=(10, 0)
+            )
+            SkEntry(
+                tab_widgets, placeholder="Password", textvariable=var2, show="●"
+            ).box(padx=10, pady=(10, 0))
+            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 0))
 
-        SkSeparator(frame).box(padx=0, pady=(10, 0))
+        tab1()
 
-        SkText(frame, text="Theme Mode", align="left").box(padx=10, pady=(10, 0))
+        def tab2():
+            tab_settings = SkFrame(tabs)
+            tabs.add(tab_settings, text="Settings")
 
-        listbox = SkListBox(frame, items=["Light", "Dark"])
-        listbox.bind(
-            "changed",
-            change_theme,
-        )
-        listbox.selected_index(1)
-        listbox.box(padx=10, pady=(10, 0))
+            def change_theme(event: SkEvent):
+                _text = event.widget.cget("text")
+                if _text == "Light":
+                    window.apply_theme(default_theme)
+                elif _text == "Dark":
+                    window.apply_theme(dark_theme)
 
-        frame.box(padx=10, pady=10, expand=True)
-        frame.bind_scroll_event()
+            SkText(tab_settings, text="Theme Mode", align="left").box(
+                padx=10, pady=(10, 0)
+            )
+
+            listbox = SkListBox(tab_settings, items=["Light", "Dark"])
+            listbox.bind(
+                "changed",
+                change_theme,
+            )
+            listbox.selected_index(1)
+            listbox.box(padx=10, pady=(10, 0))
+
+            SkTextButton(
+                tab_settings,
+                text="Save To Screenshot (wait 3s)",
+                command=lambda: window.after(3, lambda: window.save()),
+            ).box(padx=10, pady=(10, 0))
+
+        tab2()
+
+        tabs.select(0)
+        tabs.box(padx=10, pady=10, expand=True)
 
         SkTextButton(window, text="Create New window", command=create1window).box(
             padx=10, pady=(5, 0)
