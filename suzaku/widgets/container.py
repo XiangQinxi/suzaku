@@ -3,7 +3,7 @@ import typing
 
 import skia
 
-from ..con import Orient
+from ..constants import Orient
 from ..event import SkEvent
 
 

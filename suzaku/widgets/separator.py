@@ -2,7 +2,7 @@ import typing
 
 import skia
 
-from ..con import Orient
+from ..constants import Orient
 from .widget import SkWidget
 
 
