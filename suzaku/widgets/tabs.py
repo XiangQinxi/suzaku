@@ -1,3 +1,4 @@
+from ..con import Orient
 from .card import SkCard
 from .container import SkContainer
 from .frame import SkFrame
@@ -14,7 +15,7 @@ class SkTabs(SkCard):
         self.tabbar: SkTabBar = SkTabBar(self)
         self.tabbar.box(side="top", padx=2, pady=2)
         self.tabbar.bind("selected", self._select)
-        self.separator = SkSeparator(self, orient="horizontal")
+        self.separator = SkSeparator(self, orient=Orient.H)
         self.separator.box(side="top", padx=0, pady=0)
 
     def select(self, index: int) -> None:
@@ -26,7 +27,7 @@ class SkTabs(SkCard):
         if self.selected:
             self.selected.layout_forget()
         self.selected = self.tabs[index]
-        self.selected.box(side="bottom", expand=True)
+        self.selected.box(side="bottom", expand=True, padx=0, pady=(5, 2))
 
     def add(self, tab: SkContainer, text: str | None = "") -> None:
         self.tabs.append(tab)

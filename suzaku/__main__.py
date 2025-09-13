@@ -71,7 +71,7 @@ if __name__ == "__main__":
                 tab_widgets, text="SkRadioItem 2", value=True, variable=var1
             ).box(padx=10, pady=(10, 0))
 
-            SkSeparator(tab_widgets).box(padx=0, pady=(10, 0))
+            SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
             SkText(tab_widgets, text="This is a SkText").box(padx=10, pady=(10, 0))
             # SkCheckItem(tab_widgets, text="这是一个复选框").box(padx=10, pady=10)

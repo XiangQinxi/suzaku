@@ -107,6 +107,7 @@ class SkLineInput(SkWidget):
         :param event: SkEvent
         :return: None
         """
+        return
         if event.y_offset > 0 or event.x_offset > 0:
             self.cursor_right()
         elif event.y_offset < 0 or event.x_offset < 0:

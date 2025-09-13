@@ -48,7 +48,7 @@ class SkMenuBar(SkCard):
         self.add(button)
         return button.id
 
-    def add_separator(self, orient: str = "vertical", **kwargs):
+    def add_separator(self, orient: str = "v", **kwargs):
         separator = SkSeparator(self, orient=orient, **kwargs)
         separator.box(side="left", padx=0, pady=3)
         self.add(separator)

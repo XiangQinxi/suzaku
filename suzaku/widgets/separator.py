@@ -2,10 +2,8 @@ import typing
 
 import skia
 
+from ..con import Orient
 from .widget import SkWidget
-
-H = HORIZONTAL = "horizontal"
-V = VERTICAL = "vertical"
 
 
 class SkSeparator(SkWidget):
@@ -14,16 +12,16 @@ class SkSeparator(SkWidget):
         master=None,
         *,
         style: str = "SkSeparator",
-        orient: typing.Literal["horizontal", "vertical"] | None = None,
+        orient: Orient | None = Orient.H,
         **kwargs,
     ):
         super().__init__(master, style=style, **kwargs)
 
         if orient is None:
-            orient = HORIZONTAL
+            orient = Orient.H
 
         width = self.theme.get_style_attr(self.style, "width")
-        if orient == HORIZONTAL:
+        if orient == Orient.H:
             self.configure(dheight=width)
         else:
             self.configure(dwidth=width)
@@ -38,12 +36,12 @@ class SkSeparator(SkWidget):
         width = self.theme.get_style_attr(self.style, "width")
         # print(self.id, orient)
 
-        if orient == HORIZONTAL:
+        if orient == Orient.H:
             self.configure(dheight=width)
         else:
             self.configure(dwidth=width)
 
-        if orient == HORIZONTAL:
+        if orient == Orient.H:
             self._draw_line(
                 canvas,
                 x0=rect.left(),
