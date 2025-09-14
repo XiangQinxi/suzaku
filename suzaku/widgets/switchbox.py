@@ -1,32 +1,21 @@
 import skia
 
+from ..var import SkBooleanVar
 from ..event import SkEvent
+from .checkbox import SkCheckBox
 from .container import SkContainer
 from .widget import SkWidget
 
 
-class SkSwitchBox(SkWidget):
+class SkSwitchBox(SkCheckBox):
     def __init__(
         self,
         parent: SkContainer,
         *,
         style: str = "SkSwitchBox",
-        cursor="hand",
-        command=None,
         **kwargs,
     ):
-        super().__init__(parent, style=style, cursor=cursor, **kwargs)
-        self.checked = False
-        self.attributes["command"] = command
-        self.bind("click", self._on_click)
-
-    def _on_click(self, event: SkEvent):
-        self.invoke()
-        if self.cget("command"):
-            self.cget("command")(self.checked)
-
-    def invoke(self):
-        self.checked = not self.checked
+        super().__init__(parent, style=style, **kwargs)
 
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name=None

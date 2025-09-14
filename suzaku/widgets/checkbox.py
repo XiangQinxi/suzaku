@@ -23,11 +23,12 @@ class SkCheckBox(SkWidget):
         super().__init__(*args, cursor=cursor, style=style, **kwargs)
         self.attributes["selected"] = selected
         self.attributes["variable"] = variable
+        self.attributes["command"] = command
 
         self.focusable = True
         self._checked: bool = False
         self.help_parent_scroll = True
-        self.command = command
+
         self.bind("click", lambda _: self.invoke())
 
     @property
@@ -40,8 +41,8 @@ class SkCheckBox(SkWidget):
         self._checked = not self.checked
         if self.cget("variable"):
             self.cget("variable").set(self._checked)
-        if self.command:
-            self.command()
+        if self.cget("command"):
+            self.cget("command")()
 
     def _on_click(self, event: SkEvent):
         self.invoke()

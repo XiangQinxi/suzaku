@@ -29,9 +29,7 @@ class SkSwitch(SkFrame):
         self.help_parent_scroll = True
 
         self.switchbox = SkSwitchBox(
-            self,
-            command=command,
-            cursor=cursor,
+            self, command=command, cursor=cursor, variable=variable
         )
         self.label = SkText(self, text=text, align="left", cursor=cursor)
 

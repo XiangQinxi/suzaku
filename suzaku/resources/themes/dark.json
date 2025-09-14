@@ -281,6 +281,55 @@
       }
     },
 
+    "SkSwitchBox": {
+      "rest": {
+        "size": [48, 20],
+        "radius": 99
+      },
+      "unchecked-rest": {
+        "bg": [25, 25, 25, 245],
+        "bd": [55, 55, 55, 245],
+        "width": 2,
+        "button": [230, 230, 230, 180],
+        "button-padding": 4
+      },
+      "unchecked-hover": {
+        "bg": [45, 45, 45, 245],
+        "bd": [55, 55, 55, 245],
+        "width": 2,
+        "button": [230, 230, 230, 190],
+        "button-padding": 3
+      },
+      "unchecked-pressed": {
+        "bg": [75, 75, 75, 245],
+        "bd": [55, 55, 55, 245],
+        "width": 2,
+        "button": [230, 230, 230, 180],
+        "button-padding": 5
+      },
+      "checked-rest": {
+        "bg": [40, 130, 255, 255],
+        "bd": [40, 130, 255, 235],
+        "width": 2,
+        "button": [0, 0, 0, 235],
+        "button-padding": 4
+      },
+      "checked-hover": {
+        "bg": [40, 130, 255, 215],
+        "bd": [40, 130, 255, 235],
+        "width": 2,
+        "button": [0, 0, 0, 235],
+        "button-padding": 3
+      },
+      "checked-pressed": {
+        "bg": [40, 130, 255, 180],
+        "bd": [40, 130, 255, 235],
+        "width": 2,
+        "button": [0, 0, 0, 235],
+        "button-padding": 5
+      }
+    },
+
     "SkTabs": {
       "rest": {
         "size": [0, 0],

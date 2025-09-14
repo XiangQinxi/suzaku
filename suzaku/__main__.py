@@ -71,7 +71,9 @@ if __name__ == "__main__":
                 tab_widgets, text="SkRadioItem 2", value=True, variable=var1
             ).box(padx=10, pady=(10, 0))
 
-            SkSwitch(tab_widgets, text="This is a SkSwitch").box(padx=10, pady=(10, 0))
+            SkSwitch(tab_widgets, text="This is a SkSwitch", variable=var1).box(
+                padx=10, pady=(10, 0)
+            )
 
             SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
