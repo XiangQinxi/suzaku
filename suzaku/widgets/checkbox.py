@@ -81,9 +81,9 @@ class SkCheckBox(SkWidget):
                 style_name = "SkCheckBox:focus"
             else:"""
         if self.checked:
-            style_name = "SkCheckBox:checked"
+            style_name = f"{self.style}:checked"
         else:
-            style_name = "SkCheckBox:unchecked"
+            style_name = f"{self.style}:unchecked"
         if self.is_mouse_floating:
             style_name = style_name + "-hover"
         else:
