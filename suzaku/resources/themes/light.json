@@ -318,7 +318,8 @@
     "SkSwitchBox": {
       "rest": {
         "size": [48, 20],
-        "radius": 99
+        "radius": 99,
+        "shape": "circle"
       },
       "unchecked-rest": {
         "bg": [230, 230, 230, 245],

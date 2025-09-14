@@ -282,10 +282,6 @@
     },
 
     "SkSwitchBox": {
-      "rest": {
-        "size": [48, 20],
-        "radius": 99
-      },
       "unchecked-rest": {
         "bg": [25, 25, 25, 245],
         "bd": [55, 55, 55, 245],

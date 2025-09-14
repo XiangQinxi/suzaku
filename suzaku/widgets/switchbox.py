@@ -20,6 +20,8 @@ class SkSwitchBox(SkCheckBox):
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name=None
     ) -> None:
+        rest_style = self.theme.get_style(self.style)
+
         if style_name is None:
             if self.checked:
                 style_name = f"{self.style}:checked"
@@ -66,7 +68,7 @@ class SkSwitchBox(SkCheckBox):
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style(self.style)["radius"],
+            radius=rest_style["radius"],
             bg_shader=bg_shader,
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
@@ -99,10 +101,34 @@ class SkSwitchBox(SkCheckBox):
             padding = style["button-padding"]
         else:
             padding = 0
-        self._draw_circle(
-            canvas,
-            x,
-            rect.centerY(),
-            radius=rect.height() / 2 - padding / 2,
-            bg=button,
-        )
+        if "shape" in rest_style:
+            shape = rest_style["shape"]
+        else:
+            shape = "circle"
+        if "radius2" in rest_style:
+            radius2 = rest_style["radius2"]
+        else:
+            radius2 = rest_style["radius"] / 2
+
+        match shape:
+            case "circle":
+                self._draw_circle(
+                    canvas,
+                    x,
+                    rect.centerY(),
+                    radius=rect.height() / 2 - padding / 2,
+                    bg=button,
+                )
+            case "rect":
+                button_rect = skia.Rect.MakeLTRB(
+                    x - rect.height() / 2 + padding / 2,
+                    rect.top() + padding / 2,
+                    x + rect.height() / 2 - padding / 2,
+                    rect.bottom() - padding / 2,
+                )
+                self._draw_rect(
+                    canvas,
+                    button_rect,
+                    radius=radius2,
+                    bg=button,
+                )
