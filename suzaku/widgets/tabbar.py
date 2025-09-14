@@ -17,7 +17,10 @@ class SkTabBar(SkFrame):
         self.selected_item = self.items[index]
         self.event_trigger("selected", index)
 
-    def add(self, text: str | None = None, **kwargs) -> None:
+    def add(
+        self, text: str | None = None, widget: SkWidget = None, **kwargs
+    ) -> SkTabButton:
         button = SkTabButton(self, text=text, **kwargs)
         button.box(side="left", padx=(3, 0), pady=3)
         self.items.append(button)
+        return button

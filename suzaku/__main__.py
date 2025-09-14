@@ -37,6 +37,7 @@ if __name__ == "__main__":
         popupmenu.add_checkitem("Agreed", variable=var1)
         popupmenu.add_radioitem("Simple", value=False, variable=var1)
         popupmenu.add_radioitem("Complex", value=True, variable=var1)
+        popupmenu.add_switch("Switch", variable=var1)
         popupmenu.add_separator()
         popupmenu.add_command(
             "Help", command=lambda: show_message(window, message="Hello")
@@ -54,13 +55,11 @@ if __name__ == "__main__":
             tab_widgets.bind_scroll_event()
             tabs.add(tab_widgets, text="Widgets")
 
-            SkTextButton(tab_widgets, text="This is a SkTextButton").box(
-                padx=10, pady=(10, 0)
-            )
+            SkTextButton(tab_widgets, text="SkTextButton").box(padx=10, pady=(10, 0))
 
             SkCheckButton(
                 tab_widgets,
-                text="This is a CheckBox",
+                text="SkCheckItem",
                 variable=var1,
             ).box(padx=10, pady=(10, 0))
 
@@ -71,13 +70,13 @@ if __name__ == "__main__":
                 tab_widgets, text="SkRadioItem 2", value=True, variable=var1
             ).box(padx=10, pady=(10, 0))
 
-            SkSwitch(tab_widgets, text="This is a SkSwitch", variable=var1).box(
+            SkSwitch(tab_widgets, text="SkSwitch", variable=var1).box(
                 padx=10, pady=(10, 0)
             )
 
             SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
-            SkText(tab_widgets, text="This is a SkText").box(padx=10, pady=(10, 0))
+            SkText(tab_widgets, text="SkText").box(padx=10, pady=(10, 0))
             # SkCheckItem(tab_widgets, text="这是一个复选框").box(padx=10, pady=10)
 
             var2 = SkStringVar()
@@ -95,11 +94,10 @@ if __name__ == "__main__":
             tab_settings = SkFrame(tabs)
             tabs.add(tab_settings, text="Settings")
 
-            def change_theme(event: SkEvent):
-                _text = event.widget.cget("text")
-                if _text == "Light":
+            def change_theme(index: int):
+                if index == 0:
                     window.apply_theme(default_theme)
-                elif _text == "Dark":
+                elif index == 1:
                     window.apply_theme(dark_theme)
 
             SkText(tab_settings, text="Theme Mode", align="left").box(
@@ -111,7 +109,7 @@ if __name__ == "__main__":
                 "changed",
                 change_theme,
             )
-            listbox.selected_index(1)
+            listbox.select(index=0)
             listbox.box(padx=10, pady=(10, 0))
 
             SkTextButton(

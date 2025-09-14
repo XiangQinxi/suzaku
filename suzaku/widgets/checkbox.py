@@ -29,7 +29,7 @@ class SkCheckBox(SkWidget):
         self._checked: bool = False
         self.help_parent_scroll = True
 
-        self.bind("click", lambda _: self.invoke())
+        self.bind("click", self._on_click)
 
     @property
     def checked(self) -> bool:

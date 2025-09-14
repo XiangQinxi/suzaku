@@ -36,8 +36,8 @@ from .radioitem import SkRadioItem as SkRadioButton
 from .radioitem import SkRadioItem as SkRadiobutton
 from .radioitem import SkRadioItem as SkRadioitem
 from .separator import SkSeparator  # ✅
-from .switchbox import SkSwitchBox  # ✅
 from .switch import SkSwitch  # ✅
+from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar
 from .tabbutton import SkTabButton
 from .tabs import SkTabs

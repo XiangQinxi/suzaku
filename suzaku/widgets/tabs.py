@@ -4,6 +4,7 @@ from .container import SkContainer
 from .frame import SkFrame
 from .separator import SkSeparator
 from .tabbar import SkTabBar
+from .widget import SkWidget
 
 
 class SkTabs(SkCard):
@@ -29,6 +30,6 @@ class SkTabs(SkCard):
         self.selected = self.tabs[index]
         self.selected.box(side="bottom", expand=True, padx=0, pady=(5, 2))
 
-    def add(self, tab: SkContainer, text: str | None = "") -> None:
+    def add(self, tab: SkContainer, text: str | None = "") -> SkWidget:
         self.tabs.append(tab)
-        self.tabbar.add(text)
+        return self.tabbar.add(text)

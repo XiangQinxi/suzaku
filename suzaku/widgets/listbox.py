@@ -30,6 +30,17 @@ class SkListBox(SkCard):
 
         self.bind_scroll_event()
 
+    def item(self, index: int) -> SkListItem:
+        """Get the item with the specified index.【获取指定索引的项】
+
+        :param int index: Item index.【项索引】
+        :return: Item.【项】
+        """
+        return self.items[index]
+
+    def index(self, item: SkListItem) -> int:
+        return self.items.index(item)
+
     def update_order(self):
         for index, item in enumerate(self.items):
             padx = 0
@@ -47,22 +58,18 @@ class SkListBox(SkCard):
                     pady = (2, 4)
             item.box(side="top", padx=padx, pady=pady, ipadx=ipadx)
 
-    def selected(
-        self, item: SkListItem | None = None
-    ) -> SkListItem | typing.Self | None:
+    def select(
+        self, item: SkListItem | None = None, index: int | None = None
+    ) -> int | typing.Self | None:
         if item:
             self.selected_item = item
-            self.event_trigger("changed", SkEvent(event_type="changed", widget=item))
+            self.event_trigger("changed", self.items.index(item))
             return self
-        return self.selected_item
-
-    def selected_index(self, index: int) -> typing.Self | int:
         if index:
-            self.selected(self.items[index])
+            self.selected_item = self.item(index)
+            self.event_trigger("changed", index)
             return self
-        if self.selected_item is None:
-            return -1
-        return self.items.index(self.selected_item)
+        return self.index(self.selected_item) if self.selected_item else None
 
     def append(self, item: SkListItem | str):
         if isinstance(item, SkListItem):

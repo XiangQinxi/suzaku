@@ -1,7 +1,7 @@
 import skia
 
-from ..var import SkBooleanVar
 from ..event import SkEvent
+from ..var import SkBooleanVar
 from .checkbox import SkCheckBox
 from .container import SkContainer
 from .widget import SkWidget
@@ -16,6 +16,17 @@ class SkSwitchBox(SkCheckBox):
         **kwargs,
     ):
         super().__init__(parent, style=style, **kwargs)
+
+    def _on_click(self, event: SkEvent):
+        center_x = self.canvas_x + self.width / 2
+        print(self.mouse_x, center_x)
+        if self.checked:
+            if self.mouse_x > center_x:
+                return
+        else:
+            if self.mouse_x < center_x:
+                return
+        self.invoke()
 
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name=None

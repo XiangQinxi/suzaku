@@ -3,8 +3,8 @@ import typing
 import skia
 
 from ..var import SkBooleanVar
-from .switchbox import SkSwitchBox
 from .frame import SkFrame
+from .switchbox import SkSwitchBox
 from .text import SkText
 
 

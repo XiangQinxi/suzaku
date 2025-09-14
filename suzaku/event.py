@@ -180,3 +180,4 @@ class SkEvent:
     # 【给出的值0为左键，1为右键，2为中键】
     x_offset: Optional[float] = None  # 【鼠标滚轮水平滚动偏移量】
     y_offset: Optional[float] = None  # 【鼠标滚轮垂直滚动偏移量】
+    index: Optional[int] = None  # 【索引】

@@ -31,7 +31,7 @@ class SkListItem(SkTextButton):
         return self.parent.selected_item == self
 
     def _on_click(self):
-        self.parent.selected(self)
+        self.parent.select(self)
 
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None

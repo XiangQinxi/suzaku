@@ -1,4 +1,4 @@
-# Suzaku 朱雀
+0# Suzaku 朱雀
 
 Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 
@@ -19,16 +19,9 @@ Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 python3 -m suzaku
 ```
 
-### 0.0.5
-![0.0.5-Light.png](https://youke1.picui.cn/s1/2025/08/18/68a2edc08c774.png)
-![0.0.5-Dark.png](https://youke1.picui.cn/s1/2025/08/18/68a2edc088e9e.png)
-
-### 0.0.2a1
-> This is an old version of the design, and it will be re-enabled in the future.
->
-> 这个是老版本的设计，未来将会将它重新启用
-
-![0.0.2a1.png](https://youke1.picui.cn/s1/2025/08/02/688dd38fc1d9a.png)
+### 0.1.1
+![0.1.1.png](https://i.postimg.cc/nLQnc4Kx/18c79b883afd9b6d1b44139b6fa2f1ec.png)
+![0.1.1-Dark.png](https://i.postimg.cc/gjc9R8hn/d3b64d01e06c87b8abc26efb99aa0663.png)
 
 ## Layout / 布局
 Each component can use layout methods to arrange itself, such as `widget.box()`, similar to `tkinter`. I think this approach is more concise and user-friendly.

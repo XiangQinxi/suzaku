@@ -6,6 +6,7 @@ from .menuitem import SkMenuItem
 from .popup import SkPopup
 from .radioitem import SkRadioItem
 from .separator import SkSeparator
+from .switch import SkSwitch
 from .window import SkWindow
 
 
@@ -14,11 +15,13 @@ class SkPopupMenu(SkPopup):
     def __init__(self, parent: SkWindow | SkContainer, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.items: list[SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem] = []
+        self.items: list[
+            SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem | SkSwitch
+        ] = []
 
     def add(
         self,
-        item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem,
+        item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem | SkSwitch,
         index: int = -1,
     ) -> None:
         if index == -1:
@@ -58,6 +61,11 @@ class SkPopupMenu(SkPopup):
         return checkitem.id
 
     add_checkbutton = add_checkitem
+
+    def add_switch(self, text: str | None = None, **kwargs):
+        switch = SkSwitch(self, text=text, **kwargs)
+        self.add(switch)
+        return switch.id
 
     def add_radioitem(self, text: str | None = None, **kwargs):
         radioitem = SkRadioItem(self, text=text, **kwargs)
