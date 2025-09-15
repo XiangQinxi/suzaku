@@ -10,17 +10,22 @@ class SkMenu(SkTextButton):
         parent: SkContainer,
         text: str = "",
         menu: SkPopupMenu = None,
+        style: str = "SkMenu",
         **kwargs,
     ):
-        super().__init__(parent, text=text, **kwargs)
+        super().__init__(parent, text=text, style=style, **kwargs)
 
         self.attributes["popupmenu"] = menu
         self.bind("click", self._on_click)
         self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
-        if self.cget("popupmenu"):
-            self.cget("popupmenu").popup(x=self.x, y=self.y + self.height + 10)
-            """from tkinter import Menu
-
-            Menu.add_cascade()"""
+        popupmenu: SkPopupMenu = self.cget("popupmenu")
+        if popupmenu and not self.cget("disabled"):
+            if popupmenu.is_popup:
+                popupmenu.hide()
+            else:
+                self.cget("popupmenu").popup(
+                    x=self.x - self.parent.x_offset,
+                    y=self.y - self.parent.y_offset + self.height + 10,
+                )

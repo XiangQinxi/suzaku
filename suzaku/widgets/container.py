@@ -3,6 +3,7 @@ import typing
 
 import skia
 
+from ..const import Orient
 from ..event import SkEvent
 
 
@@ -86,7 +87,7 @@ class SkContainer:
         self.scroll_speed: float | int = 18  # 滚动距离：滚动量x滚动速度
 
         self._grid_lists = []  # [ [row1, ], [] ]
-        self._box_direction = None  # h(horizontal) or v(vertical)
+        self._box_direction: Orient | None = None  # h(horizontal) or v(vertical)
         self._flow_row = 0
         self.allowed_out_of_bounds = (
             allowed_out_of_bounds  # 【是否允许组件超出容器范围】
@@ -107,8 +108,13 @@ class SkContainer:
             if self.is_mouse_floating:
                 self.scroll(event.x_offset * 18, event.y_offset * 18)
                 return
+
             for child in self.children:
-                if child.is_mouse_floating and child.help_parent_scroll:
+                if (
+                    child.is_mouse_floating
+                    and child.help_parent_scroll
+                    and child.parent == self
+                ):
                     self.scroll(event.x_offset * 18, event.y_offset * 18)
                     return
 
@@ -155,19 +161,19 @@ class SkContainer:
         if "box" in layout_config:
             side = layout_config["box"]["side"]
             if side == "left" or side == "right":
-                direction = "h"
+                direction = Orient.H
             elif side == "top" or side == "bottom":
-                direction = "v"
+                direction = Orient.V
             else:
                 raise ValueError("Box layout side must be left, right, top or bottom.")
 
-            if self._box_direction == "v":
-                if direction == "h":
+            if self._box_direction == Orient.V:
+                if direction == Orient.H:
                     raise ValueError(
                         "Box layout can only be used with vertical direction."
                     )
-            elif self._box_direction == "h":
-                if direction == "v":
+            elif self._box_direction == Orient.H:
+                if direction == Orient.V:
                     raise ValueError(
                         "Box layout can only be used with horizontal direction."
                     )
@@ -342,7 +348,7 @@ class SkContainer:
                 fixed_children.append(child)
 
         # Horizontal Layout
-        if self._box_direction == "h":
+        if self._box_direction == Orient.H:
             # Calculate the width of the fixed children
             fixed_width: int | float = 0  # Occupied width of all fixed widgets enabled
             for fixed_child in fixed_children:
@@ -373,8 +379,9 @@ class SkContainer:
                     child_layout_config["pady"],
                 )
 
+                child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.width = child.dheight
+                    child.width = child.dwidth
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom
@@ -393,8 +400,9 @@ class SkContainer:
                     child_layout_config["pady"],
                 )
 
+                child.width = width - left - right
                 if not child_layout_config["expand"]:
-                    child.width = child.dheight
+                    child.width = child.dwidth
                 else:
                     child.width = expanded_width - left - right
                 child.height = height - top - bottom

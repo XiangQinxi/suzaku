@@ -1,64 +1,82 @@
 import typing
 
-from ..event import SkEvent
-from .card import SkCard
+from .checkitem import SkCheckItem
 from .container import SkContainer
-from .menubutton import SkMenuButton
+from .menuitem import SkMenuItem
+from .popup import SkPopup
+from .radioitem import SkRadioItem
 from .separator import SkSeparator
+from .switch import SkSwitch
 from .window import SkWindow
 
 
-class SkPopupMenu(SkCard):
+class SkPopupMenu(SkPopup):
 
     def __init__(self, parent: SkWindow | SkContainer, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.focusable = True
+        self.items: list[
+            SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem | SkSwitch
+        ] = []
 
-        self.items: list[SkMenuButton | SkSeparator] = []
-        self.event_generate("hide")
-        self.bind("hide", self._hide)
-
-        # 【来检查是否需要关闭改弹出菜单】
-        self.window.bind("mouse_released", self._mouse_released)
-
-        self.skip = False
-
-    def popup(self, **kwargs):
-        self.focus_set()
-        if "width" in kwargs:
-            width = kwargs.pop("width")
+    def add(
+        self,
+        item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem | SkSwitch,
+        index: int = -1,
+    ) -> None:
+        if index == -1:
+            self.items.append(item)
         else:
-            width = None
-        if "height" in kwargs:
-            height = kwargs.pop("height")
-        else:
-            height = None
-        self.fixed(**kwargs, width=width, height=height)
+            self.items.insert(index, item)
+        self.update_order()
 
-    def _mouse_released(self, event: SkEvent):
-        if not self.is_focus:
-            self.hide()
+    def update_order(self):
+        for index, item in enumerate(self.items):
+            padx = 0
+            pady = 0
+            ipadx = 10
+            if isinstance(item, SkSeparator):
+                pady = 2
+            else:
+                padx = 3
+                if index != len(self.items) - 1:
+                    pady = (2, 0)
+                elif ipadx == 0:
+                    pady = (0, 2)
+                else:
+                    pady = (2, 4)
+            item.box(side="top", padx=padx, pady=pady, ipadx=ipadx)
 
-    def _hide(self, event: SkEvent):
-        if self.skip:
-            self.skip = False
-            return
-        self.hide()
-
-    def add_command(self, text: str = None, command: typing.Callable = None):
-        button = SkMenuButton(self, text=text, command=command)
-        button.box(side="top", padx=5, pady=(1, 3), ipadx=10)
-        self.items.append(button)
+    def add_command(self, text: str | None = None, **kwargs):
+        button = SkMenuItem(self, text=text, **kwargs)
+        self.add(button)
         return button.id
 
     def add_cascade(self):
         pass
 
-    def add_separator(self):
-        separator = SkSeparator(self)
-        separator.box(side="top", padx=0, pady=0, ipadx=10)
-        self.items.append(separator)
+    def add_checkitem(self, text: str | None = None, **kwargs):
+        checkitem = SkCheckItem(self, text=text, **kwargs)
+        self.add(checkitem)
+        return checkitem.id
+
+    add_checkbutton = add_checkitem
+
+    def add_switch(self, text: str | None = None, **kwargs):
+        switch = SkSwitch(self, text=text, **kwargs)
+        self.add(switch)
+        return switch.id
+
+    def add_radioitem(self, text: str | None = None, **kwargs):
+        radioitem = SkRadioItem(self, text=text, **kwargs)
+        self.add(radioitem)
+        return radioitem.id
+
+    add_radiobutton = add_radioitem
+
+    def add_separator(self, **kwargs):
+        separator = SkSeparator(self, **kwargs)
+        self.add(separator)
         return separator.id
 
     def remove_item(self, _id):

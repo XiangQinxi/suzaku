@@ -22,7 +22,7 @@ class SkVar(SkEventHanding):
         self._value: type = default_value if default_value is not None else value_type()
         self._value_type: type = value_type
 
-    def set(self, value: typing.Any) -> None:
+    def set(self, value: typing.Any) -> typing.Self:
         """
         Set the _value of the data, which will then trigger a `change` event.
         【设置数据的值，之后会触发change事件】
@@ -35,9 +35,10 @@ class SkVar(SkEventHanding):
         """
         if not type(value) is self._value_type:
             raise ValueError(f"Value must be {self._value_type}")
-        self._value = value
-        self.event_trigger("change", value)
-        return None
+        if self._value != value:
+            self._value = value
+            self.event_trigger("change", value)
+        return self
 
     def get(self) -> typing.Any:
         """

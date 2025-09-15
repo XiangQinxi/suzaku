@@ -494,7 +494,7 @@ class SkTheme:
                         color.SkColorWarning,
                     )
                     result = color.ERR_COLOR
-        if type(result) is dict:
+        if isinstance(result, dict):
             return result.copy()
         else:
             return result

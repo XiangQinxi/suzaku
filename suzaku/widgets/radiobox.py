@@ -4,72 +4,47 @@ import skia
 
 from ..event import SkEvent
 from ..styles.color import skcolor_to_color, style_to_color
-from ..var import SkBooleanVar
+from ..var import SkVar
 from .widget import SkWidget
 
 
-class SkCheckBox(SkWidget):
-
+class SkRadioBox(SkWidget):
     def __init__(
         self,
         *args,
         cursor: str | None = "hand",
         command: typing.Callable | None = None,
         selected: bool = False,
-        style: str = "SkCheckBox",
-        variable: SkBooleanVar | None = None,
+        style: str = "SkRadioBox",
+        value: bool | int | float | str | None = None,
+        variable: SkVar | None = None,
         **kwargs,
     ):
         super().__init__(*args, cursor=cursor, style=style, **kwargs)
         self.attributes["selected"] = selected
-        self.attributes["variable"] = variable
-        self.attributes["command"] = command
+        self.attributes["value"] = value
+        self.attributes["variable"]: SkVar = variable
 
         self.focusable = True
-        self._checked: bool = False
         self.help_parent_scroll = True
-
-        self.bind("click", self._on_click)
+        self.command = command
+        self.bind("click", lambda _: self.invoke())
 
     @property
     def checked(self) -> bool:
         if self.cget("variable"):
-            return self.cget("variable").get()
-        return self._checked
+            return self.cget("variable").get() == self.cget("value")
+        else:
+            return False
 
     def invoke(self):
-        self._checked = not self.checked
-        if self.cget("variable"):
-            self.cget("variable").set(self._checked)
-        if self.cget("command"):
-            self.cget("command")()
+        if self.attributes["variable"] is not None:
+            self.attributes["variable"].set(self.cget("value"))
+        if self.command:
+            self.command()
 
     def _on_click(self, event: SkEvent):
         self.invoke()
-
-    def _draw_checkmark(self, canvas: skia.Canvas, rect: skia.Rect, fg: skia.Color):
-        left, top = rect.left(), rect.top()
-        width, height = rect.width(), rect.height()
-
-        points = [
-            (0.2, 0.6),  # 起点
-            (0.4, 0.8),  # 中间拐点
-            (0.8, 0.2),  # 终点
-        ]
-
-        # 转换为实际坐标
-        real_points = [(left + p[0] * width, top + p[1] * height) for p in points]
-
-        paint = skia.Paint(
-            Color=skcolor_to_color(style_to_color(fg, self.theme)),
-            StrokeWidth=2,  # 动态线条粗细
-            Style=skia.Paint.kStroke_Style,
-            AntiAlias=self.anti_alias,
-        )
-
-        # 分段绘制线条
-        canvas.drawLine(*real_points[0], *real_points[1], paint)  # 左下到中间
-        canvas.drawLine(*real_points[1], *real_points[2], paint)  # 中间到右上
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """if self.is_mouse_floating:
@@ -110,9 +85,13 @@ class SkCheckBox(SkWidget):
             bd_shader = None
 
         if "width" in style:
-            width = style["width"]
+            width: int | float = style["width"]
         else:
-            width = 0
+            width: int | float = 0
+        if "inner_width" in style:
+            inner_width: int | float = style["inner_width"]
+        else:
+            inner_width: int | float = 3
         if "bd" in style:
             bd = style["bd"]
         else:
@@ -125,11 +104,12 @@ class SkCheckBox(SkWidget):
             fg = style["fg"]
         else:
             fg = None
-
-        self._draw_rect(
+        _ = min(rect.width(), rect.height())
+        self._draw_circle(
             canvas,
-            rect,
-            radius=self.theme.get_style(self.style)["radius"],
+            rect.centerX(),
+            rect.centerY(),
+            radius=_ / 2,
             bg=bg,
             width=width,
             bd=bd,
@@ -139,4 +119,12 @@ class SkCheckBox(SkWidget):
         )
 
         if self.checked:
-            self._draw_checkmark(canvas, rect, fg)
+            self._draw_circle(
+                canvas,
+                rect.centerX(),
+                rect.centerY(),
+                radius=_ / 2 - inner_width,
+                bg=fg,
+                width=0,
+                bg_shader=bg_shader,
+            )

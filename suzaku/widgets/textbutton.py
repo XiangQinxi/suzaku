@@ -7,7 +7,7 @@ from .container import SkContainer
 from .text import SkText
 
 
-class SkTextButton(SkText):
+class SkTextButton(SkButton, SkText):
     """A Button with Text
 
     :param args:
@@ -27,17 +27,17 @@ class SkTextButton(SkText):
         style: str = "SkButton",
         **kwargs,
     ) -> None:
-        super().__init__(parent=parent, text=text, style=style, **kwargs)
-
-        self.attributes["cursor"] = cursor
+        SkButton.__init__(self, parent=parent)
+        SkText.__init__(
+            self, parent=parent, text=text, style=style, cursor=cursor, **kwargs
+        )
 
         self.command = command
         self.focusable = True
         self.ipadx = 10
         self.help_parent_scroll = True
 
-        if command:
-            self.bind("click", lambda _: command())
+        self.bind("click", lambda _: self.invoke())
 
     @property
     def dwidth(self):
@@ -55,70 +55,42 @@ class SkTextButton(SkText):
 
     # region Draw
 
-    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
+    def draw_widget(
+        self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
+    ):
         """Draw the button
 
         :param canvas:
         :param rect:
+        :param style_name:
         :return:
         """
-        if self.is_mouse_floating:
-            if self.is_mouse_pressed:
-                style_name = f"{self.style}:pressed"
-            else:
-                style_name = f"{self.style}:hover"
-        else:
-            if "focus" in self.styles[self.style]:
-                if self.is_focus:
-                    style_name = f"{self.style}:focus"
+        if style_name is None:
+            if not self.cget("disabled"):
+                if self.is_mouse_floating:
+                    if self.is_mouse_pressed:
+                        style_name = f"{self.style}:pressed"
+                    else:
+                        style_name = f"{self.style}:hover"
                 else:
-                    style_name = self.style
+                    if "focus" in self.styles[self.style]:
+                        if self.is_focus:
+                            style_name = f"{self.style}:focus"
+                        else:
+                            style_name = self.style
+                    else:
+                        style_name = self.style
             else:
-                style_name = self.style
+                style_name = f"{self.style}:disabled"
 
         style = self.theme.get_style(style_name)
 
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in style:
-            width = style["width"]
-        else:
-            width = 0
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
-
         # Draw the button border
-        self._draw_rect(
-            canvas,
-            rect,
-            radius=self.theme.get_style(self.style)["radius"],
-            bg=bg,
-            width=width,
-            bd=bd,
-            bd_shadow=bd_shadow,
-            bd_shader=bd_shader,
-            bg_shader=bg_shader,
-        )
+        SkButton.draw_widget(self, canvas, rect, style_name)
 
         # Draw the button text
+        canvas.save()
+        canvas.clipRect(rect)
         self._draw_text(
             canvas,
             skia.Rect.MakeLTRB(
@@ -131,5 +103,6 @@ class SkTextButton(SkText):
             fg=style["fg"],
             align=self.cget("align"),
         )
+        canvas.restore()
 
     # endregion

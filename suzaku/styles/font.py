@@ -57,6 +57,7 @@ class SkFont:
         name: str = None,
         font_path: Path | str = None,
         size: int | float = 14,
+        anti_alias: bool = False,
     ) -> skia.Font:
         """
         Get font from path
@@ -67,6 +68,7 @@ class SkFont:
         :param font_path: Path to a font file.
         :param str name: Name of the local font.
         :param int | float size: SkFont size.
+        :param anti_alias: Whether to enable anti-alias.
 
         :return: skia.Font object
         """
@@ -79,6 +81,9 @@ class SkFont:
             _font = skia.Font(skia.Typeface.MakeFromFile(path=font_path), size)
         else:
             _font = skia.Font(skia.Typeface(None), size)
+        if anti_alias:
+            _font.setEdging(skia.Font.Edging.kSubpixelAntiAlias)
+            _font.setSubpixel(True)
         return _font
 
 

@@ -303,7 +303,7 @@ def style_to_color(
             return SkColor(ERR_COLOR)
 
 
-def skcolor2color(color: SkColor | int | list) -> int:
+def skcolor_to_color(color: SkColor | int | list) -> int:
     """Convert skia.Color to color object.
 
     :param color: SkColor object or skia.Color object

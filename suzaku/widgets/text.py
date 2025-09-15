@@ -27,10 +27,11 @@ class SkText(SkWidget):
         text: str | None | int | float = "",
         *,
         align="center",
+        style: str = "SkText",
         textvariable: SkStringVar = None,
         **kwargs,
     ):
-        super().__init__(parent=parent, **kwargs)
+        super().__init__(parent=parent, style=style, **kwargs)
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["text"]: str | None = str(text)
         self.attributes["font"]: skia.Font = default_font
@@ -71,6 +72,9 @@ class SkText(SkWidget):
     # region Draw
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
+        style = self.theme.get_style(self.style)
+        canvas.save()
+        canvas.clipRect(rect)
         self._draw_text(
             canvas,
             skia.Rect.MakeLTRB(
@@ -80,9 +84,10 @@ class SkText(SkWidget):
                 rect.bottom(),
             ),
             text=self.get(),
-            fg=self.theme.get_style_attr("SkText", "fg"),
+            fg=style["fg"],
             font=self.attributes["font"],
             align=self.cget("align"),
         )
+        canvas.restore()
 
     # endregion

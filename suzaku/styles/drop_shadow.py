@@ -1,6 +1,7 @@
 import skia
 
-from .color import skcolor2color
+from .color import skcolor_to_color
+from .theme import SkTheme
 
 
 class SkDropShadow:
@@ -13,7 +14,9 @@ class SkDropShadow:
     :param colr: The color of the drop shadow.
     """
 
-    def __init__(self, dx=0, dy=0, sigmaX=0, sigmaY=0, colr=None, config_list=None):
+    def __init__(
+        self, dx=0, dy=0, sigmaX=0, sigmaY=0, colr=None, config_list=None, theme=None
+    ):
         if config_list:
             self.dx = config_list[0]
             self.dy = config_list[1]
@@ -26,6 +29,7 @@ class SkDropShadow:
             self.sigmaX = sigmaX
             self.sigmaY = sigmaY
             self.colr = colr
+        self.theme: SkTheme = theme
 
     def draw(self, paint):
         """Set the ImageFilter property of a given `skia.Paint` to draw shadows.
@@ -59,10 +63,11 @@ class SkDropShadow:
         """
         if self.colr is None:
             return None
+        # colr = self.theme.get
         return skia.ImageFilters.DropShadow(
             dx=self.dx,
             dy=self.dy,
             sigmaX=self.sigmaX,
             sigmaY=self.sigmaY,
-            color=skcolor2color(self.colr),
+            color=skcolor_to_color(self.colr),
         )

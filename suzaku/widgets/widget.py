@@ -7,7 +7,8 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor2color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -32,6 +33,7 @@ class SkWidget(SkEventHanding, SkMisc):
         cursor: str = "arrow",
         style: str = "SkWidget",
         font: skia.Font | None = default_font,
+        disabled: bool = False,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -78,14 +80,13 @@ class SkWidget(SkEventHanding, SkMisc):
             "key_pressed": dict(),
             "key_released": dict(),
             "key_repeated": dict(),
+            "double_click": dict(),
             "char": dict(),
             "click": dict(),
             "configure": dict(),
             "update": dict(),
             "scroll": dict(),
         }
-
-        # TODO 制作个双击&三击事件
 
         # Mouse events
         buttons = [
@@ -108,6 +109,8 @@ class SkWidget(SkEventHanding, SkMisc):
             "dwidth": 100,  # default width
             "dheight": 30,  # default height
             "font": font,
+            "double_click_interval": 0.24,
+            "disabled": disabled,
         }
 
         self.apply_theme(self.parent.theme)
@@ -153,6 +156,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.is_focus: bool = False
         self.gradient = SkGradient()
         self.button: typing.Literal[0, 1, 2] = 0
+        self.click_time: float | int = 0
 
         def _on_mouse(event: SkEvent):
             self.mouse_x = event.x
@@ -200,7 +204,15 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         if self.button != 1:
             if self.is_mouse_floating:
+
                 self.event_trigger("click", event)
+                time = self.time()
+
+                if self.click_time + self.cget("double_click_interval") > time:
+                    self.event_trigger("double_click", event)
+                    self.click_time = 0
+                else:
+                    self.click_time = time
 
     # endregion
 
@@ -219,13 +231,13 @@ class SkWidget(SkEventHanding, SkMisc):
         def rect(x, y, w, h):
             return skia.Rect.MakeXYWH(x, y, w, h)
 
-        _rect = rect(self.canvas_x, self.canvas_y, self.width, self.height)
+        self.rect = rect(self.canvas_x, self.canvas_y, self.width, self.height)
 
-        self.draw_widget(canvas, _rect)
+        self.draw_widget(canvas, self.rect)
 
         if self.debug:
             canvas.drawRoundRect(
-                _rect,
+                self.rect,
                 0,
                 0,
                 skia.Paint(
@@ -315,7 +327,7 @@ class SkWidget(SkEventHanding, SkMisc):
             return skia.Paint(AntiAlias=anti_alias, Color=fg_)
 
         text_paint = cache_paint(
-            self.anti_alias, skcolor2color(style_to_color(fg, self.theme))
+            self.anti_alias, skcolor_to_color(style_to_color(fg, self.theme))
         )
 
         text_width = self.measure_text(text)
@@ -333,7 +345,7 @@ class SkWidget(SkEventHanding, SkMisc):
         )
 
         if bg:
-            bg = skcolor2color(style_to_color(bg, self.theme))
+            bg = skcolor_to_color(style_to_color(bg, self.theme))
             bg_paint = skia.Paint(AntiAlias=self.anti_alias, Color=bg)
             canvas.drawRoundRect(
                 rect=skia.Rect.MakeLTRB(
@@ -406,19 +418,40 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
+    @staticmethod
+    def unpacking_radius(
+        radius: (
+            int
+            | tuple[
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+            ]
+        ),
+    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
+        _radius: list[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = list(radius)
+        for i, r in enumerate(_radius):
+            if isinstance(r, int):
+                _radius[i] = (r, r)
+        radius = tuple(_radius)
+        return radius
+
     def _draw_rect(
         self,
         canvas: skia.Canvas,
-        rect: typing.Any,
-        radius: int = 0,
+        rect: skia.Rect,
+        radius: int | tuple[int, int, int, int] = 0,
         bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
         bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
         width: int | float = 0,
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["rainbow"] = None,
-        bg_shader: None | Literal["rainbow"] = None,
+        bd_shader: None | Literal["linear_gradient"] = None,
+        bg_shader: None | Literal["linear_gradient"] = None,
     ):
         """Draw the frame
 
@@ -432,13 +465,32 @@ class SkWidget(SkEventHanding, SkMisc):
         :param bd_shader: The shader of the border
 
         """
+        is_custom_radius = isinstance(radius, tuple | list)
+        if is_custom_radius:
+            rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
+            radii: tuple[
+                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+            ] = self.unpacking_radius(radius)
+            # 设置每个角的半径（支持X/Y不对称）
+            rrect.setRectRadii(
+                skia.Rect.MakeLTRB(*rect),
+                [
+                    skia.Point(*radii[0]),  # 左上
+                    skia.Point(*radii[1]),  # 右上
+                    skia.Point(*radii[2]),  # 右下
+                    skia.Point(*radii[3]),  # 左下
+                ],
+            )
+
+            path = skia.Path()
+            path.addRRect(rrect)
 
         if bg:
             bg_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStrokeAndFill_Style,
             )
-            bg = skcolor2color(style_to_color(bg, self.theme))
+            bg = skcolor_to_color(style_to_color(bg, self.theme))
 
             # Background
             bg_paint.setStrokeWidth(width)
@@ -453,17 +505,16 @@ class SkWidget(SkEventHanding, SkMisc):
                             config=bg_shader["linear_gradient"],
                             paint=bg_paint,
                         )
-                else:
-                    if bg_shader.lower() == "rainbow":
-                        self._draw_rainbow_shader(bg_paint, rect)
-
-            canvas.drawRoundRect(rect, radius, radius, bg_paint)
+            if is_custom_radius:
+                canvas.drawPath(path, bg_paint)
+            else:
+                canvas.drawRoundRect(rect, radius, radius, bg_paint)
         if bd and width > 0:
             bd_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStroke_Style,
             )
-            bd = skcolor2color(style_to_color(bd, self.theme))
+            bd = skcolor_to_color(style_to_color(bd, self.theme))
 
             # Border
             bd_paint.setStrokeWidth(width)
@@ -476,11 +527,66 @@ class SkWidget(SkEventHanding, SkMisc):
                             config=bd_shader["linear_gradient"],
                             paint=bd_paint,
                         )
-                else:
-                    if bd_shader.lower() == "rainbow":
-                        self._draw_rainbow_shader(bd_paint, rect)
+            if is_custom_radius:
+                canvas.drawPath(path, bd_paint)
+            else:
+                canvas.drawRoundRect(rect, radius, radius, bd_paint)
 
-            canvas.drawRoundRect(rect, radius, radius, bd_paint)
+    def _draw_circle(
+        self,
+        canvas: skia.Canvas,
+        cx: float | int,
+        cy: float | int,
+        radius: int | float = 0,
+        bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
+        width: int | float = 0,
+        bd_shadow: (
+            None | tuple[int | float, int | float, int | float, int | float, str]
+        ) = None,
+        bd_shader: None | Literal["linear_gradient"] = None,
+        bg_shader: None | Literal["linear_gradient"] = None,
+    ):
+        if bg:
+            bg_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStrokeAndFill_Style,
+            )
+            bg = skcolor_to_color(style_to_color(bg, self.theme))
+
+            # Background
+            bg_paint.setStrokeWidth(width)
+            bg_paint.setColor(bg)
+            shadow = SkDropShadow(config_list=bd_shadow)
+            shadow.draw(bg_paint)
+            if bg_shader:
+                if isinstance(bg_shader, dict):
+                    if "linear_gradient" in bg_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bg_shader["linear_gradient"],
+                            paint=bg_paint,
+                        )
+            canvas.drawCircle(cx, cy, radius, bg_paint)
+        if bd and width > 0:
+            bd_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStroke_Style,
+            )
+            bd = skcolor_to_color(style_to_color(bd, self.theme))
+
+            # Border
+            bd_paint.setStrokeWidth(width)
+            bd_paint.setColor(bd)
+            if bd_shader:
+                if isinstance(bd_shader, dict):
+                    if "linear_gradient" in bd_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bd_shader["linear_gradient"],
+                            paint=bd_paint,
+                        )
+            canvas.drawCircle(cx, cy, radius, bd_paint)
 
     def _draw_rect_new(
         self,
@@ -506,7 +612,9 @@ class SkWidget(SkEventHanding, SkMisc):
                     for key, value in bg.items():
                         match key.lower():
                             case "color":
-                                _bg = skcolor2color(style_to_color(value, self.theme))
+                                _bg = skcolor_to_color(
+                                    style_to_color(value, self.theme)
+                                )
                                 bg_paint.setColor(_bg)
                             case "lg" | "linear_gradient":
                                 self.gradient.linear(
@@ -520,11 +628,32 @@ class SkWidget(SkEventHanding, SkMisc):
             canvas.drawRoundRect(rect, radius, radius, bg_paint)
 
     def _draw_line(
-        self, canvas: skia.Canvas, x0, y0, x1, y1, fg=skia.ColorGRAY, width: int = 1
+        self,
+        canvas: skia.Canvas,
+        x0,
+        y0,
+        x1,
+        y1,
+        fg=skia.ColorGRAY,
+        width: int = 1,
+        shader: None | typing.Literal["linear_gradient"] = None,
+        shadow: (
+            None | tuple[int | float, int | float, int | float, int | float, str]
+        ) = None,
     ):
-        fg = skcolor2color(style_to_color(fg, self.theme))
+        fg = skcolor_to_color(style_to_color(fg, self.theme))
         paint = skia.Paint(Color=fg, StrokeWidth=width)
-
+        if shader:
+            if isinstance(shader, dict):
+                if "linear_gradient" in shader:
+                    self.gradient.linear(
+                        widget=self,
+                        config=shader["linear_gradient"],
+                        paint=paint,
+                    )
+        if shadow:
+            shadow = SkDropShadow(config_list=shadow)
+            shadow.draw(paint)
         canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod
@@ -629,20 +758,6 @@ class SkWidget(SkEventHanding, SkMisc):
         self._root_y = value
         self._pos_update()
 
-    def clipboard(self, value: str | None = None) -> str | typing.Self:
-        """Get string from clipboard
-
-        anti images
-        """
-        if value is not None:
-            glfw.set_clipboard_string(self.window.the_window, value)
-            return self
-        else:
-            try:
-                return glfw.get_clipboard_string(self.window.the_window).decode("utf-8")
-            except AttributeError:
-                return ""
-
     def get_attribute(self, attribute_name: str) -> Any:
         """Get attribute of a widget by name.
 
@@ -709,7 +824,7 @@ class SkWidget(SkEventHanding, SkMisc):
         if hasattr(self, "children"):
             for child in self.children:
                 if not child.layout_config.get("none"):
-                    child.visible = True
+                    child.show()
 
         return self
 
@@ -858,8 +973,8 @@ class SkWidget(SkEventHanding, SkMisc):
     def box(
         self,
         side: Literal["top", "bottom", "left", "right"] = "top",
-        padx: int | float | tuple[int | float, int | float] = 10,
-        pady: int | float | tuple[int | float, int | float] = 10,
+        padx: int | float | tuple[int | float, int | float] = 5,
+        pady: int | float | tuple[int | float, int | float] = 5,
         ipadx: int | float | tuple[int | float, int | float] | None = None,
         ipady: int | float | tuple[int | float, int | float] | None = None,
         expand: bool | tuple[bool, bool] = False,

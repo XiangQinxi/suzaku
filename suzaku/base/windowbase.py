@@ -194,6 +194,18 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
+        try:
+            import PIL
+            from PIL import Image
+
+            icon = Image.open(self.icon1_path)
+            if self.framework == "glfw":
+                from glfw import set_window_icon
+
+                set_window_icon(self.the_window, 1, icon)
+        except ImportError:
+            pass
+
         # icon: skia.Image = skia.Image.open(self.icon1_path)
 
         # info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
@@ -396,15 +408,15 @@ class SkWindowBase(SkEventHanding, SkMisc):
                         self.context.releaseResourcesAndAbandonContext()
                     # Create a Surface and hand it over to this arg.
                     # 【创建Surface，交给该窗口】
-                    with self.skia_surface(self.the_window) as surface:
-                        if surface:
-                            with surface as canvas:
+                    with self.skia_surface(self.the_window) as self.surface:
+                        if self.surface:
+                            with self.surface as canvas:
                                 # Determine and call the drawing function of this arg.
                                 # 【判断并调用该窗口的绘制函数】
                                 if self.draw_func:
                                     self.draw_func(canvas)
 
-                            surface.flushAndSubmit()
+                            self.surface.flushAndSubmit()
 
                     glfw.swap_buffers(self.the_window)
                 case "sdl2":
@@ -419,6 +431,10 @@ class SkWindowBase(SkEventHanding, SkMisc):
                                     self.draw_func(canvas)
 
                     sdl2.SDL_UpdateWindowSurface(self.the_window)
+
+    def save(self, path: str = "skwindowbase.png", format: str = "png"):
+        if self.surface:
+            self.surface.makeImageSnapshot().save(path, skia.kPNG)
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
@@ -504,6 +520,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             name = "key_repeated"
         else:
             name = "key"
+        self.ime(100, 1000)
         self.event_trigger(
             name,
             SkEvent(
@@ -762,6 +779,72 @@ class SkWindowBase(SkEventHanding, SkMisc):
     # endregion
 
     # region Configure 属性配置
+
+    def ime(self, x: int = 9, y: int = 0):
+        return
+        if sys.platform == "win32":
+            import ctypes
+            from ctypes import wintypes
+
+            user32 = ctypes.WinDLL("user32", use_last_error=True)
+            imm32 = ctypes.WinDLL("imm32", use_last_error=True)
+
+            # 类型定义
+            HWND = wintypes.HWND
+            HIMC = wintypes.HANDLE
+            DWORD = wintypes.DWORD
+            LONG = wintypes.LONG
+
+            class POINT(ctypes.Structure):
+                _fields_ = [("x", LONG), ("y", LONG)]
+
+            class RECT(ctypes.Structure):
+                _fields_ = [
+                    ("left", LONG),
+                    ("top", LONG),
+                    ("right", LONG),
+                    ("bottom", LONG),
+                ]
+
+            class CANDIDATEFORM(ctypes.Structure):
+                _fields_ = [
+                    ("dwIndex", DWORD),
+                    ("dwStyle", DWORD),
+                    ("ptCurrentPos", POINT),
+                    ("rcArea", RECT),
+                ]
+
+            # 函数声明
+            imm32.ImmGetContext.restype = HIMC
+            imm32.ImmGetContext.argtypes = [HWND]
+
+            imm32.ImmReleaseContext.restype = wintypes.BOOL
+            imm32.ImmReleaseContext.argtypes = [HWND, HIMC]
+
+            imm32.ImmSetCandidateWindow.restype = wintypes.BOOL
+            imm32.ImmSetCandidateWindow.argtypes = [HIMC, ctypes.POINTER(CANDIDATEFORM)]
+
+            # 常量
+            CFS_CANDIDATEPOS = 0x40  # 直接指定候选框位置
+            CFS_EXCLUDE = 0x80  # 排除区域
+
+            def set_candidate_pos(hwnd, x, y):
+                himc = imm32.ImmGetContext(hwnd)
+                if not himc:
+                    return False
+
+                form = CANDIDATEFORM()
+                form.dwIndex = 0
+                form.dwStyle = CFS_CANDIDATEPOS
+                form.ptCurrentPos = POINT(x, y)
+                form.rcArea = RECT(0, 0, 0, 0)
+
+                ok = imm32.ImmSetCandidateWindow(himc, ctypes.byref(form))
+                imm32.ImmReleaseContext(hwnd, himc)
+                return bool(ok)
+
+            hwnd = user32.GetForegroundWindow()
+            return set_candidate_pos(hwnd, 100, 200)
 
     def geometry(self, spec: str | None = None) -> str | typing.Self:
         if spec is None:

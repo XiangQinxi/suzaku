@@ -3,14 +3,12 @@ import typing
 import skia
 
 from ..var import SkBooleanVar
-from .checkbox import SkCheckBox
 from .frame import SkFrame
+from .switchbox import SkSwitchBox
 from .text import SkText
 
 
-class SkCheckItem(SkFrame):
-    """Not yet completed"""
-
+class SkSwitch(SkFrame):
     def __init__(
         self,
         *args,
@@ -30,46 +28,52 @@ class SkCheckItem(SkFrame):
         self.focusable = True
         self.help_parent_scroll = True
 
-        self.checkbox = SkCheckBox(
+        self.switchbox = SkSwitchBox(
             self, command=command, cursor=cursor, variable=variable
         )
-        # self.checkbox.box(side="left", padx=2, pady=2)
         self.label = SkText(self, text=text, align="left", cursor=cursor)
-        # self.label.box(side="right", expand=True, padx=2, pady=2)
 
         def _(__):
-            self.checkbox.invoke()
-            self.checkbox.focus_set()
+            self.switchbox.invoke()
+            self.switchbox.focus_set()
 
         self.label.bind("click", _)
         self.bind("click", _)
 
         self.command = command
 
+    @property
+    def dwidth(self):
+        return self.label.dwidth + self.switchbox.dwidth + 10
+
     def set_attribute(self, **kwargs):
         if "cursor" in kwargs:
             cursor = kwargs.pop("cursor")
             self.attributes["cursor"] = cursor
             self.label.attributes["cursor"] = cursor
-            self.checkbox.attributes["cursor"] = cursor
+            self.switchbox.attributes["cursor"] = cursor
         if "variable" in kwargs:
-            self.checkbox.configure(variable=kwargs.pop("variable"))
+            self.switchbox.configure(variable=kwargs.pop("variable"))
         super().set_attribute(**kwargs)
 
     def invoke(self):
         if self.cget("disabled"):
             return
-        self.checkbox.invoke()
+        self.switchbox.invoke()
 
     @property
     def checked(self):
-        return self.checkbox.checked
+        return self.switchbox.checked
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         padx = 3
         ipadx = 5
         pady = 7
-        self.checkbox.fixed(
-            padx, pady, width=self.height - pady * 2, height=self.height - pady * 2
+        width = 2 * (self.height - pady * 2)
+        self.switchbox.fixed(
+            padx,
+            pady,
+            width=width,
+            height=self.height - pady * 2,
         )
-        self.label.fixed(self.height - pady * 2 + ipadx, 0, height=self.height)
+        self.label.fixed(width + ipadx, 0, height=self.height)
