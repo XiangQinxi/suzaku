@@ -164,10 +164,10 @@ class SkWindow(SkWindowBase, SkContainer):
         :return bool:
         """
         if widget.visible:
-            return (
-                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
-                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
-            )
+            cx, cy = widget.canvas_x, widget.canvas_y
+            x, y = event.x, event.y
+            width, height = widget.width, widget.height
+            return cx <= x <= cx + width and cy <= y <= cy + height
         return False
 
     def is_entered_widget(self, widget, event: SkEvent) -> bool:
@@ -178,12 +178,16 @@ class SkWindow(SkWindowBase, SkContainer):
         :return bool:
         """
         # TODO: 判定仍需优化，多层Frame将导致错误判定。
-        parent = widget.parent
-        return (
-            parent.canvas_x <= event.x <= parent.canvas_x + parent.width
-            and parent.canvas_y <= event.y <= parent.canvas_y + parent.height
-            and self.is_entered_widget_bounds(widget, event)
-        )
+        if self.is_entered_widget_bounds(widget, event):
+            is_parents = []
+            parent = widget.parent
+            while parent:
+                if isinstance(parent, (SkWindow, SkApp)):
+                    break
+                is_parents.append(self.is_entered_widget_bounds(parent, event))
+                parent = parent.parent
+            return all(is_parents)
+        return False
 
     def _mouse(self, event: SkEvent) -> None:
         children = self.visible_children
