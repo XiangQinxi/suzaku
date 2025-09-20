@@ -34,11 +34,13 @@ class SkCheckBox(SkWidget):
 
     @property
     def checked(self) -> bool:
+        """【获取当前复选框的选中状态】"""
         if self.cget("variable"):
             return self.cget("variable").get()
         return self._checked
 
     def invoke(self):
+        """【切换复选框的选中状态】"""
         self._checked = not self.checked
         if self.cget("variable"):
             self.cget("variable").set(self._checked)
@@ -46,9 +48,11 @@ class SkCheckBox(SkWidget):
             self.cget("command")()
 
     def _on_click(self, event: SkEvent):
+        """【处理点击事件，切换复选框的选中状态】"""
         self.invoke()
 
     def _draw_checkmark(self, canvas: skia.Canvas, rect: skia.Rect, fg: skia.Color):
+        """【绘制复选框的选中标记】"""
         left, top = rect.left(), rect.top()
         width, height = rect.width(), rect.height()
 
@@ -73,15 +77,7 @@ class SkCheckBox(SkWidget):
         canvas.drawLine(*real_points[1], *real_points[2], paint)  # 中间到右上
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
-        """if self.is_mouse_floating:
-            if self.is_mouse_pressed:
-                style_name = "SkCheckBox:pressed"
-            else:
-                style_name = "SkCheckBox:hover"
-        else:
-            if self.is_focus:
-                style_name = "SkCheckBox:focus"
-            else:"""
+        """【绘制复选框】"""
         if self.checked:
             style_name = f"{self.style}:checked"
         else:

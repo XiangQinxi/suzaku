@@ -285,6 +285,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
     @staticmethod
     def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
+        """Create a blur mask filter"""
         if not style:
             style = skia.kNormal_BlurStyle
         return skia.MaskFilter.MakeBlur(style, sigma)
@@ -374,6 +375,16 @@ class SkWidget(SkEventHanding, SkMisc):
         text: tuple[str, dict[str, str | int | SkColor | skia.Font]] = ("",),
         font: skia.Font = None,
     ):
+        """Draw styled text
+
+        :param canvas: The canvas
+        :param rect: The skia Rect
+        :param bg: The background color
+        :param fg: The foreground color
+        :param text: The text
+        :param font: The font
+        :return: None
+        """
         if isinstance(text, str):
             _text = text
             return None
@@ -430,6 +441,7 @@ class SkWidget(SkEventHanding, SkMisc):
             ]
         ),
     ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
+        """Unpacking the radius"""
         _radius: list[
             tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
         ] = list(radius)
@@ -547,6 +559,19 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shader: None | Literal["linear_gradient"] = None,
         bg_shader: None | Literal["linear_gradient"] = None,
     ):
+        """Draw the circle
+
+        :param canvas: The skia canvas
+        :param cx: The x coordinate of the center
+        :param cy: The y coordinate of the center
+        :param radius: The radius of the circle
+        :param bg: The background
+        :param width: The width
+        :param bd: The color of the border
+        :param bd_shadow: The border_shadow switcher
+        :param bd_shader: The shader of the border
+        """
+
         if bg:
             bg_paint = skia.Paint(
                 AntiAlias=self.anti_alias,

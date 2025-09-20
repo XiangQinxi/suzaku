@@ -5,6 +5,8 @@ from .textbutton import SkTextButton
 
 
 class SkTabButton(SkTextButton):
+    """A tab button"""
+
     def __init__(
         self,
         parent: SkContainer,
@@ -24,16 +26,25 @@ class SkTabButton(SkTextButton):
 
     @property
     def selected(self):
+        """Check if the tab button is selected"""
         if self.parent.selected_item is None:
             return False
         return self.parent.selected_item == self
 
     def _on_click(self):
+        """Handle click event"""
         self.parent.select(self.parent.items.index(self))
 
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
     ) -> None:
+        """Draw the tab button
+
+        :param canvas: The canvas to draw on
+        :param rect: The rectangle to draw in
+        :param style_name: The style name
+        :return: None
+        """
         if self.selected:
             style_name = f"{self.style}:selected"
         else:

@@ -99,11 +99,12 @@ class SkContainer:
     # endregion
 
     def bind_scroll_event(self):
-        # 容器绑定滚动事件，鼠标滚轮滚动可以滚动容器
+        # 【容器绑定滚动事件，鼠标滚轮滚动可以滚动容器】
         self.allowed_scrolled = True
         self.window.bind("scroll", self.scroll_event)
 
-    def scroll_event(self, event: SkEvent):
+    def scroll_event(self, event: SkEvent) -> None:
+        """【处理滚动事件】"""
         if self.allowed_scrolled:
             if self.is_mouse_floating:
                 self.scroll(event.x_offset * 18, event.y_offset * 18)
@@ -118,34 +119,34 @@ class SkContainer:
                     self.scroll(event.x_offset * 18, event.y_offset * 18)
                     return
 
-    def _check_scroll(self, x_offset: int, y_offset: int):
-        if y_offset < 0:
-            # 总体向上
-            if self.content_height + self.y_offset >= self.height:
-                return True
+    def update_scroll(self) -> None:
+        """【检查并更新滚动偏移量】"""
+        if self.content_width < self.width:
+            self._x_offset = 0
         else:
-            # 总体向下
-            if self.y_offset <= -y_offset:
-                return True
-        return False
-
-    def update_scroll(self):
+            self._x_offset = max(self.x_offset, -(self.content_width - self.width))
+        # 【防止容器超出下边界】
         if self.content_height < self.height:
             self._y_offset = 0
-        if self.content_height >= self.height:
+        else:
             self._y_offset = max(self.y_offset, -(self.content_height - self.height))
 
     def scroll(
         self,
         x_offset: int | float,
         y_offset: int | float,
-    ):
+    ) -> None:
+        """【滚动容器】
+
+        :param x_offset: 【水平滚动量】
+        :param y_offset: 【垂直滚动量】
+        """
         """if self._check_scroll(x_offset, y_offset):
         self.y_offset = min(y_offset + self.y_offset, self.content_height)
         """
-        self._x_offset = min(self.x_offset + x_offset, 0)
-        self._y_offset = min(self.y_offset + y_offset, 0)
-        self.update_scroll()
+        self.x_offset = min(self.x_offset + x_offset, 0)
+        # 防止容器超出上边界
+        self.y_offset = min(self.y_offset + y_offset, 0)
 
     # region add_child 添加子元素
     def add_child(self, child):

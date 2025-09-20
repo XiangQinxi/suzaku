@@ -5,7 +5,7 @@ from .frame import SkFrame
 
 
 class SkCard(SkFrame):
-    """A card widget"""
+    """A frame with border and background"""
 
     def __init__(
         self,

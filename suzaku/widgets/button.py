@@ -39,6 +39,7 @@ class SkButton(SkFrame):
         self.bind("click", lambda _: self.invoke)
 
     def invoke(self) -> None:
+        """【触发按钮的点击事件】"""
         if self.command and self.cget("disabled") is False:
             self.command()
 
