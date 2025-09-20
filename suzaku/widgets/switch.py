@@ -3,6 +3,7 @@ import typing
 import skia
 
 from ..var import SkBooleanVar
+from .container import SkContainer
 from .frame import SkFrame
 from .switchbox import SkSwitchBox
 from .text import SkText
@@ -11,7 +12,8 @@ from .text import SkText
 class SkSwitch(SkFrame):
     def __init__(
         self,
-        *args,
+        parent: SkContainer,
+        *,
         cursor: typing.Union[str, None] = "hand",
         command: typing.Union[typing.Callable, None] = None,
         text: str | None = None,
@@ -21,7 +23,7 @@ class SkSwitch(SkFrame):
         default: bool = False,
         **kwargs,
     ) -> None:
-        super().__init__(*args, style=style, **kwargs)
+        super().__init__(parent, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
         self.attributes["border"] = border

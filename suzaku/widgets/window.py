@@ -177,7 +177,6 @@ class SkWindow(SkWindowBase, SkContainer):
         :param event: SkEvent
         :return bool:
         """
-        # TODO: 判定仍需优化，多层Frame将导致错误判定。
         if self.is_entered_widget_bounds(widget, event):
             is_parents = []
             parent = widget.parent

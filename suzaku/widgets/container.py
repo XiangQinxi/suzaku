@@ -129,13 +129,23 @@ class SkContainer:
                 return True
         return False
 
+    def update_scroll(self):
+        if self.content_height < self.height:
+            self._y_offset = 0
+        if self.content_height >= self.height:
+            self._y_offset = max(self.y_offset, -(self.content_height - self.height))
+
     def scroll(
         self,
         x_offset: int | float,
         y_offset: int | float,
     ):
-        if self._check_scroll(x_offset, y_offset):
-            self.y_offset = min(y_offset + self.y_offset, self.content_height)
+        """if self._check_scroll(x_offset, y_offset):
+        self.y_offset = min(y_offset + self.y_offset, self.content_height)
+        """
+        self._x_offset = min(self.x_offset + x_offset, 0)
+        self._y_offset = min(self.y_offset + y_offset, 0)
+        self.update_scroll()
 
     # region add_child 添加子元素
     def add_child(self, child):
@@ -249,11 +259,12 @@ class SkContainer:
     # region layout 布局
 
     def update_layout(self, event: SkEvent | None = None):
-        if self.allowed_scrolled and self.y_offset < 0:
-            if not self._check_scroll(0, -5):
-                self._y_offset = self.height - self.content_height
-                if self._y_offset > 0:
-                    self._y_offset = 0
+        """if self.allowed_scrolled and self.y_offset < 0:
+        if not self._check_scroll(0, -5):
+            self._y_offset = self.height - self.content_height
+            if self._y_offset > 0:
+                self._y_offset = 0"""
+        self.update_scroll()
         self._handle_layout()
         for widget in self.children:
             widget.event_trigger("resize", SkEvent(event_type="resize"))

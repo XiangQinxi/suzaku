@@ -86,7 +86,7 @@ if __name__ == "__main__":
             SkEntry(
                 tab_widgets, placeholder="Password", textvariable=var2, show="●"
             ).box(padx=10, pady=(10, 0))
-            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 0))
+            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 10))
 
         tab1()
 
