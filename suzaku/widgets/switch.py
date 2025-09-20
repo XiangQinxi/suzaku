@@ -18,6 +18,7 @@ class SkSwitch(SkFrame):
         style: str = "SkCheckItem",
         border: bool = False,
         variable: SkBooleanVar | None = None,
+        default: bool = False,
         **kwargs,
     ) -> None:
         super().__init__(*args, style=style, **kwargs)
@@ -29,7 +30,7 @@ class SkSwitch(SkFrame):
         self.help_parent_scroll = True
 
         self.switchbox = SkSwitchBox(
-            self, command=command, cursor=cursor, variable=variable
+            self, command=command, cursor=cursor, variable=variable, default=default
         )
         self.label = SkText(self, text=text, align="left", cursor=cursor)
 

@@ -19,7 +19,6 @@ class SkSwitchBox(SkCheckBox):
 
     def _on_click(self, event: SkEvent):
         center_x = self.canvas_x + self.width / 2
-        print(self.mouse_x, center_x)
         if self.checked:
             if self.mouse_x > center_x:
                 return

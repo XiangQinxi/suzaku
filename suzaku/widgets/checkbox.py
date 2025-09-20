@@ -15,18 +15,19 @@ class SkCheckBox(SkWidget):
         *args,
         cursor: str | None = "hand",
         command: typing.Callable | None = None,
-        selected: bool = False,
+        # selected: bool = False,
         style: str = "SkCheckBox",
         variable: SkBooleanVar | None = None,
+        default: bool = False,
         **kwargs,
     ):
         super().__init__(*args, cursor=cursor, style=style, **kwargs)
-        self.attributes["selected"] = selected
+        # self.attributes["selected"] = selected
         self.attributes["variable"] = variable
         self.attributes["command"] = command
 
         self.focusable = True
-        self._checked: bool = False
+        self._checked: bool = default
         self.help_parent_scroll = True
 
         self.bind("click", self._on_click)

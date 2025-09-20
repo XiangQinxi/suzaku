@@ -92,6 +92,7 @@ if __name__ == "__main__":
 
         def tab2():
             tab_settings = SkFrame(tabs)
+            tab_settings.bind_scroll_event()
             tabs.add(tab_settings, text="Settings")
 
             def change_theme(index: int):
@@ -114,8 +115,18 @@ if __name__ == "__main__":
 
             SkTextButton(
                 tab_settings,
-                text="Save To Screenshot (wait 3s)",
+                text="Screenshot (wait 3s)",
                 command=lambda: window.after(3, lambda: window.save()),
+            ).box(padx=10, pady=(10, 0))
+
+            def anti_alias():
+                window.anti_alias = switch.checked
+
+            switch = SkSwitch(
+                tab_settings,
+                text="Enabled Anti Aliasing",
+                command=anti_alias,
+                default=True,
             ).box(padx=10, pady=(10, 0))
 
         tab2()

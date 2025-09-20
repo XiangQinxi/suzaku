@@ -47,7 +47,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.draws: list[typing.Callable] = []
 
         self.window: SkWindow = self
-        self.anti_alias: bool = anti_alias
+        self._anti_alias: bool = anti_alias
 
         self.previous_widget = None
         self.esc_to_close = True
@@ -73,6 +73,16 @@ class SkWindow(SkWindowBase, SkContainer):
     # endregion
 
     # region Theme related 主题相关
+
+    @property
+    def anti_alias(self) -> bool:
+        return self._anti_alias
+
+    @anti_alias.setter
+    def anti_alias(self, value: bool):
+        self._anti_alias = value
+        for child in self.children:
+            child.anti_alias = value
 
     def apply_theme(self, new_theme: SkTheme):
         """Apply theme to the window and its children.
@@ -167,6 +177,7 @@ class SkWindow(SkWindowBase, SkContainer):
         :param event: SkEvent
         :return bool:
         """
+        # TODO: 判定仍需优化，多层Frame将导致错误判定。
         parent = widget.parent
         return (
             parent.canvas_x <= event.x <= parent.canvas_x + parent.width
