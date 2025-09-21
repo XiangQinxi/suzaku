@@ -399,8 +399,8 @@
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": [
-              [40, 130, 255, 255],
-              [40, 130, 255, 150]
+              [40, 130, 255, 150],
+              [40, 130, 255, 255]
             ]
           }
         },
@@ -501,7 +501,7 @@
         "width": 0,
         "bd_shadow": [0, 2, 2, 2, [0, 0, 0, 100]],
         "underline": [40, 130, 255, 255],
-        "underline_width": 3
+        "underline_width": 2.5
       }
     },
 

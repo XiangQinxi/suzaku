@@ -441,7 +441,7 @@
         "width": 0,
         "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 50]],
         "underline": [40, 130, 255, 255],
-        "underline_width": 3
+        "underline_width": 2.5
       }
     },
 
