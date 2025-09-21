@@ -42,7 +42,11 @@ from .separator import SkSeparator  # ✅
 from .switch import SkSwitch  # ✅
 from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar  # ✅
+
+SkTabbar = SkSegmented = SkTabBar
 from .tabbutton import SkTabButton  # ✅
+
+SkTabbutton = SkSegmentedButton = SkTabButton
 from .tabs import SkTabs  # ✅
 from .text import SkText  # ✅
 from .textbutton import SkTextButton  # ✅

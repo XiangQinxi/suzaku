@@ -29,36 +29,14 @@ class SkCard(SkFrame):
         styles = self.theme.get_style(self.style)
         if self.cget("styles") is not None:
             styles = self.cget("styles")
-        if "radius" not in styles:
-            radius = 0
-        else:
-            radius = styles["radius"]
-        if "bg_shader" in styles:
-            bg_shader = styles["bg_shader"]
-        else:
-            bg_shader = None
+        radius = self._style("radius", 0, styles)
+        bg_shader = self._style("bg_shader", None, styles)
+        bd_shadow = self._style("bd_shadow", None, styles)
+        bd_shader = self._style("bd_shader", None, styles)
+        width = self._style("width", 0, styles)
+        bd = self._style("bd", None, styles)
+        bg = self._style("bg", None, styles)
 
-        if "bd_shadow" in styles:
-            bd_shadow = styles["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in styles:
-            bd_shader = styles["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in styles:
-            width = styles["width"]
-        else:
-            width = 0
-        if "bd" in styles:
-            bd = styles["bd"]
-        else:
-            bd = None
-        if "bg" in styles:
-            bg = styles["bg"]
-        else:
-            bg = None
         self._draw_rect(
             canvas,
             rect,

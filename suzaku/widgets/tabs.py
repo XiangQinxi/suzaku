@@ -38,7 +38,7 @@ class SkTabs(SkCard):
         if self.selected:
             self.selected.layout_forget()
         self.selected = self.tabs[index]
-        self.selected.box(side="bottom", expand=True, padx=0, pady=(0, 2))
+        self.selected.box(side="bottom", expand=True, padx=0, pady=(0, 0))
 
     def add(self, tab: SkContainer, text: str | None = "") -> SkWidget:
         """Add a tab

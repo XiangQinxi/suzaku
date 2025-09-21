@@ -7,8 +7,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -429,28 +428,6 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
-    @staticmethod
-    def unpacking_radius(
-        radius: (
-            int
-            | tuple[
-                tuple[int, int],
-                tuple[int, int],
-                tuple[int, int],
-                tuple[int, int],
-            ]
-        ),
-    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
-        """Unpacking the radius"""
-        _radius: list[
-            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-        ] = list(radius)
-        for i, r in enumerate(_radius):
-            if isinstance(r, int):
-                _radius[i] = (r, r)
-        radius = tuple(_radius)
-        return radius
-
     def _draw_rect(
         self,
         canvas: skia.Canvas,
@@ -482,7 +459,7 @@ class SkWidget(SkEventHanding, SkMisc):
             rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
             radii: tuple[
                 tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-            ] = self.unpacking_radius(radius)
+            ] = self.unpack_radius(radius)
             # 设置每个角的半径（支持X/Y不对称）
             rrect.setRectRadii(
                 skia.Rect.MakeLTRB(*rect),

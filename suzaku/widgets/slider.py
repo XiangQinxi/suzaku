@@ -1,3 +1,5 @@
+import skia
+
 from .widget import SkWidget
 
 
@@ -16,3 +18,9 @@ class SkSlider(SkWidget):
         self.attributes["value"] = value
         self.attributes["minvalue"] = minvalue
         self.attributes["maxvalue"] = maxvalue
+
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
+
+        self._draw_rect(
+            canvas,
+        )

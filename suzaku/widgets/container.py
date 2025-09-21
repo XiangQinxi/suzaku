@@ -308,27 +308,6 @@ class SkContainer:
     def _handle_grid(self):
         pass
 
-    @staticmethod
-    def unpack_padding(padx, pady):
-        """Unpack padding.
-        【左上右下】
-        :param padx:
-        :param pady:
-        :return:
-        """
-        if type(padx) is tuple:
-            left = padx[0]
-            right = padx[1]
-        else:
-            left = right = padx
-
-        if type(pady) is tuple:
-            top = pady[0]
-            bottom = pady[1]
-        else:
-            top = bottom = pady
-        return left, top, right, bottom
-
     def _handle_box(self) -> None:
         """Process box layout.
 
