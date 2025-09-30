@@ -1,8 +1,10 @@
+from __future__ import annotations as _
+
 import typing
 import threading
 import warnings
 from dataclasses import dataclass
-
+import re
 
 class SkBindedTask():
     """A class to represent binded task when a event is triggered."""
@@ -79,6 +81,17 @@ class SkEventHandling():
             self.tasks[event_type] = []
         ## Accumulate instance count
         self.__class__.instance_count += 1
+
+    def parse_event_type_str(self, event_type_str) -> dict:
+        """This function parses event type string.
+        
+        :param event_type_str: The event type string to be parsed
+        :returns: json, parsed event type
+        """
+        event_type = event_type_str.split("[")[0] # To be changed
+        params = event_type_str.split("[").replace("]", "").split(",")
+        NotImplemented # The prvious lines are to be changed as they r soooo frickin' shitty
+        return {event_type: params}
     
     def trigger(self, event_type: str) -> None:
         """To trigger a type of event
@@ -96,16 +109,25 @@ class SkEventHandling():
         
         :param event_type: The type of event to trigger
         """
-        for task in self.tasks[event_type]:
-            # Add the Event object to the global list
-            SkEvent.global_list.append(NotImplemented)
-            # To execute all tasks binded under this event
-            if not task.multithread:
-                # If not multitask, execute directly
-                task.target()
-            else:
-                # Otherwise add to multithread tasks list and let the working thread to deal with it
-                SkEventHandling.multithread_tasks.append(task)
+        parsed_event_type = self.parse_event_type_str(event_type)
+        # Find targets
+        targets = []
+        targets.append(event_type)
+        if list(parsed_event_type.values())[0] in ["", "*"]:
+            # If match all
+            targets.append(list(parsed_event_type.keys())[0])
+            targets.append(list(parsed_event_type.keys())[0] + "[*]")
+        for target in targets:
+            for task in self.tasks[target]:
+                # Add the Event object to the global list
+                SkEvent.global_list.append(NotImplemented)
+                # To execute all tasks binded under this event
+                if not task.multithread:
+                    # If not multitask, execute directly
+                    task.target()
+                else:
+                    # Otherwise add to multithread tasks list and let the working thread to deal with it
+                    SkEventHandling.multithread_tasks.append(task)
     
     def bind(self, event_type: str, target: typing.Callable, 
              multithread: bool, _keep_at_clear: bool) -> SkBindedTask | bool:
@@ -181,6 +203,11 @@ class SkEventHandling():
             return False
     
     def update(self):
+        """This function is designed to update event handler and trigger events.
+
+        Which is not implemented
+        
+        """
         NotImplemented
 
 # Initialize working thread
@@ -190,7 +217,7 @@ SkEventHandling.WORKING_THREAD = threading.Thread(target = SkEventHandling._work
 class SkEvent:
     """Used to represent an event."""
 
-    global_list: list[SkEvents] = []
+    global_list: list[SkEvent] = []
 
     def __init__(self):
         self.event_type: str = "[Unspecified]"  # Type of event
