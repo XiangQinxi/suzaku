@@ -7,7 +7,8 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -924,10 +925,12 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def grid(
         self,
-        row: int,  # 行 横
-        column: int,  # 列 竖
+        row: int = 0,  # 行 横
+        column: int = 0,  # 列 竖
         rowspan: int = 1,
         columnspan: int = 1,
+        padx: int | float | None = None,
+        pady: int | float | None = None,
     ):
 
         self.show()
@@ -937,6 +940,8 @@ class SkWidget(SkEventHanding, SkMisc):
                 "column": column,
                 "rowspan": rowspan,
                 "columnspan": columnspan,
+                "padx": padx,
+                "pady": pady,
             }
         }
         self.parent.add_layout_child(self)

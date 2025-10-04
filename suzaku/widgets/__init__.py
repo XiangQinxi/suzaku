@@ -9,6 +9,10 @@ SkCheckbox = SkCheckBox
 from .checkitem import SkCheckItem  # ✅
 
 SkCheckButton = SkCheckbutton = SkCheckitem = SkCheckItem
+
+from .combobox import SkComboBox
+
+SkCombobox = SkComboBox
 from .container import SkContainer  # ✅
 from .empty import SkEmpty  # ✅
 from .entry import SkEntry  # ✅
