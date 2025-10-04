@@ -7,8 +7,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -70,6 +69,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.events = {
             "resize": dict(),
             "move": dict(),
+            "mouse_move": dict(),
             "mouse_motion": dict(),
             "mouse_enter": dict(),
             "mouse_leave": dict(),
@@ -97,7 +97,7 @@ class SkWidget(SkEventHanding, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion"]
+        button_states = ["pressed", "released", "motion", "move"]
 
         for button in buttons:
             for state in button_states:
@@ -285,6 +285,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
     @staticmethod
     def _blur(style: skia.BlurStyle | None = None, sigma: float = 5.0):
+        """Create a blur mask filter"""
         if not style:
             style = skia.kNormal_BlurStyle
         return skia.MaskFilter.MakeBlur(style, sigma)
@@ -374,6 +375,16 @@ class SkWidget(SkEventHanding, SkMisc):
         text: tuple[str, dict[str, str | int | SkColor | skia.Font]] = ("",),
         font: skia.Font = None,
     ):
+        """Draw styled text
+
+        :param canvas: The canvas
+        :param rect: The skia Rect
+        :param bg: The background color
+        :param fg: The foreground color
+        :param text: The text
+        :param font: The font
+        :return: None
+        """
         if isinstance(text, str):
             _text = text
             return None
@@ -418,27 +429,6 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
-    @staticmethod
-    def unpacking_radius(
-        radius: (
-            int
-            | tuple[
-                tuple[int, int],
-                tuple[int, int],
-                tuple[int, int],
-                tuple[int, int],
-            ]
-        ),
-    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
-        _radius: list[
-            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-        ] = list(radius)
-        for i, r in enumerate(_radius):
-            if isinstance(r, int):
-                _radius[i] = (r, r)
-        radius = tuple(_radius)
-        return radius
-
     def _draw_rect(
         self,
         canvas: skia.Canvas,
@@ -470,7 +460,7 @@ class SkWidget(SkEventHanding, SkMisc):
             rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
             radii: tuple[
                 tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-            ] = self.unpacking_radius(radius)
+            ] = self.unpack_radius(radius)
             # 设置每个角的半径（支持X/Y不对称）
             rrect.setRectRadii(
                 skia.Rect.MakeLTRB(*rect),
@@ -547,6 +537,19 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shader: None | Literal["linear_gradient"] = None,
         bg_shader: None | Literal["linear_gradient"] = None,
     ):
+        """Draw the circle
+
+        :param canvas: The skia canvas
+        :param cx: The x coordinate of the center
+        :param cy: The y coordinate of the center
+        :param radius: The radius of the circle
+        :param bg: The background
+        :param width: The width
+        :param bd: The color of the border
+        :param bd_shadow: The border_shadow switcher
+        :param bd_shader: The shader of the border
+        """
+
         if bg:
             bg_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
@@ -922,10 +925,12 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def grid(
         self,
-        row: int,  # 行 横
-        column: int,  # 列 竖
+        row: int = 0,  # 行 横
+        column: int = 0,  # 列 竖
         rowspan: int = 1,
         columnspan: int = 1,
+        padx: int | float | None = None,
+        pady: int | float | None = None,
     ):
 
         self.show()
@@ -935,6 +940,8 @@ class SkWidget(SkEventHanding, SkMisc):
                 "column": column,
                 "rowspan": rowspan,
                 "columnspan": columnspan,
+                "padx": padx,
+                "pady": pady,
             }
         }
         self.parent.add_layout_child(self)

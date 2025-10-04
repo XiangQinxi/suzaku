@@ -32,10 +32,10 @@
           "linear_gradient": {
             "start_anchor": "center",
             "end_anchor": "s",
-            "colors": [
-              [35, 35, 35, 255],
-              [50, 50, 50, 255]
-            ]
+            "colors": {
+              "0%": [35, 35, 35, 255],
+              "100%": [50, 50, 50, 255]
+            }
           }
         },
         "fg": {"color_palette": "fg"},
@@ -49,10 +49,10 @@
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
-            "colors": [
-              [35, 35, 35, 255],
-              [50, 50, 50, 255]
-            ]
+            "colors": {
+              "0%": [35, 35, 35, 255],
+              "100%": [50, 50, 50, 255]
+            }
           }
         },
         "fg": {"color_palette": "fg"},
@@ -66,10 +66,10 @@
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
-            "colors": [
-              [55, 55, 55, 255],
-              [35, 35, 35, 255]
-            ]
+            "colors": {
+              "0%": [55, 55, 55, 255],
+              "100%": [35, 35, 35, 255]
+            }
           }
         },
         "fg": {"color_palette": "fg"},
@@ -148,6 +148,16 @@
     "SkCheckBox": {
       "unchecked-rest": {
         "bg": {"color_palette": "bg"},
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [35, 35, 35, 255],
+              "100%": [50, 50, 50, 255]
+            }
+          }
+        },
         "bd": {"color_palette": "bd"},
         "width": 2
       },
@@ -158,6 +168,16 @@
       },
       "checked-rest": {
         "bg": [40, 130, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [40, 130, 255, 255],
+              "100%": [40, 130, 255, 150]
+            }
+          }
+        },
         "fg": [10, 10, 10, 255],
         "width": 2
       },
@@ -283,14 +303,34 @@
 
     "SkSwitchBox": {
       "unchecked-rest": {
-        "bg": [25, 25, 25, 245],
+        "bg": [0, 0, 0, 245],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [35, 35, 35, 255],
+              "100%": [50, 50, 50, 255]
+            }
+          }
+        },
         "bd": [55, 55, 55, 245],
         "width": 2,
         "button": [230, 230, 230, 180],
         "button-padding": 4
       },
       "unchecked-hover": {
-        "bg": [45, 45, 45, 245],
+        "bg": [0, 0, 0, 245],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [35, 35, 35, 220],
+              "100%": [50, 50, 50, 220]
+            }
+          }
+        },
         "bd": [55, 55, 55, 245],
         "width": 2,
         "button": [230, 230, 230, 190],
@@ -304,21 +344,51 @@
         "button-padding": 5
       },
       "checked-rest": {
-        "bg": [40, 130, 255, 255],
+        "bg": [0, 0, 0, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [40, 130, 255, 255],
+              "100%": [40, 130, 255, 150]
+            }
+          }
+        },
         "bd": [40, 130, 255, 235],
         "width": 2,
         "button": [0, 0, 0, 235],
         "button-padding": 4
       },
       "checked-hover": {
-        "bg": [40, 130, 255, 215],
+        "bg": [0, 0, 0, 215],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [40, 130, 255, 255],
+              "100%": [40, 130, 255, 150]
+            }
+          }
+        },
         "bd": [40, 130, 255, 235],
         "width": 2,
         "button": [0, 0, 0, 235],
         "button-padding": 3
       },
       "checked-pressed": {
-        "bg": [40, 130, 255, 180],
+        "bg": [0, 0, 0, 180],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [40, 130, 255, 255],
+              "100%": [40, 130, 255, 150]
+            }
+          }
+        },
         "bd": [40, 130, 255, 235],
         "width": 2,
         "button": [0, 0, 0, 235],
@@ -359,19 +429,22 @@
         "bg": [40, 40, 40, 255],
         "bg_shader": {
           "linear_gradient": {
-            "start_anchor": "center",
+            "start_anchor": "n",
             "end_anchor": "s",
-            "colors": [
-              [35, 35, 35, 255],
-              [50, 50, 50, 255]
-            ]
+            "colors": {
+              "0%": [0, 0, 0, 0],
+              "40%": [0, 0, 0, 0],
+              "60%": [0, 0, 0, 0],
+              "100%": [40, 130, 255, 40]
+            }
           }
         },
         "fg": {"color_palette": "fg"},
-        "width": 0,
-        "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 50]],
+        "width": 1,
+        "bd_shadow": [0, 0, 0, 0, [40, 130, 255, 255]],
         "underline": [40, 130, 255, 255],
-        "underline_width": 3
+        "underline_width": 2,
+        "underline_padx": 1
       }
     },
 

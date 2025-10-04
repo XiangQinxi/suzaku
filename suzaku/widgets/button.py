@@ -39,6 +39,7 @@ class SkButton(SkFrame):
         self.bind("click", lambda _: self.invoke)
 
     def invoke(self) -> None:
+        """【触发按钮的点击事件】"""
         if self.command and self.cget("disabled") is False:
             self.command()
 
@@ -70,39 +71,18 @@ class SkButton(SkFrame):
                 style_name = f"{self.style}:disabled"
 
         style = self.theme.get_style(style_name)
-
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in style:
-            width = style["width"]
-        else:
-            width = 0
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
+        bg_shader = self._style("bg_shader", None, style)
+        bd_shadow = self._style("bd_shadow", None, style)
+        bd_shader = self._style("bd_shader", None, style)
+        width = self._style("width", 0, style)
+        bd = self._style("bd", None, style)
+        bg = self._style("bg", None, style)
 
         # Draw the button border
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style(self.style)["radius"],
+            radius=self.theme.get_style_attr(self.style, "radius"),
             bg=bg,
             width=width,
             bd=bd,

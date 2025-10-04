@@ -19,10 +19,14 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 630),
         )
+        # window.window_attr("border", False)
         window.bind("drop", lambda evt: print("drop", evt))
 
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
+
+        # titlebar = SkTitleBar(window)
+        # titlebar.box(side="top", padx=0, pady=0)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -48,7 +52,7 @@ if __name__ == "__main__":
         menubar.add_separator()
         menubar.add_command("Exit", command=window.destroy)
 
-        tabs = SkTabs(window)
+        tabs = SkTabs(window, expand=True)
 
         def tab1():
             tab_widgets = SkFrame(tabs)
@@ -86,12 +90,13 @@ if __name__ == "__main__":
             SkEntry(
                 tab_widgets, placeholder="Password", textvariable=var2, show="●"
             ).box(padx=10, pady=(10, 0))
-            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 0))
+            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 10))
 
         tab1()
 
         def tab2():
             tab_settings = SkFrame(tabs)
+            tab_settings.bind_scroll_event()
             tabs.add(tab_settings, text="Settings")
 
             def change_theme(index: int):
@@ -114,8 +119,18 @@ if __name__ == "__main__":
 
             SkTextButton(
                 tab_settings,
-                text="Save To Screenshot (wait 3s)",
+                text="Screenshot (wait 3s)",
                 command=lambda: window.after(3, lambda: window.save()),
+            ).box(padx=10, pady=(10, 0))
+
+            def anti_alias():
+                window.anti_alias = switch.checked
+
+            switch = SkSwitch(
+                tab_settings,
+                text="Enabled Anti Aliasing",
+                command=anti_alias,
+                default=True,
             ).box(padx=10, pady=(10, 0))
 
         tab2()

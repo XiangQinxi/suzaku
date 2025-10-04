@@ -212,8 +212,15 @@ class SkGradient:
         if config:
 
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
-            colors = []
-            for color in config["colors"]:
+            colors: list[
+                tuple[int | float, int | float, int | float, int | float] | str
+            ] = []
+            positions: list[float] = []
+            for position, color in config["colors"].items():
+                if position.endswith("%"):
+                    positions.append(float(position.strip("%")) / 100)
+                else:
+                    positions.append(float(position))
                 colors.append(SkColor(color).color)
 
             if start_pos is None or end_pos is None:
@@ -235,6 +242,7 @@ class SkGradient:
 
             if widget:
                 self.gradient = skia.GradientShader.MakeLinear(
+                    positions=positions,
                     points=[
                         tuple(self.get_anchor_pos(widget, start_anchor)),
                         tuple(self.get_anchor_pos(widget, end_anchor)),

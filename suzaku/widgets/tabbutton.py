@@ -5,12 +5,14 @@ from .textbutton import SkTextButton
 
 
 class SkTabButton(SkTextButton):
+    """A tab button"""
+
     def __init__(
         self,
         parent: SkContainer,
         text: str = None,
         style: str = "SkTabBar.Button",
-        align: str = "left",
+        align: str = "center",
         **kwargs,
     ):
         super().__init__(
@@ -24,16 +26,25 @@ class SkTabButton(SkTextButton):
 
     @property
     def selected(self):
+        """Check if the tab button is selected"""
         if self.parent.selected_item is None:
             return False
         return self.parent.selected_item == self
 
     def _on_click(self):
+        """Handle click event"""
         self.parent.select(self.parent.items.index(self))
 
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
     ) -> None:
+        """Draw the tab button
+
+        :param canvas: The canvas to draw on
+        :param rect: The rectangle to draw in
+        :param style_name: The style name
+        :return: None
+        """
         if self.selected:
             style_name = f"{self.style}:selected"
         else:
@@ -46,29 +57,18 @@ class SkTabButton(SkTextButton):
         super().draw_widget(canvas, rect, style_name)
 
         style = self.theme.get_style(style_name)
-        if "underline" in style:
-            underline = style["underline"]
-        else:
-            underline = "transparent"
-        if "underline_width" in style:
-            underline_width = style["underline_width"]
-        else:
-            underline_width = 0
-        if "underline_shader" in style:
-            underline_shader = style["underline_shader"]
-        else:
-            underline_shader = None
-        if "underline_shadow" in style:
-            underline_shadow = style["underline_shadow"]
-        else:
-            underline_shadow = None
+        underline = self._style("underline", "transparent", style)
+        underline_width = self._style("underline_width", 0, style)
+        underline_shadow = self._style("underline_shadow", 0, style)
+        underline_shader = self._style("underline_shader", None, style)
+        underline_padx = self.unpack_padx(self._style("underline_padx", (5, 5), style))
 
         if self.selected:
             self._draw_line(
                 canvas,
-                self.canvas_x,
+                self.canvas_x + underline_padx[0],
                 self.canvas_y + self.height,
-                self.canvas_x + self.width,
+                self.canvas_x + self.width - underline_padx[1],
                 self.canvas_y + self.height,
                 width=underline_width,
                 fg=underline,

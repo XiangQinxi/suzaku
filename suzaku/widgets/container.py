@@ -67,7 +67,7 @@ class SkContainer:
         # self.parent = None
         self.children = []  # Children
 
-        from ..widgets.widget import SkWidget
+        from .widget import SkWidget
 
         self.draw_list: list[list[SkWidget]] = [
             [],  # Layout layer [SkWidget1, SkWidget2, ...]
@@ -99,11 +99,12 @@ class SkContainer:
     # endregion
 
     def bind_scroll_event(self):
-        # 容器绑定滚动事件，鼠标滚轮滚动可以滚动容器
+        # 【容器绑定滚动事件，鼠标滚轮滚动可以滚动容器】
         self.allowed_scrolled = True
         self.window.bind("scroll", self.scroll_event)
 
-    def scroll_event(self, event: SkEvent):
+    def scroll_event(self, event: SkEvent) -> None:
+        """【处理滚动事件】"""
         if self.allowed_scrolled:
             if self.is_mouse_floating:
                 self.scroll(event.x_offset * 18, event.y_offset * 18)
@@ -118,24 +119,34 @@ class SkContainer:
                     self.scroll(event.x_offset * 18, event.y_offset * 18)
                     return
 
-    def _check_scroll(self, x_offset: int, y_offset: int):
-        if y_offset < 0:
-            # 总体向上
-            if self.content_height + self.y_offset >= self.height:
-                return True
+    def update_scroll(self) -> None:
+        """【检查并更新滚动偏移量】"""
+        if self.content_width < self.width:
+            self._x_offset = 0
         else:
-            # 总体向下
-            if self.y_offset <= -y_offset:
-                return True
-        return False
+            self._x_offset = max(self.x_offset, -(self.content_width - self.width))
+        # 【防止容器超出下边界】
+        if self.content_height < self.height:
+            self._y_offset = 0
+        else:
+            self._y_offset = max(self.y_offset, -(self.content_height - self.height))
 
     def scroll(
         self,
         x_offset: int | float,
         y_offset: int | float,
-    ):
-        if self._check_scroll(x_offset, y_offset):
-            self.y_offset = min(y_offset + self.y_offset, self.content_height)
+    ) -> None:
+        """【滚动容器】
+
+        :param x_offset: 【水平滚动量】
+        :param y_offset: 【垂直滚动量】
+        """
+        """if self._check_scroll(x_offset, y_offset):
+        self.y_offset = min(y_offset + self.y_offset, self.content_height)
+        """
+        self.x_offset = min(self.x_offset + x_offset, 0)
+        # 防止容器超出上边界
+        self.y_offset = min(self.y_offset + y_offset, 0)
 
     # region add_child 添加子元素
     def add_child(self, child):
@@ -149,6 +160,26 @@ class SkContainer:
             if not isinstance(self.parent, SkApp):
                 self.parent.add_child(child)
             self.children.append(child)
+
+    def grid_map(self):
+        # Grid Map
+        from .widget import SkWidget
+
+        grid_map: list[list[SkWidget | None]] = []
+        children: list[SkWidget] = self.draw_list[0]
+
+        for child in children:
+            child_config = child.layout_config["grid"]
+            row, col = child_config["row"], child_config["column"]
+
+            if col > len(grid_map) - 1:
+                while col > len(grid_map) - 1:
+                    grid_map.append([])
+            if row > len(grid_map[col]) - 1:
+                while row > len(grid_map[col]) - 1:
+                    grid_map[col].append(None)
+            grid_map[col][row] = child
+        return grid_map
 
     def add_layout_child(self, child):
         """Add layout child widget to window.
@@ -249,11 +280,12 @@ class SkContainer:
     # region layout 布局
 
     def update_layout(self, event: SkEvent | None = None):
-        if self.allowed_scrolled and self.y_offset < 0:
-            if not self._check_scroll(0, -5):
-                self._y_offset = self.height - self.content_height
-                if self._y_offset > 0:
-                    self._y_offset = 0
+        """if self.allowed_scrolled and self.y_offset < 0:
+        if not self._check_scroll(0, -5):
+            self._y_offset = self.height - self.content_height
+            if self._y_offset > 0:
+                self._y_offset = 0"""
+        self.update_scroll()
         self._handle_layout()
         for widget in self.children:
             widget.event_trigger("resize", SkEvent(event_type="resize"))
@@ -273,6 +305,10 @@ class SkContainer:
                     match child.layout_config:
                         case {"place": _}:
                             pass
+                        case {"grid": _}:
+                            self.layout_names[0] = "grid"
+                            self._handle_grid()
+                            break
                         case {"box": _}:
                             self.layout_names[0] = "box"
                             self._handle_box()
@@ -294,28 +330,46 @@ class SkContainer:
         pass
 
     def _handle_grid(self):
-        pass
+        from .widget import SkWidget
 
-    @staticmethod
-    def unpack_padding(padx, pady):
-        """Unpack padding.
-        【左上右下】
-        :param padx:
-        :param pady:
-        :return:
-        """
-        if type(padx) is tuple:
-            left = padx[0]
-            right = padx[1]
-        else:
-            left = right = padx
+        # Grid
+        col_heights: list[int | float] = []
+        row_widths: list[int | float] = []
+        # children: list[SkWidget] = self.draw_list[0]
+        grid_map = self.grid_map()
 
-        if type(pady) is tuple:
-            top = pady[0]
-            bottom = pady[1]
-        else:
-            top = bottom = pady
-        return left, top, right, bottom
+        for col, cols in enumerate(grid_map):
+
+            for row, widget in enumerate(cols):
+                child_config = widget.layout_config["grid"]
+
+                left, top, right, bottom = self.unpack_padding(
+                    child_config["padx"],
+                    child_config["pady"],
+                )
+                if len(row_widths) <= row:
+                    row_widths.append(0)
+                row_widths[row] = max(row_widths[row], widget.dwidth)
+                if len(col_heights) <= col:
+                    col_heights.append(0)
+                col_heights[col] = max(col_heights[col], widget.dheight + left + bottom)
+            # print(row_widths, col_heights)
+            row_left = 0
+
+            for row, widget in enumerate(cols):
+                child_config = widget.layout_config["grid"]
+                # print(child_config)
+                col_top = sum(col_heights[:col])
+                left, top, right, bottom = self.unpack_padding(
+                    child_config["padx"],
+                    child_config["pady"],
+                )
+                widget.width, widget.height = (
+                    row_widths[row],
+                    col_heights[col] - top - bottom,
+                )
+                widget.x, widget.y = row_left + left, col_top + top
+                row_left = widget.x + widget.width + right
 
     def _handle_box(self) -> None:
         """Process box layout.
@@ -323,7 +377,7 @@ class SkContainer:
         :return: None
         """
 
-        from ..widgets.widget import SkWidget
+        from .widget import SkWidget
 
         width = self.width  # container width
         height = self.height  # container height

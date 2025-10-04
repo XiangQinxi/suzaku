@@ -4,6 +4,8 @@ from .text import SkText
 
 
 class SkLabel(SkText):
+    """(A SkText with border and background"""
+
     def __init__(
         self, parent, text: str | None = None, *, style: str = "SkLabel", **kwargs
     ):

@@ -124,6 +124,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.events = {
             # Mouse Events
+            "mouse_move": {},
             "mouse_motion": {},
             "mouse_pressed": {},
             "mouse_released": {},
@@ -159,7 +160,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion"]
+        button_states = ["pressed", "released", "motion", "move"]
 
         for button in buttons:
             for state in button_states:
@@ -239,7 +240,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         if hasattr(self, "application") and self.application:
             match self.framework:
                 case "glfw":
-                    if self.attributes["fullscreen"]:
+                    if self.cget("fullscreen"):
                         monitor = glfw.get_primary_monitor()
                     else:
                         monitor = None
@@ -255,7 +256,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
                         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
                     else:
-                        if self.attributes["force_hardware_acceleration"]:
+                        if self.cget("force_hardware_acceleration"):
                             glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
                             glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
                             glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
@@ -265,7 +266,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                             )
 
                     window = glfw.create_window(
-                        self.width, self.height, self.attributes["title"], monitor, None
+                        self.width, self.height, self.cget("title"), monitor, None
                     )
                     if not window:
                         raise RuntimeError("无法创建GLFW窗口")
@@ -288,7 +289,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                     import sdl2
 
                     window = sdl2.SDL_CreateWindow(
-                        self.attributes["title"].encode("utf-8"),
+                        self.cget("title").encode("utf-8"),
                         sdl2.SDL_WINDOWPOS_CENTERED,
                         sdl2.SDL_WINDOWPOS_CENTERED,
                         self.width,
@@ -541,12 +542,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: None
         """
         if focused:
-            self.attributes["focus"] = True
+            self.configure(focus=True)
             self.event_trigger(
                 "focus_gain", SkEvent(event_type="focus_gain", glfw_window=window)
             )
         else:
-            self.attributes["focus"] = False
+            self.configure(focus=False)
             self.event_trigger(
                 "focus_loss", SkEvent(event_type="focus_loss", glfw_window=window)
             )
@@ -642,13 +643,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         # print(arg1, arg2)
 
-        from glfw import get_cursor_pos
-
-        pos = get_cursor_pos(window)
-        self.mouse_x = pos[0]
-        self.mouse_y = pos[1]
-        self.mouse_rootx = pos[0] + self.root_x
-        self.mouse_rooty = pos[1] + self.root_y
+        self.mouse_x, self.mouse_y = self.mouse_pos()
+        self.mouse_rootx, self.mouse_rooty = self.mouse_root_pos()
 
         if is_pressed:
             state = "pressed"
@@ -664,8 +660,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 name,
                 SkEvent(
                     event_type=name,
-                    x=pos[0],
-                    y=pos[1],
+                    x=self.mouse_x,
+                    y=self.mouse_y,
                     rootx=self.mouse_rootx,
                     rooty=self.mouse_rooty,
                     button=button,
@@ -682,14 +678,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param is_enter: Whether entered
         :return: None
         """
-
-        from glfw import get_cursor_pos
-
-        pos = get_cursor_pos(window)
-        self.mouse_x = pos[0]
-        self.mouse_y = pos[1]
-        self.mouse_rootx = pos[0] + self.root_x
-        self.mouse_rooty = pos[1] + self.root_y
+        self.mouse_x, self.mouse_y = self.mouse_pos()
+        self.mouse_rootx, self.mouse_rooty = self.mouse_root_pos()
 
         if is_enter:
             self.is_mouse_floating = True
@@ -697,8 +687,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 "mouse_enter",
                 SkEvent(
                     event_type="mouse_enter",
-                    x=pos[0],
-                    y=pos[1],
+                    x=self.mouse_x,
+                    y=self.mouse_y,
                     rootx=self.mouse_rootx,
                     rooty=self.mouse_rooty,
                 ),
@@ -709,8 +699,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 "mouse_leave",
                 SkEvent(
                     event_type="mouse_leave",
-                    x=pos[0],
-                    y=pos[1],
+                    x=self.mouse_x,
+                    y=self.mouse_y,
                     rootx=self.mouse_rootx,
                     rooty=self.mouse_rooty,
                 ),
@@ -727,8 +717,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         self.mouse_x = x
         self.mouse_y = y
-        self.mouse_rootx = x + self.root_x
-        self.mouse_rooty = y + self.root_y
+        window_pos = self.window_pos()
+        self.mouse_rootx = x + window_pos[0]
+        self.mouse_rooty = y + window_pos[1]
 
         button = self.button
         if button >= 0:
@@ -746,18 +737,17 @@ class SkWindowBase(SkEventHanding, SkMisc):
                         glfw_window=window,
                     ),
                 )
-        else:
-            self.event_trigger(
-                "mouse_motion",
-                SkEvent(
-                    event_type="mouse_motion",
-                    x=self.mouse_x,
-                    y=self.mouse_y,
-                    rootx=self.mouse_rootx,
-                    rooty=self.mouse_rooty,
-                    glfw_window=window,
-                ),
-            )
+        self.event_trigger(
+            "mouse_move",
+            SkEvent(
+                event_type="mouse_move",
+                x=self.mouse_x,
+                y=self.mouse_y,
+                rootx=self.mouse_rootx,
+                rooty=self.mouse_rooty,
+                glfw_window=window,
+            ),
+        )
 
     def _on_maximize(self, window, maximized: bool):
         self.event_trigger(
@@ -1047,8 +1037,8 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: Cursor style name or cls
         """
         if cursor_name is None:
-            return self.attributes["cursor"]
-        self.attributes["cursor"] = cursor_name
+            return self.cget("cursor")
+        self.configure(cursor=cursor_name)
         return self
 
     def wm_visible(
@@ -1160,9 +1150,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :return: cls
         """
         if text is None:
-            return self.attributes["title"]
+            return self.cget("title")
         else:
-            self.attributes["title"] = text
+            self.configure(title=text)
             from glfw import set_window_title
 
             set_window_title(self.the_window, text)
@@ -1206,8 +1196,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if x is None:
             x = self.root_x
+        if x < 0:
+            x = 0
         if y is None:
             y = self.root_y
+        if y < 0:
+            y = 0
         self.root_x = x
         self.root_y = y
         from glfw import set_window_pos
@@ -1217,8 +1211,16 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         return self
 
+    def window_pos(self):
+        return glfw.get_window_pos(self.the_window)
+
     def mouse_pos(self):
         return glfw.get_cursor_pos(self.the_window)
+
+    def mouse_root_pos(self):
+        pos = self.mouse_pos()
+        window_pos = self.window_pos()
+        return pos[0] + window_pos[0], pos[1] + window_pos[1]
 
     def get_attribute(self, attribute_name: str) -> typing.Any:
         """Get the window attribute with attribute name.

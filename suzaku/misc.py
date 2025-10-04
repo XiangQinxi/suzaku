@@ -85,3 +85,72 @@ class SkMisc:
                 keys.append(name)
 
         return join.join(keys)
+
+    @staticmethod
+    def unpack_radius(
+        radius: (
+            int
+            | tuple[
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+            ]
+        ),
+    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
+        """Unpacking the radius"""
+        _radius: list[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = list(radius)
+        for i, r in enumerate(_radius):
+            if isinstance(r, int):
+                _radius[i] = (r, r)
+        radius = tuple(_radius)
+        return radius
+
+    @staticmethod
+    def unpack_padx(padx):
+        """Unpack padx.
+        【左右】
+        :param padx:
+        :return:
+        """
+        if type(padx) is tuple:
+            left = padx[0]
+            right = padx[1]
+        else:
+            left = right = padx
+        return left, right
+
+    @staticmethod
+    def unpack_pady(pady):
+        """Unpack pady.
+        【上下】
+        :param pady:
+        :return:
+        """
+        if type(pady) is tuple:
+            top = pady[0]
+            bottom = pady[1]
+        else:
+            top = bottom = pady
+        return top, bottom
+
+    def unpack_padding(self, padx, pady):
+        """Unpack padding.
+        【左上右下】
+        :param padx:
+        :param pady:
+        :return:
+        """
+        left, right = self.unpack_padx(padx)
+        top, bottom = self.unpack_pady(pady)
+
+        return left, top, right, bottom
+
+    @staticmethod
+    def _style(name: str, default, style):
+        if name in style:
+            return style[name]
+        else:
+            return default

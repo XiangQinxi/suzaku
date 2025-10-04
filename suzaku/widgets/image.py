@@ -3,6 +3,8 @@ from typing import Any
 from .container import SkContainer
 from .widget import SkWidget
 
+# TODO 准备重组SkImage
+
 
 class SkImage(SkWidget):
     """Just a Image widget

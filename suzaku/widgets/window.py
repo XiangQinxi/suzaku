@@ -47,7 +47,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.draws: list[typing.Callable] = []
 
         self.window: SkWindow = self
-        self.anti_alias: bool = anti_alias
+        self._anti_alias: bool = anti_alias
 
         self.previous_widget = None
         self.esc_to_close = True
@@ -55,7 +55,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.entered_widgets = []
 
         self.set_draw_func(self._draw)
-        self.bind("mouse_motion", self._motion, add=True)
+        self.bind("mouse_move", self._move, add=True)
         self.bind("mouse_pressed", self._mouse)
         self.bind("mouse_released", self._mouse_released)
 
@@ -73,6 +73,16 @@ class SkWindow(SkWindowBase, SkContainer):
     # endregion
 
     # region Theme related 主题相关
+
+    @property
+    def anti_alias(self) -> bool:
+        return self._anti_alias
+
+    @anti_alias.setter
+    def anti_alias(self, value: bool):
+        self._anti_alias = value
+        for child in self.children:
+            child.anti_alias = value
 
     def apply_theme(self, new_theme: SkTheme):
         """Apply theme to the window and its children.
@@ -154,10 +164,10 @@ class SkWindow(SkWindowBase, SkContainer):
         :return bool:
         """
         if widget.visible:
-            return (
-                widget.canvas_x <= event.x <= widget.canvas_x + widget.width
-                and widget.canvas_y <= event.y <= widget.canvas_y + widget.height
-            )
+            cx, cy = widget.canvas_x, widget.canvas_y
+            x, y = event.x, event.y
+            width, height = widget.width, widget.height
+            return cx <= x <= cx + width and cy <= y <= cy + height
         return False
 
     def is_entered_widget(self, widget, event: SkEvent) -> bool:
@@ -167,12 +177,16 @@ class SkWindow(SkWindowBase, SkContainer):
         :param event: SkEvent
         :return bool:
         """
-        parent = widget.parent
-        return (
-            parent.canvas_x <= event.x <= parent.canvas_x + parent.width
-            and parent.canvas_y <= event.y <= parent.canvas_y + parent.height
-            and self.is_entered_widget_bounds(widget, event)
-        )
+        if self.is_entered_widget_bounds(widget, event):
+            is_parents = []
+            parent = widget.parent
+            while parent:
+                if isinstance(parent, (SkWindow, SkApp)):
+                    break
+                is_parents.append(self.is_entered_widget_bounds(parent, event))
+                parent = parent.parent
+            return all(is_parents)
+        return False
 
     def _mouse(self, event: SkEvent) -> None:
         children = self.visible_children
@@ -193,8 +207,8 @@ class SkWindow(SkWindowBase, SkContainer):
                     widget.event_trigger(name, event)
                 break
 
-    def _motion(self, event: SkEvent) -> None:
-        """Mouse motion event for SkWindow.
+    def _move(self, event: SkEvent) -> None:
+        """Mouse move event for SkWindow.
 
         :param event: SkEvent
         :return:
