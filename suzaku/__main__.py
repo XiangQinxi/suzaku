@@ -19,10 +19,14 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 630),
         )
+        # window.window_attr("border", False)
         window.bind("drop", lambda evt: print("drop", evt))
 
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
+
+        # titlebar = SkTitleBar(window)
+        # titlebar.box(side="top", padx=0, pady=0)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -48,7 +52,7 @@ if __name__ == "__main__":
         menubar.add_separator()
         menubar.add_command("Exit", command=window.destroy)
 
-        tabs = SkTabs(window, expand=False)
+        tabs = SkTabs(window, expand=True)
 
         def tab1():
             tab_widgets = SkFrame(tabs)
