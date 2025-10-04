@@ -14,7 +14,7 @@ class SkTitleBar(SkCard):
     ):
         super().__init__(parent, style=style, **kwargs)
 
-        self.window.bind("mouse_pressed", self._mouse_pressed)
+        self.bind("mouse_pressed", self._mouse_pressed)
         self.window.bind("mouse_motion", self._mouse_motion)
         self.window.bind("mouse_released", self._mouse_released)
         self.window.bind("configure", self._window_configure)
