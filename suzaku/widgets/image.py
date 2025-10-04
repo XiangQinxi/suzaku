@@ -1,9 +1,9 @@
 from typing import Any
 
+import skia
+
 from .container import SkContainer
 from .widget import SkWidget
-
-# TODO 准备重组SkImage
 
 
 class SkImage(SkWidget):
@@ -16,31 +16,41 @@ class SkImage(SkWidget):
     def __init__(
         self,
         parent: SkContainer,
-        path: str,
-        x: int,
-        y: int,
-        width: int,
-        height: int,
+        path: str | None = None,
         **kwargs,
     ) -> None:
         super().__init__(parent, **kwargs)
         self.parent = parent
-        self.width: int = width
-        self.height: int = height
         self.path = path
-        self.x: int = x
-        self.y: int = y
+        if path:
+            self.image: skia.Image = skia.Image.open(path)
+        else:
+            self.image = None
+
+    def path(self, filename: str | None = None) -> str | None:
+        if filename:
+            self.path = filename
+            if self.image:
+                self.image.close()
+            self.image: skia.Image = skia.Image.open(filename)
+        else:
+            return self.path
+        return self.path
 
     @property
     def dwidth(self):
-        _width = self.width
+        if self.image:
+            _width = self.image.width()
+        else:
+            _width = 0
         return _width
 
     @property
     def dheight(self):
-        _height = self.cget("dheight")
-        if _height <= 0:
-            _height = self.text_height + 8
+        if self.image:
+            _height = self.image.height()
+        else:
+            _height = 0
         return _height
 
     def draw_widget(self, canvas, rect) -> None:
@@ -51,8 +61,4 @@ class SkImage(SkWidget):
 
         :return: None
         """
-        if self.path:
-            path = self.path
-        else:
-            path = None
-        self._draw_image(canvas, path=path, uri=None, rect=rect)
+        self._draw_image(canvas, rect, self.image)

@@ -217,6 +217,8 @@ class SkGradient:
             ] = []
             positions: list[float] = []
             for position, color in config["colors"].items():
+                position: str  # ["0%", "0.5", "100%"]
+
                 if position.endswith("%"):
                     positions.append(float(position.strip("%")) / 100)
                 else:
@@ -227,14 +229,12 @@ class SkGradient:
                 if widget:
                     if "start_anchor" in config:
                         start_anchor = config["start_anchor"]
-                        del config["start_anchor"]
                     else:
                         start_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"
                         ] = "n"
                     if "end_anchor" in config:
                         end_anchor = config["end_anchor"]
-                        del config["end_anchor"]
                     else:
                         end_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"

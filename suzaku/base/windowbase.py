@@ -1196,12 +1196,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if x is None:
             x = self.root_x
-        if x < 0:
-            x = 0
+        if x < -self.width / 2:
+            x = round(-self.width / 2)
         if y is None:
             y = self.root_y
-        if y < 0:
-            y = 0
+        if y < -self.height / 2:
+            y = round(-self.height / 2)
         self.root_x = x
         self.root_y = y
         from glfw import set_window_pos

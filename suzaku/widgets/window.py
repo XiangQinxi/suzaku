@@ -20,6 +20,7 @@ class SkWindow(SkWindowBase, SkContainer):
         parent: typing.Self | SkApp = None,
         *args,
         theme: SkTheme = None,
+        style: str = "SkWindow",
         size: tuple[int, int] = (300, 300),
         anti_alias: bool = True,
         **kwargs,
@@ -35,6 +36,9 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.theme: SkTheme | None = None
         self.styles: dict | None = None
+        self.style = style
+
+        self.attributes["enabled_radius"]: bool = False
 
         if isinstance(self.parent, SkWindow):
             self.apply_theme(self.parent.theme if self.parent.theme else theme)
@@ -269,11 +273,39 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
-        bg = self.theme.get_style("SkWindow")["bg"]
-        canvas.clear(style_to_color(bg, self.theme).color)
+        style = self.theme.get_style("SkWindow")
+        self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
+        """canvas.clipRRect(
+            skia.RRect.MakeRectXY(
+                skia.Rect.MakeXYWH(0, 0, self.width, self.height), style["radius"], style["radius"]
+            )
+        )"""
+        _ = not self.window_attr("border") and "radius" in style
+        if _:
+            canvas.clipRRect(
+                skia.RRect.MakeRectXY(self.rect, style["radius"], style["radius"]),
+                self.anti_alias,
+            )
+
+        canvas.clear(style_to_color(style["bg"], self.theme).color)
         # canvas.clear(skia.ColorTRANSPARENT)
 
         self.draw_children(canvas)
+
+        if _:
+            bd = style_to_color(
+                self._style("bd", skia.ColorBLACK, self.style), self.theme
+            )
+            width = self._style("width", 2, self.style)
+            paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Color=bd,
+                StrokeWidth=width,
+                Style=skia.Paint.kStroke_Style,
+            )
+            canvas.drawRoundRect(self.rect, style["radius"], style["radius"], paint)
+
+        canvas.restore()
 
         return None
 

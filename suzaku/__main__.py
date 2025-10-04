@@ -19,12 +19,13 @@ if __name__ == "__main__":
             title="Suzaku GUI",
             size=(280, 630),
         )
-        # window.window_attr("border", False)
+
         window.bind("drop", lambda evt: print("drop", evt))
 
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
+        # window.window_attr("border", False)
         # titlebar = SkTitleBar(window)
         # titlebar.box(side="top", padx=0, pady=0)
 
