@@ -55,7 +55,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.entered_widgets = []
 
         self.set_draw_func(self._draw)
-        self.bind("mouse_motion", self._motion, add=True)
+        self.bind("mouse_move", self._move, add=True)
         self.bind("mouse_pressed", self._mouse)
         self.bind("mouse_released", self._mouse_released)
 
@@ -207,8 +207,8 @@ class SkWindow(SkWindowBase, SkContainer):
                     widget.event_trigger(name, event)
                 break
 
-    def _motion(self, event: SkEvent) -> None:
-        """Mouse motion event for SkWindow.
+    def _move(self, event: SkEvent) -> None:
+        """Mouse move event for SkWindow.
 
         :param event: SkEvent
         :return:

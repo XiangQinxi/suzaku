@@ -10,12 +10,19 @@ from .widget import SkWidget
 class SkTabs(SkCard):
     """A tabs widget"""
 
-    def __init__(self, parent: SkContainer, *, style: str = "SkTabs", **kwargs) -> None:
+    def __init__(
+        self,
+        parent: SkContainer,
+        *,
+        style: str = "SkTabs",
+        expand: bool = True,
+        **kwargs,
+    ) -> None:
         super().__init__(parent, style=style, **kwargs)
 
         self.tabs = []
         self.selected: SkFrame | None = None
-        self.tabbar: SkTabBar = SkTabBar(self)
+        self.tabbar: SkTabBar = SkTabBar(self, expand=expand)
         self.tabbar.box(side="top", padx=2, pady=(2, 0))
         self.tabbar.bind("selected", self._select)
         self.separator = SkSeparator(self, orient=Orient.H)

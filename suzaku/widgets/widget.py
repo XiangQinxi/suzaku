@@ -7,8 +7,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -70,6 +69,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.events = {
             "resize": dict(),
             "move": dict(),
+            "mouse_move": dict(),
             "mouse_motion": dict(),
             "mouse_enter": dict(),
             "mouse_leave": dict(),
@@ -97,7 +97,7 @@ class SkWidget(SkEventHanding, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion"]
+        button_states = ["pressed", "released", "motion", "move"]
 
         for button in buttons:
             for state in button_states:

@@ -74,6 +74,9 @@ class SkEventHanding:
     ) -> str:
         """Bind an event.【绑定事件】
 
+        resize,move,mouse_motion,mouse_enter,mouse_leave,mouse_pressed,mouse_released,click,double_click,focus_gain,focus_loss,key_pressed,key_released,key_repeated,char,configure,update,scroll,
+        button*_*
+
         :param name: Event name.【事件名】
         :param func: Event function.【事件函数】
         :param add: Whether to add after existed events, otherwise clean other and add itself.【是否在已存在事件后添加，否则清理其他事件并添加本身】

@@ -48,7 +48,7 @@ if __name__ == "__main__":
         menubar.add_separator()
         menubar.add_command("Exit", command=window.destroy)
 
-        tabs = SkTabs(window)
+        tabs = SkTabs(window, expand=False)
 
         def tab1():
             tab_widgets = SkFrame(tabs)

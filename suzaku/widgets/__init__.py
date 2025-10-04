@@ -54,5 +54,10 @@ SkTabbutton = SkSegmentedButton = SkTabButton
 from .tabs import SkTabs  # ✅
 from .text import SkText  # ✅
 from .textbutton import SkTextButton  # ✅
+
+from .titlebar import SkTitleBar
+
+SkTitlebar = SkHeaderBar = SkHeaderbar = SkTitleBar
+
 from .widget import SkWidget  # ✅
 from .window import SkWindow  # ✅

@@ -7,8 +7,16 @@ from .widget import SkWidget
 class SkTabBar(SkFrame):
     """A tab bar"""
 
-    def __init__(self, parent: SkContainer, style: str = "SkTabBar", **kwargs):
+    def __init__(
+        self,
+        parent: SkContainer,
+        style: str = "SkTabBar",
+        expand: bool = True,
+        **kwargs,
+    ):
         super().__init__(parent, style=style, **kwargs)
+
+        self.attributes["expand"]: bool = expand
 
         self.event_generate("selected")
 
@@ -34,7 +42,7 @@ class SkTabBar(SkFrame):
                 padx = (1, 3)
             elif index == 0:
                 padx = (3, 1)
-            item.box(side="left", padx=padx, pady=3, expand=True)
+            item.box(side="left", padx=padx, pady=3, expand=self.cget("expand"))
 
     def add(
         self, text: str | None = None, widget: SkWidget = None, **kwargs

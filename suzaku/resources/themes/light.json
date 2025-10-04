@@ -512,6 +512,17 @@
       }
     },
 
+    "SkTitleBar": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 0,
+        "bg": {"color_palette": "second_bg"},
+        "bd": {"color_palette": "bd"},
+        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "width": 2
+      }
+    },
+
     "SkWindow": {
       "rest":{
         "bg": {"color_palette": "bg"}
