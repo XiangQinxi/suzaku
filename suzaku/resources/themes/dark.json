@@ -456,9 +456,10 @@
     },
 
     "SkWindow": {
-      "rest":{
-        "bg": {"color_palette": "bg"}
-      }
+      "bg": {"color_palette": "bg"},
+      "radius": 4,
+      "width": 3,
+      "bd": {"color_palette": "bd"}
     }
 
   }

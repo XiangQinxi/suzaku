@@ -273,37 +273,36 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
-        style = self.theme.get_style("SkWindow")
+        style = self.theme.get_style(self.style)
         self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
-        """canvas.clipRRect(
-            skia.RRect.MakeRectXY(
-                skia.Rect.MakeXYWH(0, 0, self.width, self.height), style["radius"], style["radius"]
-            )
-        )"""
+
+        radius = self._style("radius", 0, style)
+
         _ = not self.window_attr("border") and "radius" in style
         if _:
             canvas.clipRRect(
-                skia.RRect.MakeRectXY(self.rect, style["radius"], style["radius"]),
+                skia.RRect.MakeRectXY(self.rect, radius, radius),
                 self.anti_alias,
             )
-
-        canvas.clear(style_to_color(style["bg"], self.theme).color)
+        canvas.clear(
+            style_to_color(self._style("bg", skia.ColorWHITE, style), self.theme).color
+        )
         # canvas.clear(skia.ColorTRANSPARENT)
 
         self.draw_children(canvas)
 
         if _:
             bd = style_to_color(
-                self._style("bd", skia.ColorBLACK, self.style), self.theme
-            )
-            width = self._style("width", 2, self.style)
+                self._style("bd", skia.ColorBLACK, style), self.theme
+            ).color
+            width = self._style("width", 2, style)
             paint = skia.Paint(
                 AntiAlias=self.anti_alias,
                 Color=bd,
                 StrokeWidth=width,
                 Style=skia.Paint.kStroke_Style,
             )
-            canvas.drawRoundRect(self.rect, style["radius"], style["radius"], paint)
+            canvas.drawRoundRect(self.rect, radius, radius, paint)
 
         canvas.restore()
 

@@ -3,6 +3,7 @@ from .card import SkCard
 from .container import SkContainer
 from .text import SkText
 from .textbutton import SkTextButton
+from .image import SkImage
 
 
 class SkTitleBar(SkCard):
@@ -14,10 +15,11 @@ class SkTitleBar(SkCard):
     ):
         super().__init__(parent, style=style, **kwargs)
 
-        self.bind("mouse_pressed", self._mouse_pressed)
-        self.window.bind("mouse_motion", self._mouse_motion)
-        self.window.bind("mouse_released", self._mouse_released)
-        self.window.bind("configure", self._window_configure)
+        self.icon = SkImage(
+            self, path=self.window.icon1_path
+        )  # TODO 改为窗口的当前图标
+        self.icon.resize(10, 10)
+        self.icon.box(side="left")
 
         self.title = SkText(self, text=self.window.title())
         self.title.box(
@@ -27,6 +29,12 @@ class SkTitleBar(SkCard):
         self.close = SkTextButton(self, text="×", command=self.window.destroy)
         # self.close_theme = self.close.theme.special("SkButton:rest", radius=99)
         self.close.box(side="right")
+
+        self.bind("mouse_pressed", self._mouse_pressed)
+        self.title.bind("mouse_pressed", self._mouse_pressed)
+        self.window.bind("mouse_motion", self._mouse_motion)
+        self.window.bind("mouse_released", self._mouse_released)
+        self.window.bind("configure", self._window_configure)
 
         self._x1 = None
         self._y1 = None

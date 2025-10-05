@@ -25,9 +25,9 @@ if __name__ == "__main__":
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
-        # window.window_attr("border", False)
-        # titlebar = SkTitleBar(window)
-        # titlebar.box(side="top", padx=0, pady=0)
+        window.window_attr("border", False)
+        titlebar = SkTitleBar(window)
+        titlebar.box(side="top", padx=0, pady=0)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)

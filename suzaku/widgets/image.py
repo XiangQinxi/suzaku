@@ -17,15 +17,29 @@ class SkImage(SkWidget):
         self,
         parent: SkContainer,
         path: str | None = None,
+        width: int | None = None,
+        height: int | None = None,
         **kwargs,
     ) -> None:
         super().__init__(parent, **kwargs)
-        self.parent = parent
-        self.path = path
+        self.path: str = path
+        self.image: skia.Image | None
         if path:
-            self.image: skia.Image = skia.Image.open(path)
+            self.image = skia.Image.open(path)
+            if width and height:
+                self.resize(width, height)
         else:
             self.image = None
+
+    def resize(self, width: int, height: int) -> None:
+        """Resize image to width and height"""
+        self.image.resize(width, height)
+
+    def image_width(self):
+        return self.image.width()
+
+    def image_height(self):
+        return self.image.height()
 
     def path(self, filename: str | None = None) -> str | None:
         if filename:
@@ -40,7 +54,7 @@ class SkImage(SkWidget):
     @property
     def dwidth(self):
         if self.image:
-            _width = self.image.width()
+            _width = self.image_width()
         else:
             _width = 0
         return _width
@@ -48,7 +62,7 @@ class SkImage(SkWidget):
     @property
     def dheight(self):
         if self.image:
-            _height = self.image.height()
+            _height = self.image_height()
         else:
             _height = 0
         return _height
