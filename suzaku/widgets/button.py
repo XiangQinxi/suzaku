@@ -31,8 +31,8 @@ class SkButton(SkFrame):
         super().__init__(parent, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
+        self.attributes["command"] = command
 
-        self.command = command
         self.focusable = True
         self.help_parent_scroll = True
 
@@ -40,8 +40,8 @@ class SkButton(SkFrame):
 
     def invoke(self) -> None:
         """【触发按钮的点击事件】"""
-        if self.command and self.cget("disabled") is False:
-            self.command()
+        if self.cget("command") and self.cget("disabled") is False:
+            self.cget("command")()
 
     def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
         """Draw button
@@ -90,3 +90,4 @@ class SkButton(SkFrame):
             bd_shader=bd_shader,
             bg_shader=bg_shader,
         )
+        return style

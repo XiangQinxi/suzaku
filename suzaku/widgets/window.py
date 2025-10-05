@@ -302,6 +302,8 @@ class SkWindow(SkWindowBase, SkContainer):
         self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
 
         radius = self._style("radius", 0, style)
+        if self.window_attr("maximized"):
+            radius = (0, 0, 0, 0)
 
         _ = not self.window_attr("border") and "radius" in style
         if _:

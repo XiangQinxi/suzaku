@@ -93,9 +93,9 @@
       }
     },
 
-    "SkButton.Close": {
+    "SkCloseButton": {
       "rest": {
-        "size": [0, 35],
+        "size": [35, 35],
         "radius": 0,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
@@ -109,6 +109,58 @@
       "pressed": {
         "bg": [145, 31, 20],
         "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
+    "SkMaximizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [50, 100, 210, 155],
+        "fg": "white",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [40, 80, 160],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
+    "SkMinimizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [0, 0, 0, 20],
+        "fg": "black",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [0, 0, 0, 40],
+        "fg": "black",
         "width": 0
       },
       "disabled": {
@@ -156,7 +208,7 @@
         "size": [0, 30],
         "fg": {"color_palette": "bd"},
         "bg": {"color_palette": "second_bg"},
-        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
+        "bd_shadow": [0, 4, 2, 2, [0, 0, 0, 50]],
         "width": 0
       }
     },
@@ -562,7 +614,7 @@
     "SkWindow": {
       "rest": {
         "bg": {"color_palette": "bg"},
-        "radius": [6, 6, 0, 0],
+        "radius": [8, 8, 0, 0],
         "width": 3,
         "bd": {"color_palette": "bd"}
       }

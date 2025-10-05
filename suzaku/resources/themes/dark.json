@@ -91,9 +91,9 @@
       }
     },
 
-    "SkButton.Close": {
+    "SkCloseButton": {
       "rest": {
-        "size": [0, 35],
+        "size": [35, 35],
         "radius": 0,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
@@ -106,6 +106,58 @@
       },
       "pressed": {
         "bg": [145, 31, 20],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
+    "SkMaximizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [50, 100, 210, 155],
+        "fg": "white",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [40, 80, 160],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
+    "SkMinimizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [255, 255, 255, 20],
+        "fg": "white",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 40],
         "fg": "white",
         "width": 0
       },
@@ -155,7 +207,7 @@
         "fg": {"color_palette": "bd"},
         "radius": 0,
         "bg": {"color_palette": "second_bg"},
-        "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]],
+        "bd_shadow": [0, 4, 2, 2, [220, 220, 220, 20]],
         "width": 2
       }
     },
@@ -458,8 +510,8 @@
             "end_anchor": "s",
             "colors": {
               "0%": [0, 0, 0, 0],
-              "40%": [0, 0, 0, 0],
-              "60%": [0, 0, 0, 0],
+              "50%": [0, 0, 0, 10],
+              "70%": [0, 0, 0, 15],
               "100%": [40, 130, 255, 40]
             }
           }
@@ -482,7 +534,7 @@
 
     "SkWindow": {
       "bg": {"color_palette": "bg"},
-      "radius": [6, 6, 0, 0],
+      "radius": [8, 8, 0, 0],
       "width": 3,
       "bd": {"color_palette": "bd"}
     }

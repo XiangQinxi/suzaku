@@ -949,6 +949,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "resizable",
             "visible",
             "border",
+            "maximized",
         ],
         value: typing.Any = None,
     ) -> typing.Any:
@@ -962,6 +963,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "resizable": glfw.RESIZABLE,
             "visible": glfw.VISIBLE,
             "border": glfw.DECORATED,
+            "maximized": glfw.MAXIMIZED,
         }
 
         if name in attrib_names:

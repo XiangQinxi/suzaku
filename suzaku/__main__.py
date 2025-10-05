@@ -1,5 +1,6 @@
 try:
     from suzaku import *
+    import suzaku as sk
 except:
     raise ModuleNotFoundError(
         "Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir."
@@ -16,10 +17,10 @@ if __name__ == "__main__":
         window = SkWindow(
             anti_alias=True,
             parent=None,
-            title="Suzaku GUI",
+            title=f"Suzaku GUI",
             size=(280, 630),
         )
-
+        window.minsize(100, 80)
         window.bind("drop", lambda evt: print("drop", evt))
 
         var1 = SkBooleanVar()
@@ -49,7 +50,7 @@ if __name__ == "__main__":
 
         menubar.add_cascade("File", menu=popupmenu)
         menubar.add_command("New", command=create1window)
-        menubar.add_command("Exit", command=window.destroy, style="SkButton.Close")
+        menubar.add_command("Exit", command=window.destroy)
 
         tabs = SkTabs(window, expand=True)
 
@@ -89,7 +90,9 @@ if __name__ == "__main__":
             SkEntry(
                 tab_widgets, placeholder="Password", textvariable=var2, show="●"
             ).box(padx=10, pady=(10, 0))
-            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 10))
+            SkLabel(tab_widgets, text=f"Suzaku Version: {sk.__version__}").box(
+                padx=10, pady=(10, 10)
+            )
 
         tab1()
 

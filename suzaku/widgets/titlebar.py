@@ -3,7 +3,7 @@ from .card import SkCard
 from .container import SkContainer
 from .image import SkImage
 from .text import SkText
-from .textbutton import SkTextButton
+from .textbutton import SkCloseButton, SkMaximizeButton, SkMinimizeButton
 
 
 class SkTitleBar(SkCard):
@@ -24,14 +24,16 @@ class SkTitleBar(SkCard):
             side="left",
         )
 
-        self.close = SkTextButton(
-            self, style="SkButton.Close", text="×", command=self.window.destroy
+        self.close = SkCloseButton(self, command=self.window.destroy).box(
+            side="right", padx=0, pady=0
         )
-        # self.close_theme = self.close.theme.special("SkButton:rest", radius=99)
-        self.close.box(side="right", padx=0, pady=0)
+        self.maximize = SkMaximizeButton(self).box(side="right", padx=0, pady=0)
+        self.minimize = SkMinimizeButton(self).box(side="right", padx=0, pady=0)
 
         self.bind("mouse_pressed", self._mouse_pressed)
+        self.bind("double_click", self._double_click)
         self.title.bind("mouse_pressed", self._mouse_pressed)
+        self.title.bind("double_click", self._double_click)
         self.window.bind("mouse_motion", self._mouse_motion)
         self.window.bind("mouse_released", self._mouse_released)
         self.window.bind("configure", self._window_configure)
@@ -42,12 +44,20 @@ class SkTitleBar(SkCard):
     def _window_configure(self, event: SkEvent):
         self.title.configure(text=self.window.title())
 
+    def _double_click(self, event: SkEvent):
+        if self.window.window_attr("maximized"):
+            self.window.restore()
+        else:
+            self.window.maximize()
+
     def _mouse_pressed(self, event: SkEvent):
         self._x1 = event.x
         self._y1 = event.y
 
     def _mouse_motion(self, event: SkEvent):
         if self._x1 and self._x1:
+            if self.window.window_attr("maximized"):
+                self.window.restore()
             self.window.move(
                 round(event.rootx - self._x1),
                 round(event.rooty - self._y1),
