@@ -25,9 +25,7 @@ if __name__ == "__main__":
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
-        window.window_attr("border", False)
-        titlebar = SkTitleBar(window)
-        titlebar.box(side="top", padx=0, pady=0)
+        headerbar = titlebar(window)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -50,8 +48,8 @@ if __name__ == "__main__":
         popupmenu.add_command("Exit", command=window.destroy)
 
         menubar.add_cascade("File", menu=popupmenu)
-        menubar.add_separator()
-        menubar.add_command("Exit", command=window.destroy)
+        menubar.add_command("New", command=create1window)
+        menubar.add_command("Exit", command=window.destroy, style="SkButton.Close")
 
         tabs = SkTabs(window, expand=True)
 
@@ -139,12 +137,10 @@ if __name__ == "__main__":
         tabs.select(0)
         tabs.box(padx=10, pady=10, expand=True)
 
-        SkTextButton(window, text="Create New window", command=create1window).box(
-            padx=10, pady=(5, 0)
-        )
-        SkTextButton(window, text="Close the window", command=window.destroy).box(
-            side="bottom", padx=10, pady=10
-        )
+        statusbar = SkCard(window)
+        sizegrip = SkSizegrip(statusbar)
+        sizegrip.box(side="right", padx=5, pady=5)
+        statusbar.box(side="bottom", padx=0, pady=0)
 
     create1window()
 

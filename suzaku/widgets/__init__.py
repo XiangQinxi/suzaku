@@ -43,6 +43,9 @@ from .radioitem import SkRadioItem  # ✅
 
 SkRadioButton = SkRadiobutton = SkRadioitem = SkRadioItem
 from .separator import SkSeparator  # ✅
+from .sizegrip import SkSizeGrip
+
+SkSizegrip = SkSizeGrip
 from .switch import SkSwitch  # ✅
 from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar  # ✅
@@ -54,7 +57,7 @@ SkTabbutton = SkSegmentedButton = SkTabButton
 from .tabs import SkTabs  # ✅
 from .text import SkText  # ✅
 from .textbutton import SkTextButton  # ✅
-from .titlebar import SkTitleBar
+from .titlebar import SkTitleBar, titlebar
 
 SkTitlebar = SkHeaderBar = SkHeaderbar = SkTitleBar
 

@@ -6,7 +6,8 @@ import skia
 
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
-from ..styles.color import style_to_color
+from ..styles.color import SkColor, skcolor_to_color, style_to_color
+from ..styles.drop_shadow import SkDropShadow
 from ..styles.theme import SkTheme, default_theme
 from .app import SkApp
 from .container import SkContainer
@@ -271,6 +272,30 @@ class SkWindow(SkWindowBase, SkContainer):
             self.previous_widget = None
         del current_widget, event
 
+    def _rect_path(
+        self,
+        rect: skia.Rect,
+        radius: int | tuple[int, int, int, int] = 0,
+    ):
+        rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
+        radii: tuple[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = self.unpack_radius(radius)
+        # 设置每个角的半径（支持X/Y不对称）
+        rrect.setRectRadii(
+            skia.Rect.MakeLTRB(*rect),
+            [
+                skia.Point(*radii[0]),  # 左上
+                skia.Point(*radii[1]),  # 右上
+                skia.Point(*radii[2]),  # 右下
+                skia.Point(*radii[3]),  # 左下
+            ],
+        )
+
+        path = skia.Path()
+        path.addRRect(rrect)
+        return path
+
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
         style = self.theme.get_style(self.style)
@@ -280,8 +305,21 @@ class SkWindow(SkWindowBase, SkContainer):
 
         _ = not self.window_attr("border") and "radius" in style
         if _:
+            radii: tuple[
+                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+            ] = self.unpack_radius(radius)
+            rrect: skia.RRect = skia.RRect.MakeRectXY(self.rect, 0, 0)
+            rrect.setRectRadii(
+                self.rect,
+                [
+                    skia.Point(*radii[0]),  # 左上
+                    skia.Point(*radii[1]),  # 右上
+                    skia.Point(*radii[2]),  # 右下
+                    skia.Point(*radii[3]),  # 左下
+                ],
+            )
             canvas.clipRRect(
-                skia.RRect.MakeRectXY(self.rect, radius, radius),
+                rrect,
                 self.anti_alias,
             )
         canvas.clear(
@@ -296,16 +334,18 @@ class SkWindow(SkWindowBase, SkContainer):
                 self._style("bd", skia.ColorBLACK, style), self.theme
             ).color
             width = self._style("width", 2, style)
-            paint = skia.Paint(
-                AntiAlias=self.anti_alias,
-                Color=bd,
-                StrokeWidth=width,
-                Style=skia.Paint.kStroke_Style,
-            )
-            canvas.drawRoundRect(self.rect, radius, radius, paint)
 
-        canvas.restore()
+            path = self._rect_path(self.rect, radius)
 
+            if bd and width > 0:
+                bd_paint = skia.Paint(
+                    AntiAlias=self.anti_alias,
+                    Style=skia.Paint.kStroke_Style,
+                )
+                bd = skcolor_to_color(style_to_color(bd, self.theme))
+                bd_paint.setStrokeWidth(width)
+                bd_paint.setColor(bd)
+                canvas.drawPath(path, bd_paint)
         return None
 
     def _mouse_released(self, event: SkEvent) -> None:

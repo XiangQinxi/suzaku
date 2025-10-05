@@ -1,9 +1,9 @@
 from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
+from .image import SkImage
 from .text import SkText
 from .textbutton import SkTextButton
-from .image import SkImage
 
 
 class SkTitleBar(SkCard):
@@ -24,9 +24,11 @@ class SkTitleBar(SkCard):
             side="left",
         )
 
-        self.close = SkTextButton(self, text="×", command=self.window.destroy)
+        self.close = SkTextButton(
+            self, style="SkButton.Close", text="×", command=self.window.destroy
+        )
         # self.close_theme = self.close.theme.special("SkButton:rest", radius=99)
-        self.close.box(side="right")
+        self.close.box(side="right", padx=0, pady=0)
 
         self.bind("mouse_pressed", self._mouse_pressed)
         self.title.bind("mouse_pressed", self._mouse_pressed)
@@ -54,3 +56,8 @@ class SkTitleBar(SkCard):
     def _mouse_released(self, event: SkEvent):
         self._x1 = None
         self._y1 = None
+
+
+def titlebar(window):
+    window.window_attr("border", False)
+    return SkTitleBar(window).box(side="top", padx=0, pady=0)

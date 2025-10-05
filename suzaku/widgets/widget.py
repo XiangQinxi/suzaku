@@ -7,7 +7,8 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -429,6 +430,30 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
+    def _rect_path(
+        self,
+        rect: skia.Rect,
+        radius: int | tuple[int, int, int, int] = 0,
+    ):
+        rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
+        radii: tuple[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = self.unpack_radius(radius)
+        # 设置每个角的半径（支持X/Y不对称）
+        rrect.setRectRadii(
+            skia.Rect.MakeLTRB(*rect),
+            [
+                skia.Point(*radii[0]),  # 左上
+                skia.Point(*radii[1]),  # 右上
+                skia.Point(*radii[2]),  # 右下
+                skia.Point(*radii[3]),  # 左下
+            ],
+        )
+
+        path = skia.Path()
+        path.addRRect(rrect)
+        return path
+
     def _draw_rect(
         self,
         canvas: skia.Canvas,
@@ -457,23 +482,7 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         is_custom_radius = isinstance(radius, tuple | list)
         if is_custom_radius:
-            rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
-            radii: tuple[
-                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-            ] = self.unpack_radius(radius)
-            # 设置每个角的半径（支持X/Y不对称）
-            rrect.setRectRadii(
-                skia.Rect.MakeLTRB(*rect),
-                [
-                    skia.Point(*radii[0]),  # 左上
-                    skia.Point(*radii[1]),  # 右上
-                    skia.Point(*radii[2]),  # 右下
-                    skia.Point(*radii[3]),  # 左下
-                ],
-            )
-
-            path = skia.Path()
-            path.addRRect(rrect)
+            path = self._rect_path(rect, radius)
 
         if bg:
             bg_paint = skia.Paint(

@@ -38,18 +38,18 @@ class SkMenuBar(SkCard):
 
     def add_command(self, text: str | None = None, **kwargs):
         button = SkMenuItem(self, text=text, **kwargs)
-        button.box(side="left", padx=(2, 4), pady=3)
+        button.box(side="left", padx=(2, 4), pady=0)
         self.add(button)
         return button.id
 
     def add_cascade(self, text: str | None = None, **kwargs):
         button = SkMenu(self, text=text, **kwargs)
-        button.box(side="left", padx=(2, 4), pady=3)
+        button.box(side="left", padx=(2, 4), pady=0)
         self.add(button)
         return button.id
 
     def add_separator(self, orient: str = "v", **kwargs):
         separator = SkSeparator(self, orient=orient, **kwargs)
-        separator.box(side="left", padx=0, pady=3)
+        separator.box(side="left", padx=0, pady=0)
         self.add(separator)
         return separator.id
