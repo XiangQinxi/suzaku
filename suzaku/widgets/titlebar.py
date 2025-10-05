@@ -15,11 +15,9 @@ class SkTitleBar(SkCard):
     ):
         super().__init__(parent, style=style, **kwargs)
 
-        self.icon = SkImage(
-            self, path=self.window.icon1_path
-        )  # TODO 改为窗口的当前图标
-        self.icon.resize(10, 10)
-        self.icon.box(side="left")
+        self.icon = SkImage(self, path=self.window.wm_iconpath())
+        self.icon.resize(15, 15)
+        self.icon.box(side="left", padx=(10, 0))
 
         self.title = SkText(self, text=self.window.title())
         self.title.box(

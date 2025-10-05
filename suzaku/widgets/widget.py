@@ -660,8 +660,14 @@ class SkWidget(SkEventHanding, SkMisc):
         canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod
-    def _draw_image(canvas: skia.Canvas, rect: skia.Rect, image: skia.Image) -> None:
+    def _draw_image_rect(
+        canvas: skia.Canvas, rect: skia.Rect, image: skia.Image
+    ) -> None:
         canvas.drawImageRect(image, rect, skia.SamplingOptions(), skia.Paint())
+
+    @staticmethod
+    def _draw_image(canvas: skia.Canvas, image: skia.Image, x, y) -> None:
+        canvas.drawImage(image, left=x, top=y)
 
     # endregion
 

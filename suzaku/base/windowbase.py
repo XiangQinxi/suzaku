@@ -195,18 +195,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        try:
-            import PIL
-            from PIL import Image
+        self.attributes["iconpath"] = None
 
-            icon = Image.open(self.icon1_path)
-            if self.framework == "glfw":
-                from glfw import set_window_icon
-
-                set_window_icon(self.the_window, 1, icon)
-        except ImportError:
-            pass
-
+        self.wm_iconpath(self.icon1_path)
         # icon: skia.Image = skia.Image.open(self.icon1_path)
 
         # info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
@@ -895,6 +886,26 @@ class SkWindowBase(SkEventHanding, SkMisc):
         glfw.request_window_attention(self.the_window)
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
+
+    def wm_iconpath(self, path: str | str = None) -> str | None:
+        if path:
+            try:
+                import PIL
+                from PIL import Image
+
+                icon = Image.open(path)
+                if self.framework == "glfw":
+                    from glfw import set_window_icon
+
+                    set_window_icon(self.the_window, 1, icon)
+            except ImportError:
+                pass
+            else:
+                self.configure(iconpath=path)
+        else:
+            return self.cget("iconpath")
+
+    iconpath = wm_iconpath
 
     def wm_maxsize(
         self, width: int | float | None = None, height: int | float | None = None
