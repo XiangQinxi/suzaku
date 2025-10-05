@@ -39,7 +39,8 @@ class SkImage(SkWidget):
 
     def resize(self, width: int, height: int) -> None:
         """Resize image to width and height"""
-        self.image.resize(width, height)
+        if self.image:
+            self.image.resize(width, height)
         self.configure(width=width, height=height)
 
     @property

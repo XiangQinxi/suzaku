@@ -195,7 +195,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        self.attributes["iconpath"] = None
+        self.attributes["iconpath"] = self.icon1_path
 
         self.wm_iconpath(self.icon1_path)
         # icon: skia.Image = skia.Image.open(self.icon1_path)
