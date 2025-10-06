@@ -488,7 +488,6 @@ class SkWidget(SkEventHanding, SkMisc):
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStrokeAndFill_Style,
             )
-            print(style_to_color(bg, self.theme))
             bg = skcolor_to_color(style_to_color(bg, self.theme))
 
             # Background

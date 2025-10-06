@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 class SkStyleNotFoundError(NameError):
     """Will be raised when a theme is not found."""
+
     pass
 
 
@@ -348,8 +349,13 @@ class SkTheme:
         # Return the parsed selector
         return result
 
-    def get_style(self, selector: str, copy: bool = True, fallback: bool = True, 
-                  make_path: bool = False) -> dict:
+    def get_style(
+        self,
+        selector: str,
+        copy: bool = True,
+        fallback: bool = True,
+        make_path: bool = False,
+    ) -> dict:
         """Get styles config using a selector.
 
         Example
@@ -363,7 +369,7 @@ class SkTheme:
         :param selector: The selector string, indicating which styles to get
         :param copy: Whether to copy a new styles json, otherwise returns the styles itself
         :param fallback: Whether to enable fallback machanism, defaults to True
-        :param make_path: Whether to create the path if not found instead of throwing errors, 
+        :param make_path: Whether to create the path if not found instead of throwing errors,
                           will force disable fallback when enabled, defaults to False
         :return result: The style dict
         """
@@ -400,8 +406,8 @@ class SkTheme:
                                 # Otherwise u should really go fuck ur selector
                                 raise SkStyleNotFoundError(
                                     "Cannot find styles with selector " f"[{selector}]"
-                            )
-                    _ = _[selector_level] # Heading to the next level
+                                )
+                    _ = _[selector_level]  # Heading to the next level
             except SkStyleNotFoundError:
                 # If this fails, then the selector is invalid
                 raise SkStyleNotFoundError(
@@ -466,7 +472,7 @@ class SkTheme:
                 )
 
         if type(style[attr_name]) is dict:
-            return style[attr_name].copy
+            return style[attr_name].copy()
         else:
             return style[attr_name]
 

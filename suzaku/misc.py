@@ -150,6 +150,7 @@ class SkMisc:
 
     @staticmethod
     def _style(name: str, default, style):
+        """"""
         if name in style:
             return style[name]
         else:

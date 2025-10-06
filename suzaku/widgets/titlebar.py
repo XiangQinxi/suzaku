@@ -79,7 +79,10 @@ class SkTitleBar(SkCard):
     def _mouse_motion(self, event: SkEvent):
         if self._x1 and self._x1:
             if self.window.window_attr("maximized"):
+                p = self._x1 / self.window.width
+                print(p)
                 self.window.restore()
+                self._x1 = self.width * p
             self.window.move(
                 event.rootx - self._x1,
                 event.rooty - self._y1,

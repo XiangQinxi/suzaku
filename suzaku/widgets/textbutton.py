@@ -155,7 +155,6 @@ class SkMaximizeButton(SkTextButton):
             self.window.restore()
         else:
             self.window.maximize()
-        print(1243)
 
     def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
         """Draw button

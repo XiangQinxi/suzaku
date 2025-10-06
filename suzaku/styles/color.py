@@ -306,7 +306,8 @@ def style_to_color(
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn(
-                message="Invalid color configuration in styles!", category=Warning
+                message=f"Invalid color configuration in styles! {style_attr_value}",
+                category=Warning,
             )
             return SkColor(ERR_COLOR)
 
