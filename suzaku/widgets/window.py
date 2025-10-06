@@ -200,7 +200,10 @@ class SkWindow(SkWindowBase, SkContainer):
         return False
 
     def _mouse(self, event: SkEvent) -> None:
-        self._anchor = self.mouse_anchor(event.x, event.y)
+        if self.window.resizable():
+            self._anchor = self.mouse_anchor(event.x, event.y)
+        else:
+            self._anchor = None
         if self._anchor:
             self._x1 = event.x
             self._y1 = event.y
@@ -208,6 +211,8 @@ class SkWindow(SkWindowBase, SkContainer):
             self._rooty1 = self.root_y
             self._width1 = self.window.width
             self._height1 = self.window.height
+            self._right = self.root_x + self.width
+            self._bottom = self.root_y + self.height
         children = self.visible_children
         children.reverse()
         for widget in children:
@@ -299,7 +304,11 @@ class SkWindow(SkWindowBase, SkContainer):
         else:
             self.previous_widget = None
 
-        if not self.window_attr("border") and not self.window_attr("maximized"):
+        if (
+            not self.window_attr("border")
+            and not self.window_attr("maximized")
+            and self.window.resizable()
+        ):
             match self.mouse_anchor(event.x, event.y):
                 case "e" | "w":
                     self.cursor("hresize")
@@ -309,24 +318,28 @@ class SkWindow(SkWindowBase, SkContainer):
                     self.cursor("resize_nwse")
                 case "sw" | "ne":
                     self.cursor("resize_nesw")
+                case _:
+                    if not self.previous_widget:
+                        self.cursor("arrow")
 
     def _motion(self, event: SkEvent) -> None:
         self._anchor: str
         if self._anchor and not self.window_attr("maximized"):
             x, y = None, None
             width, height = None, None
+            minwidth, minheight = self.wm_minsize()
             if self._anchor.startswith("s"):
-                height = max(50, self._height1 + round(event.y - self._y1))
+                height = max(minheight, self._height1 + event.y - self._y1)
             if self._anchor.startswith("n"):
-                pass
+                height = max(minheight, self._bottom - (event.rooty - self._y1))
+                y = min(self.root_y + self.height - minheight, event.rooty - self._y1)
             if self._anchor.endswith("e"):
-                width = max(50, self._width1 + round(event.x - self._x1))
+                width = max(minwidth, self._width1 + event.x - self._x1)
             if self._anchor.endswith("w"):
-                pass
-                # width = max(50, self._width1 + round(self._x1 - event.x))
-                # x = round(self._rootx1 + event.x - self._x1)
-            self.window.move(x, y)
+                width = max(minwidth, self._right - event.rootx - self._x1)
+                x = min(self.root_x + self.width - minwidth, event.rootx - self._x1)
             self.window.resize(width, height)
+            self.window.move(x, y)
 
     def _mouse_released(self, event: SkEvent) -> None:
         """Mouse release event for SkWindow.

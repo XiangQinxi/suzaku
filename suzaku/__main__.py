@@ -1,6 +1,6 @@
 try:
-    from suzaku import *
     import suzaku as sk
+    from suzaku import *
 except:
     raise ModuleNotFoundError(
         "Suzaku module not found! Install suzaku or run with python3 -m suzaku in parent dir."
@@ -21,6 +21,7 @@ if __name__ == "__main__":
             size=(280, 630),
         )
         window.minsize(100, 80)
+        window.resizable(True)
         window.bind("drop", lambda evt: print("drop", evt))
 
         var1 = SkBooleanVar()

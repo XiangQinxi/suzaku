@@ -96,7 +96,7 @@
     "SkCloseButton": {
       "rest": {
         "size": [35, 35],
-        "radius": 0,
+        "radius": [0, 5, 5, 0],
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
         "width": 0
@@ -197,7 +197,7 @@
         "width": 0
       },
       "hover": {
-        "bg": [50, 100, 210, 155],
+        "bg": [50, 100, 210, 200],
         "fg": "white",
         "width": 0
       },
@@ -216,7 +216,7 @@
     "SkMinimizeButton": {
       "rest": {
         "size": [35, 35],
-        "radius": 0,
+        "radius": [5, 0, 0, 5],
         "icon_radius": 1,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
@@ -676,7 +676,8 @@
         "size": [0, 0],
         "radius": 0,
         "width": 0,
-        "bg": {"color_palette": "second_bg"}
+        "bg": {"color_palette": "second_bg"},
+        "bd_shadow": [0, 4, 2, 2, [0, 0, 0, 50]]
       }
     },
 
@@ -686,6 +687,16 @@
         "radius": [8, 8, 0, 0],
         "width": 3,
         "bd": {"color_palette": "bd"}
+      }
+    },
+
+    "SkWindowCommand": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 5,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 2
       }
     }
 

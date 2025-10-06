@@ -94,7 +94,7 @@
     "SkCloseButton": {
       "rest": {
         "size": [35, 35],
-        "radius": 0,
+        "radius": [0, 5, 5, 0],
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
         "width": 0
@@ -145,7 +145,7 @@
     "SkMinimizeButton": {
       "rest": {
         "size": [35, 35],
-        "radius": 0,
+        "radius": [5, 0, 0, 5],
         "icon_radius": 1,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
@@ -529,6 +529,16 @@
       "rest": {
         "size": [0, 0],
         "fg": {"color_palette": "fg"}
+      }
+    },
+
+    "SkTitleBar": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 0,
+        "width": 0,
+        "bg": {"color_palette": "second_bg"},
+        "bd_shadow": [0, 4, 2, 2, [220, 220, 220, 30]]
       }
     },
 

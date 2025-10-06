@@ -4,6 +4,27 @@ from .container import SkContainer
 from .image import SkImage
 from .text import SkText
 from .textbutton import SkCloseButton, SkMaximizeButton, SkMinimizeButton
+from sys import platform
+import ctypes
+
+
+class SkWindowCommand(SkCard):
+    def __init__(
+        self,
+        parent: SkContainer,
+        style: str = "SkWindowCommand",
+        **kwargs,
+    ):
+        super().__init__(parent, style=style, **kwargs)
+        self.close = SkCloseButton(self, command=self.window.destroy).box(
+            side="right", padx=0, pady=0, expand=True
+        )
+        self.maximize = SkMaximizeButton(self).box(
+            side="right", padx=0, pady=0, expand=True
+        )
+        self.minimize = SkMinimizeButton(self).box(
+            side="right", padx=0, pady=0, expand=True
+        )
 
 
 class SkTitleBar(SkCard):
@@ -24,11 +45,8 @@ class SkTitleBar(SkCard):
             side="left",
         )
 
-        self.close = SkCloseButton(self, command=self.window.destroy).box(
-            side="right", padx=0, pady=0
-        )
-        self.maximize = SkMaximizeButton(self).box(side="right", padx=0, pady=0)
-        self.minimize = SkMinimizeButton(self).box(side="right", padx=0, pady=0)
+        self.command = SkWindowCommand(self)
+        self.command.box(side="right", padx=3, pady=3)
 
         self.bind("mouse_pressed", self._mouse_pressed)
         self.bind("double_click", self._double_click)
@@ -51,7 +69,10 @@ class SkTitleBar(SkCard):
             self.window.maximize()
 
     def _mouse_pressed(self, event: SkEvent):
-        if not self.window.mouse_anchor(event.x, event.y):
+        if (
+            not self.window.mouse_anchor(event.x, event.y)
+            or not self.window.resizable()
+        ):
             self._x1 = event.x
             self._y1 = event.y
 
@@ -60,9 +81,20 @@ class SkTitleBar(SkCard):
             if self.window.window_attr("maximized"):
                 self.window.restore()
             self.window.move(
-                round(event.rootx - self._x1),
-                round(event.rooty - self._y1),
+                event.rootx - self._x1,
+                event.rooty - self._y1,
             )
+            """if platform == "win32":
+                WM_SYSCOMMAND = 274
+                SC_MOVE = 61456
+                HTCAPTION = 2
+
+                # ctypes.windll.user32.ReleaseCapture()
+                ctypes.windll.user32.SendMessageA(
+                    ctypes.windll.user32.GetParent(self.window.window_id),
+                    SC_MOVE,
+                    0,
+                )"""
 
     def _mouse_released(self, event: SkEvent):
         self._x1 = None

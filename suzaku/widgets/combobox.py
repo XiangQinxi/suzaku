@@ -1,8 +1,8 @@
 from ..event import SkEvent
-from .container import SkContainer
-from .popupmenu import SkPopupMenu
-from .lineinput import SkLineInput
 from .button import SkButton
+from .container import SkContainer
+from .lineinput import SkLineInput
+from .popupmenu import SkPopupMenu
 from .text import SkText
 
 
