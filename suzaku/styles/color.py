@@ -311,28 +311,14 @@ def style_to_color(
             return SkColor(ERR_COLOR)
 
 
-def skcolor_to_color(color: skia.Color | SkColor) -> skia.Color:
+def skcolor_to_color(color: int | SkColor | list) -> int:
     """Returns skia.Color received or convert received SkColor into skia.Color
 
     :param color: SkColor object or skia.Color object
     :return: Color object
     """
     if isinstance(color, SkColor):
-        return color.color
-    elif isinstance(color, list):
-        return SkColor(color).color
-    else:
-        return color
-
-
-def skcolor_to_color(color: SkColor | int | list) -> int:
-    """Convert skia.Color to color object.
-
-    :param color: SkColor object or skia.Color object
-    :return: Color object
-    """
-    if isinstance(color, SkColor):
-        return color.color
+        return color.get()
     elif isinstance(color, list):
         return SkColor(color).color
     else:
