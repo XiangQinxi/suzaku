@@ -1,7 +1,8 @@
 import typing
 
 import skia
-from ..styles.color import style_to_color, skcolor_to_color
+
+from ..styles.color import skcolor_to_color, style_to_color
 from .button import SkButton
 from .container import SkContainer
 from .text import SkText
