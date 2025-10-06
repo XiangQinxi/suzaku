@@ -18,6 +18,7 @@ class SkPopup(SkCard):
         self.hide()
 
         self.skip = False
+        self.visible = False
 
     @property
     def is_popup(self):

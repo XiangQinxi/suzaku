@@ -75,18 +75,18 @@ class SkTextButton(SkButton, SkText):
     # region Draw
 
     def draw_widget(
-        self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
+        self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
     ):
         """Draw the button
 
         :param canvas:
         :param rect:
-        :param style_name:
+        :param style_selector:
         :return:
         """
 
         # Draw the button border
-        style = SkButton.draw_widget(self, canvas, rect, style_name)
+        style = SkButton.draw_widget(self, canvas, rect, style_selector)
 
         # Draw the button text
         canvas.save()
@@ -113,11 +113,11 @@ class SkCloseButton(SkTextButton):
     def __init__(self, parent: SkContainer, *, style: str = "SkCloseButton", **kwargs):
         super().__init__(parent, style=style, **kwargs)
 
-    def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         """Draw button
         :param canvas: skia.Surface to draw on
         """
-        style = super().draw_widget(canvas, rect, style_name)
+        style = super().draw_widget(canvas, rect, style_selector)
 
         icon_padding = self._style("icon_padding", 10, style)
         icon_width = self._style("icon_width", 1, style)
@@ -156,11 +156,11 @@ class SkMaximizeButton(SkTextButton):
         else:
             self.window.maximize()
 
-    def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         """Draw button
         :param canvas: skia.Surface to draw on
         """
-        style = super().draw_widget(canvas, rect, style_name)
+        style = super().draw_widget(canvas, rect, style_selector)
 
         icon_padding = self._style("icon_padding", 10, style)
         icon_width = self._style("icon_width", 1, style)
@@ -235,11 +235,11 @@ class SkMinimizeButton(SkTextButton):
     def click(self):
         self.window.iconify()
 
-    def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         """Draw button
         :param canvas: skia.Surface to draw on
         """
-        style = super().draw_widget(canvas, rect, style_name)
+        style = super().draw_widget(canvas, rect, style_selector)
 
         icon_width = self._style("icon_width", 1, style)
         fg = self._style("fg", None, style)

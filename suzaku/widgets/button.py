@@ -62,39 +62,43 @@ class SkButton(SkFrame):
         if self.cget("command") and self.cget("disabled") is False:
             self.cget("command")()
 
-    def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         """Draw button
 
         :param canvas: skia.Surface to draw on
         :param rect: Rectangle to draw in
-        :param style_name: Style name
+        :param style_selector: Style name
 
         :return: None
         """
-        if style_name is None:
+        if style_selector is None:
             if not self.cget("disabled"):
                 if self.is_mouse_floating:
                     if self.is_mouse_pressed:
-                        style_name = f"{self.style}:pressed"
+                        style_selector = f"{self.style}:pressed"
                     else:
-                        style_name = f"{self.style}:hover"
+                        style_selector = f"{self.style}:hover"
                 else:
                     if "focus" in self.styles[self.style]:
                         if self.is_focus:
-                            style_name = f"{self.style}:focus"
+                            style_selector = f"{self.style}:focus"
                         else:
-                            style_name = self.style
+                            style_selector = self.style
                     else:
-                        style_name = self.style
+                        style_selector = self.style
             else:
-                style_name = f"{self.style}:disabled"
+                style_selector = f"{self.style}:disabled"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.get_style(style_selector)
         bg_shader = self._style("bg_shader", None, style)
+        # bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
         bd_shadow = self._style("bd_shadow", None, style)
         bd_shader = self._style("bd_shader", None, style)
-        width = self._style("width", 0, style)
+        width = self.theme.get_style_attr(style_selector, "width")
+        # self._style("width", 0, style)
+        # bd = self.theme.get_style_attr(style_selector, "bd")
         bd = self._style("bd", None, style)
+        # bg = self.theme.get_style_attr(style_selector, "bg")
         bg = self._style("bg", None, style)
 
         # Draw the button border
@@ -109,4 +113,12 @@ class SkButton(SkFrame):
             bd_shader=bd_shader,
             bg_shader=bg_shader,
         )
+
+        """rest_style = self.theme.get_style(self.style)
+        hover_style = self.theme.get_style(self.style + ":hover")
+        if "bg" in hover_style:
+            bg = hover_style["bg"]
+        else:
+            bg = rest_style["bg"]"""
+
         return style

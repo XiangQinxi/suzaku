@@ -62,6 +62,8 @@ if __name__ == "__main__":
 
             SkTextButton(tab_widgets, text="SkTextButton").box(padx=10, pady=(10, 0))
 
+            SkCombobox(tab_widgets).box(padx=10, pady=(10, 0))
+
             SkCheckButton(
                 tab_widgets,
                 text="SkCheckItem",

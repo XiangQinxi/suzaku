@@ -36,27 +36,27 @@ class SkTabButton(SkTextButton):
         self.parent.select(self.parent.items.index(self))
 
     def draw_widget(
-        self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
+        self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
     ) -> None:
         """Draw the tab button
 
         :param canvas: The canvas to draw on
         :param rect: The rectangle to draw in
-        :param style_name: The style name
+        :param style_selector: The style name
         :return: None
         """
         if self.selected:
-            style_name = f"{self.style}:selected"
+            style_selector = f"{self.style}:selected"
         else:
             if self.is_mouse_floating:
                 if self.is_mouse_pressed:
-                    style_name = f"{self.style}:pressed"
+                    style_selector = f"{self.style}:pressed"
                 else:
-                    style_name = f"{self.style}:hover"
+                    style_selector = f"{self.style}:hover"
 
-        super().draw_widget(canvas, rect, style_name)
+        super().draw_widget(canvas, rect, style_selector)
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.get_style(style_selector)
         underline = self._style("underline", "transparent", style)
         underline_width = self._style("underline_width", 0, style)
         underline_shadow = self._style("underline_shadow", 0, style)

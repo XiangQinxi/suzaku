@@ -12,5 +12,5 @@ class FloodScreen(sk.SkWindow):
 
 if __name__ == "__main__":
     app = sk.SkApp()
-    window = FloodScreen(app, theme=sk.dark_theme)
+    window = FloodScreen(app, title="FloodScreen", theme=sk.dark_theme)
     app.mainloop()

@@ -116,6 +116,75 @@
       }
     },
 
+    "SkComboBox": {
+      "rest": {
+        "size": [0, 35],
+        "radius": 5,
+        "bg": [40, 40, 40, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [35, 35, 35, 255],
+              "100%": [50, 50, 50, 255]
+            }
+          }
+        },
+        "fg": {"color_palette": "fg"},
+        "bd": [50, 50, 50, 255],
+        "bd_shadow": [0, 3, 1, 1, [255, 255, 255, 30]],
+        "width": 2,
+        "arrow": "white"
+      },
+      "hover": {
+        "bg": [50, 50, 50, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [35, 35, 35, 255],
+              "100%": [50, 50, 50, 255]
+            }
+          }
+        },
+        "fg": {"color_palette": "fg"},
+        "bd": [60, 60, 60, 255],
+        "bd_shadow": [0, 0, 5, 5, [80, 160, 255, 255]],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [60, 60, 60, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [55, 55, 55, 255],
+              "100%": [35, 35, 35, 255]
+            }
+          }
+        },
+        "fg": {"color_palette": "fg"},
+        "bd": [55, 55, 55, 255],
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 255]],
+        "width": 2
+      },
+      "focus": {
+        "bg": [40, 40, 40, 255],
+        "fg": {"color_palette": "fg"},
+        "bd": [40, 130, 255, 255],
+        "width": 3
+      },
+      "disabled": {
+        "bg": [40, 40, 40, 255],
+        "fg": [120, 120, 120, 245],
+        "bd": [50, 50, 50, 255],
+        "width": 2
+      }
+    },
+
     "SkMaximizeButton": {
       "rest": {
         "size": [35, 35],

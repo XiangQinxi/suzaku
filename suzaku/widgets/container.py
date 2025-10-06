@@ -161,6 +161,15 @@ class SkContainer:
                 self.parent.add_child(child)
             self.children.append(child)
 
+    def remove_child(self, child):
+        """Remove child widget from window.
+        :param child: The child to remove"""
+        pass
+
+    def remove_all(self):
+        for child in self.children:
+            child.layout_forget()
+
     def grid_map(self):
         # Grid Map
         from .widget import SkWidget

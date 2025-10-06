@@ -1,11 +1,12 @@
+import ctypes
+from sys import platform
+
 from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
 from .image import SkImage
 from .text import SkText
 from .textbutton import SkCloseButton, SkMaximizeButton, SkMinimizeButton
-from sys import platform
-import ctypes
 
 
 class SkWindowCommand(SkCard):
@@ -80,7 +81,6 @@ class SkTitleBar(SkCard):
         if self._x1 and self._x1:
             if self.window.window_attr("maximized"):
                 p = self._x1 / self.window.width
-                print(p)
                 self.window.restore()
                 self._x1 = self.width * p
             self.window.move(

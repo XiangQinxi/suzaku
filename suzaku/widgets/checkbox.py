@@ -86,9 +86,9 @@ class SkCheckBox(SkWidget):
             style_name = style_name + "-hover"
         else:
             """if self.is_focus:
-                style_name = style_name + "-focus"
+                style_selector = style_selector + "-focus"
             else:
-                style_name = style_name + "-rest"""
+                style_selector = style_selector + "-rest"""
             style_name = style_name + "-rest"
 
         style = self.theme.get_style(style_name)
