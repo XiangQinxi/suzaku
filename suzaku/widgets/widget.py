@@ -7,8 +7,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -489,6 +488,7 @@ class SkWidget(SkEventHanding, SkMisc):
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStrokeAndFill_Style,
             )
+            print(style_to_color(bg, self.theme))
             bg = skcolor_to_color(style_to_color(bg, self.theme))
 
             # Background
