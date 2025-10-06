@@ -38,6 +38,25 @@ class SkButton(SkFrame):
 
         self.bind("click", lambda _: self.invoke)
 
+    def _click(self, event) -> None:
+        """
+        Check click event (not pressed)
+
+        :return: None
+        """
+        if self.button != 1:
+            if self.is_mouse_floating:
+
+                self.event_trigger("click", event)
+                self.invoke()
+                time = self.time()
+
+                if self.click_time + self.cget("double_click_interval") > time:
+                    self.event_trigger("double_click", event)
+                    self.click_time = 0
+                else:
+                    self.click_time = time
+
     def invoke(self) -> None:
         """【触发按钮的点击事件】"""
         if self.cget("command") and self.cget("disabled") is False:

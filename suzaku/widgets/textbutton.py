@@ -39,6 +39,24 @@ class SkTextButton(SkButton, SkText):
 
         self.bind("click", lambda _: self.invoke())
 
+    def _click(self, event) -> None:
+        """
+        Check click event (not pressed)
+
+        :return: None
+        """
+        if self.button != 1:
+            if self.is_mouse_floating:
+
+                self.event_trigger("click", event)
+                time = self.time()
+
+                if self.click_time + self.cget("double_click_interval") > time:
+                    self.event_trigger("double_click", event)
+                    self.click_time = 0
+                else:
+                    self.click_time = time
+
     @property
     def dwidth(self):
         _width = self.cget("dwidth")
@@ -136,6 +154,7 @@ class SkMaximizeButton(SkTextButton):
             self.window.restore()
         else:
             self.window.maximize()
+        print(1243)
 
     def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
         """Draw button
