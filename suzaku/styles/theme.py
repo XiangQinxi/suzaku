@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 
 
 class SkStyleNotFoundError(NameError):
-    """Will be raised whe a theme is not found."""
+    """Will be raised when a theme is not found."""
     pass
 
 
@@ -348,7 +348,8 @@ class SkTheme:
         # Return the parsed selector
         return result
 
-    def get_style(self, selector: str, copy: bool = True) -> dict:
+    def get_style(self, selector: str, copy: bool = True, fallback: bool = True, 
+                  make_path: bool = False) -> dict:
         """Get styles config using a selector.
 
         Example
@@ -361,8 +362,15 @@ class SkTheme:
 
         :param selector: The selector string, indicating which styles to get
         :param copy: Whether to copy a new styles json, otherwise returns the styles itself
+        :param fallback: Whether to enable fallback machanism, defaults to True
+        :param make_path: Whether to create the path if not found instead of throwing errors, 
+                          will force disable fallback when enabled, defaults to False
         :return result: The style dict
         """
+        # Params handling related stuff
+        if make_path:
+            # Force disable fallback when make_path enabled
+            fallback = False
         # First, set the result to all styles
         result = self.styles
         if not selector:
@@ -374,21 +382,26 @@ class SkTheme:
                 selector_parsed = self.select(selector)
                 # Validate if selector exists in theme
                 _ = self.styles
-                for level_index, selector_level in enumerate(selector_parsed):
+                for selector_level in selector_parsed:
                     # # Deprecated code of multi-state
                     # if type(selector_level) is list:
                     #     # If is more than one state specified
                     #     selector_level = selector_level[0] # Then take the first during checking
                     if selector_level not in _:
-                        if isinstance(self.parent, SkTheme):
+                        if isinstance(self.parent, SkTheme) and fallback:
                             # If parent exists, then fallback
                             return self.parent.get_style(selector, copy)
                         else:
                             # If is root theme, then go fuck ur selector
-                            raise SkStyleNotFoundError(
-                                "Cannot find styles with selector " f"[{selector}]"
+                            if make_path:
+                                # If make_path enabled, make the path
+                                _[selector_level] = {}
+                            else:
+                                # Otherwise u should really go fuck ur selector
+                                raise SkStyleNotFoundError(
+                                    "Cannot find styles with selector " f"[{selector}]"
                             )
-                    _ = _[selector_level]
+                    _ = _[selector_level] # Heading to the next level
             except SkStyleNotFoundError:
                 # If this fails, then the selector is invalid
                 raise SkStyleNotFoundError(
@@ -442,7 +455,7 @@ class SkTheme:
                 return self.get_style_attr(selector, attr_name)
             # If still fails, fallback to parent
             if self.parent is not None:
-                self.parent.get_style_attr(selector, attr_name)
+                return self.parent.get_style_attr(selector, attr_name)
             elif self.parent is None and self.name != SkTheme.DEFAULT_THEME.name:
                 SkTheme.DEFAULT_THEME.get_style_attr(selector, attr_name)
             # If is already default theme (no parent), then go fuck your selector
@@ -561,9 +574,9 @@ class SkTheme:
         new_theme = SkTheme({}, parent=self)
         new_theme.is_special = True
         selector_parsed = self.select(selector)
-        new_theme.styles = {}
+        # new_theme.styles = {}
         # Modifying styles of the new theme
-        style_operate = new_theme.get_style(selector, copy=False)
+        style_operate = new_theme.get_style(selector, copy=False, make_path=True)
         style_operate.update(kwargs)
         # Renaming the new theme
         existed_special_count = 0
