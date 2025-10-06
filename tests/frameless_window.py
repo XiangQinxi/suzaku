@@ -2,8 +2,16 @@
 # The experiments creates a frameless window with basic functions in tkinter
 
 import tkinter as tk
-import resources.common.tttk as tttk
+import tttk
 
+"""
+Due to the inactivity of project tttk on PyPI, a normal installation of tttk with pip will not be 
+able to make this file work. If necessary, please use latest tttk release from GitHub, or use 
+latest release of github.com/totowang-hhh/TK-Experiments for an original usable version of the 
+frameless window experiment with built-in tttk module.
+
+                                                                        —— 2025/10/05 rgzz666
+"""
 
 class FramelessTk(tk.Tk):
     def __init__(self, dragheight=28, *args, **kwargs):

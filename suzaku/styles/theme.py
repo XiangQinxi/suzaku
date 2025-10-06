@@ -304,7 +304,7 @@ class SkTheme:
         return self
 
     @staticmethod
-    def select(selector: str) -> list[str | list[str]]:
+    def select(selector: str) -> list[str]:
         """Parse styles selector.
 
         This is a selector parser mainly used by internal functions.
@@ -327,22 +327,24 @@ class SkTheme:
         if not re.match("[a-zA-Z0-9-_.:,]+", selector):
             raise ValueError(f"Invalid styles selector [{selector}].")
         # Handling
-        result: list[str | list[str]] = []
+        result: list[str] = []
         if ":" in selector:
             colon_parsed = selector.split(":")
             if len(colon_parsed) > 2:  # Validation
                 raise ValueError(f"Invalid styles selector [{selector}].")
-            if "," in colon_parsed[1]:
-                # If has more than one state specified:
-                result[1] = colon_parsed[1].split(",")
-            else:
-                # Otherwise, we still make it a list type
-                result[1] = [colon_parsed[1]]
-            if result[1] == "ITSELF":
+            # # Deprecated code of multi-state
+            # if "," in colon_parsed[1]:
+            #     # If has more than one state specified:
+            #     result[1] = colon_parsed[1].split(",")
+            # else:
+            #     # Otherwise, we still make it a list type
+            #     result[1] = [colon_parsed[1]]
+            if colon_parsed[1] == "ITSELF":
                 # For ITSELF selectors
                 result = [result[0]]
+            result = colon_parsed
         else:
-            result = [selector, ["rest"]]
+            result = [selector, "rest"]
         # Return the parsed selector
         return result
 
@@ -373,9 +375,10 @@ class SkTheme:
                 # Validate if selector exists in theme
                 _ = self.styles
                 for level_index, selector_level in enumerate(selector_parsed):
-                    if selector_level is list():
-                        # If is more than one state specified
-                        selector_level = selector_level[0] # Then take the first during checking
+                    # # Deprecated code of multi-state
+                    # if type(selector_level) is list:
+                    #     # If is more than one state specified
+                    #     selector_level = selector_level[0] # Then take the first during checking
                     if selector_level not in _:
                         if isinstance(self.parent, SkTheme):
                             # If parent exists, then fallback
@@ -558,7 +561,7 @@ class SkTheme:
         new_theme = SkTheme({}, parent=self)
         new_theme.is_special = True
         selector_parsed = self.select(selector)
-        new_theme.styles[selector_parsed[0]][selector_parsed[1]] = None
+        new_theme.styles = {}
         # Modifying styles of the new theme
         style_operate = new_theme.get_style(selector, copy=False)
         style_operate.update(kwargs)
@@ -567,7 +570,6 @@ class SkTheme:
         for child in self.children:
             if child.is_special:
                 existed_special_count += 1
-        new_name = self.name + f".special{existed_special_count}"
         new_theme.rename(
             f".special{existed_special_count}",
             f"{self.friendly_name} (Special {existed_special_count})",
