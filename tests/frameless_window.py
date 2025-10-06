@@ -2,7 +2,6 @@
 # The experiments creates a frameless window with basic functions in tkinter
 
 import tkinter as tk
-import resources.common.tttk as tttk
 
 
 class FramelessTk(tk.Tk):
@@ -463,9 +462,4 @@ if __name__ == "__main__":
     from PIL import Image, ImageTk
 
     win = FramelessTk()
-    img = Image.open("./resources/common/background.jpg")
-    img_resized = img.resize((int(img.size[0] * 0.5), int(img.size[1] * 0.5)))
-    img_tk = ImageTk.PhotoImage(img_resized)
-    tk.Label(win, image=img_tk).place(x=0, y=0)
-    win.geometry(str(img_resized.size[0]) + "x" + str(img_resized.size[1]))
     win.mainloop()

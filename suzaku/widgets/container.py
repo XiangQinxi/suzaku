@@ -550,13 +550,6 @@ class SkContainer:
     # endregion
 
     # region other 其他
-    def bind(self, *args, **kwargs):
-        raise RuntimeError(
-            "Anything inherited from SkContainer should support binding events!"
-            + "This error should be overrode by the actual bind function of "
-            + "SkWindow or SkWidget in normal cases."
-        )
-
     @property
     def visible_children(self):
         children = []
