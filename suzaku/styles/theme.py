@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
 
 
 class SkStyleNotFoundError(NameError):
+    """Will be raised whe a theme is not found."""
     pass
 
 
@@ -303,7 +304,7 @@ class SkTheme:
         return self
 
     @staticmethod
-    def select(selector: str) -> list:
+    def select(selector: str) -> list[str | list[str]]:
         """Parse styles selector.
 
         This is a selector parser mainly used by internal functions.
@@ -323,17 +324,25 @@ class SkTheme:
         :return: Parsed selector, levels in a list
         """
         # Validate if selector valid
-        if not re.match("[a-zA-Z0-9-_.:]", selector):
+        if not re.match("[a-zA-Z0-9-_.:,]+", selector):
             raise ValueError(f"Invalid styles selector [{selector}].")
         # Handling
+        result: list[str | list[str]] = []
         if ":" in selector:
-            result = selector.split(":")
-            if len(result) > 2:  # Validation
+            colon_parsed = selector.split(":")
+            if len(colon_parsed) > 2:  # Validation
                 raise ValueError(f"Invalid styles selector [{selector}].")
+            if "," in colon_parsed[1]:
+                # If has more than one state specified:
+                result[1] = colon_parsed[1].split(",")
+            else:
+                # Otherwise, we still make it a list type
+                result[1] = [colon_parsed[1]]
             if result[1] == "ITSELF":
+                # For ITSELF selectors
                 result = [result[0]]
         else:
-            result = [selector, "rest"]
+            result = [selector, ["rest"]]
         # Return the parsed selector
         return result
 
@@ -363,7 +372,10 @@ class SkTheme:
                 selector_parsed = self.select(selector)
                 # Validate if selector exists in theme
                 _ = self.styles
-                for selector_level in selector_parsed:
+                for level_index, selector_level in enumerate(selector_parsed):
+                    if selector_level is list():
+                        # If is more than one state specified
+                        selector_level = selector_level[0] # Then take the first during checking
                     if selector_level not in _:
                         if isinstance(self.parent, SkTheme):
                             # If parent exists, then fallback
