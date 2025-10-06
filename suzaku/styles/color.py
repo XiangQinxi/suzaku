@@ -317,7 +317,9 @@ def skcolor_to_color(color: skia.Color | SkColor) -> skia.Color:
     :param color: SkColor object or skia.Color object
     :return: Color object
     """
-    if isinstance(color, skia.Color):
-        return color
-    else:
+    if isinstance(color, SkColor):
         return color.get()
+    elif isinstance(color, list):
+        return SkColor(color).color
+    else:
+        return color
