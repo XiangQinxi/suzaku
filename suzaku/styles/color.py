@@ -311,12 +311,13 @@ def style_to_color(
             return SkColor(ERR_COLOR)
 
 
-def skcolor_to_color(
-        color: skia.Color
-        ) -> int | SkColor | SkGradient | tuple | list | int | None:
-    """Convert skia.Color to color object.
+def skcolor_to_color(color: skia.Color | SkColor) -> skia.Color:
+    """Returns skia.Color received or convert received SkColor into skia.Color
 
     :param color: SkColor object or skia.Color object
     :return: Color object
     """
-    raise RuntimeError("什么几把玩意，意义不明，代码和docstring作用对不上，类型提示还写得一坨屎，重写！")
+    if isinstance(color, skia.Color):
+        return color
+    else:
+        return color.get()
