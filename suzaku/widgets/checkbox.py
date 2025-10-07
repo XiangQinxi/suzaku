@@ -91,7 +91,7 @@ class SkCheckBox(SkWidget):
                 style_selector = style_selector + "-rest"""
             style_name = style_name + "-rest"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]
@@ -126,7 +126,7 @@ class SkCheckBox(SkWidget):
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style(self.style_name)["radius"],
+            radius=self.theme.select(self.style_name)["radius"],
             bg=bg,
             width=width,
             bd=bd,

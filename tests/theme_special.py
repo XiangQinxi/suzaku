@@ -2,7 +2,7 @@ import suzaku
 
 root = suzaku.Sk()
 
-default_theme = suzaku.SkTheme.INTERNAL_THEMES["default.light"]
+default_theme = suzaku.SkTheme.DEFAULT_THEME
 special_theme = default_theme.special("SkButton:rest", bg="red")
 print(special_theme.styles)
 

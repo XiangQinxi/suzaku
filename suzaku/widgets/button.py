@@ -89,7 +89,7 @@ class SkButton(SkFrame):
             else:
                 style_selector = f"{self.style_name}:disabled"
 
-        style = self.theme.get_style(style_selector)
+        style = self.theme.select(style_selector)
         bg_shader = self._style("bg_shader", None, style)
         # bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
         bd_shadow = self._style("bd_shadow", None, style)

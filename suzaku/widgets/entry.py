@@ -28,7 +28,7 @@ class SkEntry(SkLineInput):
         else:
             style_name = self.style_name
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_name)
         radius = self.theme.get_style_attr(self.style_name, "radius")
 
         if "bg_shader" in style:

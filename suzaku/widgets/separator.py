@@ -31,7 +31,7 @@ class SkSeparator(SkWidget):
         self.help_parent_scroll = True
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.get_style(self.style_name)
+        style = self.theme.select(self.style_name)
         orient = self.cget("orient")
         width = self.theme.get_style_attr(self.style_name, "width")
         # print(self.id, orient)

@@ -433,7 +433,7 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
-        style = self.theme.get_style(self.style)
+        style = self.theme.select(self.style)
         self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
 
         radius = self._style("radius", 0, style)

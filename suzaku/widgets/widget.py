@@ -989,7 +989,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def box(
         self,
-        side: Literal["top", "bottom", "left", "right"] = "top",
+        side: typing.Literal["top", "bottom", "left", "right"] = "top",
         padx: int | float | tuple[int | float, int | float] = 5,
         pady: int | float | tuple[int | float, int | float] = 5,
         ipadx: int | float | tuple[int | float, int | float] | None = None,

@@ -198,8 +198,8 @@ class SkTheme:
                 )
                 warnings.warn(
                     f"Error data type of <{item}> in theme data that is about to be loaded. "
-                    f"Expected {EXPECTED_DATA_TYPE[item]} but got {type(item)}. The json data "
-                    f"with theme named <{theme_name}> will not be loaded to the theme <{self.name}>",
+                    f"Expected {EXPECTED_DATA_TYPE[item]} but got {type(item)}. The json data with "
+                    f"theme named <{theme_name}> will not be loaded to the theme <{self.name}>",
                     ResourceWarning,
                 )
                 return self
@@ -230,7 +230,7 @@ class SkTheme:
         self.styles = style_json.copy()
         return self
 
-    def set_parent(self, parent_name: str) -> "SkTheme":
+    def set_parent(self, new_parent: str) -> "SkTheme":
         """Set the parent for the theme via string stored in theme json.
 
         Example
@@ -252,25 +252,28 @@ class SkTheme:
         parent directly. However, if the theme specified is not yet loaded, parent will fall back
         to `DEFAULT`.
 
-        :param parent_name: Name of the parent
+        :param parent_name: Name of the new parent, or the SkTheme object of it
         :return self: The SkTheme itself
         """
-        match parent_name:
+        match new_parent:
             case "ROOT":
                 # If root theme, then no parent (which means no fallback)
                 self.parent = None
             case "DEFAULT":
                 # If default theme for parent, then... hmm... default theme for parent... 🤔
                 self.parent = self.DEFAULT_THEME
+            case SkTheme():
+                # If is a SkTheme object, set it as parent
+                self.parent = new_parent
             case _:
                 # If else, find the theme
-                search_result = SkTheme.find_loaded_theme(parent_name)
+                search_result = SkTheme.find_loaded_theme(new_parent)
                 if search_result != False:
                     self.parent = search_result
                 else:
                     # When not found, fallback to default for parent
                     warnings.warn(
-                        f"Parent theme specified with name <{parent_name}> is not yet loaded. "
+                        f"Parent theme specified with name <{new_parent}> is not yet loaded. "
                         "Will fall back to <DEFAULT> for parent instead."
                     )
                     self.set_parent("DEFAULT")
@@ -305,7 +308,7 @@ class SkTheme:
         return self
 
     @staticmethod
-    def select(selector: str) -> list[str]:
+    def parse_selector(selector: str) -> list[str]:
         """Parse styles selector.
 
         This is a selector parser mainly used by internal functions.
@@ -349,13 +352,15 @@ class SkTheme:
         # Return the parsed selector
         return result
 
-    def get_style(
-        self,
-        selector: str,
-        copy: bool = True,
-        fallback: bool = True,
-        make_path: bool = False,
-    ) -> dict:
+    @typing.overload
+    def select(self, selector: str | list, *, copy: bool = ..., fallback: bool = ...,
+        make_path: bool = ..., allow_not_found: typing.Literal[True]) -> dict | bool: ...
+    @typing.overload
+    def select(self, selector: str | list, *, copy: bool = ..., fallback: bool = ...,
+        make_path: bool = ..., allow_not_found: typing.Literal[False]) -> dict: ...
+
+    def select(self, selector: str | list, *, copy: bool = True, fallback: bool = True,
+        make_path: bool = False, allow_not_found: bool = True) -> dict | bool:
         """Get styles config using a selector.
 
         Example
@@ -371,6 +376,8 @@ class SkTheme:
         :param fallback: Whether to enable fallback machanism, defaults to True
         :param make_path: Whether to create the path if not found instead of throwing errors,
                           will force disable fallback when enabled, defaults to False
+        :param allow_not_found: True to return False when style not found, otherwise raise error in 
+                                such cases
         :return result: The style dict
         """
         # Params handling related stuff
@@ -385,7 +392,8 @@ class SkTheme:
         else:
             try:
                 # To get a parsed selector
-                selector_parsed = self.select(selector)
+                selector_parsed = self.parse_selector(selector) if type(selector) is str \
+                                  else selector # If is already parsed list
                 # Validate if selector exists in theme
                 _ = self.styles
                 for selector_level in selector_parsed:
@@ -396,7 +404,9 @@ class SkTheme:
                     if selector_level not in _:
                         if isinstance(self.parent, SkTheme) and fallback:
                             # If parent exists, then fallback
-                            return self.parent.get_style(selector, copy)
+                            return self.parent.select(selector, copy=copy, fallback=fallback, 
+                                                      make_path=make_path, 
+                                                      allow_not_found=allow_not_found)
                         else:
                             # If is root theme, then go fuck ur selector
                             if make_path:
@@ -404,9 +414,12 @@ class SkTheme:
                                 _[selector_level] = {}
                             else:
                                 # Otherwise u should really go fuck ur selector
-                                raise SkStyleNotFoundError(
-                                    "Cannot find styles with selector " f"[{selector}]"
-                                )
+                                if allow_not_found:
+                                    return False
+                                else:
+                                    raise SkStyleNotFoundError(
+                                        "Cannot find styles with selector " f"[{selector}]"
+                                    )
                     _ = _[selector_level]  # Heading to the next level
             except SkStyleNotFoundError:
                 # If this fails, then the selector is invalid
@@ -424,7 +437,8 @@ class SkTheme:
         else:
             return result
 
-    def get_style_attr(self, selector: str, attr_name: str) -> typing.Any:
+    def get_style_attr(self, selector: str | list[str], attr_name: str, 
+                       allow_not_found: bool = True) -> typing.Any:
         """Get style attribute _value.
 
         Example
@@ -447,18 +461,21 @@ class SkTheme:
         - As the root theme must contain all attributes available, if the selector or attribute
           still cannot be found even in root theme, the program throws an error.
 
-        :param selector: The selector to the style
+        :param selector: The selector to the style, or a parsed list
         :param attr_name: The attribute name
+        :param allow_not_found: True to return False when attribute not found, otherwise raise 
+                                error in such cases
         :return: The attribute _value
         """
-        style = self.get_style(selector, copy=False)
+        parsed_selector = selector if type(selector) is list else self.parse_selector(selector)
+        style = self.select(parsed_selector, copy=False, allow_not_found=False)
         if attr_name not in style:
             # Fallback mechanism
             # Fallback to base or rest state and try
-            if self.select(selector)[-1] != "rest":
-                new_selector = self.select(selector)
+            if parsed_selector[-1] != "rest":
+                new_selector = parsed_selector
                 new_selector[-1] = "rest" if "base" not in style else style["base"]
-                return self.get_style_attr(selector, attr_name)
+                return self.get_style_attr(new_selector, attr_name)
             # If still fails, fallback to parent
             if self.parent is not None:
                 return self.parent.get_style_attr(selector, attr_name)
@@ -466,10 +483,13 @@ class SkTheme:
                 SkTheme.DEFAULT_THEME.get_style_attr(selector, attr_name)
             # If is already default theme (no parent), then go fuck your selector
             if self.name == SkTheme.DEFAULT_THEME.name:
-                raise SkStyleNotFoundError(
-                    f"Attribute <{attr_name}> is not exsited in the default theme. "
-                    "Check your selector!"
-                )
+                if allow_not_found:
+                    return False
+                else:
+                    raise SkStyleNotFoundError(
+                        f"Attribute <{attr_name}> is not exsited in the default theme. "
+                        "Check your selector!"
+                    )
 
         if type(style[attr_name]) is dict:
             return style[attr_name].copy()
@@ -545,7 +565,7 @@ class SkTheme:
             theme_operate = SkTheme(self.styles)
         else:
             theme_operate = self
-        style_operate = theme_operate.get_style(selector, copy=False)
+        style_operate = theme_operate.select(selector, copy=False, allow_not_found=False)
         style_operate.update(new_style)
         return theme_operate
 
@@ -579,10 +599,10 @@ class SkTheme:
         # (This is to prevent modifications on original theme)
         new_theme = SkTheme({}, parent=self)
         new_theme.is_special = True
-        selector_parsed = self.select(selector)
+        selector_parsed = self.parse_selector(selector)
         # new_theme.styles = {}
         # Modifying styles of the new theme
-        style_operate = new_theme.get_style(selector, copy=False, make_path=True)
+        style_operate = new_theme.select(selector, copy=False, make_path=True)
         style_operate.update(kwargs)
         # Renaming the new theme
         existed_special_count = 0

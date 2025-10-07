@@ -69,7 +69,7 @@ class SkRadioBox(SkWidget):
                 style_selector = style_selector + "-rest"""
             style_name = style_name + "-rest"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]

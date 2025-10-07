@@ -586,7 +586,7 @@ class SkLineInput(SkWidget):
         else:
             style_name = "SkEntry"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_name)
         radius = self.theme.get_style_attr("SkEntry", "radius")
 
         if "selected_bg" in style:

@@ -45,7 +45,7 @@ class SkSizeGrip(SkWidget):
         self._y1 = None
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.get_style(self.style_name)
+        style = self.theme.select(self.style_name)
 
         canvas.save()
         canvas.clipRect(rect)
