@@ -354,13 +354,13 @@ class SkTheme:
 
     @typing.overload
     def select(self, selector: str | list, *, copy: bool = ..., fallback: bool = ...,
-        make_path: bool = ..., allow_not_found: typing.Literal[True]) -> dict | bool: ...
+        make_path: bool = ..., allow_not_found: typing.Literal[True]) -> dict | None: ...
     @typing.overload
     def select(self, selector: str | list, *, copy: bool = ..., fallback: bool = ...,
         make_path: bool = ..., allow_not_found: typing.Literal[False]) -> dict: ...
 
     def select(self, selector: str | list, *, copy: bool = True, fallback: bool = True,
-        make_path: bool = False, allow_not_found: bool = True) -> dict | bool:
+        make_path: bool = False, allow_not_found: bool = True) -> dict | None:
         """Get styles config using a selector.
 
         Example
@@ -376,7 +376,7 @@ class SkTheme:
         :param fallback: Whether to enable fallback machanism, defaults to True
         :param make_path: Whether to create the path if not found instead of throwing errors,
                           will force disable fallback when enabled, defaults to False
-        :param allow_not_found: True to return False when style not found, otherwise raise error in 
+        :param allow_not_found: True to return None when style not found, otherwise raise error in 
                                 such cases
         :return result: The style dict
         """
@@ -415,7 +415,7 @@ class SkTheme:
                             else:
                                 # Otherwise u should really go fuck ur selector
                                 if allow_not_found:
-                                    return False
+                                    return None
                                 else:
                                     raise SkStyleNotFoundError(
                                         "Cannot find styles with selector " f"[{selector}]"
