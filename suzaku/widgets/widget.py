@@ -814,10 +814,14 @@ class SkWidget(SkEventHanding, SkMisc):
         self.theme = new_theme
         self.styles = self.theme.styles
         self.read_size(self.style_name)
-        if isinstance(self, SkContainer):
+        if isinstance(self, container.SkContainer):
+            child: SkWidget
+            self.children: list
             for child in self.children:
-                if child.theme.
-                child.apply_theme(new_theme)
+                if child.theme.is_special:
+                    child.theme.set_parent(new_theme.name)
+                else:
+                    child.apply_theme(new_theme)
 
     # endregion
 
