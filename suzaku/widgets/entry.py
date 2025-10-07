@@ -8,8 +8,8 @@ class SkEntry(SkLineInput):
     """A single-line input box with a border 【带边框的单行输入框】"""
 
     # region Init 初始化
-    def __init__(self, parent: SkContainer, *, style: str = "SkEntry", **kwargs):
-        super().__init__(parent=parent, style=style, **kwargs)
+    def __init__(self, parent: SkContainer, *, style_name: str = "SkEntry", **kwargs):
+        super().__init__(parent=parent, style_name=style_name, **kwargs)
 
         self.padding = 5
 
