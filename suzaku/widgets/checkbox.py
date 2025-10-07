@@ -21,7 +21,7 @@ class SkCheckBox(SkWidget):
         default: bool = False,
         **kwargs,
     ):
-        super().__init__(*args, cursor=cursor, style=style, **kwargs)
+        super().__init__(*args, cursor=cursor, style_name=style, **kwargs)
         # self.attributes["selected"] = selected
         self.attributes["variable"] = variable
         self.attributes["command"] = command
@@ -79,9 +79,9 @@ class SkCheckBox(SkWidget):
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """【绘制复选框】"""
         if self.checked:
-            style_name = f"{self.style}:checked"
+            style_name = f"{self.style_name}:checked"
         else:
-            style_name = f"{self.style}:unchecked"
+            style_name = f"{self.style_name}:unchecked"
         if self.is_mouse_floating:
             style_name = style_name + "-hover"
         else:
@@ -126,7 +126,7 @@ class SkCheckBox(SkWidget):
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style(self.style)["radius"],
+            radius=self.theme.get_style(self.style_name)["radius"],
             bg=bg,
             width=width,
             bd=bd,

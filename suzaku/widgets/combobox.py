@@ -43,7 +43,7 @@ class SkComboBox(SkButton):
         )
         arrow = skcolor_to_color(
             style_to_color(
-                self._style("arrow", skia.ColorBLACK, self.theme.get_style(self.style)),
+                self._style("arrow", skia.ColorBLACK, self.theme.get_style(self.style_name)),
                 self.theme,
             )
         )

@@ -12,7 +12,7 @@ class SkLabel(SkText):
         super().__init__(parent, text=text, style=style, **kwargs)
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.get_style(self.style)
+        style = self.theme.get_style(self.style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]

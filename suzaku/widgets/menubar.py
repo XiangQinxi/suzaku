@@ -22,7 +22,7 @@ class SkMenuBar(SkCard):
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         super().draw_widget(canvas, rect)
-        style = self.theme.get_style(self.style)
+        style = self.theme.get_style(self.style_name)
         self._draw_line(
             canvas,
             self.canvas_x,

@@ -37,12 +37,12 @@ class SkListItem(SkTextButton):
         self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
     ) -> None:
         if self.selected:
-            style_selector = f"{self.style}:selected"
+            style_selector = f"{self.style_name}:selected"
         else:
             if self.is_mouse_floating:
                 if self.is_mouse_pressed:
-                    style_selector = f"{self.style}:pressed"
+                    style_selector = f"{self.style_name}:pressed"
                 else:
-                    style_selector = f"{self.style}:hover"
+                    style_selector = f"{self.style_name}:hover"
 
         super().draw_widget(canvas, rect, style_selector)

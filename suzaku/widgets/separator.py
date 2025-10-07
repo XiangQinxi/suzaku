@@ -15,12 +15,12 @@ class SkSeparator(SkWidget):
         orient: Orient | None = Orient.H,
         **kwargs,
     ):
-        super().__init__(master, style=style, **kwargs)
+        super().__init__(master, style_name=style, **kwargs)
 
         if orient is None:
             orient = Orient.H
 
-        width = self.theme.get_style_attr(self.style, "width")
+        width = self.theme.get_style_attr(self.style_name, "width")
         if orient == Orient.H:
             self.configure(dheight=width)
         else:
@@ -31,9 +31,9 @@ class SkSeparator(SkWidget):
         self.help_parent_scroll = True
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.get_style(self.style)
+        style = self.theme.get_style(self.style_name)
         orient = self.cget("orient")
-        width = self.theme.get_style_attr(self.style, "width")
+        width = self.theme.get_style_attr(self.style_name, "width")
         # print(self.id, orient)
 
         if orient == Orient.H:

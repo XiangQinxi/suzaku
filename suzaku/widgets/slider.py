@@ -14,7 +14,7 @@ class SkSlider(SkWidget):
         style: str = "SkSlider",
         **kwargs,
     ):
-        super().__init__(parent, style=style, **kwargs)
+        super().__init__(parent, style_name=style, **kwargs)
         self.attributes["value"] = value
         self.attributes["minvalue"] = minvalue
         self.attributes["maxvalue"] = maxvalue

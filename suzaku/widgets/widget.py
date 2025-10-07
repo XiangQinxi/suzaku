@@ -1,8 +1,7 @@
 import typing
-from functools import cache
-from typing import Any, Literal
 
-import glfw
+from functools import cache
+
 import skia
 
 from ..event import SkEvent, SkEventHanding
@@ -14,6 +13,7 @@ from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
 from .appwindow import SkAppWindow
 from .window import SkWindow
+from . import container
 
 
 class SkWidget(SkEventHanding, SkMisc):
@@ -31,7 +31,7 @@ class SkWidget(SkEventHanding, SkMisc):
         parent,
         *,
         cursor: str = "arrow",
-        style: str = "SkWidget",
+        style_name: str = "SkWidget",
         font: skia.Font | None = default_font,
         disabled: bool = False,
     ) -> None:
@@ -44,8 +44,8 @@ class SkWidget(SkEventHanding, SkMisc):
 
         SkEventHanding.__init__(self)
 
-        self.parent = parent
-        self.style = style
+        self.parent: SkWidget = parent
+        self.style_name: str = style_name
 
         try:
             self.window: SkWindow | SkAppWindow = (
@@ -104,7 +104,7 @@ class SkWidget(SkEventHanding, SkMisc):
             for state in button_states:
                 self.event_generate(f"{button}_{state}")
 
-        self.attributes: dict[str, Any] = {
+        self.attributes: dict[str, typing.Any] = {
             "cursor": cursor,
             "theme": None,
             "dwidth": 100,  # default width
@@ -146,9 +146,9 @@ class SkWidget(SkEventHanding, SkMisc):
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
-        try:
+        if isinstance(self.parent, container.SkContainer)
             self.parent.add_child(self)
-        except TypeError:
+        else:
             raise TypeError("Parent component is not a SkContainer-based object.")
 
         # Events-related
@@ -465,8 +465,8 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["linear_gradient"] = None,
-        bg_shader: None | Literal["linear_gradient"] = None,
+        bd_shader: None | typing.Literal["linear_gradient"] = None,
+        bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
         """Draw the frame
 
@@ -543,8 +543,8 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["linear_gradient"] = None,
-        bg_shader: None | Literal["linear_gradient"] = None,
+        bd_shader: None | typing.Literal["linear_gradient"] = None,
+        bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
         """Draw the circle
 
@@ -664,8 +664,8 @@ class SkWidget(SkEventHanding, SkMisc):
                         paint=paint,
                     )
         if shadow:
-            shadow = SkDropShadow(config_list=shadow)
-            shadow.draw(paint)
+            _ = SkDropShadow(config_list=shadow)
+            _.draw(paint)
         canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod
@@ -766,7 +766,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self._root_y = value
         self._pos_update()
 
-    def get_attribute(self, attribute_name: str) -> Any:
+    def get_attribute(self, attribute_name: str) -> typing.Any:
         """Get attribute of a widget by name.
 
         :param attribute_name: attribute name
@@ -813,9 +813,10 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         self.theme = new_theme
         self.styles = self.theme.styles
-        self.read_size(self.style)
-        if hasattr(self, "children"):
+        self.read_size(self.style_name)
+        if isinstance(self, SkContainer):
             for child in self.children:
+                if child.theme.
                 child.apply_theme(new_theme)
 
     # endregion

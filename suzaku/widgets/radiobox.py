@@ -20,7 +20,7 @@ class SkRadioBox(SkWidget):
         variable: SkVar | None = None,
         **kwargs,
     ):
-        super().__init__(*args, cursor=cursor, style=style, **kwargs)
+        super().__init__(*args, cursor=cursor, style_name=style, **kwargs)
         self.attributes["selected"] = selected
         self.attributes["value"] = value
         self.attributes["variable"]: SkVar = variable
@@ -57,9 +57,9 @@ class SkRadioBox(SkWidget):
                 style_selector = "SkCheckBox:focus"
             else:"""
         if self.checked:
-            style_name = f"{self.style}:checked"
+            style_name = f"{self.style_name}:checked"
         else:
-            style_name = f"{self.style}:unchecked"
+            style_name = f"{self.style_name}:unchecked"
         if self.is_mouse_floating:
             style_name = style_name + "-hover"
         else:

@@ -100,7 +100,7 @@ class SkTextButton(SkButton, SkText):
                 rect.bottom(),
             ),
             text=self.get(),
-            fg=self.theme.get_style_attr(self.style, "fg"),
+            fg=self.theme.get_style_attr(self.style_name, "fg"),
             align=self.cget("align"),
         )
         canvas.restore()
@@ -168,7 +168,7 @@ class SkMaximizeButton(SkTextButton):
             style_to_color(self._style("fg", None, style), self.theme)
         )
 
-        icon_radius = self.theme.get_style_attr(self.style, "icon_radius")
+        icon_radius = self.theme.get_style_attr(self.style_name, "icon_radius")
 
         paint = skia.Paint(
             Color=fg,

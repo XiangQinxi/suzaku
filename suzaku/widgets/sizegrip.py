@@ -16,7 +16,7 @@ class SkSizeGrip(SkWidget):
         **kwargs,
     ):
 
-        super().__init__(parent=parent, style=style, cursor=cursor, **kwargs)
+        super().__init__(parent=parent, style_name=style, cursor=cursor, **kwargs)
 
         self.bind("mouse_pressed", self._mouse_pressed)
         self.window.bind("mouse_motion", self._mouse_motion)
@@ -45,7 +45,7 @@ class SkSizeGrip(SkWidget):
         self._y1 = None
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.get_style(self.style)
+        style = self.theme.get_style(self.style_name)
 
         canvas.save()
         canvas.clipRect(rect)

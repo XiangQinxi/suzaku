@@ -1,14 +1,21 @@
+import typing
+
 import ctypes
 import os
 import sys
-import threading
-import typing
-
 import glfw
+
+if typing.TYPE_CHECKING:
+    from . import window
+
+
+import warnings
+warnings.warn(FutureWarning("相亲西给我补docstring"))
 
 
 class SkMisc:
-    def time(self, value: float = None):
+
+    def time(self, value: float | None = None):
         if value is not None:
             glfw.set_time(value)
             return self
@@ -20,12 +27,12 @@ class SkMisc:
 
         try:
             with winreg.OpenKey(
-                winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion"
+                winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
             ) as key:
                 val, _ = winreg.QueryValueEx(key, "ProgramFilesDir")
                 return val
         except Exception:
-            return os.environ.get("ProgramFiles", r"C:\Program Files")
+            return os.environ.get("ProgramFiles", r"C:\\Program Files")
 
     def get_tabtip_path(self):
         base = self.get_program_files()
@@ -52,6 +59,7 @@ class SkMisc:
 
         anti images
         """
+        self.window: window.SkWindow
         if value is not None:
             glfw.set_clipboard_string(self.window.the_window, value)
             return self
@@ -88,30 +96,26 @@ class SkMisc:
 
     @staticmethod
     def unpack_radius(
-        radius: (
-            int
-            | tuple[
+        radius:
+            tuple[
                 tuple[int, int],
                 tuple[int, int],
                 tuple[int, int],
                 tuple[int, int],
             ]
-        ),
-    ) -> tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]:
+    ) -> tuple[tuple[int, int], ...]:
         """Unpacking the radius"""
-        _radius: list[
-            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-        ] = list(radius)
+        _radius: list[tuple[int, int]] = list(radius)
         for i, r in enumerate(_radius):
             if isinstance(r, int):
                 _radius[i] = (r, r)
-        radius = tuple(_radius)
-        return radius
+        result = tuple(_radius)
+        return result
 
     @staticmethod
     def unpack_padx(padx):
         """Unpack padx.
-        【左右】
+        
         :param padx:
         :return:
         """

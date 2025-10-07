@@ -75,19 +75,19 @@ class SkButton(SkFrame):
             if not self.cget("disabled"):
                 if self.is_mouse_floating:
                     if self.is_mouse_pressed:
-                        style_selector = f"{self.style}:pressed"
+                        style_selector = f"{self.style_name}:pressed"
                     else:
-                        style_selector = f"{self.style}:hover"
+                        style_selector = f"{self.style_name}:hover"
                 else:
-                    if "focus" in self.styles[self.style]:
+                    if "focus" in self.styles[self.style_name]:
                         if self.is_focus:
-                            style_selector = f"{self.style}:focus"
+                            style_selector = f"{self.style_name}:focus"
                         else:
-                            style_selector = self.style
+                            style_selector = self.style_name
                     else:
-                        style_selector = self.style
+                        style_selector = self.style_name
             else:
-                style_selector = f"{self.style}:disabled"
+                style_selector = f"{self.style_name}:disabled"
 
         style = self.theme.get_style(style_selector)
         bg_shader = self._style("bg_shader", None, style)
@@ -105,7 +105,7 @@ class SkButton(SkFrame):
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style_attr(self.style, "radius"),
+            radius=self.theme.get_style_attr(self.style_name, "radius"),
             bg=bg,
             width=width,
             bd=bd,
