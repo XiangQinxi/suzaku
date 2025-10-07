@@ -146,7 +146,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
-        if isinstance(self.parent, container.SkContainer)
+        if isinstance(self.parent, container.SkContainer):
             self.parent.add_child(self)
         else:
             raise TypeError("Parent component is not a SkContainer-based object.")
