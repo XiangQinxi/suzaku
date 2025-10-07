@@ -6,16 +6,19 @@ import sys
 import glfw
 
 if typing.TYPE_CHECKING:
-    from . import window
-
-
-import warnings
-warnings.warn(FutureWarning("相亲西给我补docstring"))
+    from .widgets import window
 
 
 class SkMisc:
 
     def time(self, value: float | None = None):
+        """Get or set the time.
+
+        :param value: The time to set. Defaults to None.
+
+        :return: float | typing.Self: The time if value is None, otherwise self.
+        """
+
         if value is not None:
             glfw.set_time(value)
             return self
@@ -23,11 +26,16 @@ class SkMisc:
             return glfw.get_time()
 
     def get_program_files(self):
+        """Get the path of the Program Files directory.
+
+        :return: str: The path of the Program Files directory.
+        """
         import winreg
 
         try:
             with winreg.OpenKey(
-                winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
+                winreg.HKEY_LOCAL_MACHINE,
+                r"SOFTWARE\\Microsoft\\Windows\\CurrentVersion",
             ) as key:
                 val, _ = winreg.QueryValueEx(key, "ProgramFilesDir")
                 return val
@@ -35,12 +43,17 @@ class SkMisc:
             return os.environ.get("ProgramFiles", r"C:\\Program Files")
 
     def get_tabtip_path(self):
+        """Get the path of the TabTip.exe file.
+
+        :return: str: The path of the TabTip.exe file.
+        """
         base = self.get_program_files()
         return os.path.join(
             base, "Common Files", "Microsoft Shared", "ink", "TabTip.exe"
         )
 
     def _keyboard_open_win32(self):
+        """Open the on-screen keyboard on Windows."""
         tabtip = (
             self.get_tabtip_path()
         )  # r"C:\Program Files\Common Files\Microsoft Shared\ink\TabTip.exe"
@@ -55,9 +68,10 @@ class SkMisc:
             self._keyboard_open_win32()
 
     def clipboard(self, value: str | None = None) -> str | typing.Self:
-        """Get string from clipboard
+        """Get or set the clipboard string.
 
-        anti images
+        :param value: The string to set to clipboard. Defaults to None.
+        :return: str | typing.Self: The string if value is None, otherwise self.
         """
         self.window: window.SkWindow
         if value is not None:
@@ -71,13 +85,17 @@ class SkMisc:
 
     @staticmethod
     def post():
-        """
-        发送一个空事件，用于触发事件循环
-        """
+        """Post an empty event to the event queue."""
         glfw.post_empty_event()
 
     @staticmethod
-    def mods_name(_mods, join: str = "+"):
+    def mods_name(_mods, join: str = "+") -> str:
+        """Get the name of the modifier keys.
+
+        :param _mods: The modifier keys.
+        :param join: The separator to join the names. Defaults to "+".
+        :return: str: The name of the modifier keys.
+        """
         keys = []
         flags = {
             "control": glfw.MOD_CONTROL,
@@ -96,15 +114,18 @@ class SkMisc:
 
     @staticmethod
     def unpack_radius(
-        radius:
-            tuple[
-                tuple[int, int],
-                tuple[int, int],
-                tuple[int, int],
-                tuple[int, int],
-            ]
+        radius: tuple[
+            tuple[int, int],
+            tuple[int, int],
+            tuple[int, int],
+            tuple[int, int],
+        ],
     ) -> tuple[tuple[int, int], ...]:
-        """Unpacking the radius"""
+        """Unpack the radius.
+
+        :param radius: The radius to unpack.
+        :return: tuple[tuple[int, int], ...]: The unpacked radius.
+        """
         _radius: list[tuple[int, int]] = list(radius)
         for i, r in enumerate(_radius):
             if isinstance(r, int):
@@ -113,11 +134,11 @@ class SkMisc:
         return result
 
     @staticmethod
-    def unpack_padx(padx):
+    def unpack_padx(padx: int | tuple[int, int]) -> tuple[int, int]:
         """Unpack padx.
-        
+
         :param padx:
-        :return:
+        :return: tuple[int, int]: The unpacked padx.
         """
         if type(padx) is tuple:
             left = padx[0]
@@ -129,9 +150,9 @@ class SkMisc:
     @staticmethod
     def unpack_pady(pady):
         """Unpack pady.
-        【上下】
+
         :param pady:
-        :return:
+        :return: tuple[int, int]: The unpacked pady.
         """
         if type(pady) is tuple:
             top = pady[0]
@@ -142,10 +163,10 @@ class SkMisc:
 
     def unpack_padding(self, padx, pady):
         """Unpack padding.
-        【左上右下】
-        :param padx:
-        :param pady:
-        :return:
+
+        :param padx: The padding to unpack.
+        :param pady: The padding to unpack.
+        :return: tuple[int, int, int, int]: The unpacked padding. [Left, Top, Right, Bottom]
         """
         left, right = self.unpack_padx(padx)
         top, bottom = self.unpack_pady(pady)
@@ -154,7 +175,13 @@ class SkMisc:
 
     @staticmethod
     def _style(name: str, default, style):
-        """"""
+        """Get the style value.
+
+        :param name: The name of the style.
+        :param default: The default value.
+        :param style: The style dictionary.
+        :return: The value of the style.
+        """
         if name in style:
             return style[name]
         else:

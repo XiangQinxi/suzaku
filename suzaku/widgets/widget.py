@@ -6,8 +6,7 @@ import skia
 
 from ..event import SkEvent, SkEventHanding
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -801,7 +800,9 @@ class SkWidget(SkEventHanding, SkMisc):
     def read_size(self, selector: str):
         try:
             size = self.theme.get_style_attr(selector, "size")
-            self.config(dwidth=size[0], dheight=size[1])
+            # print(self.id, size)
+            if size:
+                self.config(dwidth=size[0], dheight=size[1])
         except SkStyleNotFoundError:
             pass
 
@@ -814,7 +815,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self.theme = new_theme
         self.styles = self.theme.styles
         self.read_size(self.style_name)
-        if isinstance(self, container.SkContainer):
+        if hasattr(self, "children"):
             child: SkWidget
             self.children: list
             for child in self.children:
