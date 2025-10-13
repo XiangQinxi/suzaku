@@ -30,13 +30,13 @@ class SkSwitchBox(SkCheckBox):
     def draw_widget(
         self, canvas: skia.Canvas, rect: skia.Rect, style_name=None
     ) -> None:
-        rest_style = self.theme.get_style(self.style)
+        rest_style = self.theme.select(self.style_name)
 
         if style_name is None:
             if self.checked:
-                style_name = f"{self.style}:checked"
+                style_name = f"{self.style_name}:checked"
             else:
-                style_name = f"{self.style}:unchecked"
+                style_name = f"{self.style_name}:unchecked"
 
             if self.is_mouse_floating:
                 if self.is_mouse_pressed:
@@ -46,7 +46,7 @@ class SkSwitchBox(SkCheckBox):
             else:
                 style_name = style_name + "-rest"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]

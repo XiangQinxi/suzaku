@@ -21,7 +21,7 @@ class SkFrame(SkWidget, SkContainer):
     def __init__(
         self, parent: SkContainer, *, style: str = "SkFrame", **kwargs
     ) -> None:
-        SkWidget.__init__(self, parent, style=style, **kwargs)
+        SkWidget.__init__(self, parent, style_name=style, **kwargs)
         SkContainer.__init__(self)
 
     @property

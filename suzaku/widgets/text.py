@@ -31,7 +31,7 @@ class SkText(SkWidget):
         textvariable: SkStringVar = None,
         **kwargs,
     ):
-        super().__init__(parent=parent, style=style, **kwargs)
+        super().__init__(parent=parent, style_name=style, **kwargs)
         self.attributes["textvariable"]: SkStringVar = textvariable
         self.attributes["text"]: str | None = str(text)
         self.attributes["font"]: skia.Font = default_font
@@ -72,7 +72,7 @@ class SkText(SkWidget):
     # region Draw
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
-        style = self.theme.get_style(self.style)
+        style = self.theme.select(self.style_name)
         canvas.save()
         canvas.clipRect(rect)
         self._draw_text(

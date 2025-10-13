@@ -217,6 +217,8 @@ class SkGradient:
             ] = []
             positions: list[float] = []
             for position, color in config["colors"].items():
+                position: str  # ["0%", "0.5", "100%"]
+
                 if position.endswith("%"):
                     positions.append(float(position.strip("%")) / 100)
                 else:
@@ -227,14 +229,12 @@ class SkGradient:
                 if widget:
                     if "start_anchor" in config:
                         start_anchor = config["start_anchor"]
-                        del config["start_anchor"]
                     else:
                         start_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"
                         ] = "n"
                     if "end_anchor" in config:
                         end_anchor = config["end_anchor"]
-                        del config["end_anchor"]
                     else:
                         end_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se"
@@ -306,19 +306,20 @@ def style_to_color(
         case _:
             # If invalid, then return green to prevent crash
             warnings.warn(
-                message="Invalid color configuration in styles!", category=Warning
+                message=f"Invalid color configuration in styles! {style_attr_value}",
+                category=Warning,
             )
             return SkColor(ERR_COLOR)
 
 
-def skcolor_to_color(color: SkColor | int | list) -> int:
-    """Convert skia.Color to color object.
+def skcolor_to_color(color: int | SkColor | list) -> int:
+    """Returns skia.Color received or convert received SkColor into skia.Color
 
     :param color: SkColor object or skia.Color object
     :return: Color object
     """
     if isinstance(color, SkColor):
-        return color.color
+        return color.get()
     elif isinstance(color, list):
         return SkColor(color).color
     else:

@@ -8,8 +8,8 @@ class SkEntry(SkLineInput):
     """A single-line input box with a border 【带边框的单行输入框】"""
 
     # region Init 初始化
-    def __init__(self, parent: SkContainer, *, style: str = "SkEntry", **kwargs):
-        super().__init__(parent=parent, style=style, **kwargs)
+    def __init__(self, parent: SkContainer, *, style_name: str = "SkEntry", **kwargs):
+        super().__init__(parent=parent, style_name=style_name, **kwargs)
 
         self.padding = 5
 
@@ -20,16 +20,16 @@ class SkEntry(SkLineInput):
     def draw_widget(self, canvas, rect) -> None:
         if self.is_mouse_floating:
             if self.is_focus:
-                style_name = self.style + ":focus"
+                style_name = self.style_name + ":focus"
             else:
-                style_name = self.style + ":hover"
+                style_name = self.style_name + ":hover"
         elif self.is_focus:
-            style_name = self.style + ":focus"
+            style_name = self.style_name + ":focus"
         else:
-            style_name = self.style
+            style_name = self.style_name
 
-        style = self.theme.get_style(style_name)
-        radius = self.theme.get_style_attr(self.style, "radius")
+        style = self.theme.select(style_name)
+        radius = self.theme.get_style_attr(self.style_name, "radius")
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]

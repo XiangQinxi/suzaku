@@ -6,7 +6,8 @@ import skia
 
 from ..base.windowbase import SkWindowBase
 from ..event import SkEvent
-from ..styles.color import style_to_color
+from ..styles.color import SkColor, skcolor_to_color, style_to_color
+from ..styles.drop_shadow import SkDropShadow
 from ..styles.theme import SkTheme, default_theme
 from .app import SkApp
 from .container import SkContainer
@@ -20,6 +21,7 @@ class SkWindow(SkWindowBase, SkContainer):
         parent: typing.Self | SkApp = None,
         *args,
         theme: SkTheme = None,
+        style: str = "SkWindow",
         size: tuple[int, int] = (300, 300),
         anti_alias: bool = True,
         **kwargs,
@@ -35,6 +37,10 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.theme: SkTheme | None = None
         self.styles: dict | None = None
+        self.style = style
+
+        self.attributes["enabled_radius"]: bool = False
+        self.attributes["resizable_margin"] = 8
 
         if isinstance(self.parent, SkWindow):
             self.apply_theme(self.parent.theme if self.parent.theme else theme)
@@ -54,8 +60,13 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.entered_widgets = []
 
+        self._x1 = None
+        self._y1 = None
+        self._anchor = None
+
         self.set_draw_func(self._draw)
-        self.bind("mouse_move", self._move, add=True)
+        self.bind("mouse_move", self._move)
+        self.bind("mouse_motion", self._motion)
         self.bind("mouse_pressed", self._mouse)
         self.bind("mouse_released", self._mouse_released)
 
@@ -189,6 +200,19 @@ class SkWindow(SkWindowBase, SkContainer):
         return False
 
     def _mouse(self, event: SkEvent) -> None:
+        if self.window.resizable():
+            self._anchor = self.mouse_anchor(event.x, event.y)
+        else:
+            self._anchor = None
+        if self._anchor:
+            self._x1 = event.x
+            self._y1 = event.y
+            self._rootx1 = self.root_x
+            self._rooty1 = self.root_y
+            self._width1 = self.window.width
+            self._height1 = self.window.height
+            self._right = self.root_x + self.width
+            self._bottom = self.root_y + self.height
         children = self.visible_children
         children.reverse()
         for widget in children:
@@ -206,6 +230,20 @@ class SkWindow(SkWindowBase, SkContainer):
                 for name in names:
                     widget.event_trigger(name, event)
                 break
+
+    def mouse_anchor(self, x, y) -> None | str:
+        anchor = ""
+        resizable_margin = self.cget("resizable_margin")
+
+        if x >= self.width - resizable_margin:
+            anchor = "e"
+        elif x <= resizable_margin:
+            anchor = "w"
+        if y >= self.height - resizable_margin:
+            anchor = "s" + anchor
+        elif y <= resizable_margin:
+            anchor = "n" + anchor
+        return anchor
 
     def _move(self, event: SkEvent) -> None:
         """Mouse move event for SkWindow.
@@ -265,17 +303,43 @@ class SkWindow(SkWindowBase, SkContainer):
                 self.previous_widget = current_widget
         else:
             self.previous_widget = None
-        del current_widget, event
 
-    def _draw(self, canvas: skia.Canvas) -> None:
-        # print(style_to_color())
-        bg = self.theme.get_style("SkWindow")["bg"]
-        canvas.clear(style_to_color(bg, self.theme).color)
-        # canvas.clear(skia.ColorTRANSPARENT)
+        if (
+            not self.window_attr("border")
+            and not self.window_attr("maximized")
+            and self.window.resizable()
+        ):
+            match self.mouse_anchor(event.x, event.y):
+                case "e" | "w":
+                    self.cursor("hresize")
+                case "s" | "n":
+                    self.cursor("vresize")
+                case "se" | "nw":
+                    self.cursor("resize_nwse")
+                case "sw" | "ne":
+                    self.cursor("resize_nesw")
+                case _:
+                    if not self.previous_widget:
+                        self.cursor("arrow")
 
-        self.draw_children(canvas)
-
-        return None
+    def _motion(self, event: SkEvent) -> None:
+        self._anchor: str
+        if self._anchor and not self.window_attr("maximized"):
+            x, y = None, None
+            width, height = None, None
+            minwidth, minheight = self.wm_minsize()
+            if self._anchor.startswith("s"):
+                height = max(minheight, self._height1 + event.y - self._y1)
+            if self._anchor.startswith("n"):
+                height = max(minheight, self._bottom - (event.rooty - self._y1))
+                y = min(self.root_y + self.height - minheight, event.rooty - self._y1)
+            if self._anchor.endswith("e"):
+                width = max(minwidth, self._width1 + event.x - self._x1)
+            if self._anchor.endswith("w"):
+                width = max(minwidth, self._right - event.rootx - self._x1)
+                x = min(self.root_x + self.width - minwidth, event.rootx - self._x1)
+            self.window.resize(width, height)
+            self.window.move(x, y)
 
     def _mouse_released(self, event: SkEvent) -> None:
         """Mouse release event for SkWindow.
@@ -283,6 +347,10 @@ class SkWindow(SkWindowBase, SkContainer):
         :param event:
         :return:
         """
+
+        self._x1 = None
+        self._y1 = None
+
         button = self.button
         names = [
             "mouse_released",
@@ -334,5 +402,87 @@ class SkWindow(SkWindowBase, SkContainer):
             )
             self.focus_widget = self
         glfw.focus_window(self.the_window)
+
+    # endregion
+
+    # region Draw 绘制
+
+    def _rect_path(
+        self,
+        rect: skia.Rect,
+        radius: int | tuple[int, int, int, int] = 0,
+    ):
+        rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
+        radii: tuple[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = self.unpack_radius(radius)
+        # 设置每个角的半径（支持X/Y不对称）
+        rrect.setRectRadii(
+            skia.Rect.MakeLTRB(*rect),
+            [
+                skia.Point(*radii[0]),  # 左上
+                skia.Point(*radii[1]),  # 右上
+                skia.Point(*radii[2]),  # 右下
+                skia.Point(*radii[3]),  # 左下
+            ],
+        )
+
+        path = skia.Path()
+        path.addRRect(rrect)
+        return path
+
+    def _draw(self, canvas: skia.Canvas) -> None:
+        # print(style_to_color())
+        style = self.theme.select(self.style)
+        self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
+
+        radius = self._style("radius", 0, style)
+        if self.window_attr("maximized"):
+            radius = (0, 0, 0, 0)
+
+        _ = not self.window_attr("border") and "radius" in style
+        if _:
+            radii: tuple[
+                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+            ] = self.unpack_radius(radius)
+            rrect: skia.RRect = skia.RRect.MakeRectXY(self.rect, 0, 0)
+            rrect.setRectRadii(
+                self.rect,
+                [
+                    skia.Point(*radii[0]),  # 左上
+                    skia.Point(*radii[1]),  # 右上
+                    skia.Point(*radii[2]),  # 右下
+                    skia.Point(*radii[3]),  # 左下
+                ],
+            )
+            canvas.clipRRect(
+                rrect,
+                self.anti_alias,
+            )
+        canvas.clear(
+            style_to_color(self._style("bg", skia.ColorWHITE, style), self.theme).color
+        )
+        # canvas.clear(skia.ColorTRANSPARENT)
+
+        self.draw_children(canvas)
+
+        if _:
+            bd = style_to_color(
+                self._style("bd", skia.ColorBLACK, style), self.theme
+            ).color
+            width = self._style("width", 2, style)
+
+            path = self._rect_path(self.rect, radius)
+
+            if bd and width > 0:
+                bd_paint = skia.Paint(
+                    AntiAlias=self.anti_alias,
+                    Style=skia.Paint.kStroke_Style,
+                )
+                bd = skcolor_to_color(style_to_color(bd, self.theme))
+                bd_paint.setStrokeWidth(width)
+                bd_paint.setColor(bd)
+                canvas.drawPath(path, bd_paint)
+        return None
 
     # endregion

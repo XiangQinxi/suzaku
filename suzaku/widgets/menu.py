@@ -27,5 +27,5 @@ class SkMenu(SkTextButton):
             else:
                 self.cget("popupmenu").popup(
                     x=self.x - self.parent.x_offset,
-                    y=self.y - self.parent.y_offset + self.height + 10,
+                    y=self.y - self.parent.y_offset + self.height * 2,
                 )

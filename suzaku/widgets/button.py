@@ -31,58 +31,81 @@ class SkButton(SkFrame):
         super().__init__(parent, style=style, **kwargs)
 
         self.attributes["cursor"] = cursor
+        self.attributes["command"] = command
 
-        self.command = command
         self.focusable = True
         self.help_parent_scroll = True
 
         self.bind("click", lambda _: self.invoke)
 
+    def _click(self, event) -> None:
+        """
+        Check click event (not pressed)
+
+        :return: None
+        """
+        if self.button != 1:
+            if self.is_mouse_floating:
+
+                self.event_trigger("click", event)
+                self.invoke()
+                time = self.time()
+
+                if self.click_time + self.cget("double_click_interval") > time:
+                    self.event_trigger("double_click", event)
+                    self.click_time = 0
+                else:
+                    self.click_time = time
+
     def invoke(self) -> None:
         """【触发按钮的点击事件】"""
-        if self.command and self.cget("disabled") is False:
-            self.command()
+        if self.cget("command") and self.cget("disabled") is False:
+            self.cget("command")()
 
-    def draw_widget(self, canvas, rect, style_name: str | None = None) -> None:
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         """Draw button
 
         :param canvas: skia.Surface to draw on
         :param rect: Rectangle to draw in
-        :param style_name: Style name
+        :param style_selector: Style name
 
         :return: None
         """
-        if style_name is None:
+        if style_selector is None:
             if not self.cget("disabled"):
                 if self.is_mouse_floating:
                     if self.is_mouse_pressed:
-                        style_name = f"{self.style}:pressed"
+                        style_selector = f"{self.style_name}:pressed"
                     else:
-                        style_name = f"{self.style}:hover"
+                        style_selector = f"{self.style_name}:hover"
                 else:
-                    if "focus" in self.styles[self.style]:
+                    if "focus" in self.styles[self.style_name]:
                         if self.is_focus:
-                            style_name = f"{self.style}:focus"
+                            style_selector = f"{self.style_name}:focus"
                         else:
-                            style_name = self.style
+                            style_selector = self.style_name
                     else:
-                        style_name = self.style
+                        style_selector = self.style_name
             else:
-                style_name = f"{self.style}:disabled"
+                style_selector = f"{self.style_name}:disabled"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_selector)
         bg_shader = self._style("bg_shader", None, style)
+        # bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
         bd_shadow = self._style("bd_shadow", None, style)
         bd_shader = self._style("bd_shader", None, style)
-        width = self._style("width", 0, style)
+        width = self.theme.get_style_attr(style_selector, "width")
+        # self._style("width", 0, style)
+        # bd = self.theme.get_style_attr(style_selector, "bd")
         bd = self._style("bd", None, style)
+        # bg = self.theme.get_style_attr(style_selector, "bg")
         bg = self._style("bg", None, style)
 
         # Draw the button border
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style_attr(self.style, "radius"),
+            radius=self.theme.get_style_attr(self.style_name, "radius"),
             bg=bg,
             width=width,
             bd=bd,
@@ -90,3 +113,12 @@ class SkButton(SkFrame):
             bd_shader=bd_shader,
             bg_shader=bg_shader,
         )
+
+        """rest_style = self.theme.get_style(self.style)
+        hover_style = self.theme.get_style(self.style + ":hover")
+        if "bg" in hover_style:
+            bg = hover_style["bg"]
+        else:
+            bg = rest_style["bg"]"""
+
+        return style

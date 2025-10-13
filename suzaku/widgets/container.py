@@ -161,6 +161,15 @@ class SkContainer:
                 self.parent.add_child(child)
             self.children.append(child)
 
+    def remove_child(self, child):
+        """Remove child widget from window.
+        :param child: The child to remove"""
+        pass
+
+    def remove_all(self):
+        for child in self.children:
+            child.layout_forget()
+
     def grid_map(self):
         # Grid Map
         from .widget import SkWidget
@@ -377,6 +386,8 @@ class SkContainer:
         :return: None
         """
 
+        # TODO 做好ipadx、ipady的处理
+
         from .widget import SkWidget
 
         width = self.width  # container width
@@ -548,13 +559,6 @@ class SkContainer:
     # endregion
 
     # region other 其他
-    def bind(self, *args, **kwargs):
-        raise RuntimeError(
-            "Anything inherited from SkContainer should support binding events!"
-            + "This error should be overrode by the actual bind function of "
-            + "SkWindow or SkWidget in normal cases."
-        )
-
     @property
     def visible_children(self):
         children = []

@@ -26,7 +26,7 @@ class SkCard(SkFrame):
         :param rect: skia.Rect
         :return: None
         """
-        styles = self.theme.get_style(self.style)
+        styles = self.theme.select(self.style_name)
         if self.cget("styles") is not None:
             styles = self.cget("styles")
         radius = self._style("radius", 0, styles)

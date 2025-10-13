@@ -54,6 +54,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         size: tuple[int, int] = (300, 300),
         fullscreen=False,
         opacity: float = 1.0,
+        minsize: tuple[int, int] = (80, 80),
         force_hardware_acceleration: bool = False,
     ):
         # glfw.default_window_hints()
@@ -120,6 +121,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "opacity": opacity,
             "cursor": "arrow",  # default cursor
             "force_hardware_acceleration": force_hardware_acceleration,
+            "minsize": minsize,
         }
 
         self.events = {
@@ -195,18 +197,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         )
 
-        try:
-            import PIL
-            from PIL import Image
+        self.attributes["iconpath"] = self.icon1_path
 
-            icon = Image.open(self.icon1_path)
-            if self.framework == "glfw":
-                from glfw import set_window_icon
-
-                set_window_icon(self.the_window, 1, icon)
-        except ImportError:
-            pass
-
+        self.wm_iconpath(self.icon1_path)
         # icon: skia.Image = skia.Image.open(self.icon1_path)
 
         # info = skia.ImageInfo.MakeN32Premul(icon.width(), icon.height())
@@ -896,6 +889,26 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
 
+    def wm_iconpath(self, path: str | str = None) -> str | None:
+        if path:
+            try:
+                import PIL
+                from PIL import Image
+
+                icon = Image.open(path)
+                if self.framework == "glfw":
+                    from glfw import set_window_icon
+
+                    set_window_icon(self.the_window, 1, icon)
+            except ImportError:
+                pass
+            else:
+                self.configure(iconpath=path)
+        else:
+            return self.cget("iconpath")
+
+    iconpath = wm_iconpath
+
     def wm_maxsize(
         self, width: int | float | None = None, height: int | float | None = None
     ):
@@ -910,15 +923,30 @@ class SkWindowBase(SkEventHanding, SkMisc):
     maxsize = wm_maxsize
 
     def wm_minsize(
-        self, width: int | float | None = None, height: int | float | None = None
-    ):
-        if width is None:
-            width = glfw.DONT_CARE
-        if height is None:
-            height = glfw.DONT_CARE
-        glfw.set_window_size_limits(
-            self.the_window, width, height, glfw.DONT_CARE, glfw.DONT_CARE
-        )
+        self, width: int | None = None, height: int | None = None
+    ) -> tuple[int | None, int | None]:
+        if width is None and height is None:
+            size = self.cget("minsize")
+            if size[0] is None:
+                w = 0
+            else:
+                w = size[0]
+            if size[1] is None:
+                h = 0
+            else:
+                h = size[1]
+            return w, h
+        else:
+            self.configure(minsize=(width, height))
+            if width is None:
+                width = glfw.DONT_CARE
+            if height is None:
+                height = glfw.DONT_CARE
+
+            glfw.set_window_size_limits(
+                self.the_window, width, height, glfw.DONT_CARE, glfw.DONT_CARE
+            )
+            return self
 
     minsize = wm_minsize
 
@@ -938,6 +966,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "resizable",
             "visible",
             "border",
+            "maximized",
         ],
         value: typing.Any = None,
     ) -> typing.Any:
@@ -951,6 +980,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "resizable": glfw.RESIZABLE,
             "visible": glfw.VISIBLE,
             "border": glfw.DECORATED,
+            "maximized": glfw.MAXIMIZED,
         }
 
         if name in attrib_names:
@@ -1180,7 +1210,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         from glfw import set_window_size
 
-        set_window_size(self.the_window, width, height)
+        set_window_size(self.the_window, round(width), round(height))
         self.event_trigger(
             "resize", SkEvent(event_type="resize", width=width, height=height)
         )
@@ -1196,17 +1226,17 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if x is None:
             x = self.root_x
-        if x < 0:
-            x = 0
+        if x < -self.width / 2:
+            x = round(-self.width / 2)
         if y is None:
             y = self.root_y
-        if y < 0:
-            y = 0
+        if y < -self.height / 2:
+            y = round(-self.height / 2)
         self.root_x = x
         self.root_y = y
         from glfw import set_window_pos
 
-        set_window_pos(self.the_window, x, y)
+        set_window_pos(self.the_window, round(x), round(y))
         self.event_trigger("move", SkEvent(event_type="move", rootx=x, rooty=y))
 
         return self

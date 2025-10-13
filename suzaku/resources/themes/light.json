@@ -93,6 +93,153 @@
       }
     },
 
+    "SkCloseButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": [0, 5, 5, 0],
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [196, 43, 28],
+        "fg": "white",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [145, 31, 20],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
+    "SkComboBox": {
+      "rest": {
+        "size": [0, 35],
+        "radius": 5,
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "center",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [235, 235, 235, 255],
+              "100%": [200, 200, 200, 255]
+              }
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "bd_shadow": [0, 3, 1, 1, [0, 0, 0, 50]],
+        "width": 2,
+        "arrow": "gray"
+      },
+      "hover": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [245, 245, 245, 255],
+              "100%": [200, 200, 200, 255]
+            }
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "bd_shadow": [0, 0, 4, 4, [40, 130, 255, 255]],
+        "width": 2
+      },
+      "pressed": {
+        "bg": [255, 255, 255, 255],
+        "bg_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [200, 200, 200, 255],
+              "100%": [235, 235, 235, 255]
+            }
+          }
+        },
+        "fg": [0, 0, 0, 235],
+        "bd": [200, 200, 200, 255],
+        "bd_shadow": [0, 0, 3, 3, [40, 130, 255, 255]],
+        "width": 2
+      },
+      "focus": {
+        "bg": [225, 225, 225, 245],
+        "fg": [0, 0, 0, 235],
+        "bd": [40, 130, 255, 255],
+        "bd_shadow": [0, 1, 3, 3, [25, 125, 225, 100]],
+        "width": 3
+      },
+      "disabled": {
+        "bg": [240, 240, 240, 240],
+        "fg": [150, 150, 150, 235],
+        "bd": [200, 200, 200, 255],
+        "width": 2
+      }
+    },
+
+    "SkMaximizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [50, 100, 210, 200],
+        "fg": "white",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [40, 80, 160],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
+    "SkMinimizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": [5, 0, 0, 5],
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [0, 0, 0, 20],
+        "fg": "black",
+        "width": 0
+      },
+      "pressed": {
+        "bg": [0, 0, 0, 40],
+        "fg": "black",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": "gray",
+        "width": 0
+      }
+    },
+
     "SkMenu": {
       "rest": {
         "size": [0, 35],
@@ -128,11 +275,11 @@
 
     "SkMenuBar": {
       "rest": {
-        "size": [0, 38],
+        "size": [0, 30],
         "fg": {"color_palette": "bd"},
         "bg": {"color_palette": "second_bg"},
-        "bd_shadow": [0, 3, 3, 3, [0, 0, 0, 50]],
-        "width": 2
+        "bd_shadow": [0, 4, 2, 2, [0, 0, 0, 50]],
+        "width": 0
       }
     },
 
@@ -335,6 +482,16 @@
       }
     },
 
+    "SkSizeGrip": {
+      "rest": {
+        "size": [15, 15],
+        "grip_style": "dotted",
+        "dot_size": 2,
+        "dot_spacing": 5,
+        "fg": {"color_palette": "bd"}
+      }
+    },
+
     "SkSwitchBox": {
       "rest": {
         "size": [48, 20],
@@ -520,13 +677,27 @@
         "size": [0, 0],
         "radius": 0,
         "width": 0,
-        "bg": {"color_palette": "second_bg"}
+        "bg": {"color_palette": "second_bg"},
+        "bd_shadow": [0, 4, 2, 2, [0, 0, 0, 50]]
       }
     },
 
     "SkWindow": {
-      "rest":{
-        "bg": {"color_palette": "bg"}
+      "rest": {
+        "bg": {"color_palette": "bg"},
+        "radius": [8, 8, 0, 0],
+        "width": 3,
+        "bd": {"color_palette": "bd"}
+      }
+    },
+
+    "SkWindowCommand": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 5,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 2
       }
     }
 

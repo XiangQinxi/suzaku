@@ -34,15 +34,15 @@ class SkListItem(SkTextButton):
         self.parent.select(self)
 
     def draw_widget(
-        self, canvas: skia.Canvas, rect: skia.Rect, style_name: str | None = None
+        self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
     ) -> None:
         if self.selected:
-            style_name = f"{self.style}:selected"
+            style_selector = f"{self.style_name}:selected"
         else:
             if self.is_mouse_floating:
                 if self.is_mouse_pressed:
-                    style_name = f"{self.style}:pressed"
+                    style_selector = f"{self.style_name}:pressed"
                 else:
-                    style_name = f"{self.style}:hover"
+                    style_selector = f"{self.style_name}:hover"
 
-        super().draw_widget(canvas, rect, style_name)
+        super().draw_widget(canvas, rect, style_selector)

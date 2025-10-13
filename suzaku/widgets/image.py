@@ -1,9 +1,9 @@
-from typing import Any
+import typing
+
+import skia
 
 from .container import SkContainer
 from .widget import SkWidget
-
-# TODO 准备重组SkImage
 
 
 class SkImage(SkWidget):
@@ -16,31 +16,71 @@ class SkImage(SkWidget):
     def __init__(
         self,
         parent: SkContainer,
-        path: str,
-        x: int,
-        y: int,
-        width: int,
-        height: int,
+        path: str | None = None,
+        fill: typing.Literal["both", "x", "y"] | None = None,
+        anchor: typing.Literal[
+            "nw", "n", "ne", "e", "se", "s", "sw", "w", "center"
+        ] = "center",
         **kwargs,
     ) -> None:
         super().__init__(parent, **kwargs)
-        self.parent = parent
-        self.width: int = width
-        self.height: int = height
-        self.path = path
-        self.x: int = x
-        self.y: int = y
+        self.path: str = path
+        self.image: skia.Image | None
+
+        self.attributes["fill"] = fill
+        self.attributes["anchor"] = anchor
+        self.attributes["width"] = None
+        self.attributes["height"] = None
+
+        if path:
+            self.image: skia.Image = skia.Image.open(path)
+        else:
+            self.image = None
+
+    def resize(self, width: int, height: int) -> None:
+        """Resize image to width and height"""
+        if self.image:
+            self.image.resize(width, height)
+        self.configure(width=width, height=height)
+
+    @property
+    def image_width(self):
+        return self.image.width()
+
+    @property
+    def image_height(self):
+        return self.image.height()
+
+    def path(self, filename: str | None = None) -> str | None:
+        if filename:
+            self.path = filename
+            if self.image:
+                self.image.close()
+            self.image: skia.Image = skia.Image.open(filename)
+        else:
+            return self.path
+        return self.path
 
     @property
     def dwidth(self):
-        _width = self.width
+        if self.image:
+            if self.cget("width"):
+                _width = self.cget("width")
+            else:
+                _width = self.image_width
+        else:
+            _width = 0
         return _width
 
     @property
     def dheight(self):
-        _height = self.cget("dheight")
-        if _height <= 0:
-            _height = self.text_height + 8
+        if self.image:
+            if self.cget("height"):
+                _height = self.cget("height")
+            else:
+                _height = self.image_height
+        else:
+            _height = 0
         return _height
 
     def draw_widget(self, canvas, rect) -> None:
@@ -51,8 +91,20 @@ class SkImage(SkWidget):
 
         :return: None
         """
-        if self.path:
-            path = self.path
-        else:
-            path = None
-        self._draw_image(canvas, path=path, uri=None, rect=rect)
+
+        x, y, w, h = rect.x(), rect.y(), rect.width(), rect.height()
+
+        match self.cget("fill"):
+            case "both":
+                pass
+            case "x":
+                h = self.dheight
+            case "y":
+                w = self.dwidth
+            case None:
+                w, h = self.dwidth, self.dheight
+                x, y = rect.centerX() - w / 2, rect.centerY() - h / 2
+
+        rect = skia.Rect.MakeXYWH(x, y, w, h)
+
+        self._draw_image_rect(canvas, rect, self.image)

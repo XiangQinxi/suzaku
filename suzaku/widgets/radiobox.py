@@ -20,7 +20,7 @@ class SkRadioBox(SkWidget):
         variable: SkVar | None = None,
         **kwargs,
     ):
-        super().__init__(*args, cursor=cursor, style=style, **kwargs)
+        super().__init__(*args, cursor=cursor, style_name=style, **kwargs)
         self.attributes["selected"] = selected
         self.attributes["value"] = value
         self.attributes["variable"]: SkVar = variable
@@ -49,27 +49,27 @@ class SkRadioBox(SkWidget):
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """if self.is_mouse_floating:
             if self.is_mouse_pressed:
-                style_name = "SkCheckBox:pressed"
+                style_selector = "SkCheckBox:pressed"
             else:
-                style_name = "SkCheckBox:hover"
+                style_selector = "SkCheckBox:hover"
         else:
             if self.is_focus:
-                style_name = "SkCheckBox:focus"
+                style_selector = "SkCheckBox:focus"
             else:"""
         if self.checked:
-            style_name = f"{self.style}:checked"
+            style_name = f"{self.style_name}:checked"
         else:
-            style_name = f"{self.style}:unchecked"
+            style_name = f"{self.style_name}:unchecked"
         if self.is_mouse_floating:
             style_name = style_name + "-hover"
         else:
             """if self.is_focus:
-                style_name = style_name + "-focus"
+                style_selector = style_selector + "-focus"
             else:
-                style_name = style_name + "-rest"""
+                style_selector = style_selector + "-rest"""
             style_name = style_name + "-rest"
 
-        style = self.theme.get_style(style_name)
+        style = self.theme.select(style_name)
 
         if "bg_shader" in style:
             bg_shader = style["bg_shader"]

@@ -1,4 +1,5 @@
 try:
+    import suzaku as sk
     from suzaku import *
 except:
     raise ModuleNotFoundError(
@@ -16,17 +17,17 @@ if __name__ == "__main__":
         window = SkWindow(
             anti_alias=True,
             parent=None,
-            title="Suzaku GUI",
+            title=f"Suzaku GUI",
             size=(280, 630),
         )
-        # window.window_attr("border", False)
+        window.minsize(100, 80)
+        window.resizable(True)
         window.bind("drop", lambda evt: print("drop", evt))
 
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
-        # titlebar = SkTitleBar(window)
-        # titlebar.box(side="top", padx=0, pady=0)
+        headerbar = titlebar(window)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         popupmenu.add_command("Exit", command=window.destroy)
 
         menubar.add_cascade("File", menu=popupmenu)
-        menubar.add_separator()
+        menubar.add_command("New", command=create1window)
         menubar.add_command("Exit", command=window.destroy)
 
         tabs = SkTabs(window, expand=True)
@@ -60,6 +61,8 @@ if __name__ == "__main__":
             tabs.add(tab_widgets, text="Widgets")
 
             SkTextButton(tab_widgets, text="SkTextButton").box(padx=10, pady=(10, 0))
+
+            SkCombobox(tab_widgets).box(padx=10, pady=(10, 0))
 
             SkCheckButton(
                 tab_widgets,
@@ -90,7 +93,9 @@ if __name__ == "__main__":
             SkEntry(
                 tab_widgets, placeholder="Password", textvariable=var2, show="●"
             ).box(padx=10, pady=(10, 0))
-            SkLabel(tab_widgets, textvariable=var2).box(padx=10, pady=(10, 10))
+            SkLabel(tab_widgets, text=f"Suzaku Version: {sk.__version__}").box(
+                padx=10, pady=(10, 10)
+            )
 
         tab1()
 
@@ -138,12 +143,10 @@ if __name__ == "__main__":
         tabs.select(0)
         tabs.box(padx=10, pady=10, expand=True)
 
-        SkTextButton(window, text="Create New window", command=create1window).box(
-            padx=10, pady=(5, 0)
-        )
-        SkTextButton(window, text="Close the window", command=window.destroy).box(
-            side="bottom", padx=10, pady=10
-        )
+        statusbar = SkCard(window)
+        sizegrip = SkSizegrip(statusbar)
+        sizegrip.box(side="right", padx=5, pady=5)
+        statusbar.box(side="bottom", padx=0, pady=0)
 
     create1window()
 

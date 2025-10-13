@@ -1,8 +1,7 @@
 import typing
-from functools import cache
-from typing import Any, Literal
 
-import glfw
+from functools import cache
+
 import skia
 
 from ..event import SkEvent, SkEventHanding
@@ -13,6 +12,7 @@ from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
 from .appwindow import SkAppWindow
 from .window import SkWindow
+from . import container
 
 
 class SkWidget(SkEventHanding, SkMisc):
@@ -30,7 +30,7 @@ class SkWidget(SkEventHanding, SkMisc):
         parent,
         *,
         cursor: str = "arrow",
-        style: str = "SkWidget",
+        style_name: str = "SkWidget",
         font: skia.Font | None = default_font,
         disabled: bool = False,
     ) -> None:
@@ -43,8 +43,8 @@ class SkWidget(SkEventHanding, SkMisc):
 
         SkEventHanding.__init__(self)
 
-        self.parent = parent
-        self.style = style
+        self.parent: SkWidget = parent
+        self.style_name: str = style_name
 
         try:
             self.window: SkWindow | SkAppWindow = (
@@ -103,7 +103,7 @@ class SkWidget(SkEventHanding, SkMisc):
             for state in button_states:
                 self.event_generate(f"{button}_{state}")
 
-        self.attributes: dict[str, Any] = {
+        self.attributes: dict[str, typing.Any] = {
             "cursor": cursor,
             "theme": None,
             "dwidth": 100,  # default width
@@ -145,9 +145,9 @@ class SkWidget(SkEventHanding, SkMisc):
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
-        try:
+        if isinstance(self.parent, container.SkContainer):
             self.parent.add_child(self)
-        except TypeError:
+        else:
             raise TypeError("Parent component is not a SkContainer-based object.")
 
         # Events-related
@@ -429,6 +429,30 @@ class SkWidget(SkEventHanding, SkMisc):
                 )
         return None
 
+    def _rect_path(
+        self,
+        rect: skia.Rect,
+        radius: int | tuple[int, int, int, int] = 0,
+    ):
+        rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
+        radii: tuple[
+            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
+        ] = self.unpack_radius(radius)
+        # 设置每个角的半径（支持X/Y不对称）
+        rrect.setRectRadii(
+            skia.Rect.MakeLTRB(*rect),
+            [
+                skia.Point(*radii[0]),  # 左上
+                skia.Point(*radii[1]),  # 右上
+                skia.Point(*radii[2]),  # 右下
+                skia.Point(*radii[3]),  # 左下
+            ],
+        )
+
+        path = skia.Path()
+        path.addRRect(rrect)
+        return path
+
     def _draw_rect(
         self,
         canvas: skia.Canvas,
@@ -440,8 +464,8 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["linear_gradient"] = None,
-        bg_shader: None | Literal["linear_gradient"] = None,
+        bd_shader: None | typing.Literal["linear_gradient"] = None,
+        bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
         """Draw the frame
 
@@ -457,23 +481,7 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         is_custom_radius = isinstance(radius, tuple | list)
         if is_custom_radius:
-            rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
-            radii: tuple[
-                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-            ] = self.unpack_radius(radius)
-            # 设置每个角的半径（支持X/Y不对称）
-            rrect.setRectRadii(
-                skia.Rect.MakeLTRB(*rect),
-                [
-                    skia.Point(*radii[0]),  # 左上
-                    skia.Point(*radii[1]),  # 右上
-                    skia.Point(*radii[2]),  # 右下
-                    skia.Point(*radii[3]),  # 左下
-                ],
-            )
-
-            path = skia.Path()
-            path.addRRect(rrect)
+            path = self._rect_path(rect, radius)
 
         if bg:
             bg_paint = skia.Paint(
@@ -534,8 +542,8 @@ class SkWidget(SkEventHanding, SkMisc):
         bd_shadow: (
             None | tuple[int | float, int | float, int | float, int | float, str]
         ) = None,
-        bd_shader: None | Literal["linear_gradient"] = None,
-        bg_shader: None | Literal["linear_gradient"] = None,
+        bd_shader: None | typing.Literal["linear_gradient"] = None,
+        bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
         """Draw the circle
 
@@ -655,23 +663,19 @@ class SkWidget(SkEventHanding, SkMisc):
                         paint=paint,
                     )
         if shadow:
-            shadow = SkDropShadow(config_list=shadow)
-            shadow.draw(paint)
+            _ = SkDropShadow(config_list=shadow)
+            _.draw(paint)
         canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod
-    def _draw_image(
-        canvas: skia.Canvas, rect: Any, uri: str | None = None, path: str | None = None
+    def _draw_image_rect(
+        canvas: skia.Canvas, rect: skia.Rect, image: skia.Image
     ) -> None:
-        if path:
-            image = skia.Image.open(path)
-        elif uri:
-            image = skia.Image()
-        else:
-            image = None
-        if image:
-            canvas.drawImageRect(image, rect, skia.SamplingOptions(), skia.Paint())
-        del image
+        canvas.drawImageRect(image, rect, skia.SamplingOptions(), skia.Paint())
+
+    @staticmethod
+    def _draw_image(canvas: skia.Canvas, image: skia.Image, x, y) -> None:
+        canvas.drawImage(image, left=x, top=y)
 
     # endregion
 
@@ -761,7 +765,7 @@ class SkWidget(SkEventHanding, SkMisc):
         self._root_y = value
         self._pos_update()
 
-    def get_attribute(self, attribute_name: str) -> Any:
+    def get_attribute(self, attribute_name: str) -> typing.Any:
         """Get attribute of a widget by name.
 
         :param attribute_name: attribute name
@@ -796,7 +800,9 @@ class SkWidget(SkEventHanding, SkMisc):
     def read_size(self, selector: str):
         try:
             size = self.theme.get_style_attr(selector, "size")
-            self.config(dwidth=size[0], dheight=size[1])
+            # print(self.id, size)
+            if size:
+                self.config(dwidth=size[0], dheight=size[1])
         except SkStyleNotFoundError:
             pass
 
@@ -808,10 +814,15 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         self.theme = new_theme
         self.styles = self.theme.styles
-        self.read_size(self.style)
+        self.read_size(self.style_name)
         if hasattr(self, "children"):
+            child: SkWidget
+            self.children: list
             for child in self.children:
-                child.apply_theme(new_theme)
+                if child.theme.is_special:
+                    child.theme.set_parent(new_theme.name)
+                else:
+                    child.apply_theme(new_theme)
 
     # endregion
 
@@ -979,7 +990,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def box(
         self,
-        side: Literal["top", "bottom", "left", "right"] = "top",
+        side: typing.Literal["top", "bottom", "left", "right"] = "top",
         padx: int | float | tuple[int | float, int | float] = 5,
         pady: int | float | tuple[int | float, int | float] = 5,
         ipadx: int | float | tuple[int | float, int | float] | None = None,
@@ -1004,6 +1015,8 @@ class SkWidget(SkEventHanding, SkMisc):
                     "side": side,
                     "padx": padx,
                     "pady": pady,
+                    "ipadx": ipadx,
+                    "ipady": ipady,
                     "expand": expand,
                 }
             )
@@ -1013,6 +1026,8 @@ class SkWidget(SkEventHanding, SkMisc):
                     "side": side,
                     "padx": padx,
                     "pady": pady,
+                    "ipadx": ipadx,
+                    "ipady": ipady,
                     "expand": expand,
                 }
             }
