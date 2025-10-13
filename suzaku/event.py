@@ -4,7 +4,8 @@ import typing
 import threading
 import warnings
 from dataclasses import dataclass
-import re
+import time
+# import re
 
 class SkBindedTask():
     """A class to represent binded task when a event is triggered."""
@@ -34,6 +35,18 @@ class SkBindedTask():
         self.keep_at_clear: bool = _keep_at_clear
 
 
+class SkDelayTask(SkBindedTask):
+    """A class to represent delayed tasks"""
+    def __init__(self, delay, *args, **kwargs):
+        """Inherited from SkBindedTask, used to store tasks binded to delay events.
+        
+        :param delay: Time to delay, in seconds, indicating how log to wait before the task is 
+                      executed.
+        """
+        SkBindedTask.__init__(*args, **kwargs) # For other things,same as SkBindedTask
+        self.target_time = float(time.time()) + delay # To store when to execute the task
+
+
 class SkEventHandling():
     """A class containing event handling abilities.
     
@@ -49,9 +62,10 @@ class SkEventHandling():
         "focus_gain", "focus_loss", 
         "key_press", "key_release", "key_repeat", 
         "char", "click", 
-        "delay", 
+        "delay", # This row shows special event type(s)
     ]
     multithread_tasks: list[SkBindedTask] = []
+    delay_tasks: list[SkDelayTask] = []
     WORKING_THREAD: threading.Thread
     instance_count = 0
 
@@ -93,6 +107,22 @@ class SkEventHandling():
         NotImplemented # The prvious lines are to be changed as they r soooo frickin' shitty
         return {event_type: params}
     
+    def execute_task(self, task: SkBindedTask | SkDelayTask):
+        """To execute a task
+        
+        Example
+        -------
+        .. code-block:: python
+            my_task = SkWidget.bind("delay[5]", lambda: print("Hello Suzaku"))
+            SkWidget.execute_task(my_task)
+        """
+        if not task.multithread:
+            # If not multitask, execute directly
+            task.target()
+        else:
+            # Otherwise add to multithread tasks list and let the working thread to deal with it
+            SkEventHandling.multithread_tasks.append(task)
+    
     def trigger(self, event_type: str) -> None:
         """To trigger a type of event
 
@@ -117,17 +147,12 @@ class SkEventHandling():
             # If match all
             targets.append(list(parsed_event_type.keys())[0])
             targets.append(list(parsed_event_type.keys())[0] + "[*]")
+        # Add the Event object to the global list
+        SkEvent.global_list.append(NotImplemented)
         for target in targets:
             for task in self.tasks[target]:
-                # Add the Event object to the global list
-                SkEvent.global_list.append(NotImplemented)
                 # To execute all tasks binded under this event
-                if not task.multithread:
-                    # If not multitask, execute directly
-                    task.target()
-                else:
-                    # Otherwise add to multithread tasks list and let the working thread to deal with it
-                    SkEventHandling.multithread_tasks.append(task)
+                self.execute_task(task)
     
     def bind(self, event_type: str, target: typing.Callable, 
              multithread: bool, _keep_at_clear: bool) -> SkBindedTask | bool:
@@ -152,7 +177,13 @@ class SkEventHandling():
             return False
         task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
-        task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
+        parsed_event_type = self.parse_event_type_str(event_type)
+        match list(parsed_event_type.keys())[0]:
+            case "delay":
+                task = SkDelayTask(parsed_event_type["delay"][0], 
+                                   task_id, target, multithread, _keep_at_clear)
+            case _:
+                task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
         return task
 
@@ -201,14 +232,17 @@ class SkEventHandling():
                 return True
         else:
             return False
-    
-    def update(self):
-        """This function is designed to update event handler and trigger events.
-
-        Which is not implemented
         
+    def check_delay_events(self) -> None:
+        """To check and execute delay events.
+        
+        Example
+        -------
+        Mostly used by SkWidget.update(), which is internal use
         """
-        NotImplemented
+        for task in SkEventHandling.delay_tasks:
+            if int(time.time()) >= task.target_time:
+                self.execute_task(task)
 
 # Initialize working thread
 SkEventHandling.WORKING_THREAD = threading.Thread(target = SkEventHandling._working_thread_loop)

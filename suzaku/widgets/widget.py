@@ -710,6 +710,9 @@ class SkWidget(SkEventHanding, SkMisc):
     def update(self):
         self._pos_update()
         self.post()
+        if isinstance(self, SkEventHandling):
+            self.check_delay_events: typing.Callable = lambda: None
+            self.check_delay_events()
 
     @property
     def x(self):
