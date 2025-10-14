@@ -1,9 +1,9 @@
 import typing
 
-from suzaku.event import SkEventHanding
+from suzaku.event import SkEventHandling
 
 
-class SkVar(SkEventHanding):
+class SkVar(SkEventHandling):
     """Similar to Tkinter's `Var`, it is used for data transfer and synchronization.
     【类似与tkinter的Var，用于数据传递、同步】
 
@@ -14,11 +14,12 @@ class SkVar(SkEventHanding):
 
     _instance = 0
 
-    def __init__(self, default_value=None, value_type: type = typing.Any):
+    def __init__(self, default_value=None, value_type: type | typing.Any = typing.Any):
         super().__init__()
         self.id = self.__class__.__name__ + str(self._instance + 1)
         SkVar._instance += 1
-        self.events = {"change": {}}
+        # self.bindedtasks = {"change": {}}
+        self.EVENT_TYPES = ["change"]
         self._value: type = default_value if default_value is not None else value_type()
         self._value_type: type = value_type
 
@@ -37,7 +38,7 @@ class SkVar(SkEventHanding):
             raise ValueError(f"Value must be {self._value_type}")
         if self._value != value:
             self._value = value
-            self.event_trigger("change", value)
+            self.trigger(f"change[{value}]")
         return self
 
     def get(self) -> typing.Any:

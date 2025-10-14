@@ -103,7 +103,10 @@ class SkEventHandling():
         :returns: json, parsed event type
         """
         event_type = event_type_str.split("[")[0] # To be changed
-        params = event_type_str.split("[").replace("]", "").split(",")
+        if len(event_type_str.split("[")) > 1:
+            params = event_type_str.split("[")[1][0:-1].split(",")
+        else:
+            params = []
         NotImplemented # The prvious lines are to be changed as they r soooo frickin' shitty
         return {event_type: params}
     
@@ -247,7 +250,7 @@ class SkEventHandling():
 # Initialize working thread
 SkEventHandling.WORKING_THREAD = threading.Thread(target = SkEventHandling._working_thread_loop)
 
-@dataclass
+# @dataclass
 class SkEvent:
     """Used to represent an event."""
 

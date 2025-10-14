@@ -7,7 +7,7 @@ import typing
 import glfw
 import skia
 
-from ..event import SkEvent, SkEventHanding
+from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
 from .appbase import SkAppBase
 
@@ -26,7 +26,7 @@ class _GLFW_IMAGE:
         self.image.convert(colorType=skia.ColorType.kRGBA_8888_ColorType)
 
 
-class SkWindowBase(SkEventHanding, SkMisc):
+class SkWindowBase(SkEventHandling, SkMisc):
     """Base Window class
 
     Example:
@@ -62,7 +62,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
 
-        SkEventHanding.__init__(self)
+        SkEventHandling.__init__(self)
         self.parent: SkAppBase | typing.Self | int = (
             parent if parent is not None else SkAppBase.get_instance()
         )
@@ -166,7 +166,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         for button in buttons:
             for state in button_states:
-                self.event_generate(f"{button}_{state}")
+                self.trigger(f"{button}_{state}")
 
         SkWindowBase._instance_count += 1
 

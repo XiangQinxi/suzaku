@@ -4,7 +4,7 @@ import warnings
 import glfw
 import skia
 
-from ..event import SkEvent, SkEventHanding
+from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
 
 
@@ -67,7 +67,7 @@ def init_sdl2() -> None:
     )  # SDL_GL_CONTEXT_PROFILE_CORE
 
 
-class SkAppBase(SkEventHanding, SkMisc):
+class SkAppBase(SkEventHandling, SkMisc):
     """Base Application class.
 
     >>> app = SkAppBase()

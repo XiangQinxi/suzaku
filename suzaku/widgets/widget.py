@@ -4,7 +4,7 @@ from functools import cache
 
 import skia
 
-from ..event import SkEvent, SkEventHanding
+from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
 from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
@@ -15,7 +15,7 @@ from .window import SkWindow
 from . import container
 
 
-class SkWidget(SkEventHanding, SkMisc):
+class SkWidget(SkEventHandling, SkMisc):
 
     _instance_count = 0
 
@@ -41,7 +41,7 @@ class SkWidget(SkEventHanding, SkMisc):
         :param cursor: Cursor style
         """
 
-        SkEventHanding.__init__(self)
+        SkEventHandling.__init__(self)
 
         self.parent: SkWidget = parent
         self.style_name: str = style_name
