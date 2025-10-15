@@ -63,11 +63,11 @@ class SkListBox(SkCard):
     ) -> int | typing.Self | None:
         if item:
             self.selected_item = item
-            self.event_trigger("changed", self.items.index(item))
+            self.trigger("changed", self.items.index(item))
             return self
         if index:
             self.selected_item = self.item(index)
-            self.event_trigger("changed", index)
+            self.trigger("changed", index)
             return self
         return self.index(self.selected_item) if self.selected_item else None
 

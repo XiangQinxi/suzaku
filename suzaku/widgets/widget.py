@@ -101,7 +101,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
         for button in buttons:
             for state in button_states:
-                self.event_generate(f"{button}_{state}")
+                self.trigger(f"{state}[{button}]")
 
         self.attributes: dict[str, typing.Any] = {
             "cursor": cursor,
@@ -165,7 +165,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.bind("mouse_enter", _on_mouse)
         self.bind("mouse_motion", _on_mouse)
 
-        self.bind("b1_released", self._click)
+        self.bind("release[b1]", self._click)
 
     # endregion
 
@@ -185,9 +185,10 @@ class SkWidget(SkEventHandling, SkMisc):
 
         update_pos()
 
-        self.event_trigger(
+        self.trigger(
             "move",
             SkEvent(
+                widget = self,
                 event_type="move",
                 x=self._x,
                 y=self._y,
@@ -205,11 +206,11 @@ class SkWidget(SkEventHandling, SkMisc):
         if self.button != 1:
             if self.is_mouse_floating:
 
-                self.event_trigger("click", event)
+                self.trigger("click", event)
                 time = self.time()
 
                 if self.click_time + self.cget("double_click_interval") > time:
-                    self.event_trigger("double_click", event)
+                    self.trigger("double_click", event)
                     self.click_time = 0
                 else:
                     self.click_time = time
@@ -784,7 +785,7 @@ class SkWidget(SkEventHandling, SkMisc):
         :return: self
         """
         self.attributes.update(**kwargs)
-        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
+        self.trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute
@@ -802,6 +803,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
     def read_size(self, selector: str):
         try:
+            # print("Get style: ", selector, "size")
             size = self.theme.get_style_attr(selector, "size")
             # print(self.id, size)
             if size:
@@ -1051,13 +1053,13 @@ class SkWidget(SkEventHandling, SkMisc):
         """
         if self.focusable:
             if not self.is_focus:
-                self.window.focus_get().event_trigger(
+                self.window.focus_get().trigger(
                     "focus_loss", SkEvent(event_type="focus_loss")
                 )
                 self.window.focus_get().is_focus = False
                 self.window.focus_widget = self
                 self.is_focus = True
-                self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
+                self.trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:
         """

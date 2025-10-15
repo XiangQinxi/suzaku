@@ -30,7 +30,7 @@ class SkTabBar(SkFrame):
         :return: None
         """
         self.selected_item = self.items[index]
-        self.event_trigger("selected", index)
+        self.trigger("selected", index)
 
     def update_order(self):
         """Update the order of the tab buttons

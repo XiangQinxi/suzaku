@@ -348,7 +348,7 @@ class SkTheme:
                 result = [result[0]]
             result = colon_parsed
         else:
-            result = [selector, ["rest"]]
+            result = [selector, "rest"]
         # Return the parsed selector
         return result
 

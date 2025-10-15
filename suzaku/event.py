@@ -7,6 +7,10 @@ from dataclasses import dataclass
 import time
 # import re
 
+if typing.TYPE_CHECKING:
+    from .widgets import SkWidget, SkWindow
+
+
 class SkBindedTask():
     """A class to represent binded task when a event is triggered."""
     def __init__(self, id_: str, target: typing.Callable, multithread: bool=False, 
@@ -64,14 +68,15 @@ class SkEventHandling():
         "char", "click", 
         "delay", # This row shows special event type(s)
     ]
-    multithread_tasks: list[SkBindedTask] = []
-    delay_tasks: list[SkDelayTask] = []
+    multithread_tasks: list[tuple[SkBindedTask, SkEvent]] = []
     WORKING_THREAD: threading.Thread
     instance_count = 0
 
     @classmethod
     def _working_thread_loop(cls):
-        return [task.target() for task in cls.multithread_tasks]
+        while True:
+            cls.multithread_tasks[0][0].target(cls.multithread_tasks[0][1])
+            cls.multithread_tasks.pop(0)
 
     def __init__(self):
         """A class containing event handling abilities.
@@ -88,6 +93,7 @@ class SkEventHandling():
         """
         self.events: list = []
         self.tasks: dict[str, list[SkBindedTask]] = {}
+        self.delay_tasks: list[SkDelayTask] = []
         # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
         self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
         ## Initialize tasks list
@@ -110,7 +116,7 @@ class SkEventHandling():
         NotImplemented # The prvious lines are to be changed as they r soooo frickin' shitty
         return {event_type: params}
     
-    def execute_task(self, task: SkBindedTask | SkDelayTask):
+    def execute_task(self, task: SkBindedTask | SkDelayTask, event_obj: SkEvent | None = None):
         """To execute a task
         
         Example
@@ -119,14 +125,19 @@ class SkEventHandling():
             my_task = SkWidget.bind("delay[5]", lambda: print("Hello Suzaku"))
             SkWidget.execute_task(my_task)
         """
+        if type(event_obj) is None:
+            event_obj = SkEvent()
+        assert event_obj is not None
+        if event_obj.widget == None:
+            event_obj.widget = self
         if not task.multithread:
             # If not multitask, execute directly
-            task.target()
+            task.target(event_obj)
         else:
             # Otherwise add to multithread tasks list and let the working thread to deal with it
-            SkEventHandling.multithread_tasks.append(task)
+            SkEventHandling.multithread_tasks.append((task, evet_obj))
     
-    def trigger(self, event_type: str) -> None:
+    def trigger(self, event_type: str, event_obj: SkEvent | None = None) -> None:
         """To trigger a type of event
 
         Example
@@ -153,12 +164,13 @@ class SkEventHandling():
         # Add the Event object to the global list
         SkEvent.global_list.append(NotImplemented)
         for target in targets:
-            for task in self.tasks[target]:
-                # To execute all tasks binded under this event
-                self.execute_task(task)
+            if target in self.tasks:
+                for task in self.tasks[target]:
+                    # To execute all tasks binded under this event
+                    self.execute_task(task, event_obj)
     
     def bind(self, event_type: str, target: typing.Callable, 
-             multithread: bool, _keep_at_clear: bool) -> SkBindedTask | bool:
+             multithread: bool = False, _keep_at_clear: bool = False) -> SkBindedTask | bool:
         """To bind a task to the object when a specific type of event is triggered.
 
         Example
@@ -175,9 +187,11 @@ class SkEventHandling():
         :return: SkBindedTask that is binded to the task if success, otherwise False
         """
         if event_type not in self.__class__.EVENT_TYPES:
-            warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
-                           "so the task cannot be binded as expected.")
-            return False
+            # warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
+            #                "so the task cannot be binded as expected.")
+            # return False
+            self.EVENT_TYPES.append(event_type)
+            self.tasks[event_type] = []
         task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
         parsed_event_type = self.parse_event_type_str(event_type)
@@ -243,7 +257,7 @@ class SkEventHandling():
         -------
         Mostly used by SkWidget.update(), which is internal use
         """
-        for task in SkEventHandling.delay_tasks:
+        for task in self.delay_tasks:
             if int(time.time()) >= task.target_time:
                 self.execute_task(task)
 
@@ -256,21 +270,16 @@ class SkEvent:
 
     global_list: list[SkEvent] = []
 
-    def __init__(self):
-        self.event_type: str = "[Unspecified]"  # Type of event
-        self.widget: typing.Optional[typing.Any] = None  # Relating widget
+    def __init__(self, widget: SkWidget | SkWindow | None = None, 
+                 event_type: str = "[Unspecified]", **kwargs):
+        self.event_type: str = event_type  # Type of event
+        self.widget: typing.Optional[typing.Any] = widget  # Relating widget
         self.window_base: typing.Optional[typing.Any] = None  # WindowBase of the current window
         self.window: typing.Optional[typing.Any] = None  # Current window
         self.pos: typing.Optional[tuple[int, int] | list[int]] = None  # Position (to the widget)
         self.abspos: typing.Optional[tuple[int, int] | list[int]] = None  # Absolute position in win
-        self.key: typing.Optional[int | str] = None  # Related keys
-        self.keyname: typing.Optional[str] = None  # Name of keys
-        self.mods: typing.Optional[str] = None  # 【修饰键名】 (? Need explanation)
-        self.mods_key: typing.Optional[int] = None  # 【修饰键值】 (? Need explanation)
-        self.entered_text: typing.Optional[str] = None  # Text entered
-        self.new_size: typing.Optional[tuple[int, int] | list[int]] = None  # The new size
-        self.window_state: typing.Optional[str] = None  # New window state
-        self.dropped: typing.Optional[list[str] | bytes | bytearray| str] = None # Stuff droped in
-        self.cursor_displacement: typing.Optional[tuple[int, int] |\
-                                                   list[int]] = None  # Mouse displacement
         # Not all proprties above will be used
+        # Update stuff from args into attributes
+        for prop in kwargs.keys():
+            if prop not in ["widget", "event_type"]:
+                self.__setattr__(prop, kwargs[prop])

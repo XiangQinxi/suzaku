@@ -297,7 +297,7 @@ class SkContainer:
         self.update_scroll()
         self._handle_layout()
         for widget in self.children:
-            widget.event_trigger("resize", SkEvent(event_type="resize"))
+            widget.trigger("resize", SkEvent(widget=self, event_type="resize"))
 
     def record_content_size(self, child, padx=0, pady=0):
         self.content_width = max(child.x + child.dwidth + padx, self.content_width)

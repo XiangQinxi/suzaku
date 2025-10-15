@@ -191,14 +191,14 @@ class SkAppBase(SkEventHandling, SkMisc):
             if deal_event:
                 deal_event()
 
-            # 检查after事件，其中的事件是否到达时间，如到达则执行
-            if self._afters:
-                for item, config in tuple(self._afters.items()):
-                    if config[0] <= self.time():  # Time
-                        config[1]()  # Function
-                        if config[2]:  # Is Post
-                            self.post()
-                        del self._afters[item]
+            # # 检查after事件，其中的事件是否到达时间，如到达则执行
+            # if self._afters:
+            #     for item, config in tuple(self._afters.items()):
+            #         if config[0] <= self.time():  # Time
+            #             config[1]()  # Function
+            #             if config[2]:  # Is Post
+            #                 self.post()
+            #             del self._afters[item]
 
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】
@@ -222,7 +222,7 @@ class SkAppBase(SkEventHandling, SkMisc):
                         # Check if the window is valid
                         # 【检查窗口是否有效】
                         if window.can_be_close():
-                            window.event_trigger(
+                            window.trigger(
                                 "delete_window",
                                 SkEvent(event_type="delete_window", window=window),
                             )
@@ -274,7 +274,7 @@ class SkAppBase(SkEventHandling, SkMisc):
     mainloop = run
 
     def destroy_window(self, window):
-        window.event_trigger("closed", SkEvent(event_type="closed", window=window))
+        window.trigger("closed", SkEvent(event_type="closed", window=window))
         self.windows.remove(window)
 
     def cleanup(self) -> None:

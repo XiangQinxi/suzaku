@@ -47,12 +47,12 @@ class SkButton(SkFrame):
         if self.button != 1:
             if self.is_mouse_floating:
 
-                self.event_trigger("click", event)
+                self.trigger("click", event)
                 self.invoke()
                 time = self.time()
 
                 if self.click_time + self.cget("double_click_interval") > time:
-                    self.event_trigger("double_click", event)
+                    self.trigger("double_click", event)
                     self.click_time = 0
                 else:
                     self.click_time = time
