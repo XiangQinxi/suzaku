@@ -1,9 +1,8 @@
 import copy
+import typing
 
 import glfw
 import skia
-
-import typing
 
 if typing.TYPE_CHECKING:
     from . import SkWidget
@@ -63,6 +62,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.esc_to_close = True
 
         self.entered_widgets = []
+        self.pressing_widget: SkWidget | None = None
 
         self._x1 = None
         self._y1 = None
@@ -71,17 +71,17 @@ class SkWindow(SkWindowBase, SkContainer):
         self.set_draw_func(self._draw)
         self.bind("mouse_move", self._move)
         self.bind("mouse_motion", self._motion)
-        self.bind("mouse_press", self._mouse)
-        self.bind("mouse_released", self._mouse_released)
+        self.bind("mouse_press", self._press)
+        self.bind("mouse_release", self._release)
 
         self.bind("focus_loss", self._leave)
         self.bind("mouse_leave", self._leave)
 
         self.bind("char", self._char)
 
-        self.bind("key_pressed", self._key_pressed)
+        self.bind("key_press", self._key_press)
         self.bind("key_repeated", self._key_repected)
-        self.bind("key_released", self._key_released)
+        self.bind("key_release", self._key_release)
 
         self.bind("scroll", self._scroll)
 
@@ -122,7 +122,7 @@ class SkWindow(SkWindowBase, SkContainer):
     def destroy(self) -> None:
         super().destroy()
 
-    def _key_pressed(self, event: SkEvent):
+    def _key_press(self, event: SkEvent):
         """Key press event for SkWindow.
 
         :param event: SkEvent
@@ -137,7 +137,7 @@ class SkWindow(SkWindowBase, SkContainer):
                 else:
                     self.destroy()
         if self.focus_get() is not self:
-            self.focus_get().trigger("key_pressed", event)
+            self.focus_get().trigger("key_press", event)
 
     def _scroll(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
@@ -147,9 +147,9 @@ class SkWindow(SkWindowBase, SkContainer):
         if self.focus_get() is not self:
             self.focus_get().trigger("key_repeated", event)
 
-    def _key_released(self, event: SkEvent) -> None:
+    def _key_release(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
-            self.focus_get().trigger("key_released", event)
+            self.focus_get().trigger("key_release", event)
 
     def _char(self, event: SkEvent) -> None:
         # print(12)
@@ -157,6 +157,7 @@ class SkWindow(SkWindowBase, SkContainer):
             self.focus_get().trigger("char", event)
 
     def _leave(self, event: SkEvent) -> None:
+        return
         event = SkEvent(
             event_type="mouse_leave",
             x=event["x"],
@@ -188,7 +189,21 @@ class SkWindow(SkWindowBase, SkContainer):
             return all(is_parents)
         return False
 
-    def _mouse(self, event: SkEvent) -> None:
+    def mouse_anchor(self, x, y) -> str:
+        anchor = ""
+        resizable_margin = self.cget("resizable_margin")
+
+        if x >= self.width - resizable_margin:
+            anchor = "e"
+        elif x <= resizable_margin:
+            anchor = "w"
+        if y >= self.height - resizable_margin:
+            anchor = "s" + anchor
+        elif y <= resizable_margin:
+            anchor = "n" + anchor
+        return anchor
+    def _press(self, event: SkEvent) -> None:
+        # 判定鼠标位于窗口哪个角落
         if self.window.resizable():
             # assert event["x"] is int
             # assert event["y"] is int
@@ -220,20 +235,6 @@ class SkWindow(SkWindowBase, SkContainer):
                 for name in names:
                     widget.trigger(name, event)
                 break
-
-    def mouse_anchor(self, x, y) -> str:
-        anchor = ""
-        resizable_margin = self.cget("resizable_margin")
-
-        if x >= self.width - resizable_margin:
-            anchor = "e"
-        elif x <= resizable_margin:
-            anchor = "w"
-        if y >= self.height - resizable_margin:
-            anchor = "s" + anchor
-        elif y <= resizable_margin:
-            anchor = "n" + anchor
-        return anchor
 
     def _move(self, event: SkEvent) -> None:
         """Mouse move event for SkWindow.
@@ -291,6 +292,7 @@ class SkWindow(SkWindowBase, SkContainer):
                         current_widget.trigger("mouse_motion", event)
                     self.cursor(current_widget.attributes["cursor"])
                     current_widget.is_floating = True
+            if self.is_mouse_press:
                 self.previous_widget = current_widget
         else:
             self.previous_widget = None
@@ -334,7 +336,7 @@ class SkWindow(SkWindowBase, SkContainer):
             self.window.resize(width, height)
             self.window.move(x, y)
 
-    def _mouse_released(self, event: SkEvent) -> None:
+    def _release(self, event: SkEvent) -> None:
         """Mouse release event for SkWindow.
 
         :param event:
@@ -346,29 +348,30 @@ class SkWindow(SkWindowBase, SkContainer):
 
         button = self.button
         names = [
-            "mouse_released",
-            f"button{button+1}_released",
-            f"b{button+1}_released",
+            "mouse_release",
+            f"mouse_release[button{button+1}]",
+            f"mouse_release[b{button+1}]",
         ]
 
-        _widget = None
-        for widget in self.visible_children:
-            if widget.is_mouse_pressed:
-                _widget = widget
+        """_widget = None
 
-        if _widget:
-            if button >= 0:
-                for name in names:
-                    event = SkEvent(
-                        event_type=name,
-                        button=button,
-                        x=event["x"],
-                        y=event["y"],
-                        rootx=self.mouse_rootx,
-                        rooty=self.mouse_rooty,
-                    )
-                    if _widget:
-                        _widget.trigger(name, event)
+        for widget in self.visible_children:
+            if widget.is_mouse_floating:
+                _widget = widget
+                print()"""
+
+        if button >= 0:
+            for name in names:
+                event = SkEvent(
+                    event_type=name,
+                    button=button,
+                    x=event["x"],
+                    y=event["y"],
+                    rootx=self.mouse_rootx,
+                    rooty=self.mouse_rooty,
+                )
+                if self.previous_widget:
+                    self.previous_widget.trigger(name, event)
         return None
 
     # endregion

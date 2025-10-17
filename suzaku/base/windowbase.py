@@ -158,7 +158,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.surface = None
         self.attributes["fullscreen"] = fullscreen
         self.is_mouse_floating = False
-        self.is_mouse_pressed = False
+        self.is_mouse_press = False
 
         if self.width <= 0 or self.height <= 0:
             raise ValueError("The window size must be positive")
@@ -600,14 +600,14 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self,
         window: typing.Any,
         button: typing.Literal[0, 1, 2],
-        is_pressed: bool,
+        is_press: bool,
         mods: int,
     ) -> None:
-        """Trigger mouse button event (triggered when the mouse button is pressed or released).
+        """Trigger mouse button event (triggered when the mouse button is press or release).
 
         :param window: GLFW Window
         :param int button: Button
-        :param is_pressed: Whether pressed
+        :param is_press: Whether press
         :param mods: Modifiers
         :return: None
         """
@@ -616,15 +616,19 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.mouse_x, self.mouse_y = self.mouse_pos()
         self.mouse_rootx, self.mouse_rooty = self.mouse_root_pos()
 
-        if is_pressed:
-            self.is_mouse_pressed = True
+        if is_press:
+            self.is_mouse_press = True
             state = "press"
         else:
-            self.is_mouse_pressed = False
+            self.is_mouse_press = False
             state = "release"
             self.button = -1
 
-        names = [f"mouse_{state}", f"button{button+1}_{state}", f"b{button+1}_{state}"]
+        names = [
+            f"mouse_{state}",
+            f"mouse_{state}[button{button+1}]",
+            f"mouse_{state}[b{button+1}]",
+        ]
 
         self.button = button
 

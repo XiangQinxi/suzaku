@@ -43,13 +43,15 @@ class SkComboBox(SkButton):
         )
         arrow = skcolor_to_color(
             style_to_color(
-                self._style("arrow", skia.ColorBLACK, self.theme.select(self.style_name)),
+                self._style(
+                    "arrow", skia.ColorBLACK, self.theme.select(self.style_name)
+                ),
                 self.theme,
             )
         )
         button_rect.offset(0, arrow_padding / 4)
         self._draw_arrow(
-            canvas, button_rect, color=arrow, is_pressed=self.popupmenu.is_popup
+            canvas, button_rect, color=arrow, is_press=self.popupmenu.is_popup
         )
         if self.cget("editable"):
             self.input.fixed(0, 0, self.width - self.height, self.height)
@@ -72,7 +74,7 @@ class SkComboBox(SkButton):
         canvas: skia.Canvas,
         rect: skia.Rect,  # 箭头绘制区域
         color: int = skia.ColorBLACK,
-        is_pressed: bool = False,  # 按下状态
+        is_press: bool = False,  # 按下状态
     ):
         """
         绘制标准下拉箭头（实心三角形）
@@ -82,7 +84,7 @@ class SkComboBox(SkButton):
         height = rect.height() * 0.3  # 箭头高度
 
         # 基础位置（未按下状态朝下）
-        if not is_pressed:
+        if not is_press:
             points = [
                 skia.Point(rect.centerX() - width / 2, rect.top() + margin),
                 skia.Point(rect.centerX() + width / 2, rect.top() + margin),

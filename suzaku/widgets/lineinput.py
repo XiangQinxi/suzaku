@@ -76,9 +76,9 @@ class SkLineInput(SkWidget):
         self.bind("double_click", self._double_click)
         self.bind("focus_gain", self._focus_gain)
         self.bind("char", self._char)
-        self.bind("key_pressed", self._key)
+        self.bind("key_press", self._key)
         self.bind("key_repeated", self._key)
-        self.bind("mouse_pressed", self._pressed)
+        self.bind("mouse_press[b1]", self._press)
         self.window.bind("mouse_motion", self._motion)
         self.bind("mouse_motion", self._motion)
         self.bind("scroll", self._scroll)
@@ -123,23 +123,22 @@ class SkLineInput(SkWidget):
         self.cursor_visible = True
 
     def _motion(self, event: SkEvent) -> None:
-        """Record the `end_index` when the text is pressed and moved.
+        """Record the `end_index` when the text is press and moved.
         【当文本被按住并移动时，记录end_index】
         :param event: SkEvent
         """
         # 【只有在左键按下时，才记录end_index】
         if self.button == 0:
-            if self.is_mouse_pressed:
+            if self.is_mouse_press:
                 self.end_index = self.index(event["x"])
 
-    def _pressed(self, event: SkEvent) -> None:
-        """Record the `start_index` and `end_index` when the text is pressed.
+    def _press(self, event: SkEvent) -> None:
+        """Record the `start_index` and `end_index` when the text is press.
         【当文本被按住时，记录`start_index`与`end_index`。】
         """
         # 【只有在左键按下时，才记录start_index】
-        if event.button == 0:
-            self.cursor_visible = True
-            self.start_index = self.end_index = self.index(event["x"])
+        self.cursor_visible = True
+        self.start_index = self.end_index = self.index(event["x"])
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered.

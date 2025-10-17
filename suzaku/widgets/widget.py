@@ -1,18 +1,17 @@
 import typing
-
 from functools import cache
 
 import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
-
-from .window import SkWindow
 from .appwindow import SkAppWindow
+from .window import SkWindow
 
 
 class SkWidget(SkEventHandling, SkMisc):
@@ -73,12 +72,12 @@ class SkWidget(SkEventHandling, SkMisc):
         #     "mouse_motion": dict(),
         #     "mouse_enter": dict(),
         #     "mouse_leave": dict(),
-        #     "mouse_pressed": dict(),
-        #     "mouse_released": dict(),
+        #     "mouse_press": dict(),
+        #     "mouse_release": dict(),
         #     "focus_gain": dict(),
         #     "focus_loss": dict(),
-        #     "key_pressed": dict(),
-        #     "key_released": dict(),
+        #     "key_press": dict(),
+        #     "key_release": dict(),
         #     "key_repeated": dict(),
         #     "double_click": dict(),
         #     "char": dict(),
@@ -164,7 +163,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.bind("mouse_enter", _on_mouse)
         self.bind("mouse_motion", _on_mouse)
 
-        self.bind("release[b1]", self._click)
+        self.bind("mouse_release", self._on_mouse_release)
 
     # endregion
 
@@ -196,23 +195,16 @@ class SkWidget(SkEventHandling, SkMisc):
             ),
         )
 
-    def _click(self, event) -> None:
-        """
-        Check click event (not pressed)
+    def _on_mouse_release(self, event) -> None:
+        if self.is_mouse_floating:
+            self.trigger("click", event)
+            time = self.time()
 
-        :return: None
-        """
-        if self.button != 1:
-            if self.is_mouse_floating:
-
-                self.trigger("click", event)
-                time = self.time()
-
-                if self.click_time + self.cget("double_click_interval") > time:
-                    self.trigger("double_click", event)
-                    self.click_time = 0
-                else:
-                    self.click_time = time
+            if self.click_time + self.cget("double_click_interval") > time:
+                self.trigger("double_click", event)
+                self.click_time = 0
+            else:
+                self.click_time = time
 
     # endregion
 
@@ -696,8 +688,12 @@ class SkWidget(SkEventHandling, SkMisc):
         return False
 
     @property
-    def is_mouse_pressed(self):
-        return self.is_mouse_floating and self.window.is_mouse_pressed
+    def is_mouse_press(self):
+        return (
+            self.is_mouse_floating
+            and self.window.is_mouse_press
+            and self.window.previous_widget is self
+        )
 
     @property
     def dwidth(self):

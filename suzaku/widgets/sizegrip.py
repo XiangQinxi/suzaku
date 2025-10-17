@@ -18,14 +18,14 @@ class SkSizeGrip(SkWidget):
 
         super().__init__(parent=parent, style_name=style, cursor=cursor, **kwargs)
 
-        self.bind("mouse_pressed", self._mouse_pressed)
+        self.bind("mouse_press", self._mouse_press)
         self.window.bind("mouse_motion", self._mouse_motion)
-        self.window.bind("mouse_released", self._mouse_released)
+        self.window.bind("mouse_release", self._mouse_release)
 
         self._x1 = None
         self._y1 = None
 
-    def _mouse_pressed(self, event: SkEvent):
+    def _mouse_press(self, event: SkEvent):
         if not self.window.window_attr("maximized"):
             self._x1 = event["x"]
             self._y1 = event["y"]
@@ -40,7 +40,7 @@ class SkSizeGrip(SkWidget):
 
             self.window.resize(width, height)
 
-    def _mouse_released(self, event: SkEvent):
+    def _mouse_release(self, event: SkEvent):
         self._x1 = None
         self._y1 = None
 

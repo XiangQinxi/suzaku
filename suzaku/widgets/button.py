@@ -40,7 +40,7 @@ class SkButton(SkFrame):
 
     def _click(self, event) -> None:
         """
-        Check click event (not pressed)
+        Check click event (not press)
 
         :return: None
         """
@@ -74,8 +74,8 @@ class SkButton(SkFrame):
         if style_selector is None:
             if not self.cget("disabled"):
                 if self.is_mouse_floating:
-                    if self.is_mouse_pressed:
-                        style_selector = f"{self.style_name}:pressed"
+                    if self.is_mouse_press:
+                        style_selector = f"{self.style_name}:press"
                     else:
                         style_selector = f"{self.style_name}:hover"
                 else:

@@ -42,7 +42,7 @@ class SkTextButton(SkButton, SkText):
 
     def _click(self, event) -> None:
         """
-        Check click event (not pressed)
+        Check click event (not press)
 
         :return: None
         """

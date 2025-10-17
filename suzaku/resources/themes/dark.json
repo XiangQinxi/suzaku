@@ -60,7 +60,7 @@
         "bd_shadow": [0, 0, 5, 5, [80, 160, 255, 255]],
         "width": 2
       },
-      "pressed": {
+      "press": {
         "bg": [60, 60, 60, 255],
         "bg_shader": {
           "linear_gradient": {
@@ -104,7 +104,7 @@
         "fg": "white",
         "width": 0
       },
-      "pressed": {
+      "press": {
         "bg": [145, 31, 20],
         "fg": "white",
         "width": 0
@@ -154,7 +154,7 @@
         "bd_shadow": [0, 0, 5, 5, [80, 160, 255, 255]],
         "width": 2
       },
-      "pressed": {
+      "press": {
         "bg": [60, 60, 60, 255],
         "bg_shader": {
           "linear_gradient": {
@@ -199,7 +199,7 @@
         "fg": "white",
         "width": 0
       },
-      "pressed": {
+      "press": {
         "bg": [40, 80, 160],
         "fg": "white",
         "width": 0
@@ -225,7 +225,7 @@
         "fg": "white",
         "width": 0
       },
-      "pressed": {
+      "press": {
         "bg": [255, 255, 255, 40],
         "fg": "white",
         "width": 0
@@ -250,7 +250,7 @@
         "bd": [50, 50, 50, 255],
         "width": 2
       },
-      "pressed": {
+      "press": {
         "bg": [30, 30, 30, 200],
         "fg": {"color_palette": "fg"},
         "bd": [40, 40, 40, 255],
@@ -427,7 +427,7 @@
         "fg": {"color_palette": "fg"},
         "width": 0
       },
-      "pressed": {
+      "press": {
         "bg": [255, 255, 255, 25],
         "fg": {"color_palette": "fg"},
         "width": 0
@@ -482,7 +482,7 @@
         "button": [230, 230, 230, 190],
         "button-padding": 3
       },
-      "unchecked-pressed": {
+      "unchecked-press": {
         "bg": [75, 75, 75, 245],
         "bd": [55, 55, 55, 245],
         "width": 2,
@@ -523,7 +523,7 @@
         "button": [0, 0, 0, 235],
         "button-padding": 3
       },
-      "checked-pressed": {
+      "checked-press": {
         "bg": [0, 0, 0, 180],
         "bg_shader": {
           "linear_gradient": {
@@ -566,7 +566,7 @@
         "fg": {"color_palette": "fg"},
         "width": 0
       },
-      "pressed": {
+      "press": {
         "bg": [255, 255, 255, 25],
         "fg": {"color_palette": "fg"},
         "width": 0

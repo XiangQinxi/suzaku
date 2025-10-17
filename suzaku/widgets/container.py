@@ -10,8 +10,8 @@ from ..event import SkEvent
 from ..misc import SkMisc
 
 if typing.TYPE_CHECKING:
-    from . import SkWidget
     from .. import SkEventHandling
+    from . import SkWidget
 
 
 class SkLayoutError(TypeError):

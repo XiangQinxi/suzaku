@@ -1,8 +1,8 @@
-import typing
-
 import ctypes
 import os
 import sys
+import typing
+
 import glfw
 
 if typing.TYPE_CHECKING:

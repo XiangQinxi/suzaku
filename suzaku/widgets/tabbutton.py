@@ -49,8 +49,8 @@ class SkTabButton(SkTextButton):
             style_selector = f"{self.style_name}:selected"
         else:
             if self.is_mouse_floating:
-                if self.is_mouse_pressed:
-                    style_selector = f"{self.style_name}:pressed"
+                if self.is_mouse_press:
+                    style_selector = f"{self.style_name}:press"
                 else:
                     style_selector = f"{self.style_name}:hover"
 
