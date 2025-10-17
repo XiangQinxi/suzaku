@@ -47,22 +47,6 @@ class SkBindedTask:
 
 
 class SkDelayTask(SkBindedTask):
-<<<<<<< HEAD
-    """A class to represent delayed tasks"""
-
-    def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
-        """Inherited from SkBindedTask, used to store tasks binded to delay events.
-
-        :param delay: Time to delay, in seconds, indicating how log to wait before the task is
-                      executed.
-        """
-        SkBindedTask.__init__(
-            self, id_, target, *args, **kwargs
-        )  # For other things,same as SkBindedTask
-        self.target_time = (
-            float(time.time()) + delay_
-        )  # To store when to execute the task
-=======
     """A class to represent delay tasks"""
     def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
         """Inherited from SkBindedTask, used to store tasks binded to `delay` events.
@@ -73,7 +57,6 @@ class SkDelayTask(SkBindedTask):
         SkBindedTask.__init__(self, id_, target, *args, **kwargs) # For other things,same as 
                                                                   # SkBindedTask
         self.target_time = float(time.time()) + delay_ # To store when to execute the task
->>>>>>> fa9a6ee (Partially made repeat tasks)
 
 class SkRepeatTask(SkBindedTask):
     """A class to represent repeat tasks"""
@@ -100,32 +83,12 @@ class SkEventHandling:
     """
 
     EVENT_TYPES: list[str] = [
-<<<<<<< HEAD
-        "resize",
-        "move",
-        "configure",
-        "update",
-        "mouse_move",
-        "mouse_enter",
-        "mouse_leave",
-        "mouse_press",
-        "mouse_release",
-        "focus_gain",
-        "focus_loss",
-        "key_press",
-        "key_release",
-        "key_repeat",
-        "char",
-        "click",
-        "delay",  # This row shows special event type(s)
-=======
         "resize", "move", "configure", "update", 
         "mouse_move", "mouse_enter", "mouse_leave", "mouse_press", "mouse_release", 
         "focus_gain", "focus_loss", 
         "key_press", "key_release", "key_repeat", 
         "char", "click", 
         "delay", "repeat", # This row shows special event type(s)
->>>>>>> fa9a6ee (Partially made repeat tasks)
     ]
     multithread_tasks: list[tuple[SkBindedTask, SkEvent]] = []
     WORKING_THREAD: threading.Thread
@@ -341,15 +304,6 @@ class SkEventHandling:
         :param target_task: The task ID or `SkBindedTask` to unbind.
         :return: If success
         """
-<<<<<<< HEAD
-        task_id_parsed = task_id.split(".")
-        for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
-            if task.id == task_id:
-                self.tasks[task_id_parsed[1]].pop(task_index)
-                return True
-        else:
-            return False
-=======
         match target_task:
             case str():
                 task_id_parsed = target_task.split(".")
@@ -374,7 +328,6 @@ class SkEventHandling:
                 warnings.warn("Wrong type for unbind()! Must be event ID or task object", 
                               UserWarning)
                 return False
->>>>>>> fa9a6ee (Partially made repeat tasks)
 
     def _check_delay_events(self, _=None) -> None:
         """To check and execute delay events.
