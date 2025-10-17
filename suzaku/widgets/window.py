@@ -138,7 +138,6 @@ class SkWindow(SkWindowBase, SkContainer):
                     self.destroy()
         if self.focus_get() is not self:
             self.focus_get().trigger("key_pressed", event)
-        del event
 
     def _scroll(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
@@ -147,18 +146,15 @@ class SkWindow(SkWindowBase, SkContainer):
     def _key_repected(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
             self.focus_get().trigger("key_repeated", event)
-        del event
 
     def _key_released(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
             self.focus_get().trigger("key_released", event)
-        del event
 
     def _char(self, event: SkEvent) -> None:
         # print(12)
         if self.focus_get() is not self:
             self.focus_get().trigger("char", event)
-        del event
 
     def _leave(self, event: SkEvent) -> None:
         event = SkEvent(
@@ -171,9 +167,8 @@ class SkWindow(SkWindowBase, SkContainer):
         children = self.visible_children
         children.reverse()
         for widget in children:
-            widget.is_mouse_pressed = False
+            widget.is_mouse_floating = False
             widget.trigger("mouse_leave", event)
-        del event
 
     @staticmethod
     def is_entered_widget_bounds(widget, event: SkEvent) -> bool:
@@ -231,7 +226,6 @@ class SkWindow(SkWindowBase, SkContainer):
                 widget.is_mouse_floating = True
                 if widget.focusable:
                     widget.focus_set()
-                widget.is_mouse_pressed = True
                 widget.button = event["button"]
                 names = [
                     "mouse_press",
@@ -389,7 +383,6 @@ class SkWindow(SkWindowBase, SkContainer):
                         rooty=self.mouse_rooty,
                     )
                     if _widget:
-                        _widget.is_mouse_pressed = False
                         _widget.trigger(name, event)
         return None
 

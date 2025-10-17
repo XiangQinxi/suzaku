@@ -56,9 +56,12 @@ def init_sdl2() -> None:
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
 
-    from sdl2 import (SDL_GL_CONTEXT_MAJOR_VERSION,
-                      SDL_GL_CONTEXT_MINOR_VERSION,
-                      SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_SetAttribute)
+    from sdl2 import (
+        SDL_GL_CONTEXT_MAJOR_VERSION,
+        SDL_GL_CONTEXT_MINOR_VERSION,
+        SDL_GL_CONTEXT_PROFILE_MASK,
+        SDL_GL_SetAttribute,
+    )
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)
@@ -188,8 +191,7 @@ class SkAppBase(SkEventHandling, SkMisc):
         # 【开始事件循环】
         while self.alive and self.windows:
             # 处理事件
-            if handle_event:
-                handle_event()
+            handle_event()
 
             # # 检查after事件，其中的事件是否到达时间，如到达则执行
             # if self._afters:
@@ -215,10 +217,10 @@ class SkAppBase(SkEventHandling, SkMisc):
                         if (
                             self.is_get_context_on_focus
                         ):  # Only draw the window that has gained focus.
-                            if glfw.get_window_attrib(window.the_window, glfw.FOCUSED):
+                            if window.window_attr("focused"):
                                 window.draw()
                         else:
-                            if glfw.get_window_attrib(window.the_window, glfw.VISIBLE):
+                            if window.window_attr("visible"):
                                 window.draw()
                         # Check if the window is valid
                         # 【检查窗口是否有效】
@@ -243,8 +245,7 @@ class SkAppBase(SkEventHandling, SkMisc):
                             )  # 是否启用垂直同步
                     case "sdl2":
                         import sdl2
-                        from sdl2 import (SDL_Event, SDL_PollEvent,
-                                          SDL_WaitEvent)
+                        from sdl2 import SDL_Event, SDL_PollEvent, SDL_WaitEvent
 
                         event = SDL_Event()
                         while SDL_WaitEvent(event):

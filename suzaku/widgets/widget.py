@@ -152,7 +152,6 @@ class SkWidget(SkEventHandling, SkMisc):
 
         # Events-related
         self.is_mouse_floating: bool = False
-        self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
         self.gradient = SkGradient()
         self.button: typing.Literal[0, 1, 2] = 0
@@ -681,6 +680,10 @@ class SkWidget(SkEventHandling, SkMisc):
     # endregion
 
     # region Widget attribute configs 组件属性配置
+
+    @property
+    def is_mouse_pressed(self):
+        return self.is_mouse_floating and self.window.is_mouse_pressed
 
     @property
     def dwidth(self):

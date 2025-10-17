@@ -124,8 +124,18 @@ class SkWindowBase(SkEventHandling, SkMisc):
             "minsize": minsize,
         }
 
-        [self.EVENT_TYPES.append(event_type) for event_type in \
-        ["drop", "maximize", "iconify", "dpi_change", "delete_window", "closed", "move"]]
+        [
+            self.EVENT_TYPES.append(event_type)
+            for event_type in [
+                "drop",
+                "maximize",
+                "iconify",
+                "dpi_change",
+                "delete_window",
+                "closed",
+                "move",
+            ]
+        ]
 
         buttons = [
             "button1",
@@ -148,13 +158,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.surface = None
         self.attributes["fullscreen"] = fullscreen
         self.is_mouse_floating = False
+        self.is_mouse_pressed = False
 
         if self.width <= 0 or self.height <= 0:
             raise ValueError("The window size must be positive")
 
         ####################
-
-        self.is_mouse_pressed = False
 
         self.the_window = self.create()
 
@@ -577,9 +586,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         """
         self.root_x = x
         self.root_y = y
-        self.trigger(
-            "move", SkEvent(event_type="move", x=x, y=y, glfw_window=window)
-        )
+        self.trigger("move", SkEvent(event_type="move", x=x, y=y, glfw_window=window))
 
     def _on_closed(self, window: typing.Any) -> None:
         """Trigger closed event (triggered when the window is closed).
@@ -610,9 +617,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.mouse_rootx, self.mouse_rooty = self.mouse_root_pos()
 
         if is_pressed:
+            self.is_mouse_pressed = True
             state = "press"
         else:
+            self.is_mouse_pressed = False
             state = "release"
+            self.button = -1
 
         names = [f"mouse_{state}", f"button{button+1}_{state}", f"b{button+1}_{state}"]
 
@@ -631,8 +641,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
                     mods=self.mods_name(mods),
                 ),
             )
-        if not is_pressed:
-            self.button = -1
 
     def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
@@ -661,7 +669,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
             self.trigger(
                 "mouse_leave",
                 SkEvent(
-                    
                     event_type="mouse_leave",
                     x=self.mouse_x,
                     y=self.mouse_y,
@@ -687,8 +694,11 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
         button = self.button
         if button >= 0:
-            names = ["mouse_motion", f"mouse_motion[button{button+1}]", 
-                     f"mouse_motion[b{button+1}]"]
+            names = [
+                "mouse_motion",
+                f"mouse_motion[button{button+1}]",
+                f"mouse_motion[b{button+1}]",
+            ]
 
             for name in names:
                 self.trigger(
@@ -1183,9 +1193,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         from glfw import set_window_size
 
         set_window_size(self.the_window, round(width), round(height))
-        self.trigger(
-            "resize", SkEvent(event_type="resize", width=width, height=height)
-        )
+        self.trigger("resize", SkEvent(event_type="resize", width=width, height=height))
 
         return self
 
@@ -1375,9 +1383,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.physical_height = int(self.height * scale)
 
         # 触发DPI变化事件
-        self.trigger(
-            "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale)
-        )
+        self.trigger("dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale))
 
         return self
 
