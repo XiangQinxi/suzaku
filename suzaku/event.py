@@ -294,7 +294,8 @@ class SkEventHandling:
                     _keep_at_clear,
                 )
                 self.delay_tasks.append(task)
-            case "repeat"
+            case "repeat":
+                NotImplemented
             case _: # All normal event types
                 task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
