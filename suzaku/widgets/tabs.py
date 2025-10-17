@@ -1,4 +1,5 @@
 from ..const import Orient
+from ..event import SkEvent
 from .card import SkCard
 from .container import SkContainer
 from .frame import SkFrame
@@ -35,16 +36,16 @@ class SkTabs(SkCard):
         """
         self.tabbar.select(index)
 
-    def _select(self, index: int) -> None:
+    def _select(self, event: SkEvent) -> None:
         """Select a tab by index
         :param index: The tab index
         :return: None
         """
-        if self.tabbar.items[index] == self.selected:
+        if self.tabbar.items[event["index"]] == self.selected:
             return
         if self.selected:
             self.selected.layout_forget()
-        self.selected = self.tabs[index]
+        self.selected = self.tabs[event["index"]]
         self.selected.box(side="bottom", expand=True, padx=0, pady=(0, 0))
 
     def add(self, tab: SkContainer, text: str | None = "") -> SkWidget:

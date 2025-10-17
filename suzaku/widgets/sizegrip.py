@@ -27,16 +27,16 @@ class SkSizeGrip(SkWidget):
 
     def _mouse_pressed(self, event: SkEvent):
         if not self.window.window_attr("maximized"):
-            self._x1 = event.x
-            self._y1 = event.y
+            self._x1 = event["x"]
+            self._y1 = event["y"]
             self._width1 = self.window.width
             self._height1 = self.window.height
 
     def _mouse_motion(self, event: SkEvent):
         minwidth, minheight = self.window.wm_minsize()
         if self._x1 and self._x1 and self.window.resizable():
-            width = max(minwidth, self._width1 + round(event.x - self._x1))
-            height = max(minheight, self._height1 + round(event.y - self._y1))
+            width = max(minwidth, self._width1 + round(event["x"] - self._x1))
+            height = max(minheight, self._height1 + round(event["y"] - self._y1))
 
             self.window.resize(width, height)
 

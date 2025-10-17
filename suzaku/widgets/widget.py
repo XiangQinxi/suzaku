@@ -145,7 +145,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
-        if "SkContainer" in SkMisc.sk_get_type(self):
+        if "SkContainer" in SkMisc.sk_get_type(self.parent):
             self.parent.add_child(self)
         else:
             raise TypeError("Parent component is not a SkContainer-based object.")
@@ -188,7 +188,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.trigger(
             "move",
             SkEvent(
-                widget = self,
+                widget=self,
                 event_type="move",
                 x=self._x,
                 y=self._y,
@@ -712,6 +712,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.trigger("update", SkEvent(widget=self, event_type="update"))
         if "SkContainer" in SkMisc.sk_get_type(self):
             from .container import SkContainer
+
             SkContainer.update(self)
         self._pos_update()
         self.post()

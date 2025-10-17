@@ -71,11 +71,11 @@ class SkTitleBar(SkCard):
 
     def _mouse_pressed(self, event: SkEvent):
         if (
-            not self.window.mouse_anchor(event.x, event.y)
+            not self.window.mouse_anchor(event["x"], event["y"])
             or not self.window.resizable()
         ):
-            self._x1 = event.x
-            self._y1 = event.y
+            self._x1 = event["x"]
+            self._y1 = event["y"]
 
     def _mouse_motion(self, event: SkEvent):
         if self._x1 and self._x1:

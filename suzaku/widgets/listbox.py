@@ -20,8 +20,6 @@ class SkListBox(SkCard):
     ):
         super().__init__(parent, style=style, **kwargs)
 
-        self.event_generate("changed")
-
         self.items: list[SkListItem] = []
         self.selected_item: SkListItem | None = None
 

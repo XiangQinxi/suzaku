@@ -76,7 +76,6 @@ class SkContainer:
         # self.parent = None
         self.children: list[SkWidget] = []  # Children
 
-
         self.draw_list: list[list[SkWidget]] = [
             [],  # Layout layer [SkWidget1, SkWidget2, ...]
             [],  # Floating layer [SkWidget1, SkWidget2, ...]
@@ -157,7 +156,7 @@ class SkContainer:
         self.x_offset = min(self.x_offset + x_offset, 0)
         # 防止容器超出上边界
         self.y_offset = min(self.y_offset + y_offset, 0)
-    
+
     # endregion
 
     # region add_child 添加子元素
@@ -271,7 +270,7 @@ class SkContainer:
 
         if "SkWindow" not in SkMisc.sk_get_type(self):
             if "SkWidget" not in SkMisc.sk_get_type(self):
-                typing.cast(SkWidget, self)
+                typing.cast("SkWidget", self)
                 x = self.canvas_x
                 y = self.canvas_y
             else:

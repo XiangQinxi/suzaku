@@ -27,7 +27,7 @@ if __name__ == "__main__":
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
-        headerbar = titlebar(window)
+        # headerbar = titlebar(window)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)

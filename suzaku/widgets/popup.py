@@ -10,7 +10,6 @@ class SkPopup(SkCard):
 
         self.focusable = True
 
-        self.event_generate("hide")
         self.bind("hide", self._hide)
 
         # 【来检查是否需要关闭改弹出菜单】

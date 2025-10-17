@@ -4,6 +4,7 @@ import glfw
 import skia
 
 import typing
+
 if typing.TYPE_CHECKING:
     from . import SkWidget
 
@@ -129,7 +130,7 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         # print(cls.cget("focus_widget"))
         if self.esc_to_close:
-            if event.key == glfw.KEY_ESCAPE:
+            if event["key"] == glfw.KEY_ESCAPE:
                 if self.focus_widget is not self:
                     pass
                     # self.focus_set()
@@ -320,7 +321,7 @@ class SkWindow(SkWindowBase, SkContainer):
             and not self.window_attr("maximized")
             and self.window.resizable()
         ):
-            match self.mouse_anchor(event.x, event.y):
+            match self.mouse_anchor(event["x"], event["y"]):
                 case "e" | "w":
                     self.cursor("hresize")
                 case "s" | "n":
@@ -343,7 +344,9 @@ class SkWindow(SkWindowBase, SkContainer):
                 height = max(minheight, self._height1 + event["y"] - self._y1)
             if self._anchor.startswith("n"):
                 height = max(minheight, self._bottom - (event["rooty"] - self._y1))
-                y = min(self.root_y + self.height - minheight, event["rooty"] - self._y1)
+                y = min(
+                    self.root_y + self.height - minheight, event["rooty"] - self._y1
+                )
             if self._anchor.endswith("e"):
                 width = max(minwidth, self._width1 + event["x"] - self._x1)
             if self._anchor.endswith("w"):
@@ -380,8 +383,8 @@ class SkWindow(SkWindowBase, SkContainer):
                     event = SkEvent(
                         event_type=name,
                         button=button,
-                        x=event.x,
-                        y=event.y,
+                        x=event["x"],
+                        y=event["y"],
                         rootx=self.mouse_rootx,
                         rooty=self.mouse_rooty,
                     )
@@ -408,9 +411,7 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         if self.focus_widget is not self:
             self.focus_widget.focus = False
-            self.focus_widget.trigger(
-                "focus_loss", SkEvent(event_type="focus_loss")
-            )
+            self.focus_widget.trigger("focus_loss", SkEvent(event_type="focus_loss"))
             self.focus_widget: SkWindow | SkWidget = self
         glfw.focus_window(self.the_window)
 
