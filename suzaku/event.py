@@ -192,7 +192,8 @@ class SkEventHandling():
         :param _keep_at_clear: If the task should be kept when clearning the event's binding
         :return: SkBindedTask that is binded to the task if success, otherwise False
         """
-        if event_type not in self.__class__.EVENT_TYPES:
+        parsed_event_type = self.parse_event_type_str(event_type)
+        if list(parsed_event_type.keys())[0] not in self.__class__.EVENT_TYPES:
             # warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
             #                "so the task cannot be binded as expected.")
             # return False
@@ -201,7 +202,6 @@ class SkEventHandling():
             self.tasks[event_type] = []
         task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
-        parsed_event_type = self.parse_event_type_str(event_type)
         match list(parsed_event_type.keys())[0]:
             case "delay":
                 task = SkDelayTask(task_id, target, float(parsed_event_type["delay"][0]), multithread, _keep_at_clear)
