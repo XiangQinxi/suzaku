@@ -9,7 +9,7 @@ import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from .appbase import SkAppBase
+from . import SkAppBase
 
 
 class _GLFW_IMAGE:
@@ -135,7 +135,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion", "move"]
+        button_states = ["press", "release", "motion", "move"]
 
         for button in buttons:
             for state in button_states:
@@ -413,14 +413,10 @@ class SkWindowBase(SkEventHandling, SkMisc):
         return self
 
     def update(self) -> None:
-        """Update window.
-
-        :return: None
-        """
+        """Update window."""
         if self.visible:
             self.trigger("update", SkEvent(event_type="update"))
             # self.update_layout: typing.Callable
-            self.update_layout()
             # self.post()
 
     # endregion
@@ -481,11 +477,11 @@ class SkWindowBase(SkEventHandling, SkMisc):
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
-            name = "key_pressed"
+            name = "key_press"
         elif action == RELEASE:
-            name = "key_released"
+            name = "key_release"
         elif action == REPEAT:
-            name = "key_repeated"
+            name = "key_repeat"
         else:
             name = "key"
         self.ime(100, 1000)
@@ -614,9 +610,9 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.mouse_rootx, self.mouse_rooty = self.mouse_root_pos()
 
         if is_pressed:
-            state = "pressed"
+            state = "press"
         else:
-            state = "released"
+            state = "release"
 
         names = [f"mouse_{state}", f"button{button+1}_{state}", f"b{button+1}_{state}"]
 
@@ -691,7 +687,8 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
         button = self.button
         if button >= 0:
-            names = ["mouse_motion", f"button{button+1}_motion", f"b{button+1}_motion"]
+            names = ["mouse_motion", f"mouse_motion[button{button+1}]", 
+                     f"mouse_motion[b{button+1}]"]
 
             for name in names:
                 self.trigger(

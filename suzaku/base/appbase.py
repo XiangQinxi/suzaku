@@ -170,13 +170,13 @@ class SkAppBase(SkEventHandling, SkMisc):
                 glfw.set_error_callback(self.error)
 
                 if self.is_always_update:
-                    deal_event = glfw.poll_events
+                    handle_event = glfw.poll_events
                 else:
-                    deal_event = lambda: glfw.wait_events_timeout(0.5)
+                    handle_event = lambda: glfw.wait_events_timeout(0.5)
             case "sdl2":
                 from sdl2 import SDL_PollEvent
 
-                deal_event = lambda: SDL_PollEvent(None)
+                handle_event = lambda: SDL_PollEvent(None)
             case _:
                 raise SkAppInitError(f"Unknown framework {self.framework}")
 
@@ -188,8 +188,8 @@ class SkAppBase(SkEventHandling, SkMisc):
         # 【开始事件循环】
         while self.alive and self.windows:
             # 处理事件
-            if deal_event:
-                deal_event()
+            if handle_event:
+                handle_event()
 
             # # 检查after事件，其中的事件是否到达时间，如到达则执行
             # if self._afters:
@@ -204,8 +204,9 @@ class SkAppBase(SkEventHandling, SkMisc):
             # 【创建窗口副本，避免在迭代时修改窗口列表】
             current_windows = set(self.windows)
             for window in current_windows:
-                # Make sure the window is created and bound
-                # 【确保新窗口绑定事件】
+                # Trigger an update
+                # 【出发窗口刷新】
+                window.update()
                 # Draw window
                 # 【绘制窗口】
                 match self.framework:

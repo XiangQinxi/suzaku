@@ -84,6 +84,8 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.bind("scroll", self._scroll)
 
+        self.bind("update", self.update)
+
     # endregion
 
     # region Theme related 主题相关
@@ -112,6 +114,9 @@ class SkWindow(SkWindowBase, SkContainer):
     # endregion
 
     # region Event handlers 事件处理
+
+    def update(self):
+        SkContainer.update(self)
 
     def destroy(self) -> None:
         super().destroy()
@@ -157,10 +162,10 @@ class SkWindow(SkWindowBase, SkContainer):
     def _leave(self, event: SkEvent) -> None:
         event = SkEvent(
             event_type="mouse_leave",
-            x=event.x,
-            y=event.y,
-            rootx=event.rootx,
-            rooty=event.rooty,
+            x=event["x"],
+            y=event["y"],
+            rootx=event["rootx"],
+            rooty=event["rooty"],
         )
         children = self.visible_children
         children.reverse()
@@ -179,14 +184,14 @@ class SkWindow(SkWindowBase, SkContainer):
         """
         if widget.visible:
             cx, cy = widget.canvas_x, widget.canvas_y
-            x, y = event.x, event.y
+            x, y = event["x"], event["y"]
             width, height = widget.width, widget.height
             return cx <= x <= cx + width and cy <= y <= cy + height
         return False
 
     def is_entered_widget(self, widget, event: SkEvent) -> bool:
         """Check if within the widget.
-        【检查是否进入组件】
+
         :param widget: SkWidget
         :param event: SkEvent
         :return bool:
@@ -204,12 +209,14 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def _mouse(self, event: SkEvent) -> None:
         if self.window.resizable():
-            self._anchor = self.mouse_anchor(event.x, event.y)
+            # assert event["x"] is int
+            # assert event["y"] is int
+            self._anchor = self.mouse_anchor(event["x"], event["y"])
         else:
             self._anchor = None
         if self._anchor:
-            self._x1 = event.x
-            self._y1 = event.y
+            self._x1 = event["x"]
+            self._y1 = event["y"]
             self._rootx1 = self.root_x
             self._rooty1 = self.root_y
             self._width1 = self.window.width
@@ -224,17 +231,17 @@ class SkWindow(SkWindowBase, SkContainer):
                 if widget.focusable:
                     widget.focus_set()
                 widget.is_mouse_pressed = True
-                widget.button = event.button
+                widget.button = event["button"]
                 names = [
                     "mouse_press",
-                    f"button{event.button+1}_pressed",
-                    f"b{event.button + 1}_pressed",
+                    f"mouse_press[button{event["button"] + 1}]",
+                    f"mouse_press[b{event["button"] + 1}]",
                 ]
                 for name in names:
                     widget.trigger(name, event)
                 break
 
-    def mouse_anchor(self, x, y) -> None | str:
+    def mouse_anchor(self, x, y) -> str:
         anchor = ""
         resizable_margin = self.cget("resizable_margin")
 
@@ -259,10 +266,10 @@ class SkWindow(SkWindowBase, SkContainer):
             widget=self,
             event_type="mouse_motion",
             button=self.button,
-            x=event.x,
-            y=event.y,
-            rootx=event.rootx,
-            rooty=event.rooty,
+            x=event["x"],
+            y=event["y"],
+            rootx=event["rootx"],
+            rooty=event["rooty"],
         )
 
         # 找到当前鼠标所在的视觉元素
@@ -333,15 +340,15 @@ class SkWindow(SkWindowBase, SkContainer):
             width, height = None, None
             minwidth, minheight = self.wm_minsize()
             if self._anchor.startswith("s"):
-                height = max(minheight, self._height1 + event.y - self._y1)
+                height = max(minheight, self._height1 + event["y"] - self._y1)
             if self._anchor.startswith("n"):
-                height = max(minheight, self._bottom - (event.rooty - self._y1))
-                y = min(self.root_y + self.height - minheight, event.rooty - self._y1)
+                height = max(minheight, self._bottom - (event["rooty"] - self._y1))
+                y = min(self.root_y + self.height - minheight, event["rooty"] - self._y1)
             if self._anchor.endswith("e"):
-                width = max(minwidth, self._width1 + event.x - self._x1)
+                width = max(minwidth, self._width1 + event["x"] - self._x1)
             if self._anchor.endswith("w"):
-                width = max(minwidth, self._right - event.rootx - self._x1)
-                x = min(self.root_x + self.width - minwidth, event.rootx - self._x1)
+                width = max(minwidth, self._right - event["rootx"] - self._x1)
+                x = min(self.root_x + self.width - minwidth, event["rootx"] - self._x1)
             self.window.resize(width, height)
             self.window.move(x, y)
 

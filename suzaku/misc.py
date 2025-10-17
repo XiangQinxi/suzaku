@@ -186,3 +186,34 @@ class SkMisc:
             return style[name]
         else:
             return default
+    
+    @staticmethod
+    def sk_get_type(obj_or_cls: typing.Any) -> list[str]:
+        """
+        Returns a list of names of a class/object's parent classes. Written by Google Gemini.
+
+        This is used to prevent circular import caused by loads of isinstance().
+
+        :param obj_or_cls: The class or object to be checked
+        :return: A list of names of its parent classes
+        """
+        # 判斷傳入的是類別還是物件
+        if isinstance(obj_or_cls, type):
+            # 如果是類別，直接使用它
+            cls = obj_or_cls
+        else:
+            # 如果是物件，使用其 __class__ 屬性獲取類別
+            cls = obj_or_cls.__class__
+            
+        # 獲取方法解析順序 (MRO)
+        mro_tuple = cls.__mro__
+
+        # 建立一個列表，用於儲存父類別的名稱
+        parent_names = []
+
+        # 遍歷 MRO 元組，從第二個元素（第一個父類別）開始
+        # 並且排除最後一個元素（object），因為它不是我們自定義的類別。
+        for parent_cls in mro_tuple[1:-1]:
+            parent_names.append(parent_cls.__name__)
+
+        return parent_names

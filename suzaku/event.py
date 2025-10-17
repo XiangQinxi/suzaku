@@ -38,17 +38,16 @@ class SkBindedTask():
         self.multithread: bool = multithread
         self.keep_at_clear: bool = _keep_at_clear
 
-
 class SkDelayTask(SkBindedTask):
     """A class to represent delayed tasks"""
-    def __init__(self, delay, *args, **kwargs):
+    def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
         """Inherited from SkBindedTask, used to store tasks binded to delay events.
         
         :param delay: Time to delay, in seconds, indicating how log to wait before the task is 
                       executed.
         """
-        SkBindedTask.__init__(*args, **kwargs) # For other things,same as SkBindedTask
-        self.target_time = float(time.time()) + delay # To store when to execute the task
+        SkBindedTask.__init__(self, id_, target, *args, **kwargs) # For other things,same as SkBindedTask
+        self.target_time = float(time.time()) + delay_ # To store when to execute the task
 
 
 class SkEventHandling():
@@ -101,6 +100,8 @@ class SkEventHandling():
             self.tasks[event_type] = []
         ## Accumulate instance count
         self.__class__.instance_count += 1
+        # Event binds
+        self.bind("update", self._check_delay_events, _keep_at_clear=True) # Delay checking loop
 
     def parse_event_type_str(self, event_type_str) -> dict:
         """This function parses event type string.
@@ -125,7 +126,7 @@ class SkEventHandling():
             my_task = SkWidget.bind("delay[5]", lambda: print("Hello Suzaku"))
             SkWidget.execute_task(my_task)
         """
-        if type(event_obj) is None:
+        if event_obj == None:
             event_obj = SkEvent()
         assert event_obj is not None
         if event_obj.widget == None:
@@ -135,7 +136,7 @@ class SkEventHandling():
             task.target(event_obj)
         else:
             # Otherwise add to multithread tasks list and let the working thread to deal with it
-            SkEventHandling.multithread_tasks.append((task, evet_obj))
+            SkEventHandling.multithread_tasks.append((task, event_obj))
     
     def trigger(self, event_type: str, event_obj: SkEvent | None = None) -> None:
         """To trigger a type of event
@@ -153,7 +154,14 @@ class SkEventHandling():
         
         :param event_type: The type of event to trigger
         """
+        # Parse event type string
         parsed_event_type = self.parse_event_type_str(event_type)
+        # Create a default SkEvent object if not soecified
+        if event_obj == None:
+            event_obj = SkEvent(widget=self, event_type=list(parsed_event_type.keys())[0])
+        # Add the event to event lists (the widget itself and the global list)
+        self.events.append(event_obj)
+        SkEvent.global_list.append(event_obj)
         # Find targets
         targets = []
         targets.append(event_type)
@@ -161,8 +169,6 @@ class SkEventHandling():
             # If match all
             targets.append(list(parsed_event_type.keys())[0])
             targets.append(list(parsed_event_type.keys())[0] + "[*]")
-        # Add the Event object to the global list
-        SkEvent.global_list.append(NotImplemented)
         for target in targets:
             if target in self.tasks:
                 for task in self.tasks[target]:
@@ -197,8 +203,8 @@ class SkEventHandling():
         parsed_event_type = self.parse_event_type_str(event_type)
         match list(parsed_event_type.keys())[0]:
             case "delay":
-                task = SkDelayTask(parsed_event_type["delay"][0], 
-                                   task_id, target, multithread, _keep_at_clear)
+                task = SkDelayTask(task_id, target, float(parsed_event_type["delay"][0]), multithread, _keep_at_clear)
+                self.delay_tasks.append(task)
             case _:
                 task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
@@ -250,15 +256,17 @@ class SkEventHandling():
         else:
             return False
         
-    def check_delay_events(self) -> None:
+    def _check_delay_events(self, _=None) -> None:
         """To check and execute delay events.
         
         Example
         -------
         Mostly used by SkWidget.update(), which is internal use
         """
+        # print("Checking delayed events...")
         for task in self.delay_tasks:
-            if int(time.time()) >= task.target_time:
+            if float(time.time()) >= task.target_time:
+                # print(f"Current time is later than target time of {task.id}, execute the task.")
                 self.execute_task(task)
 
 # Initialize working thread
@@ -270,16 +278,39 @@ class SkEvent:
 
     global_list: list[SkEvent] = []
 
-    def __init__(self, widget: SkWidget | SkWindow | None = None, 
+    def __init__(self, widget: SkEventHandling | None = None, 
                  event_type: str = "[Unspecified]", **kwargs):
+        """This class is used to represent events.
+
+        Some properties owned by all types of events are stored as attributes, such as widget and type. 
+        Others are stored as items, which can be accessed or manipulated just like dict, e.g. 
+        `SkEvent["x"]` for get and `SkEvent["y"] = 16` for set.
+        
+        Example
+        -------
+        Included in descrepsion.
+
+        :param widget: The widget of the event, None by default
+        :param event_type: Type of the event, in string, `"[Unspecified]"` by default
+        :param **kwargs: Other properties of the event, will be added as items
+        """
         self.event_type: str = event_type  # Type of event
         self.widget: typing.Optional[typing.Any] = widget  # Relating widget
         self.window_base: typing.Optional[typing.Any] = None  # WindowBase of the current window
         self.window: typing.Optional[typing.Any] = None  # Current window
-        self.pos: typing.Optional[tuple[int, int] | list[int]] = None  # Position (to the widget)
-        self.abspos: typing.Optional[tuple[int, int] | list[int]] = None  # Absolute position in win
+        self.event_data:dict = {}
         # Not all proprties above will be used
         # Update stuff from args into attributes
         for prop in kwargs.keys():
             if prop not in ["widget", "event_type"]:
-                self.__setattr__(prop, kwargs[prop])
+                # self.__setattr__(prop, kwargs[prop])
+                self[prop] = kwargs[prop]
+    
+    def __setitem__(self, key: str, value: typing.Any):
+        self.event_data[key] = value
+    
+    def __getitem__(self, key: str) -> typing.Any:
+        if key in self.event_data:
+            return self.event_data[key]
+        else:
+            return None # If no such item avail, returns None

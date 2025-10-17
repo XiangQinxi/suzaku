@@ -58,8 +58,8 @@ class SkButton(SkFrame):
                     self.click_time = time
 
     def invoke(self) -> None:
-        """【触发按钮的点击事件】"""
-        if self.cget("command") and self.cget("disabled") is False:
+        """Trigger button click event"""
+        if self.cget("command") and not self.cget("disabled"):
             self.cget("command")()
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:

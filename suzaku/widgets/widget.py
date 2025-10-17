@@ -10,9 +10,9 @@ from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
-from .appwindow import SkAppWindow
+
 from .window import SkWindow
-from . import container
+from .appwindow import SkAppWindow
 
 
 class SkWidget(SkEventHandling, SkMisc):
@@ -66,27 +66,27 @@ class SkWidget(SkEventHandling, SkMisc):
         )
         SkWidget._instance_count += 1
 
-        self.events = {
-            "resize": dict(),
-            "move": dict(),
-            "mouse_move": dict(),
-            "mouse_motion": dict(),
-            "mouse_enter": dict(),
-            "mouse_leave": dict(),
-            "mouse_pressed": dict(),
-            "mouse_released": dict(),
-            "focus_gain": dict(),
-            "focus_loss": dict(),
-            "key_pressed": dict(),
-            "key_released": dict(),
-            "key_repeated": dict(),
-            "double_click": dict(),
-            "char": dict(),
-            "click": dict(),
-            "configure": dict(),
-            "update": dict(),
-            "scroll": dict(),
-        }
+        # self.task = {
+        #     "resize": dict(),
+        #     "move": dict(),
+        #     "mouse_move": dict(),
+        #     "mouse_motion": dict(),
+        #     "mouse_enter": dict(),
+        #     "mouse_leave": dict(),
+        #     "mouse_pressed": dict(),
+        #     "mouse_released": dict(),
+        #     "focus_gain": dict(),
+        #     "focus_loss": dict(),
+        #     "key_pressed": dict(),
+        #     "key_released": dict(),
+        #     "key_repeated": dict(),
+        #     "double_click": dict(),
+        #     "char": dict(),
+        #     "click": dict(),
+        #     "configure": dict(),
+        #     "update": dict(),
+        #     "scroll": dict(),
+        # }
 
         # Mouse events
         buttons = [
@@ -97,11 +97,11 @@ class SkWidget(SkEventHandling, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion", "move"]
+        button_states = ["press", "release", "motion", "move"]
 
-        for button in buttons:
-            for state in button_states:
-                self.trigger(f"{state}[{button}]")
+        # for button in buttons:
+        #     for state in button_states:
+        #         self.trigger(f"mouse_{state}[{button}]")
 
         self.attributes: dict[str, typing.Any] = {
             "cursor": cursor,
@@ -145,7 +145,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
-        if isinstance(self.parent, container.SkContainer):
+        if "SkContainer" in SkMisc.sk_get_type(self):
             self.parent.add_child(self)
         else:
             raise TypeError("Parent component is not a SkContainer-based object.")
@@ -159,8 +159,8 @@ class SkWidget(SkEventHandling, SkMisc):
         self.click_time: float | int = 0
 
         def _on_mouse(event: SkEvent):
-            self.mouse_x = event.x
-            self.mouse_y = event.y
+            self.mouse_x = event["x"]
+            self.mouse_y = event["y"]
 
         self.bind("mouse_enter", _on_mouse)
         self.bind("mouse_motion", _on_mouse)
@@ -709,11 +709,12 @@ class SkWidget(SkEventHandling, SkMisc):
         return font.measureText(text, *args)
 
     def update(self):
+        self.trigger("update", SkEvent(widget=self, event_type="update"))
+        if "SkContainer" in SkMisc.sk_get_type(self):
+            from .container import SkContainer
+            SkContainer.update(self)
         self._pos_update()
         self.post()
-        if isinstance(self, SkEventHandling):
-            self.check_delay_events: typing.Callable = lambda: None
-            self.check_delay_events()
 
     @property
     def x(self):
