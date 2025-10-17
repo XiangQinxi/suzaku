@@ -47,6 +47,7 @@ class SkBindedTask:
 
 
 class SkDelayTask(SkBindedTask):
+<<<<<<< HEAD
     """A class to represent delayed tasks"""
 
     def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
@@ -61,7 +62,33 @@ class SkDelayTask(SkBindedTask):
         self.target_time = (
             float(time.time()) + delay_
         )  # To store when to execute the task
+=======
+    """A class to represent delay tasks"""
+    def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
+        """Inherited from SkBindedTask, used to store tasks binded to `delay` events.
+        
+        :param delay: Time to delay, in seconds, indicating how log to wait before the task is 
+                      executed.
+        """
+        SkBindedTask.__init__(self, id_, target, *args, **kwargs) # For other things,same as 
+                                                                  # SkBindedTask
+        self.target_time = float(time.time()) + delay_ # To store when to execute the task
+>>>>>>> fa9a6ee (Partially made repeat tasks)
 
+class SkRepeatTask(SkBindedTask):
+    """A class to represent repeat tasks"""
+    def __init__(self, id_: str, target: typing.Callable, interval, *args, **kwargs):
+        """Inherited from SkBindedTask, used to store tasks binded to `repeat` events.
+        
+        :param delay: Time to delay, in seconds, indicating how log to wait before the task is 
+                      executed.
+        """
+        SkBindedTask.__init__(self, id_, target, *args, **kwargs) # For other things,same as 
+                                                                  # SkBindedTask
+        self.target_time = float(time.time()) + interval # To store when to execute the task for 
+                                                         # the next time, will be accumulated after 
+                                                         # execution of the task
+        self.interval = interval # Interval of the class
 
 class SkEventHandling:
     """A class containing event handling abilities.
@@ -73,6 +100,7 @@ class SkEventHandling:
     """
 
     EVENT_TYPES: list[str] = [
+<<<<<<< HEAD
         "resize",
         "move",
         "configure",
@@ -90,6 +118,14 @@ class SkEventHandling:
         "char",
         "click",
         "delay",  # This row shows special event type(s)
+=======
+        "resize", "move", "configure", "update", 
+        "mouse_move", "mouse_enter", "mouse_leave", "mouse_press", "mouse_release", 
+        "focus_gain", "focus_loss", 
+        "key_press", "key_release", "key_repeat", 
+        "char", "click", 
+        "delay", "repeat", # This row shows special event type(s)
+>>>>>>> fa9a6ee (Partially made repeat tasks)
     ]
     multithread_tasks: list[tuple[SkBindedTask, SkEvent]] = []
     WORKING_THREAD: threading.Thread
@@ -162,8 +198,19 @@ class SkEventHandling:
         if not task.multithread:
             # If not multitask, execute directly
             task.target(event_obj)
+            # If is a delay event, it should be removed right after execution
+            if isinstance(task, SkDelayTask):
+                self.unbind(task)
         else:
             # Otherwise add to multithread tasks list and let the working thread to deal with it
+            # If is a delay task, should add some code to let it unbind itself, here is a way, 
+            # which is absolutely not perfect, though works, to implemet this machanism, by 
+            # overriding its target with a modified version
+            def self_destruct_template(task, event_obj):
+                task.target(event_obj)
+                self.unbind(task)
+            if isinstance(task, SkDelayTask):
+                task.target = lambda event_obj: self_destruct_template(task, event_obj)
             SkEventHandling.multithread_tasks.append((task, event_obj))
 
     def trigger(self, event_type: str, event_obj: SkEvent | None = None) -> None:
@@ -247,7 +294,8 @@ class SkEventHandling:
                     _keep_at_clear,
                 )
                 self.delay_tasks.append(task)
-            case _:
+            case "repeat"
+            case _: # All normal event types
                 task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
         return task
@@ -272,7 +320,7 @@ class SkEventHandling:
         else:
             return False
 
-    def unbind(self, task_id: str) -> bool:
+    def unbind(self, target_task: str | SkBindedTask) -> bool:
         """To unbind the task with specified task ID.
 
         Example
@@ -285,11 +333,14 @@ class SkEventHandling:
         .. code-block:: python
             my_button = SkButton(...)
             my_button.unbind("SkButton114.mouse_press.*")
-        This show unbinding all tasks under `mouse_press` event from `my_button`.
+            my_button.unbind("mouse_release.*")
+        This show unbinding all tasks under `mouse_press` and `mouse_release` event from 
+        `my_button`.
 
-        :param task_id: The task ID to unbind.
+        :param target_task: The task ID or `SkBindedTask` to unbind.
         :return: If success
         """
+<<<<<<< HEAD
         task_id_parsed = task_id.split(".")
         for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
             if task.id == task_id:
@@ -297,6 +348,32 @@ class SkEventHandling:
                 return True
         else:
             return False
+=======
+        match target_task:
+            case str():
+                task_id_parsed = target_task.split(".")
+                if len(task_id_parsed) == 2:
+                    task_id_parsed.insert(0, self.id)
+                if task_id_parsed != self.id:
+                    NotImplemented
+                for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
+                    if task.id == target_task:
+                        self.tasks[task_id_parsed[1]].pop(task_index)
+                        return True
+                else:
+                    return False
+            case SkBindedTask():
+                for event_type in self.tasks:
+                    if target_task in self.tasks[event_type]:
+                        self.tasks[event_type].remove(target_task)
+                        return True
+                else:
+                    return False
+            case _:
+                warnings.warn("Wrong type for unbind()! Must be event ID or task object", 
+                              UserWarning)
+                return False
+>>>>>>> fa9a6ee (Partially made repeat tasks)
 
     def _check_delay_events(self, _=None) -> None:
         """To check and execute delay events.
