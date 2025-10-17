@@ -46,6 +46,7 @@ from .separator import SkSeparator  # ✅
 from .sizegrip import SkSizeGrip  # ✅
 
 SkSizegrip = SkSizeGrip
+from .slider import SkSlider  # ⛔
 from .switch import SkSwitch  # ✅
 from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar  # ✅
@@ -56,8 +57,7 @@ from .tabbutton import SkTabButton  # ✅
 SkTabbutton = SkSegmentedButton = SkTabButton
 from .tabs import SkTabs  # ✅
 from .text import SkText  # ✅
-from .textbutton import SkMaximizeButton  # ✅
-from .textbutton import SkCloseButton, SkMinimizeButton, SkTextButton
+from .textbutton import SkCloseButton, SkMinimizeButton, SkTextButton  # ✅
 from .titlebar import SkTitleBar, SkWindowCommand, titlebar  # ✅
 
 SkTitlebar = SkHeaderBar = SkHeaderbar = SkTitleBar

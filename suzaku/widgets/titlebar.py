@@ -84,8 +84,8 @@ class SkTitleBar(SkCard):
                 self.window.restore()
                 self._x1 = self.width * p
             self.window.move(
-                event.rootx - self._x1,
-                event.rooty - self._y1,
+                event["rootx"] - self._x1,
+                event["rooty"] - self._y1,
             )
             """if platform == "win32":
                 WM_SYSCOMMAND = 274

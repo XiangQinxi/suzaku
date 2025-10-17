@@ -492,6 +492,22 @@
       }
     },
 
+    "SkSlider": {
+      "rest": {
+        "size": [120, 20]
+      }
+    },
+
+    "SkSlider.Progress": {
+      "rest": {
+        "bg": [40, 130, 255, 215],
+        "bd": [40, 130, 255, 235],
+        "width": 2,
+        "radius": [99, 0, 0, 99],
+        "pady": 5
+      }
+    },
+
     "SkSwitchBox": {
       "rest": {
         "size": [48, 20],

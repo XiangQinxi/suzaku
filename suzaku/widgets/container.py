@@ -270,7 +270,7 @@ class SkContainer:
         """
 
         if "SkWindow" not in SkMisc.sk_get_type(self):
-            if "SkWidget" not in SkMisc.sk_get_type(self):
+            if "SkWidget" in SkMisc.sk_get_type(self):
                 typing.cast("SkWidget", self)
                 x = self.canvas_x
                 y = self.canvas_y
