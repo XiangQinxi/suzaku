@@ -197,6 +197,7 @@ class SkEventHandling():
             #                "so the task cannot be binded as expected.")
             # return False
             self.EVENT_TYPES.append(event_type)
+        if event_type not in self.tasks:
             self.tasks[event_type] = []
         task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
