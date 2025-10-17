@@ -5,8 +5,7 @@ import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -692,7 +691,7 @@ class SkWidget(SkEventHandling, SkMisc):
         return (
             self.is_mouse_floating
             and self.window.is_mouse_press
-            and self.window.previous_widget is self
+            and self.window.pressing_widget is self
         )
 
     @property

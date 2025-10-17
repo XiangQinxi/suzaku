@@ -353,14 +353,35 @@ class SkTheme:
         return result
 
     @typing.overload
-    def select(self, selector: str | list, *, copy: bool = ..., fallback: bool = ...,
-        make_path: bool = ..., allow_not_found: typing.Literal[True]) -> dict | None: ...
+    def select(
+        self,
+        selector: str | list,
+        *,
+        copy: bool = ...,
+        fallback: bool = ...,
+        make_path: bool = ...,
+        allow_not_found: typing.Literal[True],
+    ) -> dict | None: ...
     @typing.overload
-    def select(self, selector: str | list, *, copy: bool = ..., fallback: bool = ...,
-        make_path: bool = ..., allow_not_found: typing.Literal[False]) -> dict: ...
+    def select(
+        self,
+        selector: str | list,
+        *,
+        copy: bool = ...,
+        fallback: bool = ...,
+        make_path: bool = ...,
+        allow_not_found: typing.Literal[False],
+    ) -> dict: ...
 
-    def select(self, selector: str | list, *, copy: bool = True, fallback: bool = True,
-        make_path: bool = False, allow_not_found: bool = True) -> dict | None:
+    def select(
+        self,
+        selector: str | list,
+        *,
+        copy: bool = True,
+        fallback: bool = True,
+        make_path: bool = False,
+        allow_not_found: bool = True,
+    ) -> dict | None:
         """Get styles config using a selector.
 
         Example
@@ -376,7 +397,7 @@ class SkTheme:
         :param fallback: Whether to enable fallback machanism, defaults to True
         :param make_path: Whether to create the path if not found instead of throwing errors,
                           will force disable fallback when enabled, defaults to False
-        :param allow_not_found: True to return None when style not found, otherwise raise error in 
+        :param allow_not_found: True to return None when style not found, otherwise raise error in
                                 such cases
         :return result: The style dict
         """
@@ -392,8 +413,9 @@ class SkTheme:
         else:
             try:
                 # To get a parsed selector
-                selector_parsed = self.parse_selector(selector) if type(selector) is str \
-                                  else selector # If is already parsed list
+                selector_parsed = (
+                    self.parse_selector(selector) if type(selector) is str else selector
+                )  # If is already parsed list
                 # Validate if selector exists in theme
                 _ = self.styles
                 for selector_level in selector_parsed:
@@ -404,9 +426,13 @@ class SkTheme:
                     if selector_level not in _:
                         if isinstance(self.parent, SkTheme) and fallback:
                             # If parent exists, then fallback
-                            return self.parent.select(selector, copy=copy, fallback=fallback, 
-                                                      make_path=make_path, 
-                                                      allow_not_found=allow_not_found)
+                            return self.parent.select(
+                                selector,
+                                copy=copy,
+                                fallback=fallback,
+                                make_path=make_path,
+                                allow_not_found=allow_not_found,
+                            )
                         else:
                             # If is root theme, then go fuck ur selector
                             if make_path:
@@ -418,7 +444,8 @@ class SkTheme:
                                     return None
                                 else:
                                     raise SkStyleNotFoundError(
-                                        "Cannot find styles with selector " f"[{selector}]"
+                                        "Cannot find styles with selector "
+                                        f"[{selector}]"
                                     )
                     _ = _[selector_level]  # Heading to the next level
             except SkStyleNotFoundError:
@@ -437,8 +464,9 @@ class SkTheme:
         else:
             return result
 
-    def get_style_attr(self, selector: str | list[str], attr_name: str, 
-                       allow_not_found: bool = True) -> typing.Any:
+    def get_style_attr(
+        self, selector: str | list[str], attr_name: str, allow_not_found: bool = True
+    ) -> typing.Any:
         """Get style attribute _value.
 
         Example
@@ -463,11 +491,13 @@ class SkTheme:
 
         :param selector: The selector to the style, or a parsed list
         :param attr_name: The attribute name
-        :param allow_not_found: True to return False when attribute not found, otherwise raise 
+        :param allow_not_found: True to return False when attribute not found, otherwise raise
                                 error in such cases
         :return: The attribute _value
         """
-        parsed_selector = selector if type(selector) is list else self.parse_selector(selector)
+        parsed_selector = (
+            selector if type(selector) is list else self.parse_selector(selector)
+        )
         style = self.select(parsed_selector, copy=False, allow_not_found=False)
         if attr_name not in style:
             # Fallback mechanism
@@ -565,7 +595,9 @@ class SkTheme:
             theme_operate = SkTheme(self.styles)
         else:
             theme_operate = self
-        style_operate = theme_operate.select(selector, copy=False, allow_not_found=False)
+        style_operate = theme_operate.select(
+            selector, copy=False, allow_not_found=False
+        )
         style_operate.update(new_style)
         return theme_operate
 
