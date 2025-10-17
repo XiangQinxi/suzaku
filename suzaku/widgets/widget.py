@@ -681,6 +681,20 @@ class SkWidget(SkEventHandling, SkMisc):
 
     # region Widget attribute configs 组件属性配置
 
+    def is_entered(self, mouse_x, mouse_y) -> bool:
+        """Check if within the widget's bounds.
+        【检查是否进入组件范围（即使超出父组件，其超出部分进入仍判定为True）】
+        :param widget: SkWidget
+        :param event: SkEvent
+        :return bool:
+        """
+        if self.visible:
+            cx, cy = self.canvas_x, self.canvas_y
+            x, y = mouse_x, mouse_y
+            width, height = self.width, self.height
+            return cx <= x <= cx + width and cy <= y <= cy + height
+        return False
+
     @property
     def is_mouse_pressed(self):
         return self.is_mouse_floating and self.window.is_mouse_pressed

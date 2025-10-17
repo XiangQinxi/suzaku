@@ -170,35 +170,20 @@ class SkWindow(SkWindowBase, SkContainer):
             widget.is_mouse_floating = False
             widget.trigger("mouse_leave", event)
 
-    @staticmethod
-    def is_entered_widget_bounds(widget, event: SkEvent) -> bool:
-        """Check if within the widget's bounds.
-        【检查是否进入组件范围（即使超出父组件，其超出部分进入仍判定为True）】
-        :param widget: SkWidget
-        :param event: SkEvent
-        :return bool:
-        """
-        if widget.visible:
-            cx, cy = widget.canvas_x, widget.canvas_y
-            x, y = event["x"], event["y"]
-            width, height = widget.width, widget.height
-            return cx <= x <= cx + width and cy <= y <= cy + height
-        return False
-
-    def is_entered_widget(self, widget, event: SkEvent) -> bool:
+    def is_widget_mouse_floating(self, widget, event: SkEvent) -> bool:
         """Check if within the widget.
 
         :param widget: SkWidget
         :param event: SkEvent
         :return bool:
         """
-        if self.is_entered_widget_bounds(widget, event):
+        if widget.is_entered(event["x"], event["y"]):
             is_parents = []
             parent = widget.parent
             while parent:
                 if isinstance(parent, (SkWindow, SkApp)):
                     break
-                is_parents.append(self.is_entered_widget_bounds(parent, event))
+                is_parents.append(parent.is_entered(event["x"], event["y"]))
                 parent = parent.parent
             return all(is_parents)
         return False
@@ -222,10 +207,10 @@ class SkWindow(SkWindowBase, SkContainer):
         children = self.visible_children
         children.reverse()
         for widget in children:
-            if self.is_entered_widget(widget, event):
-                widget.is_mouse_floating = True
+            if self.is_widget_mouse_floating(widget, event):
                 if widget.focusable:
                     widget.focus_set()
+                widget.is_mouse_floating = True
                 widget.button = event["button"]
                 names = [
                     "mouse_press",
@@ -272,7 +257,7 @@ class SkWindow(SkWindowBase, SkContainer):
         children.reverse()
 
         for widget in reversed(children):
-            if self.is_entered_widget(widget, event):
+            if self.is_widget_mouse_floating(widget, event):
                 current_widget = widget
 
         # 处理上一个元素的离开事件

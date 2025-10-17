@@ -10,6 +10,18 @@ if typing.TYPE_CHECKING:
 
 
 class SkMisc:
+    window: "window.SkWindow"
+
+    def get_widget_with_id(self, widget_id: str) -> "window.SkWidget | None":
+        """Get the widget with the given ID.
+
+        :param widget_id: The ID of the widget.
+        :return: SkWidget | None: The widget with the given ID, or None if not found.
+        """
+        for widget in self.window.children:
+            if widget.id == widget_id:
+                return widget
+        return None
 
     def time(self, value: float | None = None):
         """Get or set the time.
@@ -186,7 +198,7 @@ class SkMisc:
             return style[name]
         else:
             return default
-    
+
     @staticmethod
     def sk_get_type(obj_or_cls: typing.Any) -> list[str]:
         """
@@ -204,7 +216,7 @@ class SkMisc:
         else:
             # 如果是物件，使用其 __class__ 屬性獲取類別
             cls = obj_or_cls.__class__
-            
+
         # 獲取方法解析順序 (MRO)
         mro_tuple = cls.__mro__
 
