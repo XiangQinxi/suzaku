@@ -570,7 +570,7 @@ class SkLineInput(SkWidget):
         # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
         if self.is_focus:
             blink_interval = self.cget("blink_interval")
-            self.bind(f"delay[{blink_interval}]", self.blink)
+            # self.bind(f"delay[{blink_interval}]", self.blink)
 
     def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Draw the text input
