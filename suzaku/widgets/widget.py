@@ -1,10 +1,9 @@
 import typing
-
 from functools import cache
 
 import skia
 
-from ..event import SkEvent, SkEventHanding
+from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
 from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
@@ -12,10 +11,9 @@ from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
 from .appwindow import SkAppWindow
 from .window import SkWindow
-from . import container
 
 
-class SkWidget(SkEventHanding, SkMisc):
+class SkWidget(SkEventHandling, SkMisc):
 
     _instance_count = 0
 
@@ -41,7 +39,7 @@ class SkWidget(SkEventHanding, SkMisc):
         :param cursor: Cursor style
         """
 
-        SkEventHanding.__init__(self)
+        SkEventHandling.__init__(self)
 
         self.parent: SkWidget = parent
         self.style_name: str = style_name
@@ -66,27 +64,27 @@ class SkWidget(SkEventHanding, SkMisc):
         )
         SkWidget._instance_count += 1
 
-        self.events = {
-            "resize": dict(),
-            "move": dict(),
-            "mouse_move": dict(),
-            "mouse_motion": dict(),
-            "mouse_enter": dict(),
-            "mouse_leave": dict(),
-            "mouse_pressed": dict(),
-            "mouse_released": dict(),
-            "focus_gain": dict(),
-            "focus_loss": dict(),
-            "key_pressed": dict(),
-            "key_released": dict(),
-            "key_repeated": dict(),
-            "double_click": dict(),
-            "char": dict(),
-            "click": dict(),
-            "configure": dict(),
-            "update": dict(),
-            "scroll": dict(),
-        }
+        # self.task = {
+        #     "resize": dict(),
+        #     "move": dict(),
+        #     "mouse_move": dict(),
+        #     "mouse_motion": dict(),
+        #     "mouse_enter": dict(),
+        #     "mouse_leave": dict(),
+        #     "mouse_press": dict(),
+        #     "mouse_release": dict(),
+        #     "focus_gain": dict(),
+        #     "focus_loss": dict(),
+        #     "key_press": dict(),
+        #     "key_release": dict(),
+        #     "key_repeated": dict(),
+        #     "double_click": dict(),
+        #     "char": dict(),
+        #     "click": dict(),
+        #     "configure": dict(),
+        #     "update": dict(),
+        #     "scroll": dict(),
+        # }
 
         # Mouse events
         buttons = [
@@ -97,11 +95,11 @@ class SkWidget(SkEventHanding, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion", "move"]
+        button_states = ["press", "release", "motion", "move"]
 
-        for button in buttons:
-            for state in button_states:
-                self.event_generate(f"{button}_{state}")
+        # for button in buttons:
+        #     for state in button_states:
+        #         self.trigger(f"mouse_{state}[{button}]")
 
         self.attributes: dict[str, typing.Any] = {
             "cursor": cursor,
@@ -145,27 +143,26 @@ class SkWidget(SkEventHanding, SkMisc):
 
         self.layout_config: dict[str, dict] = {"none": {}}
 
-        if isinstance(self.parent, container.SkContainer):
+        if "SkContainer" in SkMisc.sk_get_type(self.parent):
             self.parent.add_child(self)
         else:
             raise TypeError("Parent component is not a SkContainer-based object.")
 
         # Events-related
         self.is_mouse_floating: bool = False
-        self.is_mouse_pressed: bool = False
         self.is_focus: bool = False
         self.gradient = SkGradient()
         self.button: typing.Literal[0, 1, 2] = 0
         self.click_time: float | int = 0
 
         def _on_mouse(event: SkEvent):
-            self.mouse_x = event.x
-            self.mouse_y = event.y
+            self.mouse_x = event["x"]
+            self.mouse_y = event["y"]
 
         self.bind("mouse_enter", _on_mouse)
         self.bind("mouse_motion", _on_mouse)
 
-        self.bind("b1_released", self._click)
+        self.bind("mouse_release", self._on_mouse_release)
 
     # endregion
 
@@ -185,9 +182,10 @@ class SkWidget(SkEventHanding, SkMisc):
 
         update_pos()
 
-        self.event_trigger(
+        self.trigger(
             "move",
             SkEvent(
+                widget=self,
                 event_type="move",
                 x=self._x,
                 y=self._y,
@@ -196,23 +194,16 @@ class SkWidget(SkEventHanding, SkMisc):
             ),
         )
 
-    def _click(self, event) -> None:
-        """
-        Check click event (not pressed)
+    def _on_mouse_release(self, event) -> None:
+        if self.is_mouse_floating:
+            self.trigger("click", event)
+            time = self.time()
 
-        :return: None
-        """
-        if self.button != 1:
-            if self.is_mouse_floating:
-
-                self.event_trigger("click", event)
-                time = self.time()
-
-                if self.click_time + self.cget("double_click_interval") > time:
-                    self.event_trigger("double_click", event)
-                    self.click_time = 0
-                else:
-                    self.click_time = time
+            if self.click_time + self.cget("double_click_interval") > time:
+                self.trigger("double_click", event)
+                self.click_time = 0
+            else:
+                self.click_time = time
 
     # endregion
 
@@ -681,6 +672,28 @@ class SkWidget(SkEventHanding, SkMisc):
 
     # region Widget attribute configs 组件属性配置
 
+    def is_entered(self, mouse_x, mouse_y) -> bool:
+        """Check if within the widget's bounds.
+        【检查是否进入组件范围（即使超出父组件，其超出部分进入仍判定为True）】
+        :param widget: SkWidget
+        :param event: SkEvent
+        :return bool:
+        """
+        if self.visible:
+            cx, cy = self.canvas_x, self.canvas_y
+            x, y = mouse_x, mouse_y
+            width, height = self.width, self.height
+            return cx <= x <= cx + width and cy <= y <= cy + height
+        return False
+
+    @property
+    def is_mouse_press(self):
+        return (
+            self.is_mouse_floating
+            and self.window.is_mouse_press
+            and self.window.pressing_widget is self
+        )
+
     @property
     def dwidth(self):
         _width = self.cget("dwidth")
@@ -708,6 +721,11 @@ class SkWidget(SkEventHanding, SkMisc):
         return font.measureText(text, *args)
 
     def update(self):
+        self.trigger("update", SkEvent(widget=self, event_type="update"))
+        if "SkContainer" in SkMisc.sk_get_type(self):
+            from .container import SkContainer
+
+            SkContainer.update(self)
         self._pos_update()
         self.post()
 
@@ -781,7 +799,7 @@ class SkWidget(SkEventHanding, SkMisc):
         :return: self
         """
         self.attributes.update(**kwargs)
-        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
+        self.trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     configure = config = set_attribute
@@ -799,6 +817,7 @@ class SkWidget(SkEventHanding, SkMisc):
 
     def read_size(self, selector: str):
         try:
+            # print("Get style: ", selector, "size")
             size = self.theme.get_style_attr(selector, "size")
             # print(self.id, size)
             if size:
@@ -1048,13 +1067,13 @@ class SkWidget(SkEventHanding, SkMisc):
         """
         if self.focusable:
             if not self.is_focus:
-                self.window.focus_get().event_trigger(
+                self.window.focus_get().trigger(
                     "focus_loss", SkEvent(event_type="focus_loss")
                 )
                 self.window.focus_get().is_focus = False
                 self.window.focus_widget = self
                 self.is_focus = True
-                self.event_trigger("focus_gain", SkEvent(event_type="focus_gain"))
+                self.trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:
         """

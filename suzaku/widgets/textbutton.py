@@ -42,18 +42,18 @@ class SkTextButton(SkButton, SkText):
 
     def _click(self, event) -> None:
         """
-        Check click event (not pressed)
+        Check click event (not press)
 
         :return: None
         """
         if self.button != 1:
             if self.is_mouse_floating:
 
-                self.event_trigger("click", event)
+                self.trigger("click", event)
                 time = self.time()
 
                 if self.click_time + self.cget("double_click_interval") > time:
-                    self.event_trigger("double_click", event)
+                    self.trigger("double_click", event)
                     self.click_time = 0
                 else:
                     self.click_time = time

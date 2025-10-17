@@ -4,7 +4,7 @@ import warnings
 import glfw
 import skia
 
-from ..event import SkEvent, SkEventHanding
+from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
 
 
@@ -56,9 +56,12 @@ def init_sdl2() -> None:
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
 
-    from sdl2 import (SDL_GL_CONTEXT_MAJOR_VERSION,
-                      SDL_GL_CONTEXT_MINOR_VERSION,
-                      SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_SetAttribute)
+    from sdl2 import (
+        SDL_GL_CONTEXT_MAJOR_VERSION,
+        SDL_GL_CONTEXT_MINOR_VERSION,
+        SDL_GL_CONTEXT_PROFILE_MASK,
+        SDL_GL_SetAttribute,
+    )
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)
@@ -67,7 +70,7 @@ def init_sdl2() -> None:
     )  # SDL_GL_CONTEXT_PROFILE_CORE
 
 
-class SkAppBase(SkEventHanding, SkMisc):
+class SkAppBase(SkEventHandling, SkMisc):
     """Base Application class.
 
     >>> app = SkAppBase()
@@ -170,13 +173,13 @@ class SkAppBase(SkEventHanding, SkMisc):
                 glfw.set_error_callback(self.error)
 
                 if self.is_always_update:
-                    deal_event = glfw.poll_events
+                    handle_event = glfw.poll_events
                 else:
-                    deal_event = lambda: glfw.wait_events_timeout(0.5)
+                    handle_event = lambda: glfw.wait_events_timeout(0.5)
             case "sdl2":
                 from sdl2 import SDL_PollEvent
 
-                deal_event = lambda: SDL_PollEvent(None)
+                handle_event = lambda: SDL_PollEvent(None)
             case _:
                 raise SkAppInitError(f"Unknown framework {self.framework}")
 
@@ -188,24 +191,24 @@ class SkAppBase(SkEventHanding, SkMisc):
         # 【开始事件循环】
         while self.alive and self.windows:
             # 处理事件
-            if deal_event:
-                deal_event()
+            handle_event()
 
-            # 检查after事件，其中的事件是否到达时间，如到达则执行
-            if self._afters:
-                for item, config in tuple(self._afters.items()):
-                    if config[0] <= self.time():  # Time
-                        config[1]()  # Function
-                        if config[2]:  # Is Post
-                            self.post()
-                        del self._afters[item]
+            # # 检查after事件，其中的事件是否到达时间，如到达则执行
+            # if self._afters:
+            #     for item, config in tuple(self._afters.items()):
+            #         if config[0] <= self.time():  # Time
+            #             config[1]()  # Function
+            #             if config[2]:  # Is Post
+            #                 self.post()
+            #             del self._afters[item]
 
             # Create a copy of the window tuple to avoid modifying it while iterating
             # 【创建窗口副本，避免在迭代时修改窗口列表】
             current_windows = set(self.windows)
             for window in current_windows:
-                # Make sure the window is created and bound
-                # 【确保新窗口绑定事件】
+                # Trigger an update
+                # 【出发窗口刷新】
+                window.update()
                 # Draw window
                 # 【绘制窗口】
                 match self.framework:
@@ -214,15 +217,15 @@ class SkAppBase(SkEventHanding, SkMisc):
                         if (
                             self.is_get_context_on_focus
                         ):  # Only draw the window that has gained focus.
-                            if glfw.get_window_attrib(window.the_window, glfw.FOCUSED):
+                            if window.window_attr("focused"):
                                 window.draw()
                         else:
-                            if glfw.get_window_attrib(window.the_window, glfw.VISIBLE):
+                            if window.window_attr("visible"):
                                 window.draw()
                         # Check if the window is valid
                         # 【检查窗口是否有效】
                         if window.can_be_close():
-                            window.event_trigger(
+                            window.trigger(
                                 "delete_window",
                                 SkEvent(event_type="delete_window", window=window),
                             )
@@ -242,8 +245,7 @@ class SkAppBase(SkEventHanding, SkMisc):
                             )  # 是否启用垂直同步
                     case "sdl2":
                         import sdl2
-                        from sdl2 import (SDL_Event, SDL_PollEvent,
-                                          SDL_WaitEvent)
+                        from sdl2 import SDL_Event, SDL_PollEvent, SDL_WaitEvent
 
                         event = SDL_Event()
                         while SDL_WaitEvent(event):
@@ -274,7 +276,7 @@ class SkAppBase(SkEventHanding, SkMisc):
     mainloop = run
 
     def destroy_window(self, window):
-        window.event_trigger("closed", SkEvent(event_type="closed", window=window))
+        window.trigger("closed", SkEvent(event_type="closed", window=window))
         self.windows.remove(window)
 
     def cleanup(self) -> None:

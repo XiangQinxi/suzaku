@@ -20,8 +20,6 @@ class SkListBox(SkCard):
     ):
         super().__init__(parent, style=style, **kwargs)
 
-        self.event_generate("changed")
-
         self.items: list[SkListItem] = []
         self.selected_item: SkListItem | None = None
 
@@ -63,11 +61,14 @@ class SkListBox(SkCard):
     ) -> int | typing.Self | None:
         if item:
             self.selected_item = item
-            self.event_trigger("changed", self.items.index(item))
+            self.trigger(
+                f"changed[{self.items.index(item)}]",
+                SkEvent(self, event_type="changed"),
+            )
             return self
         if index:
             self.selected_item = self.item(index)
-            self.event_trigger("changed", index)
+            self.trigger(f"changed[{index}]", SkEvent(self, event_type="changed"))
             return self
         return self.index(self.selected_item) if self.selected_item else None
 

@@ -49,12 +49,12 @@ class SkTitleBar(SkCard):
         self.command = SkWindowCommand(self)
         self.command.box(side="right", padx=3, pady=3)
 
-        self.bind("mouse_pressed", self._mouse_pressed)
+        self.bind("mouse_press", self._mouse_press)
         self.bind("double_click", self._double_click)
-        self.title.bind("mouse_pressed", self._mouse_pressed)
+        self.title.bind("mouse_press", self._mouse_press)
         self.title.bind("double_click", self._double_click)
         self.window.bind("mouse_motion", self._mouse_motion)
-        self.window.bind("mouse_released", self._mouse_released)
+        self.window.bind("mouse_release", self._mouse_release)
         self.window.bind("configure", self._window_configure)
 
         self._x1 = None
@@ -69,13 +69,13 @@ class SkTitleBar(SkCard):
         else:
             self.window.maximize()
 
-    def _mouse_pressed(self, event: SkEvent):
+    def _mouse_press(self, event: SkEvent):
         if (
-            not self.window.mouse_anchor(event.x, event.y)
+            not self.window.mouse_anchor(event["x"], event["y"])
             or not self.window.resizable()
         ):
-            self._x1 = event.x
-            self._y1 = event.y
+            self._x1 = event["x"]
+            self._y1 = event["y"]
 
     def _mouse_motion(self, event: SkEvent):
         if self._x1 and self._x1:
@@ -99,7 +99,7 @@ class SkTitleBar(SkCard):
                     0,
                 )"""
 
-    def _mouse_released(self, event: SkEvent):
+    def _mouse_release(self, event: SkEvent):
         self._x1 = None
         self._y1 = None
 

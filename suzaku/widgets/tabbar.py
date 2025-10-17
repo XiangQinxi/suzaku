@@ -1,3 +1,4 @@
+from ..event import SkEvent
 from .container import SkContainer
 from .frame import SkFrame
 from .tabbutton import SkTabButton
@@ -18,8 +19,6 @@ class SkTabBar(SkFrame):
 
         self.attributes["expand"]: bool = expand
 
-        self.event_generate("selected")
-
         self.items: list[SkTabButton] = []
         self.selected_item: SkWidget | None = None
 
@@ -30,7 +29,14 @@ class SkTabBar(SkFrame):
         :return: None
         """
         self.selected_item = self.items[index]
-        self.event_trigger("selected", index)
+        self.trigger(
+            "selected",
+            SkEvent(
+                widget=self,
+                event_type="selected",
+                index=index,
+            ),
+        )
 
     def update_order(self):
         """Update the order of the tab buttons

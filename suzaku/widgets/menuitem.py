@@ -22,4 +22,4 @@ class SkMenuItem(SkTextButton):
 
     def _on_click(self, event: SkEvent):
         if "hide" in self.parent.events:
-            self.parent.event_trigger("hide", SkEvent(event_type="hide"))
+            self.parent.trigger("hide", SkEvent(event_type="hide"))

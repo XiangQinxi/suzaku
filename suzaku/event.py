@@ -1,186 +1,368 @@
+from __future__ import annotations as _
+
 import threading
+import time
 import typing
 import warnings
 from dataclasses import dataclass
 
+# import re
 
-class SkEventHanding:
-    """SkEvent binding manager.【事件绑定管理器】"""
+if typing.TYPE_CHECKING:
+    from .widgets import SkWidget, SkWindow
 
-    _afters = {}
-    _after = 0
+
+class SkBindedTask:
+    """A class to represent binded task when a event is triggered."""
+
+    def __init__(
+        self,
+        id_: str,
+        target: typing.Callable,
+        multithread: bool = False,
+        _keep_at_clear: bool = False,
+    ):
+        """Each object is to represent a task binded to the event.
+
+        Example
+        -------
+        This is mostly for internal use of suzaku.
+        .. code-block:: python
+            class SkEventHandling():
+                def bind(self, ...):
+                    ...
+                    task = SkBindedTask(event_id, target, multithread, _keep_at_clear)
+                    ...
+        This shows where this class is used for storing task properties in most cases.
+
+        :param id_: The task id of this task
+        :param target: A callable thing, what to do when this task is executed
+        :param multithread: If this task should be executed in another thread (False by default)
+        :param _keep_at_clear: If the task should be kept when clearning the event's binding
+        """
+        self.id: str = id_
+        self.target: typing.Callable = target
+        self.multithread: bool = multithread
+        self.keep_at_clear: bool = _keep_at_clear
+
+
+class SkDelayTask(SkBindedTask):
+    """A class to represent delayed tasks"""
+
+    def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
+        """Inherited from SkBindedTask, used to store tasks binded to delay events.
+
+        :param delay: Time to delay, in seconds, indicating how log to wait before the task is
+                      executed.
+        """
+        SkBindedTask.__init__(
+            self, id_, target, *args, **kwargs
+        )  # For other things,same as SkBindedTask
+        self.target_time = (
+            float(time.time()) + delay_
+        )  # To store when to execute the task
+
+
+class SkEventHandling:
+    """A class containing event handling abilities.
+
+    This class should be inherited by other classes with such abilities.
+
+    Events should be represented in the form of `event_type` or `event_type[args]`. e.g. `delay` or
+    `delay[500]`
+    """
+
+    EVENT_TYPES: list[str] = [
+        "resize",
+        "move",
+        "configure",
+        "update",
+        "mouse_move",
+        "mouse_enter",
+        "mouse_leave",
+        "mouse_press",
+        "mouse_release",
+        "focus_gain",
+        "focus_loss",
+        "key_press",
+        "key_release",
+        "key_repeat",
+        "char",
+        "click",
+        "delay",  # This row shows special event type(s)
+    ]
+    multithread_tasks: list[tuple[SkBindedTask, SkEvent]] = []
+    WORKING_THREAD: threading.Thread
+    instance_count = 0
+
+    @classmethod
+    def _working_thread_loop(cls):
+        while True:
+            cls.multithread_tasks[0][0].target(cls.multithread_tasks[0][1])
+            cls.multithread_tasks.pop(0)
 
     def __init__(self):
-        # events = { event_name : { event_id : [event_func, whether_to_use_multithreading] } }
-        self.events: dict[
-            str, dict[str, list[typing.Callable | bool] | tuple[typing.Callable, bool]]
-        ] = dict()
+        """A class containing event handling abilities.
 
-    def event_generate(self, name: str) -> typing.Self:
-        """Create a new event type.【创建一个新的事件类型】
-
-        >>> self.event_generate("click")
-
-        :param str name: Event name.【事件名】
-        :return: self.
+        Example
+        -------
+        This is mostly for internal use of suzaku.
+        .. code-block:: python
+            class SkWidget(SkEventHandling, ...):
+                def __init__(self):
+                    super().__init__(self)
+            ...
+        This shows subclassing SkEventHandling to let SkWidget gain the ability of handling events.
         """
+        self.events: list = []
+        self.tasks: dict[str, list[SkBindedTask]] = {}
+        self.delay_tasks: list[SkDelayTask] = []
+        # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
+        self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
+        ## Initialize tasks list
+        for event_type in self.__class__.EVENT_TYPES:
+            self.tasks[event_type] = []
+        ## Accumulate instance count
+        self.__class__.instance_count += 1
+        # Event binds
+        self.bind(
+            "update", self._check_delay_events, _keep_at_clear=True
+        )  # Delay checking loop
 
-        if not name in self.events:  # Auto create widget`s event
-            self.events[name] = dict()  # Create widget`s event
-        else:
-            warnings.warn(f"Widget {self.id}, Event {name} already exists.")
+    def parse_event_type_str(self, event_type_str) -> dict:
+        """This function parses event type string.
 
-        return self
-
-    def event_trigger(self, name: str, *args, **kwargs) -> bool | typing.Any:
-        """Send the event signal of the corresponding event type
-        (trigger the corresponding event)
-
-        【发送对应事件类型的事件信号（触发对应事件）】
-
-        Generally, the event name is followed by "SkEvent" to pass data. Of course,
-        for custom events, parameters can also be passed directly.
-
-        【一般事件名后接SkEvent，用于传递数据。当然如果是自定义事件，也可以直接传递参数。】
-
-        >>> self.event_trigger("click", SkEvent(event_type="click"))
-        >>> self.event_trigger("custom_event", "custom_data")
-
-        :param name: Event name.【事件名】
-        :param args: Event arguments.【事件参数】
-        :param kwargs: Event keyword arguments.【事件关键字参数】
-        :return: self.
+        :param event_type_str: The event type string to be parsed
+        :returns: json, parsed event type
         """
-
-        if name in self.events:
-            for event in self.events[name].values():
-                if event[1] is True:
-                    threading.Thread(target=event[0], args=args, kwargs=kwargs).start()
-                else:
-                    event[0](*args, **kwargs)
+        event_type = event_type_str.split("[")[0]  # To be changed
+        if len(event_type_str.split("[")) > 1:
+            params = event_type_str.split("[")[1][0:-1].split(",")
         else:
-            raise ValueError(f"Widget {self.id}, Event {name} not found.")
+            params = []
+        NotImplemented  # The prvious lines are to be changed as they r soooo frickin' shitty
+        return {event_type: params}
 
-        return self
+    def execute_task(
+        self, task: SkBindedTask | SkDelayTask, event_obj: SkEvent | None = None
+    ):
+        """To execute a task
 
-    # 我也是服了，我不小心将allow_multi的默认值从False改为True，导致创建新窗口时老是报错，
+        Example
+        -------
+        .. code-block:: python
+            my_task = SkWidget.bind("delay[5]", lambda: print("Hello Suzaku"))
+            SkWidget.execute_task(my_task)
+        """
+        if event_obj == None:
+            event_obj = SkEvent()
+        assert event_obj is not None
+        if event_obj.widget == None:
+            event_obj.widget = self
+        if not task.multithread:
+            # If not multitask, execute directly
+            task.target(event_obj)
+        else:
+            # Otherwise add to multithread tasks list and let the working thread to deal with it
+            SkEventHandling.multithread_tasks.append((task, event_obj))
+
+    def trigger(self, event_type: str, event_obj: SkEvent | None = None) -> None:
+        """To trigger a type of event
+
+        Example
+        -------
+        .. code-block:: python
+            class SkWidget(SkEventHandling, ...):
+                ...
+
+            my_widget = SkWidget()
+            my_widget.trigger("mouse_press")
+        This shows triggering a `mouse_press` event in a `SkWidget`, which inherited `SkEventHandling` so has the
+        ability to handle events.
+
+        :param event_type: The type of event to trigger
+        """
+        # Parse event type string
+        parsed_event_type = self.parse_event_type_str(event_type)
+        # Create a default SkEvent object if not soecified
+        if event_obj == None:
+            event_obj = SkEvent(
+                widget=self, event_type=list(parsed_event_type.keys())[0]
+            )
+        # Add the event to event lists (the widget itself and the global list)
+        self.events.append(event_obj)
+        SkEvent.global_list.append(event_obj)
+        # Find targets
+        targets = []
+        targets.append(event_type)
+        if list(parsed_event_type.values())[0] in ["", "*"]:
+            # If match all
+            targets.append(list(parsed_event_type.keys())[0])
+            targets.append(list(parsed_event_type.keys())[0] + "[*]")
+        for target in targets:
+            if target in self.tasks:
+                for task in self.tasks[target]:
+                    # To execute all tasks binded under this event
+                    self.execute_task(task, event_obj)
+
     def bind(
         self,
-        name: str,
-        func: typing.Callable,
-        *,
-        add: bool = True,
-        allow_multi: bool = False,
-    ) -> str:
-        """Bind an event.【绑定事件】
+        event_type: str,
+        target: typing.Callable,
+        multithread: bool = False,
+        _keep_at_clear: bool = False,
+    ) -> SkBindedTask | bool:
+        """To bind a task to the object when a specific type of event is triggered.
 
-        resize,move,mouse_motion,mouse_enter,mouse_leave,mouse_pressed,mouse_released,click,double_click,focus_gain,focus_loss,key_pressed,key_released,key_repeated,char,configure,update,scroll,
-        button*_*
+        Example
+        -------
+        .. code-block
+            my_button = SkButton(...).pack()
+            press_down_event = my_button.bind("mouse_press", lambda _: print("Hello world!"))
+        This shows binding a hello world to the button when it's press.
 
-        :param name: Event name.【事件名】
-        :param func: Event function.【事件函数】
-        :param add: Whether to add after existed events, otherwise clean other and add itself.【是否在已存在事件后添加，否则清理其他事件并添加本身】
-        :param allow_multi: Whether to allow multiple threads to run the event function at the same time.【是否允许多个线程同时运行事件函数】
-        :return: Event ID.【事件ID】
+        :param event_type: The type of event to be binded to
+        :param target: A callable thing, what to do when this task is executed
+        :param multithread: If this task should be executed in another thread (False by default)
+        :param _keep_at_clear: If the task should be kept when clearning the event's binding
+        :return: SkBindedTask that is binded to the task if success, otherwise False
         """
-        if name not in self.events:
-            raise ValueError(f"Widget {self.id}, Event {name} not found.")
-        _id = name + "." + str(len(self.events[name]) + 1)  # Create event ID
+        parsed_event_type = self.parse_event_type_str(event_type)
+        if list(parsed_event_type.keys())[0] not in self.__class__.EVENT_TYPES:
+            # warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
+            #                "so the task cannot be binded as expected.")
+            # return False
+            self.EVENT_TYPES.append(event_type)
+        if event_type not in self.tasks:
+            self.tasks[event_type] = []
+        task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
+        # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
+        match list(parsed_event_type.keys())[0]:
+            case "delay":
+                task = SkDelayTask(
+                    task_id,
+                    target,
+                    float(parsed_event_type["delay"][0]),
+                    multithread,
+                    _keep_at_clear,
+                )
+                self.delay_tasks.append(task)
+            case _:
+                task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
+        self.tasks[event_type].append(task)
+        return task
 
-        if add:
-            self.events[name][_id] = (func, allow_multi)
+    def find_task(self, task_id: str) -> SkBindedTask | bool:
+        """To find a binded task using task ID.
+
+        Example
+        -------
+        .. code-block:: python
+            my_button = SkButton(...)
+            press_task = my_button.find_task("SkButton114.mouse_press.514")
+        This shows getting the `SkBindedTask` object of task with ID `SkButton114.mouse_press.514`
+        from binded tasks of `my_button`.
+
+        :return: The SkBindedTask object of the task, or False if not found
+        """
+        task_id_parsed = task_id.split(".")
+        for task in self.tasks[task_id_parsed[1]]:
+            if task.id == task_id:
+                return task
         else:
-            self.events[name] = {_id: (func, allow_multi)}
-        return _id
+            return False
 
-    event_bind = bind
+    def unbind(self, task_id: str) -> bool:
+        """To unbind the task with specified task ID.
 
-    def unbind(self, name: str, _id: str) -> None:
-        """Unbind an event with event ID.【解绑事件】
+        Example
+        -------
+        .. code-block:: python
+            my_button = SkButton(...)
+            my_button.unbind("SkButton114.mouse_press.514")
+        This show unbinding the task with ID `SkButton114.mouse_press.514` from `my_button`.
 
-        :param name: Event name.【事件名】
-        :param _id Event ID.【事件ID】
-        :return: None.【无返回值】
+        .. code-block:: python
+            my_button = SkButton(...)
+            my_button.unbind("SkButton114.mouse_press.*")
+        This show unbinding all tasks under `mouse_press` event from `my_button`.
+
+        :param task_id: The task ID to unbind.
+        :return: If success
         """
-        del self.events[name][_id]  # Delete event
+        task_id_parsed = task_id.split(".")
+        for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
+            if task.id == task_id:
+                self.tasks[task_id_parsed[1]].pop(task_index)
+                return True
+        else:
+            return False
 
-    event_unbind = unbind
+    def _check_delay_events(self, _=None) -> None:
+        """To check and execute delay events.
 
-    def after(
-        self,
-        s: int | float,
-        func: typing.Callable,
-        *,
-        allow_multi: bool = False,
-        post: bool = False,
-    ) -> str | threading.Timer:
-        """Execute a function after a delay (an ID will be provided in the future for unbinding).
-
-        :param s: Delay in seconds
-        :param func: Function to execute after delay
-        :param allow_multi: Whether to allow multiple threads to run the function at the same time.
-        :param post: Whether to execute the `post()` method after the method ends
-
-        :return: ID of the timer
+        Example
+        -------
+        Mostly used by SkWidget.update(), which is internal use
         """
-
-        if allow_multi:
-            timer = threading.Timer(s, func)
-            timer.start()
-            return timer
-
-        _id = "after." + str(self._after)
-
-        self._afters[_id] = [self.time() + s, func, post]
-        self._after += 1
-        return _id
-
-    def after_cancel(self, _id: str) -> typing.Self:
-        """Cancel a timer.
-
-        :param _id: ID of the timer
-        """
-        if _id in self._afters:
-            del self._afters[_id]
-
-        return self
+        # print("Checking delayed events...")
+        for task in self.delay_tasks:
+            if float(time.time()) >= task.target_time:
+                # print(f"Current time is later than target time of {task.id}, execute the task.")
+                self.execute_task(task)
 
 
-from typing import Any, List, Optional, Union
+# Initialize working thread
+SkEventHandling.WORKING_THREAD = threading.Thread(
+    target=SkEventHandling._working_thread_loop
+)
 
 
-@dataclass
+# @dataclass
 class SkEvent:
-    """
-    Used to pass event via arguments.
+    """Used to represent an event."""
 
-    【用于传递事件的参数。】
-    """
+    global_list: list[SkEvent] = []
 
-    event_type: str  # 【事件类型】
-    x: Optional[int] = None  # 【x轴坐标】
-    y: Optional[int] = None  # 【y轴坐标】
-    rootx: Optional[int] = None  # 【相对x轴坐标】
-    rooty: Optional[int] = None  # 【相对y轴坐标】
-    key: Union[int, str, None] = None  # 【键盘按键】
-    keyname: Optional[str] = None  # 【键盘按键名】
-    mods: Optional[str] = None  # 【修饰键名】
-    mods_key: Optional[int] = None  # 【修饰键值】
-    char: Optional[str] = None  # 【输入文本值】
-    width: Optional[int] = None  # 【宽度】
-    height: Optional[int] = None  # 【高度】
-    widget: Any = None  # 【事件组件】
-    maximized: Optional[bool] = None  # 【窗口是否最大化】
-    paths: Optional[List[str]] = None
-    #  The file path passed in when the window triggers the `drop` event
-    #  【窗口触发drop事件传入的文件路径】
-    iconified: Optional[bool] = None  # 【窗口是否最小化】
-    dpi_scale: Optional[float] = None  # 【DPI缩放】
-    glfw_window: Optional[typing.Any] = None  # 【glfw窗口】
-    window: Optional[typing.Any] = None  # 【SkWindow窗口】
-    button: typing.Literal[0, 1, 2] = None
-    # The provided values are: 0 for left button, 1 for right button, and 2 for middle button.
-    # 【给出的值0为左键，1为右键，2为中键】
-    x_offset: Optional[float] = None  # 【鼠标滚轮水平滚动偏移量】
-    y_offset: Optional[float] = None  # 【鼠标滚轮垂直滚动偏移量】
-    index: Optional[int] = None  # 【索引】
+    def __init__(
+        self,
+        widget: SkEventHandling | None = None,
+        event_type: str = "[Unspecified]",
+        **kwargs,
+    ):
+        """This class is used to represent events.
+
+        Some properties owned by all types of events are stored as attributes, such as widget and type.
+        Others are stored as items, which can be accessed or manipulated just like dict, e.g.
+        `SkEvent["x"]` for get and `SkEvent["y"] = 16` for set.
+
+        Example
+        -------
+        Included in descrepsion.
+
+        :param widget: The widget of the event, None by default
+        :param event_type: Type of the event, in string, `"[Unspecified]"` by default
+        :param **kwargs: Other properties of the event, will be added as items
+        """
+        self.event_type: str = event_type  # Type of event
+        self.widget: typing.Optional[typing.Any] = widget  # Relating widget
+        self.window_base: typing.Optional[typing.Any] = (
+            None  # WindowBase of the current window
+        )
+        self.window: typing.Optional[typing.Any] = None  # Current window
+        self.event_data: dict = {}
+        # Not all proprties above will be used
+        # Update stuff from args into attributes
+        for prop in kwargs.keys():
+            if prop not in ["widget", "event_type"]:
+                # self.__setattr__(prop, kwargs[prop])
+                self[prop] = kwargs[prop]
+
+    def __setitem__(self, key: str, value: typing.Any):
+        self.event_data[key] = value
+
+    def __getitem__(self, key: str) -> typing.Any:
+        if key in self.event_data:
+            return self.event_data[key]
+        else:
+            return None  # If no such item avail, returns None

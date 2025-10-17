@@ -39,8 +39,8 @@ class SkSwitchBox(SkCheckBox):
                 style_name = f"{self.style_name}:unchecked"
 
             if self.is_mouse_floating:
-                if self.is_mouse_pressed:
-                    style_name = style_name + "-pressed"
+                if self.is_mouse_press:
+                    style_name = style_name + "-press"
                 else:
                     style_name = style_name + "-hover"
             else:
@@ -87,18 +87,18 @@ class SkSwitchBox(SkCheckBox):
             bg=bg,
         )
 
-        pressed = self.is_mouse_floating and self.is_mouse_pressed
+        press = self.is_mouse_floating and self.is_mouse_press
 
         x = 0
         left = rect.x() + rect.height() / 2
         right = rect.x() + rect.width() - rect.height() / 2
         if self.checked:
-            if pressed:
+            if press:
                 x = max(min(self.mouse_x, right), left)
             else:
                 x = right
         else:
-            if pressed:
+            if press:
                 x = min(max(self.mouse_x, left), right)
             else:
                 x = left

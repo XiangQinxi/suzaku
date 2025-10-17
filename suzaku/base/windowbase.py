@@ -7,9 +7,9 @@ import typing
 import glfw
 import skia
 
-from ..event import SkEvent, SkEventHanding
+from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from .appbase import SkAppBase
+from . import SkAppBase
 
 
 class _GLFW_IMAGE:
@@ -26,7 +26,7 @@ class _GLFW_IMAGE:
         self.image.convert(colorType=skia.ColorType.kRGBA_8888_ColorType)
 
 
-class SkWindowBase(SkEventHanding, SkMisc):
+class SkWindowBase(SkEventHandling, SkMisc):
     """Base Window class
 
     Example:
@@ -62,7 +62,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.id = self.__class__.__name__ + str(self._instance_count + 1)
         self.children = []
 
-        SkEventHanding.__init__(self)
+        SkEventHandling.__init__(self)
         self.parent: SkAppBase | typing.Self | int = (
             parent if parent is not None else SkAppBase.get_instance()
         )
@@ -124,35 +124,18 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "minsize": minsize,
         }
 
-        self.events = {
-            # Mouse Events
-            "mouse_move": {},
-            "mouse_motion": {},
-            "mouse_pressed": {},
-            "mouse_released": {},
-            "mouse_enter": {},
-            "mouse_leave": {},
-            "scroll": {},
-            # Keyboard Events
-            "key_pressed": {},
-            "key_released": {},
-            "key_repeated": {},
-            "char": {},
-            # Window Events
-            "focus_gain": {},
-            "focus_loss": {},
-            "resize": {},
-            "drop": {},
-            "maximize": {},
-            "iconify": {},
-            "configure": {},
-            "dpi_change": {},  # 添加DPI变化事件
-            "delete_window": {},
-            # Unlike the `closed` event, `delete_window` is triggered when the window is not yet destroyed but the user attempts to close it.
-            "closed": {},
-            "move": {},
-            "update": {},
-        }
+        [
+            self.EVENT_TYPES.append(event_type)
+            for event_type in [
+                "drop",
+                "maximize",
+                "iconify",
+                "dpi_change",
+                "delete_window",
+                "closed",
+                "move",
+            ]
+        ]
 
         buttons = [
             "button1",
@@ -162,11 +145,11 @@ class SkWindowBase(SkEventHanding, SkMisc):
             "b2",
             "b3",
         ]  # Left Right Middle
-        button_states = ["pressed", "released", "motion", "move"]
+        button_states = ["press", "release", "motion", "move"]
 
         for button in buttons:
             for state in button_states:
-                self.event_generate(f"{button}_{state}")
+                self.trigger(f"button_{state}[{button}]")
 
         SkWindowBase._instance_count += 1
 
@@ -175,13 +158,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.surface = None
         self.attributes["fullscreen"] = fullscreen
         self.is_mouse_floating = False
+        self.is_mouse_press = False
 
         if self.width <= 0 or self.height <= 0:
             raise ValueError("The window size must be positive")
 
         ####################
-
-        self.is_mouse_pressed = False
 
         self.the_window = self.create()
 
@@ -440,13 +422,10 @@ class SkWindowBase(SkEventHanding, SkMisc):
         return self
 
     def update(self) -> None:
-        """Update window.
-
-        :return: None
-        """
+        """Update window."""
         if self.visible:
-            self.event_trigger("update", SkEvent(event_type="update"))
-            self.update_layout()
+            self.trigger("update", SkEvent(event_type="update"))
+            # self.update_layout: typing.Callable
             # self.post()
 
     # endregion
@@ -482,7 +461,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param char: Unicode character
         """
 
-        self.event_trigger(
+        self.trigger(
             "char", SkEvent(event_type="char", char=chr(char), glfw_window=window)
         )
 
@@ -507,15 +486,15 @@ class SkWindowBase(SkEventHanding, SkMisc):
         # 我真尼玛服了啊，改了半天，发现delete键获取不到键名，卡了我半天啊
 
         if action == PRESS:
-            name = "key_pressed"
+            name = "key_press"
         elif action == RELEASE:
-            name = "key_released"
+            name = "key_release"
         elif action == REPEAT:
-            name = "key_repeated"
+            name = "key_repeat"
         else:
             name = "key"
         self.ime(100, 1000)
-        self.event_trigger(
+        self.trigger(
             name,
             SkEvent(
                 event_type=name,
@@ -536,12 +515,12 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         if focused:
             self.configure(focus=True)
-            self.event_trigger(
+            self.trigger(
                 "focus_gain", SkEvent(event_type="focus_gain", glfw_window=window)
             )
         else:
             self.configure(focus=False)
-            self.event_trigger(
+            self.trigger(
                 "focus_loss", SkEvent(event_type="focus_loss", glfw_window=window)
             )
 
@@ -558,7 +537,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param y_offset: Y offset
         :return: None
         """
-        self.event_trigger(
+        self.trigger(
             "scroll",
             SkEvent(
                 event_type="scroll",
@@ -592,9 +571,9 @@ class SkWindowBase(SkEventHanding, SkMisc):
             event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
         )
 
-        self.event_trigger("resize", event)
+        self.trigger("resize", event)
         for child in self.children:
-            child.event_trigger("resize", event)
+            child.trigger("resize", event)
         # cls.update()
 
     def _on_window_pos(self, window: typing.Any, x: int, y: int) -> None:
@@ -607,9 +586,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         """
         self.root_x = x
         self.root_y = y
-        self.event_trigger(
-            "move", SkEvent(event_type="move", x=x, y=y, glfw_window=window)
-        )
+        self.trigger("move", SkEvent(event_type="move", x=x, y=y, glfw_window=window))
 
     def _on_closed(self, window: typing.Any) -> None:
         """Trigger closed event (triggered when the window is closed).
@@ -617,20 +594,20 @@ class SkWindowBase(SkEventHanding, SkMisc):
         :param window: GLFW Window
         :return: None
         """
-        # self.event_trigger("closed", SkEvent(event_type="closed", the_window=window))
+        # self.trigger("closed", SkEvent(event_type="closed", the_window=window))
 
     def _on_mouse_button(
         self,
         window: typing.Any,
         button: typing.Literal[0, 1, 2],
-        is_pressed: bool,
+        is_press: bool,
         mods: int,
     ) -> None:
-        """Trigger mouse button event (triggered when the mouse button is pressed or released).
+        """Trigger mouse button event (triggered when the mouse button is press or release).
 
         :param window: GLFW Window
         :param int button: Button
-        :param is_pressed: Whether pressed
+        :param is_press: Whether press
         :param mods: Modifiers
         :return: None
         """
@@ -639,17 +616,24 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.mouse_x, self.mouse_y = self.mouse_pos()
         self.mouse_rootx, self.mouse_rooty = self.mouse_root_pos()
 
-        if is_pressed:
-            state = "pressed"
+        if is_press:
+            self.is_mouse_press = True
+            state = "press"
         else:
-            state = "released"
+            self.is_mouse_press = False
+            state = "release"
+            self.button = -1
 
-        names = [f"mouse_{state}", f"button{button+1}_{state}", f"b{button+1}_{state}"]
+        names = [
+            f"mouse_{state}",
+            f"mouse_{state}[button{button+1}]",
+            f"mouse_{state}[b{button+1}]",
+        ]
 
         self.button = button
 
         for name in names:
-            self.event_trigger(
+            self.trigger(
                 name,
                 SkEvent(
                     event_type=name,
@@ -661,8 +645,6 @@ class SkWindowBase(SkEventHanding, SkMisc):
                     mods=self.mods_name(mods),
                 ),
             )
-        if not is_pressed:
-            self.button = -1
 
     def _on_cursor_enter(self, window: typing.Any, is_enter: bool) -> None:
         """Trigger mouse enter event (triggered when the mouse enters the window) or mouse leave event (triggered when the mouse leaves the window).
@@ -676,7 +658,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         if is_enter:
             self.is_mouse_floating = True
-            self.event_trigger(
+            self.trigger(
                 "mouse_enter",
                 SkEvent(
                     event_type="mouse_enter",
@@ -688,7 +670,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             )
         else:
             self.is_mouse_floating = False
-            self.event_trigger(
+            self.trigger(
                 "mouse_leave",
                 SkEvent(
                     event_type="mouse_leave",
@@ -716,10 +698,14 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
         button = self.button
         if button >= 0:
-            names = ["mouse_motion", f"button{button+1}_motion", f"b{button+1}_motion"]
+            names = [
+                "mouse_motion",
+                f"mouse_motion[button{button+1}]",
+                f"mouse_motion[b{button+1}]",
+            ]
 
             for name in names:
-                self.event_trigger(
+                self.trigger(
                     name,
                     SkEvent(
                         event_type=name,
@@ -730,7 +716,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                         glfw_window=window,
                     ),
                 )
-        self.event_trigger(
+        self.trigger(
             "mouse_move",
             SkEvent(
                 event_type="mouse_move",
@@ -743,18 +729,18 @@ class SkWindowBase(SkEventHanding, SkMisc):
         )
 
     def _on_maximize(self, window, maximized: bool):
-        self.event_trigger(
+        self.trigger(
             "maximize",
             SkEvent(event_type="maximize", maximized=maximized, glfw_window=window),
         )
 
     def _on_drop(self, window: typing.Any, paths):
-        self.event_trigger(
+        self.trigger(
             "drop", SkEvent(event_type="drop", paths=paths, glfw_window=window)
         )
 
     def _on_iconify(self, window: typing.Any, iconified: bool):
-        self.event_trigger(
+        self.trigger(
             "iconify",
             SkEvent(event_type="iconify", iconified=iconified, glfw_window=window),
         )
@@ -889,7 +875,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
 
     ask_notice = ask_focus = hongwen = wm_ask_notice
 
-    def wm_iconpath(self, path: str | str = None) -> str | None:
+    def wm_iconpath(self, path: str | None = None) -> str | None:
         if path:
             try:
                 import PIL
@@ -1211,9 +1197,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         from glfw import set_window_size
 
         set_window_size(self.the_window, round(width), round(height))
-        self.event_trigger(
-            "resize", SkEvent(event_type="resize", width=width, height=height)
-        )
+        self.trigger("resize", SkEvent(event_type="resize", width=width, height=height))
 
         return self
 
@@ -1237,7 +1221,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         from glfw import set_window_pos
 
         set_window_pos(self.the_window, round(x), round(y))
-        self.event_trigger("move", SkEvent(event_type="move", rootx=x, rooty=y))
+        self.trigger("move", SkEvent(event_type="move", rootx=x, rooty=y))
 
         return self
 
@@ -1291,7 +1275,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
                 print(f"[ERROR] Failed to set opacity: {e}")
 
         self.attributes.update(kwargs)
-        self.event_trigger("configure", SkEvent(event_type="configure", widget=self))
+        self.trigger("configure", SkEvent(event_type="configure", widget=self))
         return self
 
     config = configure = set_attribute
@@ -1348,7 +1332,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
             self.dpi_scale = 1.0
 
         # 触发DPI变化事件
-        self.event_trigger(
+        self.trigger(
             "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale)
         )
 
@@ -1363,7 +1347,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.dpi_scale = (xscale + yscale) / 2.0
 
         # 触发DPI变化事件
-        self.event_trigger(
+        self.trigger(
             "dpi_change",
             SkEvent(
                 event_type="dpi_change", dpi_scale=self.dpi_scale, glfw_window=window
@@ -1403,9 +1387,7 @@ class SkWindowBase(SkEventHanding, SkMisc):
         self.physical_height = int(self.height * scale)
 
         # 触发DPI变化事件
-        self.event_trigger(
-            "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale)
-        )
+        self.trigger("dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale))
 
         return self
 

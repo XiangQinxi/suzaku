@@ -1,3 +1,5 @@
+from __future__ import annotations as _
+
 import array
 import typing
 
@@ -5,6 +7,11 @@ import skia
 
 from ..const import Orient
 from ..event import SkEvent
+from ..misc import SkMisc
+
+if typing.TYPE_CHECKING:
+    from .. import SkEventHandling
+    from . import SkWidget
 
 
 class SkLayoutError(TypeError):
@@ -60,14 +67,14 @@ class SkContainer:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._handle_layout()
         # 触发更新事件
-        self.event_trigger("update", SkEvent(event_type="update"))
+        if isinstance(self, SkEventHandling):
+            self.trigger("update", SkEvent(widget=self, event_type="update"))
+            self.update()
 
     def __init__(self, allowed_out_of_bounds: bool = False):
 
         # self.parent = None
-        self.children = []  # Children
-
-        from .widget import SkWidget
+        self.children: list[SkWidget] = []  # Children
 
         self.draw_list: list[list[SkWidget]] = [
             [],  # Layout layer [SkWidget1, SkWidget2, ...]
@@ -98,6 +105,7 @@ class SkContainer:
 
     # endregion
 
+    # region Scroll
     def bind_scroll_event(self):
         # 【容器绑定滚动事件，鼠标滚轮滚动可以滚动容器】
         self.allowed_scrolled = True
@@ -106,8 +114,9 @@ class SkContainer:
     def scroll_event(self, event: SkEvent) -> None:
         """【处理滚动事件】"""
         if self.allowed_scrolled:
+            typing.cast("SkWidget", self)
             if self.is_mouse_floating:
-                self.scroll(event.x_offset * 18, event.y_offset * 18)
+                self.scroll(event["x_offset"] * 18, event["y_offset"] * 18)
                 return
 
             for child in self.children:
@@ -116,7 +125,7 @@ class SkContainer:
                     and child.help_parent_scroll
                     and child.parent == self
                 ):
-                    self.scroll(event.x_offset * 18, event.y_offset * 18)
+                    self.scroll(event["x_offset"] * 18, event["y_offset"] * 18)
                     return
 
     def update_scroll(self) -> None:
@@ -148,7 +157,10 @@ class SkContainer:
         # 防止容器超出上边界
         self.y_offset = min(self.y_offset + y_offset, 0)
 
+    # endregion
+
     # region add_child 添加子元素
+
     def add_child(self, child):
         """Add child widget to window.
 
@@ -172,7 +184,6 @@ class SkContainer:
 
     def grid_map(self):
         # Grid Map
-        from .widget import SkWidget
 
         grid_map: list[list[SkWidget | None]] = []
         children: list[SkWidget] = self.draw_list[0]
@@ -257,11 +268,10 @@ class SkContainer:
         :param canvas: The canvas to draw on
         :return: None
         """
-        from ..widgets.widget import SkWidget
-        from .window import SkWindow
 
-        if not isinstance(self, SkWindow):
-            if isinstance(self, SkWidget):
+        if "SkWindow" not in SkMisc.sk_get_type(self):
+            if "SkWidget" not in SkMisc.sk_get_type(self):
+                typing.cast("SkWidget", self)
                 x = self.canvas_x
                 y = self.canvas_y
             else:
@@ -297,7 +307,7 @@ class SkContainer:
         self.update_scroll()
         self._handle_layout()
         for widget in self.children:
-            widget.event_trigger("resize", SkEvent(event_type="resize"))
+            widget.trigger("resize", SkEvent(widget=self, event_type="resize"))
 
     def record_content_size(self, child, padx=0, pady=0):
         self.content_width = max(child.x + child.dwidth + padx, self.content_width)
@@ -339,7 +349,6 @@ class SkContainer:
         pass
 
     def _handle_grid(self):
-        from .widget import SkWidget
 
         # Grid
         col_heights: list[int | float] = []
@@ -387,8 +396,6 @@ class SkContainer:
         """
 
         # TODO 做好ipadx、ipady的处理
-
-        from .widget import SkWidget
 
         width = self.width  # container width
         height = self.height  # container height
@@ -595,5 +602,10 @@ class SkContainer:
     def y_offset(self, value: int | float):
         self._y_offset = value
         self.update_layout(None)
+
+    def update(self):
+        self.update_layout()
+        for child in self.children:
+            child.update()
 
     # endregion

@@ -76,9 +76,9 @@ class SkLineInput(SkWidget):
         self.bind("double_click", self._double_click)
         self.bind("focus_gain", self._focus_gain)
         self.bind("char", self._char)
-        self.bind("key_pressed", self._key)
+        self.bind("key_press", self._key)
         self.bind("key_repeated", self._key)
-        self.bind("mouse_pressed", self._pressed)
+        self.bind("mouse_press[b1]", self._press)
         self.window.bind("mouse_motion", self._motion)
         self.bind("mouse_motion", self._motion)
         self.bind("scroll", self._scroll)
@@ -108,9 +108,9 @@ class SkLineInput(SkWidget):
         :return: None
         """
         return
-        if event.y_offset > 0 or event.x_offset > 0:
+        if event["y_offset"] > 0 or event["x_offset"] > 0:
             self.cursor_right()
-        elif event.y_offset < 0 or event.x_offset < 0:
+        elif event["y_offset"] < 0 or event["x_offset"] < 0:
             self.cursor_left()
         self.cursor_visible = True
 
@@ -123,23 +123,22 @@ class SkLineInput(SkWidget):
         self.cursor_visible = True
 
     def _motion(self, event: SkEvent) -> None:
-        """Record the `end_index` when the text is pressed and moved.
+        """Record the `end_index` when the text is press and moved.
         【当文本被按住并移动时，记录end_index】
         :param event: SkEvent
         """
         # 【只有在左键按下时，才记录end_index】
         if self.button == 0:
-            if self.is_mouse_pressed:
-                self.end_index = self.index(event.x)
+            if self.is_mouse_press:
+                self.end_index = self.index(event["x"])
 
-    def _pressed(self, event: SkEvent) -> None:
-        """Record the `start_index` and `end_index` when the text is pressed.
+    def _press(self, event: SkEvent) -> None:
+        """Record the `start_index` and `end_index` when the text is press.
         【当文本被按住时，记录`start_index`与`end_index`。】
         """
         # 【只有在左键按下时，才记录start_index】
-        if event.button == 0:
-            self.cursor_visible = True
-            self.start_index = self.end_index = self.index(event.x)
+        self.cursor_visible = True
+        self.start_index = self.end_index = self.index(event["x"])
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered.
@@ -155,14 +154,14 @@ class SkLineInput(SkWidget):
 
         # 当文本未被选中时，正常在文本后添加文本，并更新光标索引
         if not self.is_selected():
-            self.set(text[:cursor_index] + event.char + text[cursor_index:])
+            self.set(text[:cursor_index] + event["char"] + text[cursor_index:])
             self.cursor_right()
         # 当文本被选中时，将选中文本替代为输入的文本
         else:
             start, end = self.sort_select()
-            self.set(text[:start] + event.char + text[end:])
+            self.set(text[:start] + event["char"] + text[end:])
             self.start_index = self.end_index = self._cursor_index = len(
-                text[:start] + event.char
+                text[:start] + event["char"]
             )
 
     def _key(self, event: SkEvent):
@@ -173,7 +172,7 @@ class SkLineInput(SkWidget):
         """
 
         # 快捷键
-        match event.key:
+        match event["key"]:
             # Backspace 删除光标前面文本
             case glfw.KEY_BACKSPACE:
                 """Delete the text before the cursor"""
@@ -570,7 +569,8 @@ class SkLineInput(SkWidget):
         # 【仅当输入框获得焦点时光标闪烁】
         # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
         if self.is_focus:
-            self.after(self.cget("blink_interval"), self.blink)
+            blink_interval = self.cget("blink_interval")
+            # self.bind(f"delay[{blink_interval}]", self.blink)
 
     def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Draw the text input

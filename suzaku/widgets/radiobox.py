@@ -48,8 +48,8 @@ class SkRadioBox(SkWidget):
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """if self.is_mouse_floating:
-            if self.is_mouse_pressed:
-                style_selector = "SkCheckBox:pressed"
+            if self.is_mouse_press:
+                style_selector = "SkCheckBox:press"
             else:
                 style_selector = "SkCheckBox:hover"
         else:
