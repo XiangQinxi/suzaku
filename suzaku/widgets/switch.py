@@ -47,7 +47,7 @@ class SkSwitch(SkFrame):
 
     @property
     def dwidth(self):
-        return self.label.dwidth + self.switchbox.dwidth + 10
+        return self.label.dwidth + self.switchbox.dwidth
 
     def set_attribute(self, **kwargs):
         if "cursor" in kwargs:

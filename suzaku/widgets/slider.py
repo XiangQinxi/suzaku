@@ -1,5 +1,6 @@
 import skia
 
+from ..event import SkEvent
 from .widget import SkWidget
 
 
