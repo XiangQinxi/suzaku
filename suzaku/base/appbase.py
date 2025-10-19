@@ -161,9 +161,10 @@ class SkAppBase(SkEventHandling, SkMisc):
 
         :param bool redraw: Whether to redraw the window.
         """
-        from glfw import wait_events
+        from glfw import wait_events, poll_events
 
-        wait_events()
+        # wait_events()
+        poll_events()
 
         for window in self.windows:
             if window.visible and window.alive:

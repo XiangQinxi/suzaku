@@ -129,6 +129,11 @@ if __name__ == "__main__":
                 text="Screenshot (wait 3s)",
                 command=lambda: window.bind("delay[3]", lambda _: window.save()),
             ).box(padx=10, pady=(10, 0))
+            SkTextButton(
+                tab_settings,
+                text="Check",
+                command=lambda: print(window.tasks["delay[3]"]),
+            ).box(padx=10, pady=(10, 0))
 
             def anti_alias():
                 window.anti_alias = switch.checked
