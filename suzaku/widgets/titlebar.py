@@ -75,7 +75,7 @@ class SkTitleBar(SkCard):
         """When the mouse is pressed, record the initial position."""
         if (
             not self.window.mouse_anchor(event["x"], event["y"])
-            or self.window.window_attr("maximized")
+            # or self.window.window_attr("maximized")
         ) or not self.window.resizable():
             self._x1 = event["x"]
             self._y1 = event["y"]
