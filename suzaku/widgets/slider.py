@@ -22,7 +22,7 @@ class SkSlider(SkWidget):
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         if not self.cget("disabled"):
             if self.is_mouse_floating:
-                if self.is_mouse_pressed:
+                if self.is_mouse_press:
                     state = "pressed"
                 else:
                     state = "hover"

@@ -125,9 +125,10 @@ if __name__ == "__main__":
             listbox.box(padx=10, pady=(10, 0))
 
             SkTextButton(
-                tab_settings, text="Screenshot (wait 3s)", command=lambda: window.save()
+                tab_settings,
+                text="Screenshot (wait 3s)",
+                command=lambda: window.bind("delay[3]", lambda _: window.save()),
             ).box(padx=10, pady=(10, 0))
-            window.bind("delay[3]", lambda _: window.save())
 
             def anti_alias():
                 window.anti_alias = switch.checked
@@ -149,8 +150,9 @@ if __name__ == "__main__":
         sizegrip.box(side="right", padx=5, pady=5)
         statusbar.box(side="bottom", padx=0, pady=0)
 
-        window.bind("delay[5]", lambda _: print("Delay 5"))
+        # window.bind("delay[5]", lambda _: print("Delay 5"))
 
     create1window()
 
     app.run()
+    print(124314)

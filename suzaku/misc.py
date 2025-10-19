@@ -98,6 +98,7 @@ class SkMisc:
     @staticmethod
     def post():
         """Post an empty event to the event queue."""
+        return
         glfw.post_empty_event()
 
     @staticmethod

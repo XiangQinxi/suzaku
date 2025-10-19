@@ -154,6 +154,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.gradient = SkGradient()
         self.button: typing.Literal[0, 1, 2] = 0
         self.click_time: float | int = 0
+        self.need_redraw: bool = False
 
         def _on_mouse(event: SkEvent):
             self.mouse_x = event["x"]
@@ -720,14 +721,16 @@ class SkWidget(SkEventHandling, SkMisc):
         font: skia.Font = self.cget("font")
         return font.measureText(text, *args)
 
-    def update(self):
+    def update(self, redraw: bool = False) -> None:
         self.trigger("update", SkEvent(widget=self, event_type="update"))
+        self.need_redraw = redraw
+
         if "SkContainer" in SkMisc.sk_get_type(self):
             from .container import SkContainer
 
             SkContainer.update(self)
+
         self._pos_update()
-        self.post()
 
     @property
     def x(self):

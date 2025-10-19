@@ -86,11 +86,15 @@ class SkWindow(SkWindowBase, SkContainer):
 
         self.bind("scroll", self._scroll)
 
-        self.bind("update", self.update)
+        self.bind("resize", self._resize)
 
     # endregion
 
     # region Theme related 主题相关
+
+    def _resize(self, event: SkEvent = None) -> None:
+        if hasattr(self, "update_layout"):
+            self.update_layout()
 
     @property
     def anti_alias(self) -> bool:
@@ -116,9 +120,6 @@ class SkWindow(SkWindowBase, SkContainer):
     # endregion
 
     # region Event handlers 事件处理
-
-    def update(self):
-        SkContainer.update(self)
 
     def destroy(self) -> None:
         super().destroy()

@@ -166,6 +166,8 @@ class SkWindowBase(SkEventHandling, SkMisc):
         ####################
 
         self.the_window = self.create()
+        self.alive = True
+        self.create_bind()
 
         # self.cursor(self.default_cursor())
 
@@ -372,7 +374,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
                 yield surface  # ⚠️ 必须用 yield，不要 return
 
-    def draw(self):
+    def draw(self, event: SkEvent = None) -> None:
         if self.visible:
             # Set the current context for each arg
             # 【为该窗口设置当前上下文】
@@ -421,10 +423,20 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.draw_func = func
         return self
 
-    def update(self) -> None:
-        """Update window."""
+    def update(self, redraw: bool = True) -> None:
+        """Update window.
+
+        :param bool redraw: Whether to redraw the window.
+        """
         if self.visible:
             self.trigger("update", SkEvent(event_type="update"))
+
+            if redraw:
+                self.draw()
+            else:
+                if all([not child.need_redraw for child in self.children]):
+                    return
+                self.draw()
             # self.update_layout: typing.Callable
             # self.post()
 
@@ -525,9 +537,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
-        self.draw()
-        if hasattr(self, "update_layout"):
-            self.update_layout()
+        self.update(redraw=True)
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
@@ -548,7 +558,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         )
 
     def _on_framebuffer_size(self, window: typing.Any, width: int, height: int) -> None:
-        pass
+        self.update(redraw=False)
 
     def _on_resizing(self, window, width: int, height: int) -> None:
         """Trigger resize event (triggered when the window size changes).
@@ -570,10 +580,10 @@ class SkWindowBase(SkEventHandling, SkMisc):
         event = SkEvent(
             event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
         )
-
         self.trigger("resize", event)
         for child in self.children:
             child.trigger("resize", event)
+        self.update(redraw=True)
         # cls.update()
 
     def _on_window_pos(self, window: typing.Any, x: int, y: int) -> None:
@@ -1146,14 +1156,24 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     restore = wm_restore
 
-    def destroy(self) -> None:
+    def wm_destroy(self) -> None:
         """Destroy the window.
 
         :return: None
         """
         # self._event_init = False
         # print(self.id)
-        self.can_be_close(True)
+        self.application.destroy_window(self)
+        glfw.destroy_window(self.the_window)
+
+        self.alive = False
+        self.draw_func = None
+        self.the_window = None  # Clear the reference
+
+        for child in self.children:
+            child.destroy()
+
+    destroy = wm_destroy
 
     def wm_title(self, text: str | None = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.
