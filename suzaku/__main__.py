@@ -160,4 +160,4 @@ if __name__ == "__main__":
     create1window()
 
     app.run()
-    print(124314)
+    print("Closed")

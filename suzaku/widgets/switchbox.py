@@ -109,8 +109,6 @@ class SkSwitchBox(SkCheckBox):
         left = rect.x() + rect.height() / 2
         right = rect.x() + rect.width() - rect.height() / 2
 
-        print(self._pressing)
-
         if self.checked:
             if self._pressing:
                 x = max(min(self._x1, right), left)
