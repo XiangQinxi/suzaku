@@ -17,9 +17,7 @@ class SkComboBox(SkButton):
         editable: bool = True,
         **kwargs,
     ):
-        super().__init__(
-            parent, style=style, command=lambda _=None: self._on_click(_), **kwargs
-        )
+        super().__init__(parent, style=style, **kwargs)
 
         self.attributes["editable"]: bool = editable
 
@@ -29,6 +27,7 @@ class SkComboBox(SkButton):
         self.text = SkText(
             self,
         )
+        self.bind("click", self._on_click)
 
         self.help_parent_scroll = True
 
@@ -59,6 +58,7 @@ class SkComboBox(SkButton):
             self.input.layout_forget()
 
     def _on_click(self, event: SkEvent):
+        print(1243)
         if self.popupmenu and not self.cget("disabled"):
             if self.popupmenu.is_popup:
                 self.popupmenu.hide()

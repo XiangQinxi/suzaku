@@ -198,6 +198,7 @@ class SkWindow(SkWindowBase, SkContainer):
         else:
             self._anchor = None
         if self._anchor:
+            # print(event["x"])
             self._x1 = event["x"]
             self._y1 = event["y"]
             self._rootx1 = self.root_x
@@ -319,7 +320,15 @@ class SkWindow(SkWindowBase, SkContainer):
     def _mouse_motion(self, event: SkEvent) -> None:
         if not self.window_attr("border"):
             self._anchor: str
-            if self._anchor and not self.window_attr("maximized"):
+            if all(
+                [
+                    self._anchor,
+                    not self.window_attr("maximized"),
+                    self.window.resizable(),
+                    self._x1,
+                    self._y1,
+                ]
+            ):
                 x, y = None, None
                 width, height = None, None
                 minwidth, minheight = self.wm_minsize()

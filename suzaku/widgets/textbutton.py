@@ -46,9 +46,10 @@ class SkTextButton(SkButton, SkText):
 
         :return: None
         """
+        print(self.button)
         if self.button != 1:
             if self.is_mouse_floating:
-
+                print(1243)
                 self.trigger("click", event)
                 time = self.time()
 
