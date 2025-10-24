@@ -5,8 +5,7 @@ import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -157,12 +156,17 @@ class SkWidget(SkEventHandling, SkMisc):
         self.click_time: float | int = 0
         self.need_redraw: bool = False
 
-        def _on_mouse(event: SkEvent):
+        def _on_motion(event: SkEvent):
             self.mouse_x = event["x"]
             self.mouse_y = event["y"]
 
-        self.bind("mouse_enter", _on_mouse)
-        self.bind("mouse_motion", _on_mouse)
+        def _draw(event: SkEvent):
+            self.need_redraw = True
+
+        self.bind("mouse_enter", _draw)
+        self.bind("mouse_leave", _draw)
+        self.bind("mouse_press", _draw)
+        self.bind("mouse_motion", _on_motion)
 
         self.bind("mouse_release", self._on_mouse_release)
 
@@ -198,6 +202,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
     def _on_mouse_release(self, event) -> None:
         if self.is_mouse_floating:
+            self.need_redraw = True
             self.trigger("click", event)
             time = self.time()
 
@@ -243,6 +248,8 @@ class SkWidget(SkEventHandling, SkMisc):
         if hasattr(self, "draw_children"):
             self.update_layout(None)
             self.draw_children(canvas)
+
+        self.trigger("redraw", SkEvent(self, "redraw"))
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Execute the widget rendering

@@ -284,6 +284,7 @@
     "SkCard": {
       "rest": {
         "size": [0, 0],
+        "radius": 8,
         "bg": {"color_palette": "second_bg"},
         "fg": {"color_palette": "bd"},
         "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]],

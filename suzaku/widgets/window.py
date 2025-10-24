@@ -81,7 +81,7 @@ class SkWindow(SkWindowBase, SkContainer):
         self.bind("char", self._char)
 
         self.bind("key_press", self._key_press)
-        self.bind("key_repeated", self._key_repected)
+        self.bind("key_repeat", self._key_repeat)
         self.bind("key_release", self._key_release)
 
         self.bind("scroll", self._scroll)
@@ -124,6 +124,10 @@ class SkWindow(SkWindowBase, SkContainer):
     def destroy(self) -> None:
         super().destroy()
 
+    def _scroll(self, event: SkEvent) -> None:
+        if self.focus_get() is not self:
+            self.focus_get().trigger("scroll", event)
+
     def _key_press(self, event: SkEvent):
         """Key press event for SkWindow.
 
@@ -141,13 +145,9 @@ class SkWindow(SkWindowBase, SkContainer):
         if self.focus_get() is not self:
             self.focus_get().trigger("key_press", event)
 
-    def _scroll(self, event: SkEvent) -> None:
+    def _key_repeat(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
-            self.focus_get().trigger("scroll", event)
-
-    def _key_repected(self, event: SkEvent) -> None:
-        if self.focus_get() is not self:
-            self.focus_get().trigger("key_repeated", event)
+            self.focus_get().trigger("key_repeat", event)
 
     def _key_release(self, event: SkEvent) -> None:
         if self.focus_get() is not self:

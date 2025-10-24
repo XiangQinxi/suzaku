@@ -381,9 +381,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             match self.framework:
                 case "glfw":
                     glfw.make_context_current(self.the_window)
-                    if self.context:
-                        self.context.freeGpuResources()
-                        self.context.releaseResourcesAndAbandonContext()
+
                     # Create a Surface and hand it over to this arg.
                     # 【创建Surface，交给该窗口】
                     with self.skia_surface(self.the_window) as self.surface:
@@ -409,6 +407,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
                                     self.draw_func(canvas)
 
                     sdl2.SDL_UpdateWindowSurface(self.the_window)
+        if self.context:
+            self.context.freeGpuResources()
+            self.context.releaseResourcesAndAbandonContext()
+        for child in self.children:
+            child.need_redraw = False
+        self.trigger("redraw", SkEvent(self, "redraw"))
 
     def save(self, path: str = "skwindowbase.png", format: str = "png"):
         if self.surface:
@@ -423,7 +427,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.draw_func = func
         return self
 
-    def update(self, redraw: bool = True) -> None:
+    def update(self, redraw: bool = False) -> None:
         """Update window.
 
         :param bool redraw: Whether to redraw the window.
@@ -476,6 +480,8 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.trigger(
             "char", SkEvent(event_type="char", char=chr(char), glfw_window=window)
         )
+        self.update()
+        # self.update(redraw=True)
 
     def _on_key(
         self, window: typing.Any, key: str, scancode: str, action: str, mods: int
@@ -517,6 +523,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                 glfw_window=window,
             ),
         )
+        self.update()
 
     def _on_focus(self, window, focused) -> None:
         """Triggers the focus event (triggered when the window gains or loses focus).
@@ -530,6 +537,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             self.trigger(
                 "focus_gain", SkEvent(event_type="focus_gain", glfw_window=window)
             )
+            self.update(redraw=True)
         else:
             self.configure(focus=False)
             self.trigger(
@@ -537,7 +545,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
-        self.update(redraw=True)
+        self.update(True)
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
@@ -558,7 +566,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         )
 
     def _on_framebuffer_size(self, window: typing.Any, width: int, height: int) -> None:
-        self.update(redraw=False)
+        self.update()
 
     def _on_resizing(self, window, width: int, height: int) -> None:
         """Trigger resize event (triggered when the window size changes).
@@ -583,7 +591,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.trigger("resize", event)
         for child in self.children:
             child.trigger("resize", event)
-        self.update(redraw=True)
+        self.update(True)
         # cls.update()
 
     def _on_window_pos(self, window: typing.Any, x: int, y: int) -> None:
@@ -1102,7 +1110,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         if hasattr(self, "update_layout"):
             self.update_layout()  # 添加初始布局更新
         glfw.show_window(self.the_window)
-        self.update()  # 添加初始绘制触发
+        self.update(True)  # 添加初始绘制触发
         return self
 
     show = wm_show
@@ -1391,9 +1399,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     # 添加设置DPI缩放因子的方法
     def set_dpi_scale(self, scale: float) -> "SkWindowBase":
-
-        self.update()
-
         """Set DPI scale factor
 
         :param scale: DPI scale factor
@@ -1409,6 +1414,4 @@ class SkWindowBase(SkEventHandling, SkMisc):
         # 触发DPI变化事件
         self.trigger("dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale))
 
-        return self
-
-    # endregion
+        self.update(True)

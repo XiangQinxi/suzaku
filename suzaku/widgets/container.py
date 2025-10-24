@@ -156,6 +156,8 @@ class SkContainer:
         self.x_offset = min(self.x_offset + x_offset, 0)
         # 防止容器超出上边界
         self.y_offset = min(self.y_offset + y_offset, 0)
+        self.update()
+        self.need_redraw = True
 
     # endregion
 

@@ -77,7 +77,7 @@ class SkLineInput(SkWidget):
         self.bind("focus_gain", self._focus_gain)
         self.bind("char", self._char)
         self.bind("key_press", self._key)
-        self.bind("key_repeated", self._key)
+        self.bind("key_repeat", self._key)
         self.bind("mouse_press[b1]", self._press)
         self.window.bind("mouse_motion", self._motion)
         self.bind("mouse_motion", self._motion)
@@ -172,6 +172,7 @@ class SkLineInput(SkWidget):
         """
 
         # 快捷键
+        mods = event["mods"]
         match event["key"]:
             # Backspace 删除光标前面文本
             case glfw.KEY_BACKSPACE:
@@ -184,21 +185,21 @@ class SkLineInput(SkWidget):
             # Ctrl + V 粘贴
             case glfw.KEY_V:
                 """Paste Text"""
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_paste()
             # Ctrl + C 复制
             case glfw.KEY_C:
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_copy()
             # Ctrl + A 全选
             case glfw.KEY_A:
                 """Select All"""
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_select_all()
             # Ctrl + X 剪切
             case glfw.KEY_X:
                 """Cut Text"""
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_cut()
             # Home ↑ 光标移至最左
             case glfw.KEY_HOME | glfw.KEY_UP:
@@ -218,9 +219,9 @@ class SkLineInput(SkWidget):
                 self.cursor_right()
             case glfw.KEY_Z:
                 """Redo"""
-                if event.mods == "control":
+                if mods == "control":
                     self.undo()
-                elif event.mods == "control+shift":
+                elif mods == "control+shift":
                     self.redo()
 
     def get(self) -> str:

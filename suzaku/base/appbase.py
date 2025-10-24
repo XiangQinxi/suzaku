@@ -56,9 +56,12 @@ def init_sdl2() -> None:
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
 
-    from sdl2 import (SDL_GL_CONTEXT_MAJOR_VERSION,
-                      SDL_GL_CONTEXT_MINOR_VERSION,
-                      SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_SetAttribute)
+    from sdl2 import (
+        SDL_GL_CONTEXT_MAJOR_VERSION,
+        SDL_GL_CONTEXT_MINOR_VERSION,
+        SDL_GL_CONTEXT_PROFILE_MASK,
+        SDL_GL_SetAttribute,
+    )
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)
