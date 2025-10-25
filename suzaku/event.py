@@ -124,6 +124,24 @@ class SkEventHandling:
         while True:
             cls.multithread_tasks[0][0].target(cls.multithread_tasks[0][1])
             cls.multithread_tasks.pop(0)
+            """
+            if not cls.multithread_tasks:
+                time.sleep(0.01)  # 避免空转消耗CPU
+                continue
+
+            try:
+                task, event_obj = cls.multithread_tasks[0]
+                task.target(event_obj)
+                cls.multithread_tasks.pop(0)
+            except Exception as e:
+                # 即使任务执行失败，也要从队列中移除，防止队列堵塞
+                if cls.multithread_tasks:
+                    failed_task = cls.multithread_tasks.pop(0)
+                    warnings.warn(
+                        f"Multithread task failed and removed: {failed_task[0].id}, error: {e}"
+                    )
+        
+            """
 
     def __init__(self):
         """A class containing event handling abilities.
@@ -240,6 +258,39 @@ class SkEventHandling:
                 for task in self.tasks[target]:
                     # To execute all tasks bound under this event
                     self.execute_task(task, event_obj)
+
+        """
+        parsed_event_type = self.parse_event_type_str(event_type)
+        # Create a default SkEvent object if not specified
+        if event_obj is None:
+            event_obj = SkEvent(
+                widget=self, event_type=list(parsed_event_type.keys())[0]
+            )
+
+        # 限制事件列表大小，防止无限增长
+        MAX_EVENTS_PER_INSTANCE = 1000
+        MAX_GLOBAL_EVENTS = 5000
+
+        if len(self.events) >= MAX_EVENTS_PER_INSTANCE:
+            self.events = self.events[MAX_EVENTS_PER_INSTANCE // 2 :]
+        self.events.append(event_obj)
+
+        if len(SkEvent.global_list) >= MAX_GLOBAL_EVENTS:
+            SkEvent.global_list = SkEvent.global_list[MAX_GLOBAL_EVENTS // 2 :]
+        SkEvent.global_list.append(event_obj)
+
+        # Find targets
+        targets = [event_type]
+        if list(parsed_event_type.values())[0] in ["", "*"]:
+            targets.append(list(parsed_event_type.keys())[0])
+            targets.append(list(parsed_event_type.keys())[0] + "[*]")
+
+        for target in targets:
+            if target in self.tasks:
+                for task in self.tasks[target]:
+                    self.execute_task(task, event_obj)
+
+        """
 
     def bind(
         self,
@@ -365,10 +416,23 @@ class SkEventHandling:
         Mostly used by SkWidget.update(), which is internal use
         """
         # print("Checking delayed events...")
-        for task in self.delay_tasks:
-            if float(time.time()) >= task.target_time:
-                # print(f"Current time is later than target time of {task.id}, execute the task.")
-                self.execute_task(task)
+        current_time = float(time.time())
+        tasks_to_remove = []
+
+        for i, task in enumerate(self.delay_tasks):
+            if current_time >= task.target_time:
+                try:
+                    self.execute_task(task)
+                except Exception as e:
+                    warnings.warn(f"Failed to execute delay task {task.id}: {e}")
+                finally:
+                    # 确保任务被移除，即使执行失败
+                    tasks_to_remove.append(i)
+
+        # 反向移除避免索引问题
+        for i in sorted(tasks_to_remove, reverse=True):
+            if i < len(self.delay_tasks):
+                self.delay_tasks.pop(i)
 
 
 # Initialize working thread
@@ -382,6 +446,7 @@ class SkEvent:
     """Used to represent an event."""
 
     global_list: list[SkEvent] = []
+    _max_global_events: int = 5000  # 新增最大事件数限制
 
     def __init__(
         self,
@@ -414,7 +479,6 @@ class SkEvent:
         # Update stuff from args into attributes
         for prop in kwargs.keys():
             if prop not in ["widget", "event_type"]:
-                # self.__setattr__(prop, kwargs[prop])
                 self[prop] = kwargs[prop]
 
     def __setitem__(self, key: str, value: typing.Any):

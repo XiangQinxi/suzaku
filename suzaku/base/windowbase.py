@@ -87,6 +87,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self._event_init = False  #
         self._cursor = None
         self.cursors = {}
+        self.mode: typing.Literal["normal", "input"] = "normal"
 
         # Always is 0
         self.x: int | float = 0
@@ -327,12 +328,15 @@ class SkWindowBase(SkEventHandling, SkMisc):
         if self.visible:
             self.trigger("update", SkEvent(event_type="update"))
 
-            if redraw:
+            if self.mode == "input":
                 self.draw()
             else:
-                if all([not child.need_redraw for child in self.children]):
-                    return
-                self.draw()
+                if redraw:
+                    self.draw()
+                else:
+                    if all([not child.need_redraw for child in self.children]):
+                        return
+                    self.draw()
             # self.update_layout: typing.Callable
             # self.post()
 
@@ -431,9 +435,18 @@ class SkWindowBase(SkEventHandling, SkMisc):
             child.need_redraw = False
         self.trigger("redraw", SkEvent(self, "redraw"))
 
-    def save(self, path: str = "skwindowbase.png", format: str = "png"):
+    def save(self, path: str = "snapshot.png", _format: str = "png"):
+        if _format == "png":
+            _format = skia.kPNG
         if self.surface:
-            self.surface.makeImageSnapshot().save(path, skia.kPNG)
+            snapshot = self.surface.makeImageSnapshot()
+            if snapshot:
+                return snapshot.save(path, _format)
+            else:
+                return False
+        return None
+
+    snapshot = save
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
