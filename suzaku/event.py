@@ -182,7 +182,7 @@ class SkEventHandling:
             params = event_type_str.split("[")[1][0:-1].split(",")
         else:
             params = []
-        NotImplemented  # The prvious lines are to be changed as they r soooo frickin' shitty
+        NotImplemented  # The previous lines are to be changed as they r soooo frickin' shitty
         return {event_type: params}
 
     def execute_task(
@@ -416,6 +416,11 @@ class SkEventHandling:
         Mostly used by SkWidget.update(), which is internal use
         """
         # print("Checking delayed events...")
+        for task in self.delay_tasks:
+            if float(time.time()) >= task.target_time:
+                # print(f"Current time is later than target time of {task.id}, execute the task.")
+                self.execute_task(task)
+        """
         current_time = float(time.time())
         tasks_to_remove = []
 
@@ -433,6 +438,7 @@ class SkEventHandling:
         for i in sorted(tasks_to_remove, reverse=True):
             if i < len(self.delay_tasks):
                 self.delay_tasks.pop(i)
+        """
 
 
 # Initialize working thread
