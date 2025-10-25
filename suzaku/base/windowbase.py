@@ -319,6 +319,23 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     # region Draw 绘制相关
 
+    def update(self, redraw: bool = False) -> None:
+        """Update window.
+
+        :param bool redraw: Whether to redraw the window.
+        """
+        if self.visible:
+            self.trigger("update", SkEvent(event_type="update"))
+
+            if redraw:
+                self.draw()
+            else:
+                if all([not child.need_redraw for child in self.children]):
+                    return
+                self.draw()
+            # self.update_layout: typing.Callable
+            # self.post()
+
     @contextlib.contextmanager
     def skia_surface(self, arg: typing.Any) -> skia.Surface:
         """Create a Skia surface for the window.
@@ -426,23 +443,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
         """
         self.draw_func = func
         return self
-
-    def update(self, redraw: bool = False) -> None:
-        """Update window.
-
-        :param bool redraw: Whether to redraw the window.
-        """
-        if self.visible:
-            self.trigger("update", SkEvent(event_type="update"))
-
-            if redraw:
-                self.draw()
-            else:
-                if all([not child.need_redraw for child in self.children]):
-                    return
-                self.draw()
-            # self.update_layout: typing.Callable
-            # self.post()
 
     # endregion
 
@@ -1415,3 +1415,5 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.trigger("dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale))
 
         self.update(True)
+
+    # endregion

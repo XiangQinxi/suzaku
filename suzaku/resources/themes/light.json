@@ -96,7 +96,7 @@
     "SkCloseButton": {
       "rest": {
         "size": [35, 35],
-        "radius": [0, 5, 5, 0],
+        "radius": [0, 5, 0, 0],
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
         "width": 0
@@ -710,7 +710,7 @@
     "SkWindowCommand": {
       "rest": {
         "size": [0, 0],
-        "radius": 5,
+        "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
         "width": 2

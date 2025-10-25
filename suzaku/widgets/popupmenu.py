@@ -24,6 +24,7 @@ class SkPopupMenu(SkPopup):
         item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem | SkSwitch,
         index: int = -1,
     ) -> None:
+        """Add a menu item."""
         if index == -1:
             self.items.append(item)
         else:
@@ -31,6 +32,7 @@ class SkPopupMenu(SkPopup):
         self.update_order()
 
     def update_order(self):
+        """Update the order of the menu items."""
         for index, item in enumerate(self.items):
             padx = 0
             pady = 0
@@ -85,6 +87,7 @@ class SkPopupMenu(SkPopup):
                 self.items.remove(item)
 
     def configure_item(self, _id, **kwargs):
+        """Configure attributes of the item with id"""
         for item in self.items:
             if item.id == _id:
                 self.items[_id].configure(**kwargs)

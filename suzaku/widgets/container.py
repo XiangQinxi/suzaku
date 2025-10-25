@@ -74,6 +74,8 @@ class SkContainer:
     def __init__(self, allowed_out_of_bounds: bool = False):
 
         # self.parent = None
+        self.need_redraw: bool
+        self.is_mouse_floating: bool
         self.children: list[SkWidget] = []  # Children
 
         self.draw_list: list[list[SkWidget]] = [
@@ -84,12 +86,12 @@ class SkContainer:
         self.layout_names = [None, None, None]
 
         # 【内部组件统计总占大小】
-        self.content_width = 0
-        self.content_height = 0
+        self.content_width: int | float = 0
+        self.content_height: int | float = 0
 
         # 【内部组件偏移，用于实现容器内部的滚动】
-        self._x_offset = 0
-        self._y_offset = 0
+        self._x_offset: int | float = 0
+        self._y_offset: int | float = 0
         self.allowed_scrolled: bool = False
         self.scroll_speed: float | int = 18  # 滚动距离：滚动量x滚动速度
 
@@ -114,7 +116,7 @@ class SkContainer:
     def scroll_event(self, event: SkEvent) -> None:
         """【处理滚动事件】"""
         if self.allowed_scrolled:
-            typing.cast("SkWidget", self)
+            # typing.cast("SkWidget", self)
             if self.is_mouse_floating:
                 self.scroll(event["x_offset"] * 18, event["y_offset"] * 18)
                 return
@@ -156,8 +158,7 @@ class SkContainer:
         self.x_offset = min(self.x_offset + x_offset, 0)
         # 防止容器超出上边界
         self.y_offset = min(self.y_offset + y_offset, 0)
-        self.update()
-        self.need_redraw = True
+        self.update(redraw=True)
 
     # endregion
 

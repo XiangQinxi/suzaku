@@ -18,7 +18,9 @@ class SkSwitchBox(SkCheckBox):
         super().__init__(parent, style=style, **kwargs)
 
         def record_mouse_pos(event: SkEvent):
-            self._x1 = event["x"]
+            if self._pressing:
+                self._x1 = event["x"]
+                self.update(redraw=True)
 
         def record_mouse_pressing(event: SkEvent):
             self._pressing = True

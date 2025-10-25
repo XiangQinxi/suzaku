@@ -5,7 +5,8 @@ import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -161,7 +162,7 @@ class SkWidget(SkEventHandling, SkMisc):
             self.mouse_y = event["y"]
 
         def _draw(event: SkEvent):
-            self.need_redraw = True
+            self.update(redraw=True)
 
         self.bind("mouse_enter", _draw)
         self.bind("mouse_leave", _draw)
@@ -202,7 +203,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
     def _on_mouse_release(self, event) -> None:
         if self.is_mouse_floating:
-            self.need_redraw = True
+            self.update(redraw=True)
             self.trigger("click", event)
             time = self.time()
 
@@ -215,6 +216,17 @@ class SkWidget(SkEventHandling, SkMisc):
     # endregion
 
     # region Draw the widget 绘制组件
+
+    def update(self, redraw: bool = False) -> None:
+        self.trigger("update", SkEvent(widget=self, event_type="update"))
+        self.need_redraw = redraw
+
+        if "SkContainer" in SkMisc.sk_get_type(self):
+            from .container import SkContainer
+
+            SkContainer.update(self)
+
+        self._pos_update()
 
     def draw(self, canvas: skia.Canvas) -> None:
         """Execute the widget rendering and subwidget rendering
@@ -728,17 +740,6 @@ class SkWidget(SkEventHandling, SkMisc):
     def measure_text(self, text: str, *args) -> float | int:
         font: skia.Font = self.cget("font")
         return font.measureText(text, *args)
-
-    def update(self, redraw: bool = False) -> None:
-        self.trigger("update", SkEvent(widget=self, event_type="update"))
-        self.need_redraw = redraw
-
-        if "SkContainer" in SkMisc.sk_get_type(self):
-            from .container import SkContainer
-
-            SkContainer.update(self)
-
-        self._pos_update()
 
     @property
     def x(self):
