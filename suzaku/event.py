@@ -13,7 +13,11 @@ import collections.abc
 #     from .widgets import SkWidget, SkWindow
 
 
-# [TODO] Implemention of clear_bind() and keep_at_clear
+# [TODO] Implementation of clear_bind() and keep_at_clear
+# [TODO] Implementation of repeat events
+# [TODO] Rewrite event type string parsing
+# [TODO] Fix a type error in SkEventHandling.bind()
+# [TODO] Support unbind for another widget's event
 
 class SkBoundTask:
     """A class to represent bound task when a event is triggered."""
@@ -85,7 +89,7 @@ class SkRepeatTask(SkBoundTask):
         )  # To store when to execute the task for
         # the next time, will be accumulated after
         # execution of the task
-        self.interval = interval  # Interval of the class
+        self.interval = interval  # Interval of the task
 
 
 class SkEventHandling:
@@ -96,28 +100,17 @@ class SkEventHandling:
     Events should be represented in the form of `event_type` or `event_type[args]`. e.g. `delay` or
     `delay[500]`
     """
-
+    
+    # fmt: off
     EVENT_TYPES: list[str] = [
-        "resize",
-        "move",
-        "configure",
-        "update",
-        "redraw",
-        "mouse_move",
-        "mouse_enter",
-        "mouse_leave",
-        "mouse_press",
-        "mouse_release",
-        "focus_gain",
-        "focus_loss",
-        "key_press",
-        "key_release",
-        "key_repeat",
-        "char",
-        "click",
-        "delay",
-        "repeat",  # This row shows special event type(s)
+        "resize", "move", 
+        "configure", "update", "redraw", 
+        "mouse_move", "mouse_enter", "mouse_leave", "mouse_press", "mouse_release", "click", 
+        "focus_gain", "focus_loss", 
+        "key_press", "key_release", "key_repeat", "char", 
+        "delay", "repeat", # This row shows special event type(s)
     ]
+    # fmt: on
     multithread_tasks: list[tuple[SkBoundTask, SkEvent]] = []
     WORKING_THREAD: threading.Thread
     instance_count = 0
@@ -126,7 +119,8 @@ class SkEventHandling:
     def _working_thread_loop(cls):
         while True:
             try:
-                SkEventHandling._execute_task(cls.multithread_tasks[0][0], cls.multithread_tasks[0][1])
+                SkEventHandling._execute_task(cls.multithread_tasks[0][0], 
+                                              cls.multithread_tasks[0][1])
                 # For line above: [0][0] is task object, [0][1] is SkEvent object
             except Exception as e:
                 warnings.warn(RuntimeWarning("Error in multithread suzaku-event-bound task "
@@ -268,7 +262,7 @@ class SkEventHandling:
             )
         # Add the event to event lists (the widget itself and the global list)
         self.events.append(event_obj)
-        SkEvent.global_list.append(event_obj)
+        SkEvent.latest = event_obj
         # Find targets
         targets = []
         targets.append(event_type)
@@ -459,9 +453,7 @@ SkEventHandling.WORKING_THREAD = threading.Thread(
 # @dataclass
 class SkEvent:
     """Used to represent an event."""
-
-    global_list: list[SkEvent] = []
-    _max_global_events: int = 5000  # 新增最大事件数限制
+    latest: SkEvent
 
     def __init__(
         self,
