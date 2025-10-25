@@ -120,7 +120,7 @@ if __name__ == "__main__":
             themes = {}
             for theme in SkTheme.loaded_themes:
                 themes[theme.friendly_name] = theme
-            listbox = SkListBox(tab_settings, items=themes.keys())
+            listbox = SkListBox(tab_settings, items=list(themes.keys()))
             listbox.bind(
                 "changed",
                 change_theme,

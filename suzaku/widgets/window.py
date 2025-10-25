@@ -21,9 +21,9 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def __init__(
         self,
-        parent: typing.Self | SkApp = None,
+        parent: typing.Self | SkApp | None = None,
         *args,
-        theme: SkTheme = None,
+        theme: SkTheme | None = None,
         style: str = "SkWindow",
         size: tuple[int, int] = (300, 300),
         anti_alias: bool = True,
@@ -42,15 +42,14 @@ class SkWindow(SkWindowBase, SkContainer):
         self.styles: dict | None = None
         self.style = style
 
-        self.attributes["enabled_radius"]: bool = False
+        self.attributes["enabled_radius"] = False
         self.attributes["resizable_margin"] = 8
 
         if isinstance(self.parent, SkWindow):
-            self.apply_theme(self.parent.theme if self.parent.theme else theme)
-        else:
-            if theme is None:
-                theme = default_theme
-            self.apply_theme(theme)
+            self.theme = self.parent.theme if self.parent.theme else theme
+        if theme is None:
+            theme = default_theme
+        self.apply_theme(theme)
 
         self.focus_widget = self
         self.draws: list[typing.Callable] = []
