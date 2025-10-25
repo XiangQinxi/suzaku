@@ -4,13 +4,16 @@ import threading
 import time
 import typing
 import warnings
-from dataclasses import dataclass
+import collections.abc
+# from dataclasses import dataclass
 
 # import re
 
-if typing.TYPE_CHECKING:
-    from .widgets import SkWidget, SkWindow
+# if typing.TYPE_CHECKING:
+#     from .widgets import SkWidget, SkWindow
 
+
+# [TODO] Implemention of clear_bind() and keep_at_clear
 
 class SkBoundTask:
     """A class to represent bound task when a event is triggered."""
@@ -18,7 +21,7 @@ class SkBoundTask:
     def __init__(
         self,
         id_: str,
-        target: typing.Callable,
+        target: typing.Callable | typing.Iterable,
         multithread: bool = False,
         _keep_at_clear: bool = False,
     ):
@@ -41,7 +44,7 @@ class SkBoundTask:
         :param _keep_at_clear: If the task should be kept when cleaning the event's binding
         """
         self.id: str = id_
-        self.target: typing.Callable = target
+        self.target: typing.Callable | typing.Iterable = target
         self.multithread: bool = multithread
         self.keep_at_clear: bool = _keep_at_clear
 
@@ -122,26 +125,47 @@ class SkEventHandling:
     @classmethod
     def _working_thread_loop(cls):
         while True:
-            cls.multithread_tasks[0][0].target(cls.multithread_tasks[0][1])
-            cls.multithread_tasks.pop(0)
-            """
-            if not cls.multithread_tasks:
-                time.sleep(0.01)  # 避免空转消耗CPU
-                continue
-
             try:
-                task, event_obj = cls.multithread_tasks[0]
-                task.target(event_obj)
-                cls.multithread_tasks.pop(0)
+                SkEventHandling._execute_task(cls.multithread_tasks[0][0], cls.multithread_tasks[0][1])
+                # For line above: [0][0] is task object, [0][1] is SkEvent object
             except Exception as e:
-                # 即使任务执行失败，也要从队列中移除，防止队列堵塞
-                if cls.multithread_tasks:
-                    failed_task = cls.multithread_tasks.pop(0)
-                    warnings.warn(
-                        f"Multithread task failed and removed: {failed_task[0].id}, error: {e}"
-                    )
-        
-            """
+                warnings.warn(RuntimeWarning("Error in multithread suzaku-event-bound task "
+                                            f"with ID {cls.multithread_tasks[0][0].id}, "
+                                            f"detailed error info: \"{str(e)}\". "
+                                             "The working thread will head to the next task "
+                                             "(skipping current causing the error)."))
+            cls.multithread_tasks.pop(0) # Executed tasks should be removed, anyway
+
+            if not cls.multithread_tasks:
+                time.sleep(0.01)  # Avoid CPU draining while no tasks avail
+                continue
+            
+            # # Codes below written by AI, will be removed as same fixes already been made to 
+            # # current codes manually.
+            # try:
+            #     task, event_obj = cls.multithread_tasks[0]
+            #     task.target(event_obj)
+            #     cls.multithread_tasks.pop(0)
+            # except Exception as e:
+            #     # 即使任务执行失败，也要从队列中移除，防止队列堵塞
+            #     if cls.multithread_tasks:
+            #         failed_task = cls.multithread_tasks.pop(0)
+            #         warnings.warn(
+            #             f"Multithread task failed and removed: {failed_task[0].id}, error: {e}"
+            #         )
+
+    @staticmethod
+    def _execute_task(task: SkBoundTask, event_obj: SkEvent) -> None:
+        """To execute the binded task directly, regardless its props, mainly for internal use."""
+        match task.target:
+            case _ if callable(task.target):
+                task.target(event_obj)
+            case _ if isinstance(task.target, collections.abc.Iterable):
+                for task_step in task.target:
+                    task_step(event_obj)
+            case _:
+                raise ValueError("Error type for suzaku task target! Excepted callable or "
+                                f"iterable but received {type(task.target)}")
 
     def __init__(self):
         """A class containing event handling abilities.
@@ -158,7 +182,6 @@ class SkEventHandling:
         """
         self.events: list = []
         self.tasks: dict[str, list[SkBoundTask]] = {}
-        self.delay_tasks: list[SkDelayTask] = []
         # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
         self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
         ## Initialize tasks list
@@ -186,7 +209,7 @@ class SkEventHandling:
         return {event_type: params}
 
     def execute_task(
-        self, task: SkBoundTask | SkDelayTask, event_obj: SkEvent | None = None
+        self, task: SkBoundTask, event_obj: SkEvent | None = None
     ):
         """To execute a task
 
@@ -203,7 +226,7 @@ class SkEventHandling:
             event_obj.widget = self
         if not task.multithread:
             # If not multitask, execute directly
-            task.target(event_obj)
+            SkEventHandling._execute_task(task, event_obj)
             # If is a delay event, it should be removed right after execution
             if isinstance(task, SkDelayTask):
                 self.unbind(task)
@@ -213,7 +236,7 @@ class SkEventHandling:
             # which is absolutely not perfect, though works, to implement this mechanism, by
             # overriding its target with a modified version
             def self_destruct_template(task, event_obj):
-                task.target(event_obj)
+                SkEventHandling._execute_task(task, event_obj)
                 self.unbind(task)
 
             if isinstance(task, SkDelayTask):
@@ -292,13 +315,10 @@ class SkEventHandling:
 
         """
 
-    def bind(
-        self,
-        event_type: str,
-        target: typing.Callable,
-        multithread: bool = False,
-        _keep_at_clear: bool = False,
-    ) -> SkBoundTask | bool:
+    def bind(self, 
+             event_type: str, target: typing.Callable | typing.Iterable,
+             multithread: bool = False, _keep_at_clear: bool = False,
+            ) -> SkBoundTask | bool:
         """To bind a task to the object when a specific type of event is triggered.
 
         Example
@@ -309,7 +329,7 @@ class SkEventHandling:
         This shows binding a hello world to the button when it's press.
 
         :param event_type: The type of event to be bound to
-        :param target: A callable thing, what to do when this task is executed
+        :param target: A (list of) callable thing, what to do when this task is executed
         :param multithread: If this task should be executed in another thread (False by default)
         :param _keep_at_clear: If the task should be kept when cleaning the event's binding
         :return: SkBoundTask that is bound to the task if success, otherwise False
@@ -328,12 +348,11 @@ class SkEventHandling:
             case "delay":
                 task = SkDelayTask(
                     task_id,
-                    target,
+                    target, # I will fix this type error later (ignore is ur type check is off)
                     float(parsed_event_type["delay"][0]),
                     multithread,
                     _keep_at_clear,
                 )
-                self.delay_tasks.append(task)
             case "repeat":
                 NotImplemented
             case _:  # All normal event types
@@ -355,6 +374,8 @@ class SkEventHandling:
         :return: The SkBoundTask object of the task, or False if not found
         """
         task_id_parsed = task_id.split(".")
+        if len(task_id_parsed) == 2: # If is a shortened ID (without widget indicator)
+            task_id_parsed.insert(0, self.id) # We assume that this indicates self
         for task in self.tasks[task_id_parsed[1]]:
             if task.id == task_id:
                 return task
@@ -382,12 +403,15 @@ class SkEventHandling:
         :return: If success
         """
         match target_task:
-            case str():
+            case str(): # If given an ID string
                 task_id_parsed = target_task.split(".")
-                if len(task_id_parsed) == 2:
-                    task_id_parsed.insert(0, self.id)
-                if task_id_parsed != self.id:
-                    NotImplemented
+                if len(task_id_parsed) == 2: # If is a shortened ID (without widget indicator)
+                    task_id_parsed.insert(0, self.id) # We assume that this indicates self
+                if task_id_parsed != self.id: # If given ID indicates another widget
+                    NotImplemented 
+                    # Still not inplemented, as we currently cannot get a SkWidget object itself 
+                    # only with its ID (waiting for XiangQinxi)
+                    # This part should call the unbind function of the widget with such ID
                 for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
                     if task.id == target_task:
                         self.tasks[task_id_parsed[1]].pop(task_index)
@@ -416,29 +440,14 @@ class SkEventHandling:
         Mostly used by SkWidget.update(), which is internal use
         """
         # print("Checking delayed events...")
-        for task in self.delay_tasks:
-            if float(time.time()) >= task.target_time:
-                # print(f"Current time is later than target time of {task.id}, execute the task.")
-                self.execute_task(task)
-        """
-        current_time = float(time.time())
-        tasks_to_remove = []
-
-        for i, task in enumerate(self.delay_tasks):
-            if current_time >= task.target_time:
-                try:
-                    self.execute_task(task)
-                except Exception as e:
-                    warnings.warn(f"Failed to execute delay task {task.id}: {e}")
-                finally:
-                    # 确保任务被移除，即使执行失败
-                    tasks_to_remove.append(i)
-
-        # 反向移除避免索引问题
-        for i in sorted(tasks_to_remove, reverse=True):
-            if i < len(self.delay_tasks):
-                self.delay_tasks.pop(i)
-        """
+        for binded_event_type in self.tasks:
+            if next(iter(self.parse_event_type_str(binded_event_type))) == "delay":
+                for task in self.tasks[binded_event_type]:
+                    if isinstance(task, SkDelayTask):
+                        if float(time.time()) >= task.target_time:
+                            # print(f"Current time is later than target time of {task.id}, "
+                            #        "execute the task.")
+                            self.execute_task(task)
 
 
 # Initialize working thread
