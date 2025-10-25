@@ -12,8 +12,8 @@ if typing.TYPE_CHECKING:
     from .widgets import SkWidget, SkWindow
 
 
-class SkBindedTask:
-    """A class to represent binded task when a event is triggered."""
+class SkBoundTask:
+    """A class to represent bound task when a event is triggered."""
 
     def __init__(
         self,
@@ -22,7 +22,7 @@ class SkBindedTask:
         multithread: bool = False,
         _keep_at_clear: bool = False,
     ):
-        """Each object is to represent a task binded to the event.
+        """Each object is to represent a task bound to the event.
 
         Example
         -------
@@ -31,14 +31,14 @@ class SkBindedTask:
             class SkEventHandling():
                 def bind(self, ...):
                     ...
-                    task = SkBindedTask(event_id, target, multithread, _keep_at_clear)
+                    task = SkBoundTask(event_id, target, multithread, _keep_at_clear)
                     ...
         This shows where this class is used for storing task properties in most cases.
 
         :param id_: The task id of this task
         :param target: A callable thing, what to do when this task is executed
         :param multithread: If this task should be executed in another thread (False by default)
-        :param _keep_at_clear: If the task should be kept when clearning the event's binding
+        :param _keep_at_clear: If the task should be kept when cleaning the event's binding
         """
         self.id: str = id_
         self.target: typing.Callable = target
@@ -46,37 +46,37 @@ class SkBindedTask:
         self.keep_at_clear: bool = _keep_at_clear
 
 
-class SkDelayTask(SkBindedTask):
+class SkDelayTask(SkBoundTask):
     """A class to represent delay tasks"""
 
     def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
-        """Inherited from SkBindedTask, used to store tasks binded to `delay` events.
+        """Inherited from SkBoundTask, used to store tasks bound to `delay` events.
 
         :param delay: Time to delay, in seconds, indicating how log to wait before the task is
                       executed.
         """
-        SkBindedTask.__init__(
+        SkBoundTask.__init__(
             self, id_, target, *args, **kwargs
         )  # For other things,same as
-        # SkBindedTask
+        # SkBoundTask
         self.target_time = (
             float(time.time()) + delay_
         )  # To store when to execute the task
 
 
-class SkRepeatTask(SkBindedTask):
+class SkRepeatTask(SkBoundTask):
     """A class to represent repeat tasks"""
 
     def __init__(self, id_: str, target: typing.Callable, interval, *args, **kwargs):
-        """Inherited from SkBindedTask, used to store tasks binded to `repeat` events.
+        """Inherited from SkBoundTask, used to store tasks bound to `repeat` events.
 
         :param delay: Time to delay, in seconds, indicating how log to wait before the task is
                       executed.
         """
-        SkBindedTask.__init__(
+        SkBoundTask.__init__(
             self, id_, target, *args, **kwargs
         )  # For other things,same as
-        # SkBindedTask
+        # SkBoundTask
         self.target_time = (
             float(time.time()) + interval
         )  # To store when to execute the task for
@@ -115,7 +115,7 @@ class SkEventHandling:
         "delay",
         "repeat",  # This row shows special event type(s)
     ]
-    multithread_tasks: list[tuple[SkBindedTask, SkEvent]] = []
+    multithread_tasks: list[tuple[SkBoundTask, SkEvent]] = []
     WORKING_THREAD: threading.Thread
     instance_count = 0
 
@@ -139,7 +139,7 @@ class SkEventHandling:
         This shows subclassing SkEventHandling to let SkWidget gain the ability of handling events.
         """
         self.events: list = []
-        self.tasks: dict[str, list[SkBindedTask]] = {}
+        self.tasks: dict[str, list[SkBoundTask]] = {}
         self.delay_tasks: list[SkDelayTask] = []
         # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
         self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
@@ -168,7 +168,7 @@ class SkEventHandling:
         return {event_type: params}
 
     def execute_task(
-        self, task: SkBindedTask | SkDelayTask, event_obj: SkEvent | None = None
+        self, task: SkBoundTask | SkDelayTask, event_obj: SkEvent | None = None
     ):
         """To execute a task
 
@@ -178,10 +178,10 @@ class SkEventHandling:
             my_task = SkWidget.bind("delay[5]", lambda: print("Hello Suzaku"))
             SkWidget.execute_task(my_task)
         """
-        if event_obj == None:
+        if event_obj is None:
             event_obj = SkEvent()
         assert event_obj is not None
-        if event_obj.widget == None:
+        if event_obj.widget is None:
             event_obj.widget = self
         if not task.multithread:
             # If not multitask, execute directly
@@ -192,7 +192,7 @@ class SkEventHandling:
         else:
             # Otherwise add to multithread tasks list and let the working thread to deal with it
             # If is a delay task, should add some code to let it unbind itself, here is a way,
-            # which is absolutely not perfect, though works, to implemet this machanism, by
+            # which is absolutely not perfect, though works, to implement this mechanism, by
             # overriding its target with a modified version
             def self_destruct_template(task, event_obj):
                 task.target(event_obj)
@@ -220,7 +220,7 @@ class SkEventHandling:
         """
         # Parse event type string
         parsed_event_type = self.parse_event_type_str(event_type)
-        # Create a default SkEvent object if not soecified
+        # Create a default SkEvent object if not specified
         if event_obj == None:
             event_obj = SkEvent(
                 widget=self, event_type=list(parsed_event_type.keys())[0]
@@ -238,7 +238,7 @@ class SkEventHandling:
         for target in targets:
             if target in self.tasks:
                 for task in self.tasks[target]:
-                    # To execute all tasks binded under this event
+                    # To execute all tasks bound under this event
                     self.execute_task(task, event_obj)
 
     def bind(
@@ -247,7 +247,7 @@ class SkEventHandling:
         target: typing.Callable,
         multithread: bool = False,
         _keep_at_clear: bool = False,
-    ) -> SkBindedTask | bool:
+    ) -> SkBoundTask | bool:
         """To bind a task to the object when a specific type of event is triggered.
 
         Example
@@ -257,16 +257,16 @@ class SkEventHandling:
             press_down_event = my_button.bind("mouse_press", lambda _: print("Hello world!"))
         This shows binding a hello world to the button when it's press.
 
-        :param event_type: The type of event to be binded to
+        :param event_type: The type of event to be bound to
         :param target: A callable thing, what to do when this task is executed
         :param multithread: If this task should be executed in another thread (False by default)
-        :param _keep_at_clear: If the task should be kept when clearning the event's binding
-        :return: SkBindedTask that is binded to the task if success, otherwise False
+        :param _keep_at_clear: If the task should be kept when cleaning the event's binding
+        :return: SkBoundTask that is bound to the task if success, otherwise False
         """
         parsed_event_type = self.parse_event_type_str(event_type)
         if list(parsed_event_type.keys())[0] not in self.__class__.EVENT_TYPES:
             # warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
-            #                "so the task cannot be binded as expected.")
+            #                "so the task cannot be bound as expected.")
             # return False
             self.EVENT_TYPES.append(event_type)
         if event_type not in self.tasks:
@@ -286,22 +286,22 @@ class SkEventHandling:
             case "repeat":
                 NotImplemented
             case _:  # All normal event types
-                task = SkBindedTask(task_id, target, multithread, _keep_at_clear)
+                task = SkBoundTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
         return task
 
-    def find_task(self, task_id: str) -> SkBindedTask | bool:
-        """To find a binded task using task ID.
+    def find_task(self, task_id: str) -> SkBoundTask | bool:
+        """To find a bound task using task ID.
 
         Example
         -------
         .. code-block:: python
             my_button = SkButton(...)
             press_task = my_button.find_task("SkButton114.mouse_press.514")
-        This shows getting the `SkBindedTask` object of task with ID `SkButton114.mouse_press.514`
-        from binded tasks of `my_button`.
+        This shows getting the `SkBoundTask` object of task with ID `SkButton114.mouse_press.514`
+        from bound tasks of `my_button`.
 
-        :return: The SkBindedTask object of the task, or False if not found
+        :return: The SkBoundTask object of the task, or False if not found
         """
         task_id_parsed = task_id.split(".")
         for task in self.tasks[task_id_parsed[1]]:
@@ -310,7 +310,7 @@ class SkEventHandling:
         else:
             return False
 
-    def unbind(self, target_task: str | SkBindedTask) -> bool:
+    def unbind(self, target_task: str | SkBoundTask) -> bool:
         """To unbind the task with specified task ID.
 
         Example
@@ -327,7 +327,7 @@ class SkEventHandling:
         This show unbinding all tasks under `mouse_press` and `mouse_release` event from
         `my_button`.
 
-        :param target_task: The task ID or `SkBindedTask` to unbind.
+        :param target_task: The task ID or `SkBoundTask` to unbind.
         :return: If success
         """
         match target_task:
@@ -343,7 +343,7 @@ class SkEventHandling:
                         return True
                 else:
                     return False
-            case SkBindedTask():
+            case SkBoundTask():
                 for event_type in self.tasks:
                     if target_task in self.tasks[event_type]:
                         self.tasks[event_type].remove(target_task)
@@ -397,7 +397,7 @@ class SkEvent:
 
         Example
         -------
-        Included in descrepsion.
+        Included in description.
 
         :param widget: The widget of the event, None by default
         :param event_type: Type of the event, in string, `"[Unspecified]"` by default
@@ -410,7 +410,7 @@ class SkEvent:
         )
         self.window: typing.Optional[typing.Any] = None  # Current window
         self.event_data: dict = {}
-        # Not all proprties above will be used
+        # Not all properties above will be used
         # Update stuff from args into attributes
         for prop in kwargs.keys():
             if prop not in ["widget", "event_type"]:
