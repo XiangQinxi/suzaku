@@ -96,7 +96,7 @@
     "SkCloseButton": {
       "rest": {
         "size": [35, 35],
-        "radius": [0, 5, 5, 0],
+        "radius": [0, 5, 0, 0],
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
         "width": 0
@@ -492,6 +492,22 @@
       }
     },
 
+    "SkSlider": {
+      "rest": {
+        "size": [120, 20]
+      }
+    },
+
+    "SkSlider.Progress": {
+      "rest": {
+        "bg": [40, 130, 255, 215],
+        "bd": [40, 130, 255, 235],
+        "width": 2,
+        "radius": [99, 0, 0, 99],
+        "pady": 5
+      }
+    },
+
     "SkSwitchBox": {
       "rest": {
         "size": [48, 20],
@@ -694,7 +710,7 @@
     "SkWindowCommand": {
       "rest": {
         "size": [0, 0],
-        "radius": 5,
+        "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
         "width": 2

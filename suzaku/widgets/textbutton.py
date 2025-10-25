@@ -48,7 +48,6 @@ class SkTextButton(SkButton, SkText):
         """
         if self.button != 1:
             if self.is_mouse_floating:
-
                 self.trigger("click", event)
                 time = self.time()
 
@@ -163,7 +162,7 @@ class SkMaximizeButton(SkTextButton):
         style = super().draw_widget(canvas, rect, style_selector)
 
         icon_padding = self._style("icon_padding", 10, style)
-        icon_width = self._style("icon_width", 1, style)
+        icon_width = self._style("icon_width", 1.1, style)
         fg = skcolor_to_color(
             style_to_color(self._style("fg", None, style), self.theme)
         )
@@ -188,16 +187,16 @@ class SkMaximizeButton(SkTextButton):
 
             # 右上角矩形（较小）
             right_rect = skia.Rect.MakeXYWH(
-                rect.left() + margin,
-                rect.top() + margin * 0.5,
+                rect.left() + margin * 1.2,
+                rect.top() + margin * 0.8,
                 inner_size,
                 inner_size,
             )
 
             # 左下角矩形（较大，覆盖右上）
             left_rect = skia.Rect.MakeXYWH(
-                rect.left() + margin * 0.5,
-                rect.top() + margin,
+                rect.left() + margin * 0.8,
+                rect.top() + margin * 1.2,
                 inner_size,
                 inner_size,
             )
@@ -211,7 +210,7 @@ class SkMaximizeButton(SkTextButton):
             )
 
             # 1. 先绘制左下矩形（完整）
-            canvas.drawRect(left_rect, paint)
+            canvas.drawRoundRect(left_rect, icon_radius, icon_radius, paint)
 
             # 2. 设置裁剪区域（关键修正点）
             clip_path = skia.Path()
@@ -222,7 +221,7 @@ class SkMaximizeButton(SkTextButton):
             canvas.clipPath(
                 clip_path, skia.ClipOp.kDifference, True
             )  # 第三个参数是doAntiAlias
-            canvas.drawRect(right_rect, paint)
+            canvas.drawRoundRect(right_rect, icon_radius, icon_radius, paint)
             canvas.restore()
 
 
@@ -246,9 +245,9 @@ class SkMinimizeButton(SkTextButton):
 
         self._draw_line(
             canvas,
-            rect.left() + 10,
+            rect.left() + rect.width() * 0.32,
             rect.centerY(),
-            rect.right() - 10,
+            rect.right() - rect.width() * 0.32,
             rect.centerY(),
             fg=fg,
             width=icon_width,

@@ -81,16 +81,20 @@ class SkWindow(SkWindowBase, SkContainer):
         self.bind("char", self._char)
 
         self.bind("key_press", self._key_press)
-        self.bind("key_repeated", self._key_repected)
+        self.bind("key_repeat", self._key_repeat)
         self.bind("key_release", self._key_release)
 
         self.bind("scroll", self._scroll)
 
-        self.bind("update", self.update)
+        self.bind("resize", self._resize)
 
     # endregion
 
     # region Theme related 主题相关
+
+    def _resize(self, event: SkEvent = None) -> None:
+        if hasattr(self, "update_layout"):
+            self.update_layout()
 
     @property
     def anti_alias(self) -> bool:
@@ -117,11 +121,12 @@ class SkWindow(SkWindowBase, SkContainer):
 
     # region Event handlers 事件处理
 
-    def update(self):
-        SkContainer.update(self)
-
     def destroy(self) -> None:
         super().destroy()
+
+    def _scroll(self, event: SkEvent) -> None:
+        if self.focus_get() is not self:
+            self.focus_get().trigger("scroll", event)
 
     def _key_press(self, event: SkEvent):
         """Key press event for SkWindow.
@@ -140,13 +145,9 @@ class SkWindow(SkWindowBase, SkContainer):
         if self.focus_get() is not self:
             self.focus_get().trigger("key_press", event)
 
-    def _scroll(self, event: SkEvent) -> None:
+    def _key_repeat(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
-            self.focus_get().trigger("scroll", event)
-
-    def _key_repected(self, event: SkEvent) -> None:
-        if self.focus_get() is not self:
-            self.focus_get().trigger("key_repeated", event)
+            self.focus_get().trigger("key_repeat", event)
 
     def _key_release(self, event: SkEvent) -> None:
         if self.focus_get() is not self:
@@ -198,6 +199,7 @@ class SkWindow(SkWindowBase, SkContainer):
         else:
             self._anchor = None
         if self._anchor:
+            # print(event["x"])
             self._x1 = event["x"]
             self._y1 = event["y"]
             self._rootx1 = self.root_x
@@ -319,7 +321,15 @@ class SkWindow(SkWindowBase, SkContainer):
     def _mouse_motion(self, event: SkEvent) -> None:
         if not self.window_attr("border"):
             self._anchor: str
-            if self._anchor and not self.window_attr("maximized"):
+            if all(
+                [
+                    self._anchor,
+                    not self.window_attr("maximized"),
+                    self.window.resizable(),
+                    self._x1,
+                    self._y1,
+                ]
+            ):
                 x, y = None, None
                 width, height = None, None
                 minwidth, minheight = self.wm_minsize()

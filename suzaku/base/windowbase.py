@@ -87,6 +87,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self._event_init = False  #
         self._cursor = None
         self.cursors = {}
+        self.mode: typing.Literal["normal", "input"] = "normal"
 
         # Always is 0
         self.x: int | float = 0
@@ -166,6 +167,8 @@ class SkWindowBase(SkEventHandling, SkMisc):
         ####################
 
         self.the_window = self.create()
+        self.alive = True
+        self.create_bind()
 
         # self.cursor(self.default_cursor())
 
@@ -317,6 +320,26 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     # region Draw 绘制相关
 
+    def update(self, redraw: bool = False) -> None:
+        """Update window.
+
+        :param bool redraw: Whether to redraw the window.
+        """
+        if self.visible:
+            self.trigger("update", SkEvent(event_type="update"))
+
+            if self.mode == "input":
+                self.draw()
+            else:
+                if redraw:
+                    self.draw()
+                else:
+                    if all([not child.need_redraw for child in self.children]):
+                        return
+                    self.draw()
+            # self.update_layout: typing.Callable
+            # self.post()
+
     @contextlib.contextmanager
     def skia_surface(self, arg: typing.Any) -> skia.Surface:
         """Create a Skia surface for the window.
@@ -372,16 +395,14 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
                 yield surface  # ⚠️ 必须用 yield，不要 return
 
-    def draw(self):
+    def draw(self, event: SkEvent = None) -> None:
         if self.visible:
             # Set the current context for each arg
             # 【为该窗口设置当前上下文】
             match self.framework:
                 case "glfw":
                     glfw.make_context_current(self.the_window)
-                    if self.context:
-                        self.context.freeGpuResources()
-                        self.context.releaseResourcesAndAbandonContext()
+
                     # Create a Surface and hand it over to this arg.
                     # 【创建Surface，交给该窗口】
                     with self.skia_surface(self.the_window) as self.surface:
@@ -407,10 +428,25 @@ class SkWindowBase(SkEventHandling, SkMisc):
                                     self.draw_func(canvas)
 
                     sdl2.SDL_UpdateWindowSurface(self.the_window)
+        if self.context:
+            self.context.freeGpuResources()
+            self.context.releaseResourcesAndAbandonContext()
+        for child in self.children:
+            child.need_redraw = False
+        self.trigger("redraw", SkEvent(self, "redraw"))
 
-    def save(self, path: str = "skwindowbase.png", format: str = "png"):
+    def save(self, path: str = "snapshot.png", _format: str = "png"):
+        if _format == "png":
+            _format = skia.kPNG
         if self.surface:
-            self.surface.makeImageSnapshot().save(path, skia.kPNG)
+            snapshot = self.surface.makeImageSnapshot()
+            if snapshot:
+                return snapshot.save(path, _format)
+            else:
+                return False
+        return None
+
+    snapshot = save
 
     def set_draw_func(self, func: typing.Callable) -> "SkWindowBase":
         """Set the draw function.
@@ -420,13 +456,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
         """
         self.draw_func = func
         return self
-
-    def update(self) -> None:
-        """Update window."""
-        if self.visible:
-            self.trigger("update", SkEvent(event_type="update"))
-            # self.update_layout: typing.Callable
-            # self.post()
 
     # endregion
 
@@ -464,6 +493,8 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.trigger(
             "char", SkEvent(event_type="char", char=chr(char), glfw_window=window)
         )
+        self.update()
+        # self.update(redraw=True)
 
     def _on_key(
         self, window: typing.Any, key: str, scancode: str, action: str, mods: int
@@ -505,6 +536,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                 glfw_window=window,
             ),
         )
+        self.update()
 
     def _on_focus(self, window, focused) -> None:
         """Triggers the focus event (triggered when the window gains or loses focus).
@@ -518,6 +550,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             self.trigger(
                 "focus_gain", SkEvent(event_type="focus_gain", glfw_window=window)
             )
+            self.update(redraw=True)
         else:
             self.configure(focus=False)
             self.trigger(
@@ -525,9 +558,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             )
 
     def _on_refresh(self, window: typing.Any):
-        self.draw()
-        if hasattr(self, "update_layout"):
-            self.update_layout()
+        self.update(True)
 
     def _on_scroll(self, window, x_offset, y_offset):
         """Trigger scroll event (triggered when the mouse scroll wheel is scrolled).
@@ -548,7 +579,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         )
 
     def _on_framebuffer_size(self, window: typing.Any, width: int, height: int) -> None:
-        pass
+        self.update()
 
     def _on_resizing(self, window, width: int, height: int) -> None:
         """Trigger resize event (triggered when the window size changes).
@@ -570,10 +601,10 @@ class SkWindowBase(SkEventHandling, SkMisc):
         event = SkEvent(
             event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
         )
-
         self.trigger("resize", event)
         for child in self.children:
             child.trigger("resize", event)
+        self.update(True)
         # cls.update()
 
     def _on_window_pos(self, window: typing.Any, x: int, y: int) -> None:
@@ -1092,7 +1123,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         if hasattr(self, "update_layout"):
             self.update_layout()  # 添加初始布局更新
         glfw.show_window(self.the_window)
-        self.update()  # 添加初始绘制触发
+        self.update(True)  # 添加初始绘制触发
         return self
 
     show = wm_show
@@ -1146,14 +1177,24 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     restore = wm_restore
 
-    def destroy(self) -> None:
+    def wm_destroy(self) -> None:
         """Destroy the window.
 
         :return: None
         """
         # self._event_init = False
         # print(self.id)
-        self.can_be_close(True)
+        self.application.destroy_window(self)
+        glfw.destroy_window(self.the_window)
+
+        self.alive = False
+        self.draw_func = None
+        self.the_window = None  # Clear the reference
+
+        for child in self.children:
+            child.destroy()
+
+    destroy = wm_destroy
 
     def wm_title(self, text: str | None = None) -> typing.Union[str, "SkWindowBase"]:
         """Get or set the window title.
@@ -1371,9 +1412,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     # 添加设置DPI缩放因子的方法
     def set_dpi_scale(self, scale: float) -> "SkWindowBase":
-
-        self.update()
-
         """Set DPI scale factor
 
         :param scale: DPI scale factor
@@ -1389,6 +1427,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
         # 触发DPI变化事件
         self.trigger("dpi_change", SkEvent(event_type="dpi_change", dpi_scale=scale))
 
-        return self
+        self.update(True)
 
     # endregion

@@ -17,13 +17,33 @@ class SkSwitchBox(SkCheckBox):
     ):
         super().__init__(parent, style=style, **kwargs)
 
+        def record_mouse_pos(event: SkEvent):
+            if self._pressing:
+                self._x1 = event["x"]
+                self.update(redraw=True)
+
+        def record_mouse_pressing(event: SkEvent):
+            self._pressing = True
+            self._x1 = event["x"]
+
+        def record_mouse_released(event: SkEvent):
+            if self._pressing:
+                self._pressing = False
+                self._on_click(event)
+
+        self._x1 = None
+        self._pressing = False
+        self.bind("mouse_press", record_mouse_pressing)
+        self.window.bind("mouse_move", record_mouse_pos)
+        self.window.bind("mouse_release", record_mouse_released)
+
     def _on_click(self, event: SkEvent):
         center_x = self.canvas_x + self.width / 2
         if self.checked:
-            if self.mouse_x > center_x:
+            if self._x1 > center_x:
                 return
         else:
-            if self.mouse_x < center_x:
+            if self._x1 < center_x:
                 return
         self.invoke()
 
@@ -87,19 +107,18 @@ class SkSwitchBox(SkCheckBox):
             bg=bg,
         )
 
-        press = self.is_mouse_floating and self.is_mouse_press
-
         x = 0
         left = rect.x() + rect.height() / 2
         right = rect.x() + rect.width() - rect.height() / 2
+
         if self.checked:
-            if press:
-                x = max(min(self.mouse_x, right), left)
+            if self._pressing:
+                x = max(min(self._x1, right), left)
             else:
                 x = right
         else:
-            if press:
-                x = min(max(self.mouse_x, left), right)
+            if self._pressing:
+                x = min(max(self._x1, left), right)
             else:
                 x = left
 

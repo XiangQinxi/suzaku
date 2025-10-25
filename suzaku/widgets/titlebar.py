@@ -17,9 +17,9 @@ class SkWindowCommand(SkCard):
         **kwargs,
     ):
         super().__init__(parent, style=style, **kwargs)
-        self.close = SkCloseButton(self, command=self.window.destroy).box(
-            side="right", padx=0, pady=0, expand=True
-        )
+        self.close = SkCloseButton(
+            self, command=lambda: self.window.can_be_close(True)
+        ).box(side="right", padx=0, pady=0, expand=True)
         self.maximize = SkMaximizeButton(self).box(
             side="right", padx=0, pady=0, expand=True
         )
@@ -61,31 +61,36 @@ class SkTitleBar(SkCard):
         self._y1 = None
 
     def _window_configure(self, event: SkEvent):
+        """When the window is configured, update the title."""
         self.title.configure(text=self.window.title())
 
     def _double_click(self, event: SkEvent):
+        """当双击标题栏时，最大化或恢复窗口"""
         if self.window.window_attr("maximized"):
             self.window.restore()
         else:
             self.window.maximize()
 
     def _mouse_press(self, event: SkEvent):
+        """When the mouse is pressed, record the initial position."""
         if (
             not self.window.mouse_anchor(event["x"], event["y"])
-            or not self.window.resizable()
-        ):
+            # or self.window.window_attr("maximized")
+        ) or not self.window.resizable():
             self._x1 = event["x"]
             self._y1 = event["y"]
 
     def _mouse_motion(self, event: SkEvent):
-        if self._x1 and self._x1:
+        """When the mouse is moved, move the window based on the initial position."""
+        if self._x1 and self._y1:
+            # 当窗口最大化时移动窗口，则恢复并根据原先鼠标位置占窗口宽度的比例来计算恢复后鼠标的x坐标
             if self.window.window_attr("maximized"):
                 p = self._x1 / self.window.width
                 self.window.restore()
                 self._x1 = self.width * p
             self.window.move(
-                event.rootx - self._x1,
-                event.rooty - self._y1,
+                event["rootx"] - self._x1,
+                event["rooty"] - self._y1,
             )
             """if platform == "win32":
                 WM_SYSCOMMAND = 274
@@ -100,6 +105,7 @@ class SkTitleBar(SkCard):
                 )"""
 
     def _mouse_release(self, event: SkEvent):
+        """When the mouse is released, clear the initial position."""
         self._x1 = None
         self._y1 = None
 

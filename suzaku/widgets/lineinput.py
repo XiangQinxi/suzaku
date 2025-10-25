@@ -77,11 +77,12 @@ class SkLineInput(SkWidget):
         self.bind("focus_gain", self._focus_gain)
         self.bind("char", self._char)
         self.bind("key_press", self._key)
-        self.bind("key_repeated", self._key)
+        self.bind("key_repeat", self._key)
         self.bind("mouse_press[b1]", self._press)
         self.window.bind("mouse_motion", self._motion)
         self.bind("mouse_motion", self._motion)
         self.bind("scroll", self._scroll)
+        # self.window
 
     # endregion
 
@@ -131,6 +132,7 @@ class SkLineInput(SkWidget):
         if self.button == 0:
             if self.is_mouse_press:
                 self.end_index = self.index(event["x"])
+                self.update(True)
 
     def _press(self, event: SkEvent) -> None:
         """Record the `start_index` and `end_index` when the text is press.
@@ -139,6 +141,7 @@ class SkLineInput(SkWidget):
         # 【只有在左键按下时，才记录start_index】
         self.cursor_visible = True
         self.start_index = self.end_index = self.index(event["x"])
+        self.update(True)
 
     def _char(self, event: SkEvent):
         """Triggered when input text is entered.
@@ -163,6 +166,7 @@ class SkLineInput(SkWidget):
             self.start_index = self.end_index = self._cursor_index = len(
                 text[:start] + event["char"]
             )
+        self.update(True)
 
     def _key(self, event: SkEvent):
         """Key event 按键事件触发
@@ -172,6 +176,7 @@ class SkLineInput(SkWidget):
         """
 
         # 快捷键
+        mods = event["mods"]
         match event["key"]:
             # Backspace 删除光标前面文本
             case glfw.KEY_BACKSPACE:
@@ -184,21 +189,21 @@ class SkLineInput(SkWidget):
             # Ctrl + V 粘贴
             case glfw.KEY_V:
                 """Paste Text"""
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_paste()
             # Ctrl + C 复制
             case glfw.KEY_C:
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_copy()
             # Ctrl + A 全选
             case glfw.KEY_A:
                 """Select All"""
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_select_all()
             # Ctrl + X 剪切
             case glfw.KEY_X:
                 """Cut Text"""
-                if event.mods == "control":
+                if mods == "control":
                     self.cursor_cut()
             # Home ↑ 光标移至最左
             case glfw.KEY_HOME | glfw.KEY_UP:
@@ -218,9 +223,9 @@ class SkLineInput(SkWidget):
                 self.cursor_right()
             case glfw.KEY_Z:
                 """Redo"""
-                if event.mods == "control":
+                if mods == "control":
                     self.undo()
-                elif event.mods == "control+shift":
+                elif mods == "control+shift":
                     self.redo()
 
     def get(self) -> str:
@@ -242,6 +247,8 @@ class SkLineInput(SkWidget):
             self.attributes["textvariable"].set(text)
         else:
             self.attributes["text"] = text
+        self.update(True)
+
         return self
 
     def index(self, mouse_x: int) -> int:
@@ -308,6 +315,7 @@ class SkLineInput(SkWidget):
             # 更新光标位置到文本末尾
             self.cursor_end()
             self.check()
+            self.update(True)
 
     def undo(self):
         """Undo the last operation【撤销上一个操作】"""
@@ -325,6 +333,7 @@ class SkLineInput(SkWidget):
             # 更新光标位置到文本末尾
             self.cursor_end()
             self.check()
+            self.update(True)
 
     def cursor_index(self, index: int | None = None) -> Self | int:
         """Set cursor index
@@ -332,6 +341,7 @@ class SkLineInput(SkWidget):
         """
         if index and isinstance(index, int):
             self._cursor_index = index
+            self.update(True)
         else:
             return self._cursor_index
         return self
@@ -371,6 +381,8 @@ class SkLineInput(SkWidget):
                 if self.is_selected():
                     self.start_index = self.end_index = 0
         self.cursor_visible = True
+        self.update(True)
+
         return self
 
     def cursor_right(self, move: int = 1, cancel_selected: bool = True) -> Self:
@@ -413,6 +425,8 @@ class SkLineInput(SkWidget):
                 if self.is_selected():
                     self.start_index = self.end_index = long
         self.cursor_visible = True
+        self.update(True)
+
         return self
 
     def delete_selected(self) -> Self:
@@ -428,6 +442,8 @@ class SkLineInput(SkWidget):
             )
             self.set(self.get()[:start] + self.get()[end:])
             self.check()
+        self.update(True)
+
         return self
 
     def cursor_backspace(self) -> Self:
@@ -447,6 +463,8 @@ class SkLineInput(SkWidget):
         else:
             self.delete_selected()
         self.cursor_visible = True
+        self.update(True)
+
         return self
 
     def cursor_delete(self) -> Self:
@@ -472,6 +490,8 @@ class SkLineInput(SkWidget):
             self.record_state()
             self.delete_selected()
         self.cursor_visible = True
+        self.update(True)
+
         return self
 
     def cursor_home(self) -> Self:
@@ -481,6 +501,8 @@ class SkLineInput(SkWidget):
         self._cursor_index = 0
         self.visible_start_index = 0
         self.cursor_visible = True
+        self.update(True)
+
         return self
 
     def cursor_end(self) -> Self:
@@ -498,6 +520,8 @@ class SkLineInput(SkWidget):
         ):
             self.visible_start_index += 1
         self.cursor_visible = True
+        self.update(True)
+
         return self
 
     def cursor_paste(self):
@@ -527,6 +551,7 @@ class SkLineInput(SkWidget):
                 index = start + len(clipboard)
                 self.cursor_index(index)
                 self.start_index = self.end_index = index
+            self.update(True)
 
     def cursor_copy(self):
         """Copy the selected text
@@ -546,6 +571,7 @@ class SkLineInput(SkWidget):
             if self.attributes["readonly"]:
                 return
             self.cursor_backspace()
+            self.update(True)
 
     def sort_select(self):
         return sorted([self.start_index, self.end_index])
@@ -553,6 +579,7 @@ class SkLineInput(SkWidget):
     def cursor_select(self, start: int, end: int):
         self.start_index = start
         self.end_index = self._cursor_index = end
+        self.update(True)
 
     def cursor_select_all(self):
         """Select all text
@@ -570,7 +597,10 @@ class SkLineInput(SkWidget):
         # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
         if self.is_focus:
             blink_interval = self.cget("blink_interval")
-            # self.bind(f"delay[{blink_interval}]", self.blink)
+            self.bind(f"delay[{blink_interval}]", self.blink)
+            self.need_redraw = True
+
+        #
 
     def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Draw the text input

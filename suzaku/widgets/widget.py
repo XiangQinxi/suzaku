@@ -5,7 +5,8 @@ import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
+from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
+                            style_to_color)
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -154,13 +155,19 @@ class SkWidget(SkEventHandling, SkMisc):
         self.gradient = SkGradient()
         self.button: typing.Literal[0, 1, 2] = 0
         self.click_time: float | int = 0
+        self.need_redraw: bool = False
 
-        def _on_mouse(event: SkEvent):
+        def _on_motion(event: SkEvent):
             self.mouse_x = event["x"]
             self.mouse_y = event["y"]
 
-        self.bind("mouse_enter", _on_mouse)
-        self.bind("mouse_motion", _on_mouse)
+        def _draw(event: SkEvent):
+            self.update(redraw=True)
+
+        self.bind("mouse_enter", _draw)
+        self.bind("mouse_leave", _draw)
+        self.bind("mouse_press", _draw)
+        self.bind("mouse_motion", _on_motion)
 
         self.bind("mouse_release", self._on_mouse_release)
 
@@ -196,6 +203,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
     def _on_mouse_release(self, event) -> None:
         if self.is_mouse_floating:
+            self.update(redraw=True)
             self.trigger("click", event)
             time = self.time()
 
@@ -208,6 +216,17 @@ class SkWidget(SkEventHandling, SkMisc):
     # endregion
 
     # region Draw the widget 绘制组件
+
+    def update(self, redraw: bool = False) -> None:
+        self.trigger("update", SkEvent(widget=self, event_type="update"))
+        self.need_redraw = redraw
+
+        if "SkContainer" in SkMisc.sk_get_type(self):
+            from .container import SkContainer
+
+            SkContainer.update(self)
+
+        self._pos_update()
 
     def draw(self, canvas: skia.Canvas) -> None:
         """Execute the widget rendering and subwidget rendering
@@ -241,6 +260,8 @@ class SkWidget(SkEventHandling, SkMisc):
         if hasattr(self, "draw_children"):
             self.update_layout(None)
             self.draw_children(canvas)
+
+        self.trigger("redraw", SkEvent(self, "redraw"))
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Execute the widget rendering
@@ -719,15 +740,6 @@ class SkWidget(SkEventHandling, SkMisc):
     def measure_text(self, text: str, *args) -> float | int:
         font: skia.Font = self.cget("font")
         return font.measureText(text, *args)
-
-    def update(self):
-        self.trigger("update", SkEvent(widget=self, event_type="update"))
-        if "SkContainer" in SkMisc.sk_get_type(self):
-            from .container import SkContainer
-
-            SkContainer.update(self)
-        self._pos_update()
-        self.post()
 
     @property
     def x(self):

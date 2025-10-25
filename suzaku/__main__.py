@@ -27,7 +27,7 @@ if __name__ == "__main__":
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt))
 
-        # headerbar = titlebar(window)
+        headerbar = titlebar(window)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -60,7 +60,9 @@ if __name__ == "__main__":
             tab_widgets.bind_scroll_event()
             tabs.add(tab_widgets, text="Widgets")
 
-            SkTextButton(tab_widgets, text="SkTextButton").box(padx=10, pady=(10, 0))
+            SkTextButton(
+                tab_widgets, text="SkTextButton", command=lambda: print("click")
+            ).box(padx=10, pady=(10, 0))
 
             SkCombobox(tab_widgets).box(padx=10, pady=(10, 0))
 
@@ -104,10 +106,10 @@ if __name__ == "__main__":
             tab_settings.bind_scroll_event()
             tabs.add(tab_settings, text="Settings")
 
-            def change_theme(index: int):
-                if index == 0:
+            def change_theme(event: SkEvent):
+                if event["index"] == 0:
                     window.apply_theme(default_theme)
-                elif index == 1:
+                elif event["index"] == 1:
                     window.apply_theme(dark_theme)
 
             SkText(tab_settings, text="Theme Mode", align="left").box(
@@ -125,7 +127,12 @@ if __name__ == "__main__":
             SkTextButton(
                 tab_settings,
                 text="Screenshot (wait 3s)",
-                command=lambda: window.after(3, lambda: window.save()),
+                command=lambda: window.bind("delay[3]", lambda _: window.save()),
+            ).box(padx=10, pady=(10, 0))
+            SkTextButton(
+                tab_settings,
+                text="Check",
+                command=lambda: print(window.tasks["delay[3]"]),
             ).box(padx=10, pady=(10, 0))
 
             def anti_alias():
@@ -148,6 +155,9 @@ if __name__ == "__main__":
         sizegrip.box(side="right", padx=5, pady=5)
         statusbar.box(side="bottom", padx=0, pady=0)
 
+        # window.bind("delay[5]", lambda _: print("Delay 5"))
+
     create1window()
 
     app.run()
+    print("Closed")

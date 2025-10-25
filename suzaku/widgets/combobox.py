@@ -17,9 +17,7 @@ class SkComboBox(SkButton):
         editable: bool = True,
         **kwargs,
     ):
-        super().__init__(
-            parent, style=style, command=lambda _=None: self._on_click(_), **kwargs
-        )
+        super().__init__(parent, style=style, **kwargs)
 
         self.attributes["editable"]: bool = editable
 
@@ -29,6 +27,7 @@ class SkComboBox(SkButton):
         self.text = SkText(
             self,
         )
+        self.bind("click", self._on_click)
 
         self.help_parent_scroll = True
 
