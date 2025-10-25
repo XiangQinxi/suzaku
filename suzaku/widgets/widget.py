@@ -5,8 +5,7 @@ import skia
 
 from ..event import SkEvent, SkEventHandling
 from ..misc import SkMisc
-from ..styles.color import (SkColor, SkGradient, skcolor_to_color,
-                            style_to_color)
+from ..styles.color import SkColor, SkGradient, skcolor_to_color, style_to_color
 from ..styles.drop_shadow import SkDropShadow
 from ..styles.font import default_font
 from ..styles.theme import SkStyleNotFoundError, SkTheme, default_theme
@@ -940,7 +939,7 @@ class SkWidget(SkEventHandling, SkMisc):
                     "height": height,
                 }
             }
-            self.parent.add_fixed_child(self)
+            self.parent.add_layer3_child(self)
 
         return self
 
@@ -962,9 +961,11 @@ class SkWidget(SkEventHandling, SkMisc):
                 "y": y,
             }
         }
-        self.parent.add_floating_child(self)
+        self.parent.add_layer2_child(self)
 
         return self
+
+    floating = place
 
     def grid(
         self,
@@ -987,7 +988,7 @@ class SkWidget(SkEventHandling, SkMisc):
                 "pady": pady,
             }
         }
-        self.parent.add_layout_child(self)
+        self.parent.add_layer1_child(self)
 
         return self
 
@@ -1016,7 +1017,7 @@ class SkWidget(SkEventHandling, SkMisc):
                 "expand": expand,
             }
         }
-        self.parent.add_layout_child(self)
+        self.parent.add_layer1_child(self)
 
         return self
 
@@ -1063,7 +1064,7 @@ class SkWidget(SkEventHandling, SkMisc):
                     "expand": expand,
                 }
             }
-            self.parent.add_layout_child(self)
+            self.parent.add_layer1_child(self)
         if ipadx:
             self.ipadx = ipadx
         if ipady:

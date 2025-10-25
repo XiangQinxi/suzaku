@@ -204,7 +204,12 @@ class SkContainer:
             grid_map[col][row] = child
         return grid_map
 
-    def add_layout_child(self, child):
+    def add_layer_child(self, layer, child):
+        self.draw_list[layer].append(child)
+
+        self.update_layout()
+
+    def add_layer1_child(self, child):
         """Add layout child widget to window.
 
         :arg child: SkWidget
@@ -234,20 +239,18 @@ class SkContainer:
             else:
                 self._box_direction = direction
 
-        self.draw_list[0].append(child)
-        self.update_layout()
+        self.add_layer_child(0, child)
 
-    def add_floating_child(self, child):
+    def add_layer2_child(self, child):
         """Add floating child widget to window.
 
         :arg child: SkWidget
         :return: None
         """
 
-        self.draw_list[1].append(child)
-        self.update_layout()
+        self.add_layer_child(1, child)
 
-    def add_fixed_child(self, child):
+    def add_layer3_child(self, child):
         """Add fixed child widget to window.
 
         Example:
@@ -258,8 +261,7 @@ class SkContainer:
         :arg child: SkWidget
         :return: None
         """
-        self.draw_list[2].append(child)
-        self.update_layout()
+        self.add_layer_child(2, child)
 
     # endregion
 

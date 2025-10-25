@@ -1,7 +1,7 @@
 {
-  "name": "sunvalley.light",
+  "name": "cosmic.light",
   "base": "default.light",
-  "friendly_name": "SunValley Light",
+  "friendly_name": "Cosmic Light",
 
   "color_palette": {
     "bg": [250, 250, 250, 255],
@@ -63,14 +63,15 @@
 
     "SkCloseButton": {
       "rest": {
-        "size": [35, 35],
-        "radius": [0, 5, 0, 0],
-        "bg": "transparent",
-        "fg": {"color_palette": "fg"},
+        "size": [20, 20],
+        "radius": 99,
+        "bg": [255, 95, 87],
+        "bd": [0,0,0,20],
+        "fg": "transparent",
         "width": 0
       },
       "hover": {
-        "bg": [196, 43, 28],
+        "bg": [255, 95, 87],
         "fg": "white",
         "width": 0
       },
@@ -88,8 +89,8 @@
 
     "SkMaximizeButton": {
       "rest": {
-        "size": [35, 35],
-        "radius": 0,
+        "size": [30, 30],
+        "radius": 99,
         "icon_radius": 1,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
@@ -114,15 +115,15 @@
 
     "SkMinimizeButton": {
       "rest": {
-        "size": [35, 35],
-        "radius": [5, 0, 0, 5],
+        "size": [20, 20],
+        "radius": 99,
         "icon_radius": 1,
-        "bg": "transparent",
-        "fg": {"color_palette": "fg"},
+        "bg": [254, 188, 46],
+        "fg": "transparent",
         "width": 0
       },
       "hover": {
-        "bg": [0, 0, 0, 20],
+        "bg": [254, 188, 46],
         "fg": "black",
         "width": 0
       },
@@ -143,50 +144,15 @@
         "size": [0, 0],
         "radius": 0,
         "width": 0,
-        "bg": {"color_palette": "second_bg"},
-        "bd_shadow": [0, 1, 2, 2, [0, 0, 0, 50]]
-      }
-    },
-
-    "SkTabs": {
-      "rest": {
-        "size": [0, 0],
-        "radius": 0,
-        "bg": "transparent",
-        "bd": "transparent",
-        "width": 0
-      }
-    },
-
-    "SkTabBar.Button": {
-      "rest": {
-        "size": [0, 32],
-        "radius": [4, 4, 0, 0],
-        "bg": "transparent",
-        "fg": {"color_palette": "fg"},
-        "width": 0
-      },
-      "hover": {
-        "bg": [255, 255, 255, 15],
-        "fg": {"color_palette": "fg"},
-        "width": 0
-      },
-      "press": {
-        "bg": [255, 255, 255, 25],
-        "fg": {"color_palette": "fg"},
-        "width": 0
-      },
-      "selected": {
-        "bg": [220, 220, 220, 180],
-        "fg": {"color_palette": "fg"},
-        "width": 1
+        "bg": "white",
+        "bd_shadow": [0, 2, 0, 0, [0, 0, 0, 30]]
       }
     },
 
     "SkWindow": {
       "rest": {
         "bg": {"color_palette": "bg"},
-        "radius": [10, 10, 10, 10],
+        "radius": [0, 0, 0, 0],
         "width": 3,
         "bd": {"color_palette": "bd"}
       }
@@ -194,7 +160,7 @@
 
     "SkWindowCommand": {
       "rest": {
-        "size": [0, 0],
+        "size": [0, 20],
         "radius": 0,
         "bg": "transparent",
         "bd": "transparent",
