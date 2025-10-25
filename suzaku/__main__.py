@@ -12,6 +12,10 @@ if __name__ == "__main__":
     # 修改主窗口创建代码
     app = SkApp(is_get_context_on_focus=False, is_always_update=False, framework="glfw")
     # print(glfw.default_window_hints())
+    try:
+        SkTheme().load_from_file("../demos/sunvalley.json")
+    except FileNotFoundError:
+        pass
 
     def create1window():
         window = SkWindow(
@@ -65,6 +69,9 @@ if __name__ == "__main__":
             ).box(padx=10, pady=(10, 0))
 
             SkCombobox(tab_widgets).box(padx=10, pady=(10, 0))
+            SkListBox(tab_widgets, items=["SkListItem 1", "SkListItem 2"]).box(
+                padx=10, pady=(10, 0)
+            )
 
             SkCheckButton(
                 tab_widgets,
@@ -107,16 +114,13 @@ if __name__ == "__main__":
             tabs.add(tab_settings, text="Settings")
 
             def change_theme(event: SkEvent):
-                if event["index"] == 0:
-                    window.apply_theme(default_theme)
-                elif event["index"] == 1:
-                    window.apply_theme(dark_theme)
+                window.apply_theme(themes[event["text"]])
 
-            SkText(tab_settings, text="Theme Mode", align="left").box(
-                padx=10, pady=(10, 0)
-            )
-
-            listbox = SkListBox(tab_settings, items=["Light", "Dark"])
+            SkText(tab_settings, text="Theme", align="left").box(padx=10, pady=(10, 0))
+            themes = {}
+            for theme in SkTheme.loaded_themes:
+                themes[theme.friendly_name] = theme
+            listbox = SkListBox(tab_settings, items=themes.keys())
             listbox.bind(
                 "changed",
                 change_theme,
@@ -154,6 +158,8 @@ if __name__ == "__main__":
         sizegrip = SkSizegrip(statusbar)
         sizegrip.box(side="right", padx=5, pady=5)
         statusbar.box(side="bottom", padx=0, pady=0)
+
+        window.update_layout()
 
         # window.bind("delay[5]", lambda _: print("Delay 5"))
 

@@ -7,7 +7,9 @@
     "bg": [20, 20, 20, 255],
     "bd": [50, 50, 50, 255],
     "fg": [255, 255, 255, 245],
-    "second_bg": [30, 30, 30, 255]
+    "inverse_fg": [0, 0, 0, 245],
+    "second_bg": [30, 30, 30, 255],
+    "accent": [25, 125, 225, 235]
   },
 
   "styles": {
@@ -375,7 +377,7 @@
       "hover": {
         "bg": [40, 40, 40, 245],
         "fg": {"color_palette": "fg"},
-        "bd": [25, 125, 225, 235],
+        "bd": {"color_palette": "accent"},
         "bd_shadow": [0, 1, 4, 4, [25, 125, 225, 50]],
         "width": 2,
         "placeholder": [255, 255, 255, 165]
@@ -383,7 +385,7 @@
       "focus": {
         "bg": [30, 30, 30, 240],
         "fg": {"color_palette": "fg"},
-        "bd": [25, 125, 225, 235],
+        "bd": {"color_palette": "accent"},
         "bd_shadow": [0, 1, 3, 3, [25, 125, 225, 100]],
         "width": 3,
         "cursor": [255, 255, 255, 100],
@@ -434,9 +436,9 @@
         "width": 0
       },
       "selected": {
-        "bg": [255, 255, 255, 10],
-        "bd": [25, 125, 225, 235],
-        "fg": {"color_palette": "fg"},
+        "bg": {"color_palette": "accent"},
+        "bd": {"color_palette": "accent"},
+        "fg": {"color_palette": "inverse_fg"},
         "width": 2
       }
     },
@@ -632,7 +634,7 @@
       "bg": {"color_palette": "bg"},
       "radius": [8, 8, 0, 0],
       "width": 3,
-      "bd": {"color_palette": "bd"}
+      "bd": [58, 59, 62]
     }
 
   }

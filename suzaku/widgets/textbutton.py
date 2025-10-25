@@ -99,7 +99,7 @@ class SkTextButton(SkButton, SkText):
                 rect.bottom(),
             ),
             text=self.get(),
-            fg=self.theme.get_style_attr(self.style_name, "fg"),
+            fg=style["fg"],
             align=self.cget("align"),
         )
         canvas.restore()

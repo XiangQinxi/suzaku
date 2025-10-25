@@ -117,6 +117,8 @@ class SkWindow(SkWindowBase, SkContainer):
         for child in self.children:
             child.apply_theme(new_theme)
 
+        self.update(True)
+
     # endregion
 
     # region Event handlers 事件处理

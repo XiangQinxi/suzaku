@@ -72,18 +72,28 @@ class SkListBox(SkCard):
         :return: Item index.【项索引】
         """
         if item:
-            self.selected_item = item
-            self.trigger(
-                f"changed",
-                SkEvent(self, event_type="changed", index=self.index(item), item=item),
-            )
-            return self
-        if index:
-            self.selected_item = self.item(index)
+            self.selected_item: SkListItem = item
             self.trigger(
                 f"changed",
                 SkEvent(
-                    self, event_type="changed", index=index, item=self.selected_item
+                    self,
+                    event_type="changed",
+                    index=self.index(item),
+                    item=item,
+                    text=item.cget("text"),
+                ),
+            )
+            return self
+        if index:
+            self.selected_item: SkListItem = self.item(index)
+            self.trigger(
+                f"changed",
+                SkEvent(
+                    self,
+                    event_type="changed",
+                    index=index,
+                    item=self.selected_item,
+                    text=self.selected_item.cget("text"),
                 ),
             )
             return self
