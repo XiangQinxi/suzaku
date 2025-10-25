@@ -537,6 +537,7 @@ class SkWidget(SkEventHandling, SkMisc):
                             config=bd_shader["linear_gradient"],
                             paint=bd_paint,
                         )
+                        # print(bd_shader["linear_gradient"])
             if is_custom_radius:
                 canvas.drawPath(path, bd_paint)
             else:
