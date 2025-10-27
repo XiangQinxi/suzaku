@@ -5,7 +5,6 @@ import time
 import typing
 import warnings
 import collections.abc
-# from dataclasses import dataclass
 
 # import re
 
@@ -133,20 +132,6 @@ class SkEventHandling:
             if not cls.multithread_tasks:
                 time.sleep(0.01)  # Avoid CPU draining while no tasks avail
                 continue
-            
-            # # Codes below written by AI, will be removed as same fixes already been made to 
-            # # current codes manually.
-            # try:
-            #     task, event_obj = cls.multithread_tasks[0]
-            #     task.target(event_obj)
-            #     cls.multithread_tasks.pop(0)
-            # except Exception as e:
-            #     # 即使任务执行失败，也要从队列中移除，防止队列堵塞
-            #     if cls.multithread_tasks:
-            #         failed_task = cls.multithread_tasks.pop(0)
-            #         warnings.warn(
-            #             f"Multithread task failed and removed: {failed_task[0].id}, error: {e}"
-            #         )
 
     @staticmethod
     def _execute_task(task: SkBoundTask, event_obj: SkEvent) -> None:
@@ -174,7 +159,7 @@ class SkEventHandling:
             ...
         This shows subclassing SkEventHandling to let SkWidget gain the ability of handling events.
         """
-        self.events: list = []
+        self.latest_event: SkEvent = SkEvent(widget=None, event_type="NO_EVENT")
         self.tasks: dict[str, list[SkBoundTask]] = {}
         # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
         self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
@@ -261,7 +246,7 @@ class SkEventHandling:
                 widget=self, event_type=list(parsed_event_type.keys())[0]
             )
         # Add the event to event lists (the widget itself and the global list)
-        self.events.append(event_obj)
+        self.latest_event = event_obj
         SkEvent.latest = event_obj
         # Find targets
         targets = []
@@ -275,39 +260,6 @@ class SkEventHandling:
                 for task in self.tasks[target]:
                     # To execute all tasks bound under this event
                     self.execute_task(task, event_obj)
-
-        """
-        parsed_event_type = self.parse_event_type_str(event_type)
-        # Create a default SkEvent object if not specified
-        if event_obj is None:
-            event_obj = SkEvent(
-                widget=self, event_type=list(parsed_event_type.keys())[0]
-            )
-
-        # 限制事件列表大小，防止无限增长
-        MAX_EVENTS_PER_INSTANCE = 1000
-        MAX_GLOBAL_EVENTS = 5000
-
-        if len(self.events) >= MAX_EVENTS_PER_INSTANCE:
-            self.events = self.events[MAX_EVENTS_PER_INSTANCE // 2 :]
-        self.events.append(event_obj)
-
-        if len(SkEvent.global_list) >= MAX_GLOBAL_EVENTS:
-            SkEvent.global_list = SkEvent.global_list[MAX_GLOBAL_EVENTS // 2 :]
-        SkEvent.global_list.append(event_obj)
-
-        # Find targets
-        targets = [event_type]
-        if list(parsed_event_type.values())[0] in ["", "*"]:
-            targets.append(list(parsed_event_type.keys())[0])
-            targets.append(list(parsed_event_type.keys())[0] + "[*]")
-
-        for target in targets:
-            if target in self.tasks:
-                for task in self.tasks[target]:
-                    self.execute_task(task, event_obj)
-
-        """
 
     def bind(self, 
              event_type: str, target: typing.Callable | typing.Iterable,
@@ -496,3 +448,5 @@ class SkEvent:
             return self.event_data[key]
         else:
             return None  # If no such item avail, returns None
+
+SkEvent.latest = SkEvent(widget=None, event_type="NO_EVENT")
