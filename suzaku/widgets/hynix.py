@@ -9,9 +9,13 @@ RAM = """
 
 
 class SkHynix:
+    """Ester egg from the very beginning, by rgzz666."""
     def __init__(self):
-        """
-        Ester egg from the very beginning, by rgzz666.
+        """Ester egg from the very beginning, by rgzz666.
+        
+        Example
+        -------
+        DO NOT try to create any object from SkHynix class, unless u wanna blow up ur program.
         """
         print(RAM)
         raise RuntimeError(
