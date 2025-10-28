@@ -6,7 +6,7 @@ import typing
 import warnings
 import collections.abc
 
-# import re
+import re
 
 # if typing.TYPE_CHECKING:
 #     from .widgets import SkWidget, SkWindow
@@ -179,13 +179,15 @@ class SkEventHandling:
         :param event_type_str: The event type string to be parsed
         :returns: json, parsed event type
         """
-        event_type = event_type_str.split("[")[0]  # To be changed
-        if len(event_type_str.split("[")) > 1:
-            params = event_type_str.split("[")[1][0:-1].split(",")
-        else:
-            params = []
-        NotImplemented  # The previous lines are to be changed as they r soooo frickin' shitty
-        return {event_type: params}
+        if not re.match(".*\\[.*\\]", event_type_str):
+            return {"type": event_type_str, "params": []}
+        event_type = re.findall("^(.*?)\\[", event_type_str)[0]
+        params_raw = re.findall("\\[(.*?)\\]$", event_type_str)[0]
+        params = params_raw.split(",")
+        if len(params) == 1:
+            if params[0].strip() == "":
+                params = []
+        return {"type": event_type, "params": params}
 
     def execute_task(
         self, task: SkBoundTask, event_obj: SkEvent | None = None
@@ -250,11 +252,14 @@ class SkEventHandling:
         SkEvent.latest = event_obj
         # Find targets
         targets = []
-        targets.append(event_type)
-        if list(parsed_event_type.values())[0] in ["", "*"]:
-            # If match all
-            targets.append(list(parsed_event_type.keys())[0])
-            targets.append(list(parsed_event_type.keys())[0] + "[*]")
+        targets.append(parsed_event_type["type"])
+        if parsed_event_type["params"] == []:
+            targets.append(parsed_event_type["type"] + "[*]")
+        else:
+            targets.append(event_type)
+        # if parsed_event_type["params"][0] in ["", "*"]: # If match all
+        #     targets.append(parsed_event_type["type"])
+        #     targets.append(parsed_event_type["type"] + "[*]")
         for target in targets:
             if target in self.tasks:
                 for task in self.tasks[target]:
@@ -281,7 +286,7 @@ class SkEventHandling:
         :return: SkBoundTask that is bound to the task if success, otherwise False
         """
         parsed_event_type = self.parse_event_type_str(event_type)
-        if list(parsed_event_type.keys())[0] not in self.__class__.EVENT_TYPES:
+        if parsed_event_type["type"] not in self.__class__.EVENT_TYPES:
             # warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
             #                "so the task cannot be bound as expected.")
             # return False
@@ -290,7 +295,7 @@ class SkEventHandling:
             self.tasks[event_type] = []
         task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
-        match list(parsed_event_type.keys())[0]:
+        match parsed_event_type["type"]:
             case "delay":
                 task = SkDelayTask(
                     task_id,
@@ -300,7 +305,7 @@ class SkEventHandling:
                     _keep_at_clear,
                 )
             case "repeat":
-                NotImplemented
+                raise NotImplementedError("repeat events is not implemented yet!")
             case _:  # All normal event types
                 task = SkBoundTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
@@ -356,7 +361,7 @@ class SkEventHandling:
                 if task_id_parsed != self.id: # If given ID indicates another widget
                     NotImplemented 
                     # Still not inplemented, as we currently cannot get a SkWidget object itself 
-                    # only with its ID (waiting for XiangQinxi)
+                    # only with its ID (waiting for @XiangQinxi)
                     # This part should call the unbind function of the widget with such ID
                 for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
                     if task.id == target_task:
@@ -387,7 +392,7 @@ class SkEventHandling:
         """
         # print("Checking delayed events...")
         for binded_event_type in self.tasks:
-            if next(iter(self.parse_event_type_str(binded_event_type))) == "delay":
+            if self.parse_event_type_str(binded_event_type)["type"] == "delay":
                 for task in self.tasks[binded_event_type]:
                     if isinstance(task, SkDelayTask):
                         if float(time.time()) >= task.target_time:
