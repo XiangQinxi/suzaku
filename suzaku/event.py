@@ -300,7 +300,7 @@ class SkEventHandling:
                 task = SkDelayTask(
                     task_id,
                     target, # I will fix this type error later (ignore is ur type check is off)
-                    float(parsed_event_type["delay"][0]),
+                    float(parsed_event_type["params"][0]),
                     multithread,
                     _keep_at_clear,
                 )

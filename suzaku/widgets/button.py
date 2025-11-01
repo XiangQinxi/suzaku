@@ -8,8 +8,6 @@ from .frame import SkFrame
 class SkButton(SkFrame):
     """Button without Label or Icon.
 
-    **Will be re-written in the future.**
-
     :param args: Passed to SkVisual
     :param text: Button text
     :param size: Default size
@@ -71,7 +69,8 @@ class SkButton(SkFrame):
 
         :return: None
         """
-        if style_selector is None:
+        styles = self.theme.select(self.style_name)
+        if style_selector is None and styles is not None:
             if not self.cget("disabled"):
                 if self.is_mouse_floating:
                     if self.is_mouse_press:
@@ -79,7 +78,7 @@ class SkButton(SkFrame):
                     else:
                         style_selector = f"{self.style_name}:hover"
                 else:
-                    if "focus" in self.styles[self.style_name]:
+                    if "focus" in self.theme.select(self.style_name):
                         if self.is_focus:
                             style_selector = f"{self.style_name}:focus"
                         else:

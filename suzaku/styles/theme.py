@@ -371,7 +371,7 @@ class SkTheme:
         copy: bool = ...,
         fallback: bool = ...,
         make_path: bool = ...,
-        allow_not_found: typing.Literal[True],
+        allow_not_found: typing.Literal[True] = True,
     ) -> dict | None: ...
     @typing.overload
     def select(
@@ -381,7 +381,7 @@ class SkTheme:
         copy: bool = ...,
         fallback: bool = ...,
         make_path: bool = ...,
-        allow_not_found: typing.Literal[False],
+        allow_not_found: typing.Literal[False] = False,
     ) -> dict: ...
 
     def select(
