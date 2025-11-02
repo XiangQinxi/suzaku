@@ -8,13 +8,8 @@ import collections.abc
 
 import re
 
-# if typing.TYPE_CHECKING:
-#     from .widgets import SkWidget, SkWindow
 
-
-# [TODO] Implementation of clear_bind() and keep_at_clear
 # [TODO] Implementation of repeat events
-# [TODO] Rewrite event type string parsing
 # [TODO] Fix a type error in SkEventHandling.bind()
 # [TODO] Support unbind for another widget's event
 
@@ -382,13 +377,45 @@ class SkEventHandling:
                     UserWarning,
                 )
                 return False
+    
+    def clear_bind(self, event_type: str) -> bool:
+        """To clear clear tasks binded to a spcific event or widget
+        
+        Example
+        -------
+        .. code-block:: python
+            my_widget = SkWidget(...)
+            my_widget.clear_bind("click")
+        This shows clearing tasks bound to `click` event on `my_widget`.
+
+        .. code-block:: python
+            my_widget = SkWidget(...)
+            my_widget.clear_bind("*")
+        This shows clearing all events bound to any event on `my_widget`.
+
+        :param event_type: Type of event to clear binds, `*` for all
+        :return: Boolean, whether success or not
+        """
+        if event_type == "*": # Clear all tasks of this object
+            return not False in \
+            [self.clear_bind(this_type) for this_type in self.tasks]
+        else: # In other cases, this must be an specific event type
+            if event_type in self.tasks: # If type given existed and include some tasks
+                for task in self.tasks[event_type]:
+                    if not task.keep_at_clear: # Skip any keep_at_clear tasks
+                        self.unbind(task)
+                return True
+            else:
+                return False
 
     def _check_delay_events(self, _=None) -> None:
         """To check and execute delay events.
 
         Example
         -------
-        Mostly used by SkWidget.update(), which is internal use
+        Mostly used by SkWidget.update(), which is internal use.
+
+        :param _: To accept an event object if is given, will be ignored
         """
         # print("Checking delayed events...")
         for binded_event_type in self.tasks:
