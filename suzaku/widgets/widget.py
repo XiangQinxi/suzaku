@@ -41,6 +41,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
         SkEventHandling.__init__(self)
 
+        self.focused_redraw: bool = False
         self.parent: SkWidget = parent
         self.style_name: str = style_name
 
@@ -52,16 +53,9 @@ class SkWidget(SkEventHandling, SkMisc):
             )
             self.application = self.window.application
         except AttributeError:
-            raise AttributeError(
-                f"Parent component is not a SkWindow-based object. {self.parent}"
-            )
+            raise AttributeError(f"Parent component is not a SkWindow-based object. {self.parent}")
         self.anti_alias = self.window.anti_alias
-        self.id = (
-            self.window.id
-            + "."
-            + self.__class__.__name__
-            + str(self._instance_count + 1)
-        )
+        self.id = self.window.id + "." + self.__class__.__name__ + str(self._instance_count + 1)
         SkWidget._instance_count += 1
 
         # self.task = {
@@ -170,6 +164,9 @@ class SkWidget(SkEventHandling, SkMisc):
 
         self.bind("mouse_release", self._on_mouse_release)
 
+    def __str__(self):
+        return self.id
+
     # endregion
 
     # region Event
@@ -216,10 +213,10 @@ class SkWidget(SkEventHandling, SkMisc):
 
     # region Draw the widget 绘制组件
 
-    def update(self, redraw: bool = False) -> None:
+    def update(self, redraw: bool | None = None) -> None:
         self.trigger("update", SkEvent(widget=self, event_type="update"))
-        if redraw:
-            self.need_redraw = True
+        if redraw is not None:
+            self.need_redraw = redraw
 
         if "SkContainer" in SkMisc.sk_get_type(self):
             from .container import SkContainer
@@ -339,9 +336,7 @@ class SkWidget(SkEventHandling, SkMisc):
         def cache_paint(anti_alias, fg_):
             return skia.Paint(AntiAlias=anti_alias, Color=fg_)
 
-        text_paint = cache_paint(
-            self.anti_alias, skcolor_to_color(style_to_color(fg, self.theme))
-        )
+        text_paint = cache_paint(self.anti_alias, skcolor_to_color(style_to_color(fg, self.theme)))
 
         text_width = self.measure_text(text)
 
@@ -353,9 +348,7 @@ class SkWidget(SkEventHandling, SkMisc):
             draw_x = rect.left()
 
         metrics = self.metrics
-        draw_y = (
-            rect.top() + rect.height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
-        )
+        draw_y = rect.top() + rect.height() / 2 - (metrics.fAscent + metrics.fDescent) / 2
 
         if bg:
             bg = skcolor_to_color(style_to_color(bg, self.theme))
@@ -447,9 +440,9 @@ class SkWidget(SkEventHandling, SkMisc):
         radius: int | tuple[int, int, int, int] = 0,
     ):
         rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
-        radii: tuple[
-            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-        ] = self.unpack_radius(radius)
+        radii: tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]] = (
+            self.unpack_radius(radius)
+        )
         # 设置每个角的半径（支持X/Y不对称）
         rrect.setRectRadii(
             skia.Rect.MakeLTRB(*rect),
@@ -473,9 +466,7 @@ class SkWidget(SkEventHandling, SkMisc):
         bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
         bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
         width: int | float = 0,
-        bd_shadow: (
-            None | tuple[int | float, int | float, int | float, int | float, str]
-        ) = None,
+        bd_shadow: None | tuple[int | float, int | float, int | float, int | float, str] = None,
         bd_shader: None | typing.Literal["linear_gradient"] = None,
         bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
@@ -552,9 +543,7 @@ class SkWidget(SkEventHandling, SkMisc):
         bg: str | SkColor | int | None | tuple[int, int, int, int] = None,
         bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
         width: int | float = 0,
-        bd_shadow: (
-            None | tuple[int | float, int | float, int | float, int | float, str]
-        ) = None,
+        bd_shadow: None | tuple[int | float, int | float, int | float, int | float, str] = None,
         bd_shader: None | typing.Literal["linear_gradient"] = None,
         bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
@@ -636,9 +625,7 @@ class SkWidget(SkEventHandling, SkMisc):
                     for key, value in bg.items():
                         match key.lower():
                             case "color":
-                                _bg = skcolor_to_color(
-                                    style_to_color(value, self.theme)
-                                )
+                                _bg = skcolor_to_color(style_to_color(value, self.theme))
                                 bg_paint.setColor(_bg)
                             case "lg" | "linear_gradient":
                                 self.gradient.linear(
@@ -661,9 +648,7 @@ class SkWidget(SkEventHandling, SkMisc):
         fg=skia.ColorGRAY,
         width: int = 1,
         shader: None | typing.Literal["linear_gradient"] = None,
-        shadow: (
-            None | tuple[int | float, int | float, int | float, int | float, str]
-        ) = None,
+        shadow: None | tuple[int | float, int | float, int | float, int | float, str] = None,
     ):
         fg = skcolor_to_color(style_to_color(fg, self.theme))
         paint = skia.Paint(Color=fg, StrokeWidth=width)
@@ -681,9 +666,7 @@ class SkWidget(SkEventHandling, SkMisc):
         canvas.drawLine(x0, y0, x1, y1, paint)
 
     @staticmethod
-    def _draw_image_rect(
-        canvas: skia.Canvas, rect: skia.Rect, image: skia.Image
-    ) -> None:
+    def _draw_image_rect(canvas: skia.Canvas, rect: skia.Rect, image: skia.Image) -> None:
         canvas.drawImageRect(image, rect, skia.SamplingOptions(), skia.Paint())
 
     @staticmethod
@@ -1082,12 +1065,11 @@ class SkWidget(SkEventHandling, SkMisc):
         """
         if self.focusable:
             if not self.is_focus:
-                self.window.focus_get().trigger(
-                    "focus_loss", SkEvent(event_type="focus_loss")
-                )
+                self.window.focus_get().trigger("focus_loss", SkEvent(event_type="focus_loss"))
                 self.window.focus_get().is_focus = False
                 self.window.focus_widget = self
                 self.is_focus = True
+
                 self.trigger("focus_gain", SkEvent(event_type="focus_gain"))
 
     def focus_get(self) -> None:

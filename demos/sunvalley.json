@@ -75,6 +75,53 @@
       }
     },
 
+    "SkComboBox": {
+      "rest": {
+        "size": [0, 35],
+        "radius": 4,
+        "width": 1.3,
+        "bg": {"color_palette": "default_bg"},
+        "fg": {"color_palette": "default_fg"},
+        "bd": {"color_palette": "default_bd"},
+        "bd_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "91%": [0, 0, 0, 15],
+              "100%": [0, 0, 0, 40]
+            }
+          }
+        }
+      },
+      "hover": {
+        "bg": {"color_palette": "secondary_bg"},
+        "fg": {"color_palette": "secondary_fg"},
+        "bd": {"color_palette": "secondary_bd"},
+        "bd_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "91%": [0, 0, 0, 15],
+              "100%": [0, 0, 0, 40]
+            }
+          }
+        }
+      },
+      "press": {
+        "bg": {"color_palette": "tertiary_bg"},
+        "fg": {"color_palette": "tertiary_fg"},
+        "bd": {"color_palette": "tertiary_bd"}
+      },
+      "disabled": {
+        "bg": {"color_palette": "disabled_bg"},
+        "fg": {"color_palette": "disabled_fg"},
+        "bd": {"color_palette": "disabled_bg"},
+        "width": 2
+      }
+    },
+
     "SkCloseButton": {
       "rest": {
         "size": [35, 35],
@@ -151,6 +198,12 @@
         "width": 0
       }
     },
+    "SkSeparator": {
+      "rest": {
+        "fg": {"color_palette": "default_card_bd"},
+        "width": 2
+      }
+    },
 
     "SkTitleBar": {
       "rest": {
@@ -165,10 +218,10 @@
     "SkTabs": {
       "rest": {
         "size": [0, 0],
-        "radius": 0,
-        "bg": "transparent",
-        "bd": "transparent",
-        "width": 0
+        "radius": 6,
+        "bg": {"color_palette": "default_card_bg"},
+        "bd": {"color_palette": "default_card_bd"},
+        "width": 2
       }
     },
 

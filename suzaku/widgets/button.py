@@ -78,8 +78,9 @@ class SkButton(SkFrame):
                     else:
                         style_selector = f"{self.style_name}:hover"
                 else:
-                    if "focus" in self.theme.select(self.style_name):
-                        if self.is_focus:
+                    if self.is_focus:
+                        print(self.theme.select(self.style_name))
+                        if "focus" in self.theme.select(self.style_name):
                             style_selector = f"{self.style_name}:focus"
                         else:
                             style_selector = self.style_name

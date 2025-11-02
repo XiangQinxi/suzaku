@@ -28,13 +28,13 @@ def init_glfw() -> None:
     """
     if not glfw.init():
         raise SkAppInitError("glfw.init() failed")
-    
+
     # I don't think OpenGL works here
     # 设置全局GLFW、OpenGL配置
 
-    #import OpenGL
+    # import OpenGL
 
-    #OpenGL.ERROR_CHECKING = False
+    # OpenGL.ERROR_CHECKING = False
 
     glfw.window_hint(glfw.STENCIL_BITS, 8)
     glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, True)
@@ -58,15 +58,16 @@ def init_sdl2() -> None:
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
 
-    from sdl2 import (SDL_GL_CONTEXT_MAJOR_VERSION,
-                      SDL_GL_CONTEXT_MINOR_VERSION,
-                      SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_SetAttribute)
+    from sdl2 import (
+        SDL_GL_CONTEXT_MAJOR_VERSION,
+        SDL_GL_CONTEXT_MINOR_VERSION,
+        SDL_GL_CONTEXT_PROFILE_MASK,
+        SDL_GL_SetAttribute,
+    )
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)
-    SDL_GL_SetAttribute(
-        SDL_GL_CONTEXT_PROFILE_MASK, 0x0001
-    )  # SDL_GL_CONTEXT_PROFILE_CORE
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0x0001)  # SDL_GL_CONTEXT_PROFILE_CORE
 
 
 class SkAppBase(SkEventHandling, SkMisc):
@@ -108,9 +109,7 @@ class SkAppBase(SkEventHandling, SkMisc):
         self.is_get_context_on_focus: bool = is_get_context_on_focus
         self.vsync = vsync
         self.samples = samples
-        self.alive: bool = (
-            False  # Is the program currently running. 【程序是否正在运行】
-        )
+        self.alive: bool = False  # Is the program currently running. 【程序是否正在运行】
 
         SkAppBase.default_application = self
 
@@ -162,15 +161,22 @@ class SkAppBase(SkEventHandling, SkMisc):
         """
         from glfw import poll_events, wait_events
 
-        wait_events() # use wait events for static update, reduce CPU usage
-        # poll_events() # dynamic update
+        input_mode: bool = False
+
+        # poll_events()
 
         for window in self.windows:
-            if not glfw.get_window_attrib(window.window.the_window, glfw.FOCUSED):
-                continue
             if window.visible and window.alive:
                 window.update()
-                #if glfw.get_current_context():
+                if window.mode == "input":
+                    input_mode = True
+                if glfw.get_current_context():
+                    glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
+
+        if input_mode:
+            poll_events()
+        else:
+            wait_events()
 
     def run(self) -> None:
         """Run the program (i.e., start the event loop).
@@ -189,10 +195,6 @@ class SkAppBase(SkEventHandling, SkMisc):
             case "glfw":
                 glfw.window_hint(glfw.SAMPLES, self.samples)
                 glfw.set_error_callback(self.error)
-                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
-
-        import gc
-        gc.collect()
 
         while self.alive:
             if not self.windows:

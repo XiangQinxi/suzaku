@@ -21,5 +21,4 @@ class SkMenuItem(SkTextButton):
         self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
-        if "hide" in self.parent.events:
-            self.parent.trigger("hide", SkEvent(event_type="hide"))
+        self.parent.trigger("hide", SkEvent(event_type="hide"))

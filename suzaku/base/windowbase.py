@@ -223,7 +223,9 @@ class SkWindowBase(SkEventHandling, SkMisc):
                     else:
                         monitor = None
 
-                    glfw.window_hint(glfw.CONTEXT_RELEASE_BEHAVIOR, glfw.RELEASE_BEHAVIOR_NONE) # mystery optimize
+                    glfw.window_hint(
+                        glfw.CONTEXT_RELEASE_BEHAVIOR, glfw.RELEASE_BEHAVIOR_NONE
+                    )  # mystery optimize
                     glfw.window_hint(glfw.STENCIL_BITS, 8)
                     glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
                     glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
@@ -825,8 +827,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
             hwnd = user32.GetForegroundWindow()
             return set_candidate_pos(hwnd, 100, 200)
 
-    # TODO: docstring
     def geometry(self, spec: str | None = None) -> str | typing.Self:
+        """Get or set the geometry of the window.
+
+        :param spec: Geometry specification string, such as "100x100+100+100"
+        :return: Geometry string if no argument is given, otherwise self
+        """
         if spec is None:
             return f"{self.width}x{self.height}+{self.root_x}+{self.root_y}"
 

@@ -338,16 +338,12 @@ class SkWindow(SkWindowBase, SkContainer):
                     height = max(minheight, self._height1 + event["y"] - self._y1)
                 if self._anchor.startswith("n"):
                     height = max(minheight, self._bottom - (event["rooty"] - self._y1))
-                    y = min(
-                        self.root_y + self.height - minheight, event["rooty"] - self._y1
-                    )
+                    y = min(self.root_y + self.height - minheight, event["rooty"] - self._y1)
                 if self._anchor.endswith("e"):
                     width = max(minwidth, self._width1 + event["x"] - self._x1)
                 if self._anchor.endswith("w"):
                     width = max(minwidth, self._right - event["rootx"] - self._x1)
-                    x = min(
-                        self.root_x + self.width - minwidth, event["rootx"] - self._x1
-                    )
+                    x = min(self.root_x + self.width - minwidth, event["rootx"] - self._x1)
                 self.window.resize(width, height)
                 self.window.move(x, y)
 
@@ -440,9 +436,9 @@ class SkWindow(SkWindowBase, SkContainer):
         radius: int | tuple[int, int, int, int] = 0,
     ):
         rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
-        radii: tuple[
-            tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-        ] = self.unpack_radius(radius)
+        radii: tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]] = (
+            self.unpack_radius(radius)
+        )
         # 设置每个角的半径（支持X/Y不对称）
         rrect.setRectRadii(
             skia.Rect.MakeLTRB(*rect),
@@ -469,9 +465,9 @@ class SkWindow(SkWindowBase, SkContainer):
 
         _ = not self.window_attr("border") and "radius" in style
         if _:
-            radii: tuple[
-                tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]
-            ] = self.unpack_radius(radius)
+            radii: tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]] = (
+                self.unpack_radius(radius)
+            )
             rrect: skia.RRect = skia.RRect.MakeRectXY(self.rect, 0, 0)
             rrect.setRectRadii(
                 self.rect,
@@ -486,17 +482,13 @@ class SkWindow(SkWindowBase, SkContainer):
                 rrect,
                 self.anti_alias,
             )
-        canvas.clear(
-            style_to_color(self._style("bg", skia.ColorWHITE, style), self.theme).color
-        )
+        canvas.clear(style_to_color(self._style("bg", skia.ColorWHITE, style), self.theme).color)
         # canvas.clear(skia.ColorTRANSPARENT)
 
         self.draw_children(canvas)
 
         if _:
-            bd = style_to_color(
-                self._style("bd", skia.ColorBLACK, style), self.theme
-            ).color
+            bd = style_to_color(self._style("bd", skia.ColorBLACK, style), self.theme).color
             width = self._style("width", 2, style)
 
             path = self._rect_path(self.rect, radius)
