@@ -13,6 +13,7 @@ import re
 # [TODO] Fix a type error in SkEventHandling.bind()
 # [TODO] Support unbind for another widget's event
 
+
 class SkBoundTask:
     """A class to represent bound task when a event is triggered."""
 
@@ -50,11 +51,12 @@ class SkBoundTask:
 class SkDelayTask(SkBoundTask):
     """A class to represent delay tasks"""
 
-    def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
+    def __init__(self, id_: str, target: typing.Callable | typing.Iterable, delay_, *args, **kwargs):
         """Inherited from SkBoundTask, used to store tasks bound to `delay` events.
 
         :param delay: Time to delay, in seconds, indicating how log to wait before the task is
                       executed.
+        :param (Other): See `SkBoundTask.__init__()`
         """
         SkBoundTask.__init__(
             self, id_, target, *args, **kwargs
