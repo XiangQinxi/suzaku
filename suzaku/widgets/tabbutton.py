@@ -61,14 +61,14 @@ class SkTabButton(SkTextButton):
         underline_width = self._style("underline_width", 0, style)
         underline_shadow = self._style("underline_shadow", 0, style)
         underline_shader = self._style("underline_shader", None, style)
-        underline_padx = self.unpack_padx(self._style("underline_padx", (5, 5), style))
+        underline_ipadx = self.unpack_padx(self._style("underline_ipadx", (5, 5), style))
 
         if self.selected:
             self._draw_line(
                 canvas,
-                self.canvas_x + underline_padx[0],
+                self.canvas_x + underline_ipadx[0],
                 self.canvas_y + self.height,
-                self.canvas_x + self.width - underline_padx[1],
+                self.canvas_x + self.width - underline_ipadx[1],
                 self.canvas_y + self.height,
                 width=underline_width,
                 fg=underline,

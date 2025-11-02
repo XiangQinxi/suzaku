@@ -609,7 +609,7 @@
         "bd_shadow": [0, 0, 0, 0, [40, 130, 255, 255]],
         "underline": [40, 130, 255, 255],
         "underline_width": 2,
-        "underline_padx": 1
+        "underline_ipadx": 1
       }
     },
 

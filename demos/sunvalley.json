@@ -235,20 +235,57 @@
       },
       "hover": {
         "bg": [255, 255, 255, 15],
-        "fg": {"color_palette": "fg"},
-        "width": 0
+        "fg": {"color_palette": "default_fg"}
       },
       "press": {
         "bg": [255, 255, 255, 25],
-        "fg": {"color_palette": "fg"},
-        "width": 0
+        "fg": {"color_palette": "default_fg"}
       },
       "selected": {
-        "bg": [220, 220, 220, 180],
+        "bg": [220, 220, 220, 100],
         "fg": {"color_palette": "default_fg"},
+        "underline": {"color_palette": "accent"},
+        "underline_width": 2,
+        "underline_ipadx": 10
+      }
+    },
+
+    "SkListBox": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 5,
+        "bg": {"color_palette": "default_card_bg"},
+        "bd": {"color_palette": "default_card_bd"},
         "width": 1
       }
     },
+
+    "SkListBox.Item": {
+      "rest": {
+        "size": [0, 32],
+        "radius": 3,
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"}
+      },
+      "press": {
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"}
+      },
+      "selected": {
+        "bg": {"color_palette": "default_card_bd"},
+        "fg": {"color_palette": "default_fg"},
+        "leftline": {"color_palette": "accent"},
+        "leftline_width": 2,
+        "leftline_ipady": 5,
+        "leftline_ipadx": 2
+      }
+    },
+
 
     "SkWindow": {
       "rest": {
