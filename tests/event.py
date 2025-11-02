@@ -7,6 +7,4 @@ button = sk.SkTextButton(
     root, text="Print latest event", command=lambda: print(sk.SkEvent.latest.event_type)
 ).box(padx=20, pady=50)
 
-# root.bind("delay[2]", output_latest_event)
-
 root.mainloop()

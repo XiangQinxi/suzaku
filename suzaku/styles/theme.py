@@ -6,6 +6,7 @@ import pathlib
 import re
 import typing
 import warnings
+import inspect
 
 from . import color
 
@@ -127,15 +128,16 @@ class SkTheme:
         self.children = []
         self.is_special = False
 
-        self.styles: dict = styles
         if styles is None:
             self.styles: dict = SkTheme.DEFAULT_THEME.styles
+        else:
+            self.styles: dict = styles
         self.color_palette = {}
 
         SkTheme.loaded_themes.append(self)  # TODO: figure out.
         return
 
-    def load_from_file(self, file_path: typing.Union[str, pathlib.Path]) -> "SkTheme":
+    def load_from_file(self, file_path: str | pathlib.Path) -> "SkTheme":
         """Load styles to theme from a file.
 
         Example
@@ -150,6 +152,15 @@ class SkTheme:
         :param file_path: Path to the theme file
         :return self: The SkTheme itself
         """
+        # Change path string into pathlib Path
+        if type(file_path) is str:
+            file_path = pathlib.Path(file_path)
+        # Get path where lies codes calling this function (to support relative path)
+        if not file_path.is_absolute():
+            frame = inspect.currentframe()
+            outer_frame = inspect.getouterframes(frame)[1]
+            caller_file = pathlib.Path(outer_frame.filename).parent
+            file_path = (caller_file / file_path).resolve()
         # We need a file to load from file \o/ \o/ \o/
         with open(file_path, mode="r", encoding="utf-8") as f:
             style_raw = f.read()
@@ -360,7 +371,7 @@ class SkTheme:
         copy: bool = ...,
         fallback: bool = ...,
         make_path: bool = ...,
-        allow_not_found: typing.Literal[True],
+        allow_not_found: typing.Literal[True] = True,
     ) -> dict | None: ...
     @typing.overload
     def select(
@@ -370,7 +381,7 @@ class SkTheme:
         copy: bool = ...,
         fallback: bool = ...,
         make_path: bool = ...,
-        allow_not_found: typing.Literal[False],
+        allow_not_found: typing.Literal[False] = False,
     ) -> dict: ...
 
     def select(
@@ -631,8 +642,6 @@ class SkTheme:
         # (This is to prevent modifications on original theme)
         new_theme = SkTheme({}, parent=self)
         new_theme.is_special = True
-        selector_parsed = self.parse_selector(selector)
-        # new_theme.styles = {}
         # Modifying styles of the new theme
         style_operate = new_theme.select(selector, copy=False, make_path=True)
         style_operate.update(kwargs)

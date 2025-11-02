@@ -223,6 +223,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                     else:
                         monitor = None
 
+                    glfw.window_hint(glfw.CONTEXT_RELEASE_BEHAVIOR, glfw.RELEASE_BEHAVIOR_NONE) # mystery optimize
                     glfw.window_hint(glfw.STENCIL_BITS, 8)
                     glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, glfw.TRUE)  # macOS
                     glfw.window_hint(glfw.SCALE_TO_MONITOR, glfw.TRUE)  # Windows/Linux
@@ -305,7 +306,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                     glfw.set_scroll_callback(window, self._on_scroll)
                     glfw.set_window_content_scale_callback(window, self._on_dpi_change)
                 case "sdl2":
-                    import sdl2
+                    print("TODO: implement sdl2 `create_bind`")
             self._event_init = True
 
     # endregion
@@ -320,15 +321,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
         if self.visible:
             self.trigger("update", SkEvent(event_type="update"))
 
-            if self.mode == "input":
+            if self.mode == "input" or redraw:
                 self.draw()
             else:
-                if redraw:
-                    self.draw()
-                else:
-                    if all([not child.need_redraw for child in self.children]):
-                        return
-                    self.draw()
+                if all([not child.need_redraw for child in self.children]):
+                    return
+                self.draw()
             # self.update_layout: typing.Callable
             # self.post()
 
@@ -760,6 +758,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     # region Configure 属性配置
 
+    # TODO: wtf function name and docstring
     def ime(self, x: int = 9, y: int = 0):
         return
         if sys.platform == "win32":
@@ -826,6 +825,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             hwnd = user32.GetForegroundWindow()
             return set_candidate_pos(hwnd, 100, 200)
 
+    # TODO: docstring
     def geometry(self, spec: str | None = None) -> str | typing.Self:
         if spec is None:
             return f"{self.width}x{self.height}+{self.root_x}+{self.root_y}"
@@ -884,7 +884,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         """
         glfw.request_window_attention(self.the_window)
 
-    ask_notice = ask_focus = hongwen = wm_ask_notice
+    ask_notice = ask_focus = wm_ask_notice
 
     def wm_iconpath(self, path: str | None = None) -> str | None:
         if path:

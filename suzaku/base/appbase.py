@@ -28,11 +28,13 @@ def init_glfw() -> None:
     """
     if not glfw.init():
         raise SkAppInitError("glfw.init() failed")
+    
+    # I don't think OpenGL works here
     # 设置全局GLFW、OpenGL配置
 
-    import OpenGL
+    #import OpenGL
 
-    OpenGL.ERROR_CHECKING = False
+    #OpenGL.ERROR_CHECKING = False
 
     glfw.window_hint(glfw.STENCIL_BITS, 8)
     glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, True)
@@ -160,14 +162,15 @@ class SkAppBase(SkEventHandling, SkMisc):
         """
         from glfw import poll_events, wait_events
 
-        # wait_events()
-        poll_events()
+        wait_events() # use wait events for static update, reduce CPU usage
+        # poll_events() # dynamic update
 
         for window in self.windows:
+            if not glfw.get_window_attrib(window.window.the_window, glfw.FOCUSED):
+                continue
             if window.visible and window.alive:
                 window.update()
-                if glfw.get_current_context():
-                    glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
+                #if glfw.get_current_context():
 
     def run(self) -> None:
         """Run the program (i.e., start the event loop).
@@ -186,6 +189,10 @@ class SkAppBase(SkEventHandling, SkMisc):
             case "glfw":
                 glfw.window_hint(glfw.SAMPLES, self.samples)
                 glfw.set_error_callback(self.error)
+                glfw.swap_interval(1 if self.vsync else 0)  # 是否启用垂直同步
+
+        import gc
+        gc.collect()
 
         while self.alive:
             if not self.windows:

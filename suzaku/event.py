@@ -5,19 +5,14 @@ import time
 import typing
 import warnings
 import collections.abc
-# from dataclasses import dataclass
 
-# import re
-
-# if typing.TYPE_CHECKING:
-#     from .widgets import SkWidget, SkWindow
+import re
 
 
-# [TODO] Implementation of clear_bind() and keep_at_clear
 # [TODO] Implementation of repeat events
-# [TODO] Rewrite event type string parsing
 # [TODO] Fix a type error in SkEventHandling.bind()
 # [TODO] Support unbind for another widget's event
+
 
 class SkBoundTask:
     """A class to represent bound task when a event is triggered."""
@@ -56,11 +51,12 @@ class SkBoundTask:
 class SkDelayTask(SkBoundTask):
     """A class to represent delay tasks"""
 
-    def __init__(self, id_: str, target: typing.Callable, delay_, *args, **kwargs):
+    def __init__(self, id_: str, target: typing.Callable | typing.Iterable, delay_, *args, **kwargs):
         """Inherited from SkBoundTask, used to store tasks bound to `delay` events.
 
         :param delay: Time to delay, in seconds, indicating how log to wait before the task is
                       executed.
+        :param (Other): See `SkBoundTask.__init__()`
         """
         SkBoundTask.__init__(
             self, id_, target, *args, **kwargs
@@ -133,20 +129,6 @@ class SkEventHandling:
             if not cls.multithread_tasks:
                 time.sleep(0.01)  # Avoid CPU draining while no tasks avail
                 continue
-            
-            # # Codes below written by AI, will be removed as same fixes already been made to 
-            # # current codes manually.
-            # try:
-            #     task, event_obj = cls.multithread_tasks[0]
-            #     task.target(event_obj)
-            #     cls.multithread_tasks.pop(0)
-            # except Exception as e:
-            #     # 即使任务执行失败，也要从队列中移除，防止队列堵塞
-            #     if cls.multithread_tasks:
-            #         failed_task = cls.multithread_tasks.pop(0)
-            #         warnings.warn(
-            #             f"Multithread task failed and removed: {failed_task[0].id}, error: {e}"
-            #         )
 
     @staticmethod
     def _execute_task(task: SkBoundTask, event_obj: SkEvent) -> None:
@@ -174,7 +156,7 @@ class SkEventHandling:
             ...
         This shows subclassing SkEventHandling to let SkWidget gain the ability of handling events.
         """
-        self.events: list = []
+        self.latest_event: SkEvent = SkEvent(widget=None, event_type="NO_EVENT")
         self.tasks: dict[str, list[SkBoundTask]] = {}
         # Make a initial ID here as it will be needed anyway even if the object does not have an ID.
         self.id = f"{self.__class__.__name__}{self.__class__.instance_count}"
@@ -194,13 +176,15 @@ class SkEventHandling:
         :param event_type_str: The event type string to be parsed
         :returns: json, parsed event type
         """
-        event_type = event_type_str.split("[")[0]  # To be changed
-        if len(event_type_str.split("[")) > 1:
-            params = event_type_str.split("[")[1][0:-1].split(",")
-        else:
-            params = []
-        NotImplemented  # The previous lines are to be changed as they r soooo frickin' shitty
-        return {event_type: params}
+        if not re.match(".*\\[.*\\]", event_type_str):
+            return {"type": event_type_str, "params": []}
+        event_type = re.findall("^(.*?)\\[", event_type_str)[0]
+        params_raw = re.findall("\\[(.*?)\\]$", event_type_str)[0]
+        params = params_raw.split(",")
+        if len(params) == 1:
+            if params[0].strip() == "":
+                params = []
+        return {"type": event_type, "params": params}
 
     def execute_task(
         self, task: SkBoundTask, event_obj: SkEvent | None = None
@@ -261,53 +245,23 @@ class SkEventHandling:
                 widget=self, event_type=list(parsed_event_type.keys())[0]
             )
         # Add the event to event lists (the widget itself and the global list)
-        self.events.append(event_obj)
+        self.latest_event = event_obj
         SkEvent.latest = event_obj
         # Find targets
         targets = []
-        targets.append(event_type)
-        if list(parsed_event_type.values())[0] in ["", "*"]:
-            # If match all
-            targets.append(list(parsed_event_type.keys())[0])
-            targets.append(list(parsed_event_type.keys())[0] + "[*]")
+        targets.append(parsed_event_type["type"])
+        if parsed_event_type["params"] == []:
+            targets.append(parsed_event_type["type"] + "[*]")
+        else:
+            targets.append(event_type)
+        # if parsed_event_type["params"][0] in ["", "*"]: # If match all
+        #     targets.append(parsed_event_type["type"])
+        #     targets.append(parsed_event_type["type"] + "[*]")
         for target in targets:
             if target in self.tasks:
                 for task in self.tasks[target]:
                     # To execute all tasks bound under this event
                     self.execute_task(task, event_obj)
-
-        """
-        parsed_event_type = self.parse_event_type_str(event_type)
-        # Create a default SkEvent object if not specified
-        if event_obj is None:
-            event_obj = SkEvent(
-                widget=self, event_type=list(parsed_event_type.keys())[0]
-            )
-
-        # 限制事件列表大小，防止无限增长
-        MAX_EVENTS_PER_INSTANCE = 1000
-        MAX_GLOBAL_EVENTS = 5000
-
-        if len(self.events) >= MAX_EVENTS_PER_INSTANCE:
-            self.events = self.events[MAX_EVENTS_PER_INSTANCE // 2 :]
-        self.events.append(event_obj)
-
-        if len(SkEvent.global_list) >= MAX_GLOBAL_EVENTS:
-            SkEvent.global_list = SkEvent.global_list[MAX_GLOBAL_EVENTS // 2 :]
-        SkEvent.global_list.append(event_obj)
-
-        # Find targets
-        targets = [event_type]
-        if list(parsed_event_type.values())[0] in ["", "*"]:
-            targets.append(list(parsed_event_type.keys())[0])
-            targets.append(list(parsed_event_type.keys())[0] + "[*]")
-
-        for target in targets:
-            if target in self.tasks:
-                for task in self.tasks[target]:
-                    self.execute_task(task, event_obj)
-
-        """
 
     def bind(self, 
              event_type: str, target: typing.Callable | typing.Iterable,
@@ -329,7 +283,7 @@ class SkEventHandling:
         :return: SkBoundTask that is bound to the task if success, otherwise False
         """
         parsed_event_type = self.parse_event_type_str(event_type)
-        if list(parsed_event_type.keys())[0] not in self.__class__.EVENT_TYPES:
+        if parsed_event_type["type"] not in self.__class__.EVENT_TYPES:
             # warnings.warn(f"Event type {event_type} is not present in {self.__class__.__name__}, "
             #                "so the task cannot be bound as expected.")
             # return False
@@ -338,17 +292,17 @@ class SkEventHandling:
             self.tasks[event_type] = []
         task_id = f"{self.id}.{event_type}.{len(self.tasks[event_type])}"
         # e.g. SkButton114.focus_gain.514 / SkEventHandling114.focus_gain.514
-        match list(parsed_event_type.keys())[0]:
+        match parsed_event_type["type"]:
             case "delay":
                 task = SkDelayTask(
                     task_id,
                     target, # I will fix this type error later (ignore is ur type check is off)
-                    float(parsed_event_type["delay"][0]),
+                    float(parsed_event_type["params"][0]),
                     multithread,
                     _keep_at_clear,
                 )
             case "repeat":
-                NotImplemented
+                raise NotImplementedError("repeat events is not implemented yet!")
             case _:  # All normal event types
                 task = SkBoundTask(task_id, target, multithread, _keep_at_clear)
         self.tasks[event_type].append(task)
@@ -404,7 +358,7 @@ class SkEventHandling:
                 if task_id_parsed != self.id: # If given ID indicates another widget
                     NotImplemented 
                     # Still not inplemented, as we currently cannot get a SkWidget object itself 
-                    # only with its ID (waiting for XiangQinxi)
+                    # only with its ID (waiting for @XiangQinxi)
                     # This part should call the unbind function of the widget with such ID
                 for task_index, task in enumerate(self.tasks[task_id_parsed[1]]):
                     if task.id == target_task:
@@ -425,17 +379,49 @@ class SkEventHandling:
                     UserWarning,
                 )
                 return False
+    
+    def clear_bind(self, event_type: str) -> bool:
+        """To clear clear tasks binded to a spcific event or widget
+        
+        Example
+        -------
+        .. code-block:: python
+            my_widget = SkWidget(...)
+            my_widget.clear_bind("click")
+        This shows clearing tasks bound to `click` event on `my_widget`.
+
+        .. code-block:: python
+            my_widget = SkWidget(...)
+            my_widget.clear_bind("*")
+        This shows clearing all events bound to any event on `my_widget`.
+
+        :param event_type: Type of event to clear binds, `*` for all
+        :return: Boolean, whether success or not
+        """
+        if event_type == "*": # Clear all tasks of this object
+            return not False in \
+            [self.clear_bind(this_type) for this_type in self.tasks]
+        else: # In other cases, this must be an specific event type
+            if event_type in self.tasks: # If type given existed and include some tasks
+                for task in self.tasks[event_type]:
+                    if not task.keep_at_clear: # Skip any keep_at_clear tasks
+                        self.unbind(task)
+                return True
+            else:
+                return False
 
     def _check_delay_events(self, _=None) -> None:
         """To check and execute delay events.
 
         Example
         -------
-        Mostly used by SkWidget.update(), which is internal use
+        Mostly used by SkWidget.update(), which is internal use.
+
+        :param _: To accept an event object if is given, will be ignored
         """
         # print("Checking delayed events...")
         for binded_event_type in self.tasks:
-            if next(iter(self.parse_event_type_str(binded_event_type))) == "delay":
+            if self.parse_event_type_str(binded_event_type)["type"] == "delay":
                 for task in self.tasks[binded_event_type]:
                     if isinstance(task, SkDelayTask):
                         if float(time.time()) >= task.target_time:
@@ -496,3 +482,5 @@ class SkEvent:
             return self.event_data[key]
         else:
             return None  # If no such item avail, returns None
+
+SkEvent.latest = SkEvent(widget=None, event_type="NO_EVENT")
