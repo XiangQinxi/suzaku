@@ -23,15 +23,13 @@ class SkTextButton(SkButton, SkText):
         parent: SkContainer,
         text: str | None | int | float = "",
         *,
-        cursor: typing.Union[str, None] = "hand",
+        cursor: typing.Union[str, None] = "arrow",
         command: typing.Union[typing.Callable, None] = None,
         style: str = "SkButton",
         **kwargs,
     ) -> None:
         SkButton.__init__(self, parent=parent)
-        SkText.__init__(
-            self, parent=parent, text=text, style=style, cursor=cursor, **kwargs
-        )
+        SkText.__init__(self, parent=parent, text=text, style=style, cursor=cursor, **kwargs)
         self.attributes["command"] = command
 
         self.focusable = True
@@ -73,9 +71,7 @@ class SkTextButton(SkButton, SkText):
 
     # region Draw
 
-    def draw_widget(
-        self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
-    ):
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None):
         """Draw the button
 
         :param canvas:
@@ -120,9 +116,7 @@ class SkCloseButton(SkTextButton):
 
         icon_padding = self._style("icon_padding", 10, style)
         icon_width = self._style("icon_width", 1, style)
-        fg = skcolor_to_color(
-            style_to_color(self._style("fg", None, style), self.theme)
-        )
+        fg = skcolor_to_color(style_to_color(self._style("fg", None, style), self.theme))
 
         cross_size = rect.width() * 0.35  # ×大小
         offset_x, offset_y = rect.centerX(), rect.centerY()
@@ -144,9 +138,7 @@ class SkCloseButton(SkTextButton):
 
 
 class SkMaximizeButton(SkTextButton):
-    def __init__(
-        self, parent: SkContainer, *, style: str = "SkMaximizeButton", **kwargs
-    ):
+    def __init__(self, parent: SkContainer, *, style: str = "SkMaximizeButton", **kwargs):
         super().__init__(parent, style=style, command=self.toggle_maximize, **kwargs)
 
     def toggle_maximize(self):
@@ -163,9 +155,7 @@ class SkMaximizeButton(SkTextButton):
 
         icon_padding = self._style("icon_padding", 10, style)
         icon_width = self._style("icon_width", 1.1, style)
-        fg = skcolor_to_color(
-            style_to_color(self._style("fg", None, style), self.theme)
-        )
+        fg = skcolor_to_color(style_to_color(self._style("fg", None, style), self.theme))
 
         icon_radius = self.theme.get_style_attr(self.style_name, "icon_radius")
 
@@ -218,17 +208,13 @@ class SkMaximizeButton(SkTextButton):
 
             canvas.save()
             # 正确调用方式（注意参数顺序）：
-            canvas.clipPath(
-                clip_path, skia.ClipOp.kDifference, True
-            )  # 第三个参数是doAntiAlias
+            canvas.clipPath(clip_path, skia.ClipOp.kDifference, True)  # 第三个参数是doAntiAlias
             canvas.drawRoundRect(right_rect, icon_radius, icon_radius, paint)
             canvas.restore()
 
 
 class SkMinimizeButton(SkTextButton):
-    def __init__(
-        self, parent: SkContainer, *, style: str = "SkMinimizeButton", **kwargs
-    ):
+    def __init__(self, parent: SkContainer, *, style: str = "SkMinimizeButton", **kwargs):
         super().__init__(parent, style=style, command=self.click, **kwargs)
 
     def click(self):

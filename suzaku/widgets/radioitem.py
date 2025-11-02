@@ -14,7 +14,7 @@ class SkRadioItem(SkFrame):
     def __init__(
         self,
         *args,
-        cursor: typing.Union[str, None] = "hand",
+        cursor: typing.Union[str, None] = "arrow",
         command: typing.Union[typing.Callable, None] = None,
         text: str | None = None,
         style: str = "SkRadioItem",
@@ -69,7 +69,5 @@ class SkRadioItem(SkFrame):
         padx = 3
         ipadx = 5
         pady = 7
-        self.radiobox.fixed(
-            padx, pady, width=self.height - pady * 2, height=self.height - pady * 2
-        )
+        self.radiobox.fixed(padx, pady, width=self.height - pady * 2, height=self.height - pady * 2)
         self.label.fixed(self.height - pady * 2 + ipadx, 0, height=self.height)

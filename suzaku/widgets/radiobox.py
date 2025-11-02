@@ -12,7 +12,7 @@ class SkRadioBox(SkWidget):
     def __init__(
         self,
         *args,
-        cursor: str | None = "hand",
+        cursor: str | None = "arrow",
         command: typing.Callable | None = None,
         selected: bool = False,
         style: str = "SkRadioBox",

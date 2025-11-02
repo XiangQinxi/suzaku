@@ -24,7 +24,7 @@ class SkButton(SkFrame):
         parent: SkContainer,
         *,
         style: str = "SkButton",
-        cursor: typing.Union[str, None] = "hand",
+        cursor: typing.Union[str, None] = "arrow",
         command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:

@@ -14,7 +14,7 @@ class SkSwitch(SkFrame):
         self,
         parent: SkContainer,
         *,
-        cursor: typing.Union[str, None] = "hand",
+        cursor: typing.Union[str, None] = "arrow",
         command: typing.Union[typing.Callable, None] = None,
         text: str | None = None,
         style: str = "SkCheckItem",

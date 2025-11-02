@@ -14,7 +14,7 @@ class SkCheckItem(SkFrame):
     def __init__(
         self,
         *args,
-        cursor: typing.Union[str, None] = "hand",
+        cursor: typing.Union[str, None] = "arrow",
         command: typing.Union[typing.Callable, None] = None,
         text: str | None = None,
         style: str = "SkCheckItem",
@@ -30,9 +30,7 @@ class SkCheckItem(SkFrame):
         self.focusable = True
         self.help_parent_scroll = True
 
-        self.checkbox = SkCheckBox(
-            self, command=command, cursor=cursor, variable=variable
-        )
+        self.checkbox = SkCheckBox(self, command=command, cursor=cursor, variable=variable)
         # self.checkbox.box(side="left", padx=2, pady=2)
         self.label = SkText(self, text=text, align="left", cursor=cursor)
         # self.label.box(side="right", expand=True, padx=2, pady=2)
@@ -69,7 +67,5 @@ class SkCheckItem(SkFrame):
         padx = 3
         ipadx = 5
         pady = 7
-        self.checkbox.fixed(
-            padx, pady, width=self.height - pady * 2, height=self.height - pady * 2
-        )
+        self.checkbox.fixed(padx, pady, width=self.height - pady * 2, height=self.height - pady * 2)
         self.label.fixed(self.height - pady * 2 + ipadx, 0, height=self.height)

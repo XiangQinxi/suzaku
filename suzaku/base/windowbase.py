@@ -239,9 +239,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                             glfw.window_hint(glfw.CLIENT_API, glfw.OPENGL_API)
                             glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
                             glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
-                            glfw.window_hint(
-                                glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE
-                            )
+                            glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
                     window = glfw.create_window(
                         self.width, self.height, self.cget("title"), monitor, None
@@ -272,17 +270,13 @@ class SkWindowBase(SkEventHandling, SkMisc):
                         sdl2.SDL_WINDOWPOS_CENTERED,
                         self.width,
                         self.height,
-                        sdl2.SDL_WINDOW_OPENGL
-                        | sdl2.SDL_WINDOW_SHOWN
-                        | sdl2.SDL_WINDOW_RESIZABLE,
+                        sdl2.SDL_WINDOW_OPENGL | sdl2.SDL_WINDOW_SHOWN | sdl2.SDL_WINDOW_RESIZABLE,
                     )
 
                     self.visible = True
             return window
         else:
-            raise RuntimeError(
-                "The window must be added to the Application instance first"
-            )
+            raise RuntimeError("The window must be added to the Application instance first")
 
     def create_bind(self) -> None:
         """Binding glfw window events.
@@ -295,9 +289,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                 case "glfw":
                     glfw.make_context_current(window)
                     glfw.set_window_size_callback(window, self._on_resizing)
-                    glfw.set_framebuffer_size_callback(
-                        window, self._on_framebuffer_size
-                    )
+                    glfw.set_framebuffer_size_callback(window, self._on_framebuffer_size)
                     glfw.set_window_close_callback(window, self._on_closed)
                     glfw.set_mouse_button_callback(window, self._on_mouse_button)
                     glfw.set_cursor_enter_callback(window, self._on_cursor_enter)
@@ -490,15 +482,11 @@ class SkWindowBase(SkEventHandling, SkMisc):
         :param char: Unicode character
         """
 
-        self.trigger(
-            "char", SkEvent(event_type="char", char=chr(char), glfw_window=window)
-        )
+        self.trigger("char", SkEvent(event_type="char", char=chr(char), glfw_window=window))
         self.update()
         # self.update(redraw=True)
 
-    def _on_key(
-        self, window: typing.Any, key: str, scancode: str, action: str, mods: int
-    ) -> None:
+    def _on_key(self, window: typing.Any, key: str, scancode: str, action: str, mods: int) -> None:
         """
         触发键盘事件
 
@@ -547,15 +535,11 @@ class SkWindowBase(SkEventHandling, SkMisc):
         """
         if focused:
             self.configure(focus=True)
-            self.trigger(
-                "focus_gain", SkEvent(event_type="focus_gain", glfw_window=window)
-            )
+            self.trigger("focus_gain", SkEvent(event_type="focus_gain", glfw_window=window))
             self.update(redraw=True)
         else:
             self.configure(focus=False)
-            self.trigger(
-                "focus_loss", SkEvent(event_type="focus_loss", glfw_window=window)
-            )
+            self.trigger("focus_loss", SkEvent(event_type="focus_loss", glfw_window=window))
 
     def _on_refresh(self, window: typing.Any):
         self.update(True)
@@ -598,9 +582,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.physical_width = int(width * self.dpi_scale)
         self.physical_height = int(height * self.dpi_scale)
 
-        event = SkEvent(
-            event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale
-        )
+        event = SkEvent(event_type="resize", width=width, height=height, dpi_scale=self.dpi_scale)
         self.trigger("resize", event)
         for child in self.children:
             child.trigger("resize", event)
@@ -766,9 +748,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         )
 
     def _on_drop(self, window: typing.Any, paths):
-        self.trigger(
-            "drop", SkEvent(event_type="drop", paths=paths, glfw_window=window)
-        )
+        self.trigger("drop", SkEvent(event_type="drop", paths=paths, glfw_window=window))
 
     def _on_iconify(self, window: typing.Any, iconified: bool):
         self.trigger(
@@ -926,16 +906,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     iconpath = wm_iconpath
 
-    def wm_maxsize(
-        self, width: int | float | None = None, height: int | float | None = None
-    ):
+    def wm_maxsize(self, width: int | float | None = None, height: int | float | None = None):
         if width is None:
             width = glfw.DONT_CARE
         if height is None:
             height = glfw.DONT_CARE
-        glfw.set_window_size_limits(
-            self.the_window, glfw.DONT_CARE, glfw.DONT_CARE, width, height
-        )
+        glfw.set_window_size_limits(self.the_window, glfw.DONT_CARE, glfw.DONT_CARE, width, height)
 
     maxsize = wm_maxsize
 
@@ -1051,9 +1027,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         if name not in self.cursors:
             if custom_cursor is not None:
                 # 【自定义光标样式】
-                cursor = glfw.create_cursor(
-                    custom_cursor[0], custom_cursor[1], custom_cursor[2]
-                )
+                cursor = glfw.create_cursor(custom_cursor[0], custom_cursor[1], custom_cursor[2])
             else:
                 cursor_get = getattr(
                     __import__("glfw", fromlist=[f"{name}_CURSOR"]), f"{name}_CURSOR"
@@ -1071,9 +1045,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     cursor = wm_cursor
 
-    def default_cursor(
-        self, cursor_name: str | None = None
-    ) -> typing.Union[str, "SkWindowBase"]:
+    def default_cursor(self, cursor_name: str | None = None) -> typing.Union[str, "SkWindowBase"]:
         """Set the default cursor style of the window.
 
         cursor_name:
@@ -1088,9 +1060,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.configure(cursor=cursor_name)
         return self
 
-    def wm_visible(
-        self, is_visible: bool | None = None
-    ) -> typing.Union[bool, "SkWindowBase"]:
+    def wm_visible(self, is_visible: bool | None = None) -> typing.Union[bool, "SkWindowBase"]:
         """Get or set the visibility of the window.
 
         is_visible:
@@ -1218,9 +1188,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
 
     title = wm_title
 
-    def resize(
-        self, width: int | None = None, height: int | None = None
-    ) -> "SkWindowBase":
+    def resize(self, width: int | None = None, height: int | None = None) -> "SkWindowBase":
         """Resize the window.
 
         :param width: Width
@@ -1373,9 +1341,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
             self.dpi_scale = 1.0
 
         # 触发DPI变化事件
-        self.trigger(
-            "dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale)
-        )
+        self.trigger("dpi_change", SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale))
 
     def _on_dpi_change(self, window, xscale, yscale) -> None:
         """Handle DPI change event
@@ -1390,9 +1356,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         # 触发DPI变化事件
         self.trigger(
             "dpi_change",
-            SkEvent(
-                event_type="dpi_change", dpi_scale=self.dpi_scale, glfw_window=window
-            ),
+            SkEvent(event_type="dpi_change", dpi_scale=self.dpi_scale, glfw_window=window),
         )
 
         # 更新窗口物理尺寸

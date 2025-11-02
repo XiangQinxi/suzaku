@@ -4,9 +4,9 @@ from suzaku import *
 sunvalley = SkTheme().load_from_file("./sunvalley.json")
 
 root = Sk(theme=sunvalley)
-headerbar = titlebar(root)
+# headerbar = titlebar(root)
 
-button = SkTextButton(root, text="Click me")
-button.box()
+for i in range(5):
+    SkTextButton(root, text="Click me").box()
 
 root.mainloop()
