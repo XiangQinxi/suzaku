@@ -26,6 +26,6 @@ class SkMenu(SkTextButton):
                 popupmenu.hide()
             else:
                 self.cget("popupmenu").popup(
-                    x=self.x - self.parent.x_offset,
-                    y=self.y - self.parent.y_offset + self.height * 2,
+                    x=self.canvas_x - self.parent.x_offset,
+                    y=self.canvas_y - self.parent.y_offset + self.height,
                 )

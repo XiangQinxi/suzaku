@@ -301,6 +301,17 @@
       }
     },
 
+    "SkLabel": {
+      "rest": {
+        "size": [0, 0],
+        "fg": {"color_palette": "fg"},
+        "bg": {"color_palette": "quarternary_bg"},
+        "bd": [0, 0, 0, 15],
+        "width": 1,
+        "radius": 4
+      }
+    },
+
     "SkCard": {
       "rest": {
         "size": [0, 0],
@@ -344,7 +355,7 @@
         "size": [0, 30],
         "fg": {"color_palette": "default_card_bd"},
         "bg": {"color_palette": "default_card_bg"},
-        "bd_shadow": [0, 2, 1, 2, [0, 0, 0, 30]],
+        "bd_shadow": [0, 1, 1, 2, [0, 0, 0, 20]],
         "width": 0
       }
     },
@@ -444,7 +455,7 @@
         "radius": 0,
         "width": 0,
         "bg": {"color_palette": "default_card_bg"},
-        "bd_shadow": [0, 1, 2, 2, [0, 0, 0, 50]]
+        "bd_shadow": [0, 1, 1, 2, [0, 0, 0, 20]]
       }
     },
 
