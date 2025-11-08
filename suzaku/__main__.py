@@ -12,10 +12,6 @@ if __name__ == "__main__":
     # 修改主窗口创建代码
     app = SkApp(is_get_context_on_focus=False, is_always_update=False, framework="glfw")
     # print(glfw.default_window_hints())
-    try:
-        SkTheme().load_from_file("../demos/sunvalley.json")
-    except FileNotFoundError:
-        pass
 
     def create1window():
         window = SkWindow(
@@ -26,10 +22,10 @@ if __name__ == "__main__":
         )
         window.minsize(100, 80)
         window.resizable(True)
-        window.bind("drop", lambda evt: print("drop", evt))
+        window.bind("drop", lambda evt: print("Dropped:", evt["paths"]))
 
         var1 = SkBooleanVar()
-        var1.bind("change", lambda evt: print("Changed:", evt))
+        var1.bind("change", lambda evt: print("Changed:", evt["value"]))
 
         headerbar = titlebar(window)
 
@@ -48,9 +44,7 @@ if __name__ == "__main__":
         popupmenu.add_radioitem("Complex", value=True, variable=var1)
         popupmenu.add_switch("Switch", variable=var1)
         popupmenu.add_separator()
-        popupmenu.add_command(
-            "Help", command=lambda: show_message(window, message="Hello")
-        )
+        popupmenu.add_command("Help", command=lambda: show_message(window, message="Hello"))
         popupmenu.add_command("Exit", command=window.destroy)
 
         menubar.add_cascade("File", menu=popupmenu)
@@ -64,9 +58,9 @@ if __name__ == "__main__":
             tab_widgets.bind_scroll_event()
             tabs.add(tab_widgets, text="Widgets")
 
-            SkTextButton(
-                tab_widgets, text="SkTextButton", command=lambda: print("click")
-            ).box(padx=10, pady=(10, 0))
+            SkTextButton(tab_widgets, text="SkTextButton", command=lambda: print("Clicked")).box(
+                padx=10, pady=(10, 0)
+            )
 
             SkCombobox(tab_widgets).box(padx=10, pady=(10, 0))
             SkListBox(tab_widgets, items=["SkListItem 1", "SkListItem 2"]).box(
@@ -79,16 +73,14 @@ if __name__ == "__main__":
                 variable=var1,
             ).box(padx=10, pady=(10, 0))
 
-            SkRadioButton(
-                tab_widgets, text="SkRadioItem 1", value=False, variable=var1
-            ).box(padx=10, pady=(10, 0))
-            SkRadioButton(
-                tab_widgets, text="SkRadioItem 2", value=True, variable=var1
-            ).box(padx=10, pady=(10, 0))
-
-            SkSwitch(tab_widgets, text="SkSwitch", variable=var1).box(
+            SkRadioButton(tab_widgets, text="SkRadioItem 1", value=False, variable=var1).box(
                 padx=10, pady=(10, 0)
             )
+            SkRadioButton(tab_widgets, text="SkRadioItem 2", value=True, variable=var1).box(
+                padx=10, pady=(10, 0)
+            )
+
+            SkSwitch(tab_widgets, text="SkSwitch", variable=var1).box(padx=10, pady=(10, 0))
 
             SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
@@ -99,9 +91,9 @@ if __name__ == "__main__":
             SkEntry(tab_widgets, placeholder="TextVariable", textvariable=var2).box(
                 padx=10, pady=(10, 0)
             )
-            SkEntry(
-                tab_widgets, placeholder="Password", textvariable=var2, show="●"
-            ).box(padx=10, pady=(10, 0))
+            SkEntry(tab_widgets, placeholder="Password", textvariable=var2, show="●").box(
+                padx=10, pady=(10, 0)
+            )
             SkLabel(tab_widgets, text=f"Suzaku Version: {sk.__version__}").box(
                 padx=10, pady=(10, 10)
             )
@@ -125,7 +117,7 @@ if __name__ == "__main__":
                 "changed",
                 change_theme,
             )
-            listbox.select(index=0)
+            listbox.select(index=2)
             listbox.box(padx=10, pady=(10, 0))
 
             SkTextButton(

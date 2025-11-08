@@ -1,6 +1,6 @@
 import typing
 
-from suzaku.event import SkEventHandling
+from .event import SkEvent, SkEventHandling
 
 
 class SkVar(SkEventHandling):
@@ -38,7 +38,7 @@ class SkVar(SkEventHandling):
             raise ValueError(f"Value must be {self._value_type}")
         if self._value != value:
             self._value = value
-            self.trigger(f"change[{value}]")
+            self.trigger(f"change", SkEvent(self, "change", value=value))
         return self
 
     def get(self) -> typing.Any:
