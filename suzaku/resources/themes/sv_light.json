@@ -383,7 +383,7 @@
         "size": [0, 30],
         "fg": {"color_palette": "default_card_bd"},
         "bg": {"color_palette": "default_card_bg"},
-        "bd_shadow": [0, 1, 1, 2, [0, 0, 0, 20]],
+        "bd_shadow": [0, 2, 1, 2, [0, 0, 0, 10]],
         "width": 0
       }
     },

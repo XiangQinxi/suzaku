@@ -1,14 +1,14 @@
 from suzaku import *
 
-root = Sk(size=(400, 300), title="Minimal", minsize=(360, 80), theme=light_theme)
+root = Sk(size=(400, 300), title="Minimal", minsize=(360, 80), theme=sv_light_theme)
 titlebar = titlebar(root)
 
 
 def switch():
     if switch_theme.checked:
-        root.apply_theme(dark_theme)
+        root.apply_theme(sv_dark_theme)
     else:
-        root.apply_theme(default_theme)
+        root.apply_theme(sv_light_theme)
 
 
 switch_theme = SkSwitch(titlebar, text="Dark mode", command=switch).box(

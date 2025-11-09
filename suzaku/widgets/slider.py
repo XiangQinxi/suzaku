@@ -28,11 +28,8 @@ class SkSlider(SkWidget):
                 else:
                     state = "hover"
             else:
-                if "focus" in self.styles[self.style_name]:
-                    if self.is_focus:
-                        state = "focus"
-                    else:
-                        state = ""
+                if self.is_focus:
+                    state = "focus"
                 else:
                     state = ""
         else:
@@ -42,15 +39,14 @@ class SkSlider(SkWidget):
             selector = f"{self.style_name}:{state}"
         else:
             selector = self.style_name
-
+        progress_selector = self.style_name + ".Progress"
         style = self.theme.select(selector)
-        progress_style = self.theme.select(self.style_name + ".Progress")
+        progress_style = self.theme.select(progress_selector)
 
         progress_rect = skia.Rect.MakeLTRB(
             rect.left(),
             rect.top() + self._style("pady", 0, progress_style),
-            rect.width()
-            * (self.cget("value") / (self.cget("maxvalue") - self.cget("minvalue"))),
+            rect.width() * (self.cget("value") / (self.cget("maxvalue") - self.cget("minvalue"))),
             rect.bottom() - self._style("pady", 0, progress_style),
         )
         if self.cget("value") > self.cget("minvalue"):
