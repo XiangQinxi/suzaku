@@ -1,6 +1,6 @@
 from suzaku import *
 
-root = Sk(size=(400, 300), title="Minimal", minsize=(360, 80))
+root = Sk(size=(400, 300), title="Minimal", minsize=(360, 80), theme=light_theme)
 titlebar = titlebar(root)
 
 

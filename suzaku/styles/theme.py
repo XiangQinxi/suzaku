@@ -63,9 +63,7 @@ class SkTheme:
         for file in os.listdir(SkTheme.INTERNAL_THEME_DIR):
             if file == f"{SkTheme.DEFAULT_THEME_FILENAME}.json":
                 # For default theme, no need to reload it
-                SkTheme.INTERNAL_THEMES[SkTheme.DEFAULT_THEME.name] = (
-                    SkTheme.DEFAULT_THEME
-                )
+                SkTheme.INTERNAL_THEMES[SkTheme.DEFAULT_THEME.name] = SkTheme.DEFAULT_THEME
                 continue
             _ = SkTheme({}).load_from_file(SkTheme.INTERNAL_THEME_DIR / file)
             SkTheme.INTERNAL_THEMES[_.name] = _
@@ -165,9 +163,7 @@ class SkTheme:
         with open(file_path, mode="r", encoding="utf-8") as f:
             style_raw = f.read()
             theme_data = json.loads(style_raw)
-            if (
-                search_result := SkTheme.find_loaded_theme(theme_data["name"])
-            ) != False:
+            if (search_result := SkTheme.find_loaded_theme(theme_data["name"])) != False:
                 # If name already occupied, meaning the theme might already be loaded
                 # (or just simply has an occupied name)
                 warnings.warn(
@@ -203,9 +199,7 @@ class SkTheme:
         for item in EXPECTED_DATA_TYPE.keys():
             if type(theme_data[item]) != EXPECTED_DATA_TYPE[item]:
                 theme_name = (
-                    theme_data["name"]
-                    if type(theme_data["name"]) is str
-                    else "(Type error)"
+                    theme_data["name"] if type(theme_data["name"]) is str else "(Type error)"
                 )
                 warnings.warn(
                     f"Error data type of <{item}> in theme data that is about to be loaded. "
@@ -455,8 +449,7 @@ class SkTheme:
                                     return None
                                 else:
                                     raise SkStyleNotFoundError(
-                                        "Cannot find styles with selector "
-                                        f"[{selector}]"
+                                        "Cannot find styles with selector " f"[{selector}]"
                                     )
                     _ = _[selector_level]  # Heading to the next level
             except SkStyleNotFoundError:
@@ -506,9 +499,7 @@ class SkTheme:
                                 error in such cases
         :return: The attribute _value
         """
-        parsed_selector = (
-            selector if type(selector) is list else self.parse_selector(selector)
-        )
+        parsed_selector = selector if type(selector) is list else self.parse_selector(selector)
         style = self.select(parsed_selector, copy=False, allow_not_found=False)
         if attr_name not in style:
             # Fallback mechanism
@@ -606,9 +597,7 @@ class SkTheme:
             theme_operate = SkTheme(self.styles)
         else:
             theme_operate = self
-        style_operate = theme_operate.select(
-            selector, copy=False, allow_not_found=False
-        )
+        style_operate = theme_operate.select(selector, copy=False, allow_not_found=False)
         style_operate.update(new_style)
         return theme_operate
 
@@ -680,5 +669,7 @@ class SkTheme:
 SkTheme._load_internal_themes()
 
 # Alias for default theme
-default_theme = SkTheme.DEFAULT_THEME
+light_theme = default_theme = SkTheme.DEFAULT_THEME
 dark_theme = SkTheme.INTERNAL_THEMES["default.dark"]
+sv_theme = sv_light_theme = SkTheme.INTERNAL_THEMES["sun_valley.light"]
+sv_dark_theme = SkTheme.INTERNAL_THEMES["sun_valley.dark"]

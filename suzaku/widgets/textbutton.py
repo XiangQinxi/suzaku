@@ -71,7 +71,9 @@ class SkTextButton(SkButton, SkText):
 
     # region Draw
 
-    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None):
+    def draw_widget(
+        self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
+    ) -> str | None:
         """Draw the button
 
         :param canvas:
@@ -81,8 +83,10 @@ class SkTextButton(SkButton, SkText):
         """
 
         # Draw the button border
-        style = SkButton.draw_widget(self, canvas, rect, style_selector)
-
+        if style_selector is None:
+            style_selector = SkButton.draw_widget(self, canvas, rect, style_selector)
+        else:
+            SkButton.draw_widget(self, canvas, rect, style_selector)
         # Draw the button text
         canvas.save()
         canvas.clipRect(rect)
@@ -95,11 +99,11 @@ class SkTextButton(SkButton, SkText):
                 rect.bottom(),
             ),
             text=self.get(),
-            fg=style["fg"],
+            fg=self.theme.get_style_attr(style_selector, "fg"),
             align=self.cget("align"),
         )
         canvas.restore()
-        return style
+        return style_selector
 
     # endregion
 
@@ -112,11 +116,13 @@ class SkCloseButton(SkTextButton):
         """Draw button
         :param canvas: skia.Surface to draw on
         """
-        style = super().draw_widget(canvas, rect, style_selector)
-
-        icon_padding = self._style("icon_padding", 10, style)
-        icon_width = self._style("icon_width", 1, style)
-        fg = skcolor_to_color(style_to_color(self._style("fg", None, style), self.theme))
+        style_selector = super().draw_widget(canvas, rect, style_selector)
+        icon_padding = self.theme.get_style_attr(style_selector, "icon_padding")
+        if not icon_padding:
+            icon_padding = 10
+        icon_width = self.theme.get_style_attr(style_selector, "icon_width")
+        if not icon_width:
+            icon_width = 1
 
         cross_size = rect.width() * 0.35  # ×大小
         offset_x, offset_y = rect.centerX(), rect.centerY()
@@ -128,7 +134,9 @@ class SkCloseButton(SkTextButton):
         path.lineTo(offset_x - cross_size / 2, offset_y + cross_size / 2)
 
         paint = skia.Paint(
-            Color=fg,
+            Color=skcolor_to_color(
+                style_to_color(self.theme.get_style_attr(style_selector, "fg"), self.theme)
+            ),
             Style=skia.Paint.kStroke_Style,
             StrokeWidth=icon_width,
             StrokeCap=skia.Paint.kRound_Cap,
@@ -151,16 +159,22 @@ class SkMaximizeButton(SkTextButton):
         """Draw button
         :param canvas: skia.Surface to draw on
         """
-        style = super().draw_widget(canvas, rect, style_selector)
+        style_selector = super().draw_widget(canvas, rect, style_selector)
+        icon_padding = self.theme.get_style_attr(style_selector, "icon_padding")
+        if not icon_padding:
+            icon_padding = 10
+        icon_width = self.theme.get_style_attr(style_selector, "icon_width")
+        if not icon_width:
+            icon_width = 1.1
 
-        icon_padding = self._style("icon_padding", 10, style)
-        icon_width = self._style("icon_width", 1.1, style)
-        fg = skcolor_to_color(style_to_color(self._style("fg", None, style), self.theme))
-
-        icon_radius = self.theme.get_style_attr(self.style_name, "icon_radius")
+        icon_radius = self.theme.get_style_attr(style_selector, "icon_radius")
+        if not icon_radius:
+            icon_radius = 4
 
         paint = skia.Paint(
-            Color=fg,
+            Color=skcolor_to_color(
+                style_to_color(self.theme.get_style_attr(style_selector, "fg"), self.theme)
+            ),
             Style=skia.Paint.kStroke_Style,
             StrokeWidth=icon_width,
             AntiAlias=self.anti_alias,
@@ -193,7 +207,9 @@ class SkMaximizeButton(SkTextButton):
 
             # 绘制设置
             paint = skia.Paint(
-                Color=fg,
+                Color=skcolor_to_color(
+                    style_to_color(self.theme.get_style_attr(style_selector, "fg"), self.theme)
+                ),
                 Style=skia.Paint.kStroke_Style,
                 StrokeWidth=icon_width,
                 AntiAlias=True,
@@ -224,10 +240,11 @@ class SkMinimizeButton(SkTextButton):
         """Draw button
         :param canvas: skia.Surface to draw on
         """
-        style = super().draw_widget(canvas, rect, style_selector)
+        style_selector = super().draw_widget(canvas, rect, style_selector)
 
-        icon_width = self._style("icon_width", 1, style)
-        fg = self._style("fg", None, style)
+        icon_width = self.theme.get_style_attr(style_selector, "icon_width")
+        if not icon_width:
+            icon_width = 1
 
         self._draw_line(
             canvas,
@@ -235,6 +252,6 @@ class SkMinimizeButton(SkTextButton):
             rect.centerY(),
             rect.right() - rect.width() * 0.32,
             rect.centerY(),
-            fg=fg,
+            fg=self.theme.get_style_attr(style_selector, "fg"),
             width=icon_width,
         )

@@ -1,36 +1,36 @@
 {
-  "name": "sun_valley.light",
-  "base": "default.light",
-  "friendly_name": "SunValley Light",
+  "name": "sun_valley.dark",
+  "base": "default.dark",
+  "friendly_name": "SunValley Dark",
 
   "color_palette": {
-    "default_fg": [0, 0, 0, 230],
-    "secondary_fg": [0, 0, 0, 180],
+    "default_fg": [255, 255, 255, 255],
+    "secondary_fg": [255, 255, 255, 180],
     "tertiary_fg": [0, 0, 0, 100],
     "disabled_fg": [150, 150, 150, 235],
 
-    "default_bg": [255, 255, 255, 180],
-    "default_card_bg": [251, 251, 251, 255],
-    "default_surface_bg": [245, 245, 245, 255],
-    "secondary_bg": [249, 249, 249, 130],
+    "default_bg": [255, 255, 255, 15],
+    "default_card_bg": [30, 30, 30, 255],
+    "default_surface_bg": [45, 45, 45, 255],
+    "secondary_bg": [255, 255, 255, 20],
     "secondary_alt_bg": [0, 0, 0, 5],
-    "tertiary_bg": [250, 250, 250, 75],
+    "tertiary_bg": [255, 255, 255, 8],
     "tertiary_alt_bg": [0, 0, 0, 15],
     "quarternary_bg": [0, 0, 0, 24],
     "disabled_bg": [240, 240, 240, 240],
 
-    "default_bd": [0, 0, 0, 255],
-    "default_strong_bd": [0, 0, 0, 155],
-    "default_card_bd": [229, 229, 229],
-    "default_surface_bd": [193, 193, 193, 255],
+    "default_bd": [255, 255, 255, 125],
+    "default_strong_bd": [255, 255, 255, 130],
+    "default_card_bd": [65, 65, 65],
+    "default_surface_bd": [65, 65, 65, 255],
     "secondary_bd": [0, 0, 0, 255],
     "secondary_surface_bd": [229, 229, 229, 255],
     "tertiary_bd": [0, 0, 0, 15],
 
-    "default_accent": [0, 95, 185, 255],
-    "default_accent_fg": [250, 250, 250, 255],
-    "secondary_accent": [0, 95, 185, 230],
-    "tertiary_accent": [0, 95, 185, 205]
+    "default_accent": [96, 205, 255, 255],
+    "default_accent_fg": [0, 0, 0, 255],
+    "secondary_accent": [96, 205, 255, 230],
+    "tertiary_accent": [96, 205, 255, 205]
   },
 
   "styles": {
@@ -48,8 +48,8 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "91%": [0, 0, 0, 15],
-              "100%": [0, 0, 0, 40]
+              "0%": [255, 255, 255, 23],
+              "10%": [255, 255, 255, 18]
             }
           }
         }
@@ -57,22 +57,32 @@
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "secondary_bd"},
+        "bd": {"color_palette": "default_bd"},
         "bd_shader": {
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "91%": [0, 0, 0, 15],
-              "100%": [0, 0, 0, 40]
+              "0%": [255, 255, 255, 23],
+              "10%": [255, 255, 255, 18]
             }
           }
         }
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
-        "fg": {"color_palette": "tertiary_fg"},
-        "bd": {"color_palette": "tertiary_bd"}
+        "fg": {"color_palette": "secondary_fg"},
+        "bd": {"color_palette": "default_bd"},
+        "bd_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [255, 255, 255, 23],
+              "10%": [255, 255, 255, 18]
+            }
+          }
+        }
       },
       "disabled": {
         "bg": {"color_palette": "disabled_bg"},
@@ -95,37 +105,51 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "91%": [0, 0, 0, 15],
-              "100%": [0, 0, 0, 40]
+              "0%": [255, 255, 255, 23],
+              "10%": [255, 255, 255, 18]
             }
           }
-        }
+        },
+        "arrow": {"color_palette": "default_fg"}
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "secondary_bd"},
+        "bd": {"color_palette": "default_bd"},
         "bd_shader": {
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "91%": [0, 0, 0, 15],
-              "100%": [0, 0, 0, 40]
+              "0%": [255, 255, 255, 23],
+              "10%": [255, 255, 255, 18]
             }
           }
-        }
+        },
+        "arrow": {"color_palette": "default_fg"}
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
-        "fg": {"color_palette": "tertiary_fg"},
-        "bd": {"color_palette": "tertiary_bd"}
+        "fg": {"color_palette": "secondary_fg"},
+        "bd": {"color_palette": "default_bd"},
+        "bd_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [255, 255, 255, 23],
+              "10%": [255, 255, 255, 18]
+            }
+          }
+        },
+        "arrow": {"color_palette": "default_fg"}
       },
       "disabled": {
         "bg": {"color_palette": "disabled_bg"},
         "fg": {"color_palette": "disabled_fg"},
         "bd": {"color_palette": "disabled_bg"},
-        "width": 2
+        "width": 2,
+        "arrow": {"color_palette": "default_fg"}
       }
     },
 
@@ -429,9 +453,9 @@
       "checked-rest": {
         "bg": {"color_palette": "default_accent"},
         "bd": {"color_palette": "default_accent"},
-        "width": 2,
+        "width": 1,
         "button": {"color_palette": "default_accent_fg"},
-        "button-padding": 3
+        "button-padding": 6
       },
       "checked-hover": {
         "bg": {"color_palette": "secondary_accent"},
@@ -487,7 +511,7 @@
         "fg": {"color_palette": "default_fg"}
       },
       "selected": {
-        "bg": [220, 220, 220, 100],
+        "bg": [220, 220, 220, 25],
         "fg": {"color_palette": "default_fg"},
         "underline": {"color_palette": "default_accent"},
         "underline_width": 2,
