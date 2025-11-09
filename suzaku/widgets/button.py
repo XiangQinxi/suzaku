@@ -60,7 +60,7 @@ class SkButton(SkFrame):
         if self.cget("command") and not self.cget("disabled"):
             self.cget("command")()
 
-    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> str:
         """Draw button
 
         :param canvas: skia.Surface to draw on
@@ -84,17 +84,27 @@ class SkButton(SkFrame):
             else:
                 style_selector = f"{self.style_name}:disabled"
 
-        style = self.theme.select(style_selector)
-        bg_shader = self._style("bg_shader", None, style)
+        bg_shader = self.theme.get_style_attr(style_selector, "bg_shader")
+        if not bg_shader:
+            bg_shader = None
         # bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
-        bd_shadow = self._style("bd_shadow", None, style)
-        bd_shader = self._style("bd_shader", None, style)
+        bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
+        if not bd_shadow:
+            bd_shadow = None
+        bd_shader = self.theme.get_style_attr(style_selector, "bd_shader")
+        if not bd_shader:
+            bd_shader = None
         width = self.theme.get_style_attr(style_selector, "width")
-        # self._style("width", 0, style)
+        if not width:
+            width = 0
         # bd = self.theme.get_style_attr(style_selector, "bd")
-        bd = self._style("bd", None, style)
+        bd = self.theme.get_style_attr(style_selector, "bd")
+        if not bd:
+            bd = None
         # bg = self.theme.get_style_attr(style_selector, "bg")
-        bg = self._style("bg", None, style)
+        bg = self.theme.get_style_attr(style_selector, "bg")
+        if not bg:
+            bg = None
 
         # Draw the button border
         self._draw_rect(
