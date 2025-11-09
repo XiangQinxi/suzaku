@@ -1,3 +1,5 @@
+import typing
+
 import skia
 
 from ..event import SkEvent
@@ -7,29 +9,60 @@ from .container import SkContainer
 from .lineinput import SkLineInput
 from .popupmenu import SkPopupMenu
 from .text import SkText
+from ..var import SkStringVar
 
 
 class SkComboBox(SkButton):
     def __init__(
         self,
         parent: SkContainer,
+        *,
+        default: str = None,
+        values: list | None = None,
         style: str = "SkComboBox",
-        editable: bool = True,
+        readonly: bool = False,
+        textvariable: None | SkStringVar = None,
         **kwargs,
     ):
         super().__init__(parent, style=style, **kwargs)
 
-        self.attributes["editable"]: bool = editable
+        if textvariable is None:
+            textvariable = SkStringVar(default_value=default)
 
-        self.popupmenu = SkPopupMenu(self.parent)
-        self.popupmenu.add_command("asdf1")
-        self.input = SkLineInput(self)
-        self.text = SkText(
-            self,
-        )
+        self.attributes["textvariable"] = textvariable
+        self.attributes["readonly"]: bool = readonly
+        self.attributes["values"]: list | None = values
+        self.attributes["command"]: None | typing.Callable = None
+
+        self.popupmenu = SkPopupMenu(self.window)
+        self.popupmenu.bind_scroll_event()
+
+        for item in values:
+            self.popupmenu.add_command(item)
+        self.input = SkLineInput(self, textvariable=textvariable, readonly=readonly)
         self.bind("click", self._on_click)
+        self.bind("command", lambda evt: self.cget("textvariable").set(evt["text"]))
+        self.parent.bind("scrolled", self._on_parent_scrolled)
+        self.popupmenu.bind("command", lambda evt: self.trigger("command", evt))
 
         self.help_parent_scroll = True
+
+    def _on_parent_scrolled(self, event: SkEvent):
+        if self.popupmenu.is_popup:
+            self.popup()
+
+    def set_attribute(self, **kwargs):
+        if "values" in kwargs:
+            values = kwargs.pop("values")
+            self.attributes["values"] = values
+            self.popupmenu.remove_all()
+            for item in values:
+                self.popupmenu.add_command(item, command=lambda: self.set)
+        if "readonly" in kwargs:
+            readonly = kwargs.pop("readonly")
+            self.attributes["readonly"] = readonly
+            self.input.set_attribute(readonly=readonly)
+        return super().set_attribute(**kwargs)
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         style = super().draw_widget(canvas, rect, style_selector)
@@ -42,31 +75,36 @@ class SkComboBox(SkButton):
         )
         arrow = skcolor_to_color(
             style_to_color(
-                self._style(
-                    "arrow", skia.ColorBLACK, self.theme.select(self.style_name)
-                ),
+                self._style("arrow", skia.ColorBLACK, self.theme.select(self.style_name)),
                 self.theme,
             )
         )
         button_rect.offset(0, arrow_padding / 4)
-        self._draw_arrow(
-            canvas, button_rect, color=arrow, is_press=self.popupmenu.is_popup
-        )
-        if self.cget("editable"):
-            self.input.fixed(0, 0, self.width - self.height, self.height)
-        else:
-            self.input.layout_forget()
+        self._draw_arrow(canvas, button_rect, color=arrow, is_press=self.popupmenu.is_popup)
+        self.input.fixed(5, 0, self.width - self.height, self.height)
+
+    def set(self, value: str):
+        self.cget("textvariable").set(value)
+
+    def get(self) -> str:
+        return self.cget("textvariable").get()
+
+    def popup(self):
+        if self.cget("values"):
+            y = self.canvas_y + self.height
+            self.popupmenu.popup(
+                x=self.canvas_x,
+                y=y,
+                width=self.width,
+                height=min(self.popupmenu.content_height, self.window.height - y),
+            )
 
     def _on_click(self, event: SkEvent):
         if self.popupmenu and not self.cget("disabled"):
             if self.popupmenu.is_popup:
                 self.popupmenu.hide()
             else:
-                self.popupmenu.popup(
-                    x=self.x - self.parent.x_offset,
-                    y=self.y - self.parent.y_offset + self.height + 5,
-                    width=self.width,
-                )
+                self.popup()
 
     @staticmethod
     def _draw_arrow(

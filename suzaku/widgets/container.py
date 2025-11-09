@@ -98,9 +98,7 @@ class SkContainer:
         self._grid_lists = []  # [ [row1, ], [] ]
         self._box_direction: Orient | None = None  # h(horizontal) or v(vertical)
         self._flow_row = 0
-        self.allowed_out_of_bounds = (
-            allowed_out_of_bounds  # 【是否允许组件超出容器范围】
-        )
+        self.allowed_out_of_bounds = allowed_out_of_bounds  # 【是否允许组件超出容器范围】
 
         # Events
         self.bind("resize", lambda _: self.update_layout())
@@ -122,11 +120,7 @@ class SkContainer:
                 return
 
             for child in self.children:
-                if (
-                    child.is_mouse_floating
-                    and child.help_parent_scroll
-                    and child.parent == self
-                ):
+                if child.is_mouse_floating and child.help_parent_scroll and child.parent == self:
                     self.scroll(event["x_offset"] * 18, event["y_offset"] * 18)
                     return
 
@@ -159,6 +153,7 @@ class SkContainer:
         # 防止容器超出上边界
         self.y_offset = min(self.y_offset + y_offset, 0)
         self.update(redraw=True)
+        self.trigger("scrolled", SkEvent(self, "scrolled"))
 
     # endregion
 
@@ -228,14 +223,10 @@ class SkContainer:
 
             if self._box_direction == Orient.V:
                 if direction == Orient.H:
-                    raise ValueError(
-                        "Box layout can only be used with vertical direction."
-                    )
+                    raise ValueError("Box layout can only be used with vertical direction.")
             elif self._box_direction == Orient.H:
                 if direction == Orient.V:
-                    raise ValueError(
-                        "Box layout can only be used with horizontal direction."
-                    )
+                    raise ValueError("Box layout can only be used with horizontal direction.")
             else:
                 self._box_direction = direction
 

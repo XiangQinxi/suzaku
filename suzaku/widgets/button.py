@@ -69,8 +69,7 @@ class SkButton(SkFrame):
 
         :return: None
         """
-        styles = self.theme.select(self.style_name)
-        if style_selector is None and styles is not None:
+        if style_selector is None:
             if not self.cget("disabled"):
                 if self.is_mouse_floating:
                     if self.is_mouse_press:

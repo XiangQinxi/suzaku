@@ -305,6 +305,12 @@
         "fg": {"color_palette": "tertiary_fg"},
         "bd": {"color_palette": "tertiary_bd"}
       },
+      "focus": {
+        "width": 2,
+        "bg": {"color_palette": "default_bg"},
+        "fg": {"color_palette": "default_fg"},
+        "bd": {"color_palette": "default_bd"}
+      },
       "disabled": {
         "bg": {"color_palette": "disabled_bg"},
         "fg": {"color_palette": "disabled_fg"},

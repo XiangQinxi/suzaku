@@ -14,6 +14,7 @@ class SkPopup(SkCard):
 
         # 【来检查是否需要关闭改弹出菜单】
         self.window.bind("mouse_release", self._mouse_release)
+
         self.hide()
 
         self.skip = False
@@ -34,6 +35,7 @@ class SkPopup(SkCard):
         else:
             height = None
         self.fixed(**kwargs, width=width, height=height)
+        self.trigger("popup", SkEvent(self, "popup"))
 
     def _mouse_release(self, event: SkEvent = None):
         if not self.is_focus:

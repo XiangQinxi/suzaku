@@ -8,6 +8,7 @@ from .radioitem import SkRadioItem
 from .separator import SkSeparator
 from .switch import SkSwitch
 from .window import SkWindow
+from .. import SkEvent
 
 
 class SkPopupMenu(SkPopup):
@@ -15,9 +16,7 @@ class SkPopupMenu(SkPopup):
     def __init__(self, parent: SkWindow | SkContainer, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.items: list[
-            SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem | SkSwitch
-        ] = []
+        self.items: list[SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem | SkSwitch] = []
 
     def add(
         self,
@@ -30,6 +29,10 @@ class SkPopupMenu(SkPopup):
         else:
             self.items.insert(index, item)
         self.update_order()
+
+    def index(self, item: SkMenuItem | SkCheckItem | SkSeparator | SkRadioItem | SkSwitch) -> int:
+        """Get the index of a menu item."""
+        return self.items.index(item)
 
     def update_order(self):
         """Update the order of the menu items."""
@@ -50,8 +53,28 @@ class SkPopupMenu(SkPopup):
             item.box(side="top", padx=padx, pady=pady, ipadx=ipadx)
 
     def add_command(self, text: str | None = None, **kwargs):
-        button = SkMenuItem(self, text=text, **kwargs)
+        if "command" in kwargs:
+            command = kwargs.pop("command")
+
+            def command_wrapper():
+                command()
+                print(button.index)
+                self.trigger(
+                    "command",
+                    SkEvent(button, "command", text=text, index=button.index),
+                )
+
+        else:
+
+            def command_wrapper():
+                self.trigger(
+                    "command",
+                    SkEvent(button, "command", text=text, index=button.index),
+                )
+
+        button = SkMenuItem(self, text=text, command=command_wrapper, **kwargs)
         self.add(button)
+        button.index = self.index(button)
         return button.id
 
     def add_cascade(self):

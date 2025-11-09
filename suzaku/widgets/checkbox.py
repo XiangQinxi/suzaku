@@ -126,7 +126,7 @@ class SkCheckBox(SkWidget):
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.select(self.style_name)["radius"],
+            radius=self.theme.get_style_attr(style_name, "radius"),
             bg=bg,
             width=width,
             bd=bd,

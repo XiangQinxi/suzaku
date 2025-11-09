@@ -62,7 +62,12 @@ if __name__ == "__main__":
                 padx=10, pady=(10, 0)
             )
 
-            SkCombobox(tab_widgets).box(padx=10, pady=(10, 0))
+            combobox = SkCombobox(tab_widgets, values=["Item 1", "Item 2"], readonly=True).box(
+                padx=10, pady=(10, 0)
+            )
+            combobox.bind(
+                "command", lambda evt: print(f"Selected: (Index: {evt['index']}) {evt['text']}")
+            )
             SkListBox(tab_widgets, items=["SkListItem 1", "SkListItem 2"]).box(
                 padx=10, pady=(10, 0)
             )
