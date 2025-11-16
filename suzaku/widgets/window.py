@@ -430,78 +430,77 @@ class SkWindow(SkWindowBase, SkContainer):
 
     # region Draw 绘制
 
-    def _rect_path(
-        self,
-        rect: skia.Rect,
-        radius: int | tuple[int, int, int, int] = 0,
-    ):
-        rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
-        radii: tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]] = (
-            self.unpack_radius(radius)
-        )
-        # 设置每个角的半径（支持X/Y不对称）
+    def _rrect(self, rect: skia.Rect, radius: int | tuple[int, int, int, int] = 0):
+        radius = self.unpack_radius(radius)
+        rrect = skia.RRect()
         rrect.setRectRadii(
             skia.Rect.MakeLTRB(*rect),
             [
-                skia.Point(*radii[0]),  # 左上
-                skia.Point(*radii[1]),  # 右上
-                skia.Point(*radii[2]),  # 右下
-                skia.Point(*radii[3]),  # 左下
+                skia.Point(*radius[0]),  # 左上
+                skia.Point(*radius[1]),  # 右上
+                skia.Point(*radius[2]),  # 右下
+                skia.Point(*radius[3]),  # 左下
             ],
         )
-
-        path = skia.Path()
-        path.addRRect(rrect)
-        return path
+        return rrect
 
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
-        style = self.theme.select(self.style)
         self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
 
-        radius = self._style("radius", 0, style)
+        radius = self.theme.get_style_attr(self.style, "radius")
+        if not radius:
+            radius = 0
         if self.window_attr("maximized"):
-            radius = (0, 0, 0, 0)
+            radius = 0
+        rrect = self._rrect(self.rect, radius)
 
-        _ = not self.window_attr("border") and "radius" in style
+        _ = not self.window_attr("border") and radius
         if _:
-            radii: tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]] = (
-                self.unpack_radius(radius)
-            )
-            rrect: skia.RRect = skia.RRect.MakeRectXY(self.rect, 0, 0)
-            rrect.setRectRadii(
-                self.rect,
-                [
-                    skia.Point(*radii[0]),  # 左上
-                    skia.Point(*radii[1]),  # 右上
-                    skia.Point(*radii[2]),  # 右下
-                    skia.Point(*radii[3]),  # 左下
-                ],
-            )
             canvas.clipRRect(
                 rrect,
                 self.anti_alias,
             )
-        canvas.clear(style_to_color(self._style("bg", skia.ColorWHITE, style), self.theme).color)
+
+        bg = self.theme.get_style_attr(self.style, "bg")
+        if not bg:
+            bg = skia.ColorWHITE
+
+        canvas.clear(style_to_color(bg, self.theme).color)
         # canvas.clear(skia.ColorTRANSPARENT)
 
         self.draw_children(canvas)
 
         if _:
-            bd = style_to_color(self._style("bd", skia.ColorBLACK, style), self.theme).color
-            width = self._style("width", 2, style)
+            bd = self.theme.get_style_attr(self.style, "bd")
+            if not bd:
+                bd = None
+            width = self.theme.get_style_attr(self.style, "width")
+            if not width:
+                width = 2
+            bd_shader = self.theme.get_style_attr(self.style, "bd_shader")
+            if not bd_shader:
+                bd_shader = None
 
-            path = self._rect_path(self.rect, radius)
+            bd_paint = skia.Paint(
+                AntiAlias=self.anti_alias,
+                Style=skia.Paint.kStroke_Style,
+            )
+            bd = skcolor_to_color(style_to_color(bd, self.theme))
 
             if bd and width > 0:
-                bd_paint = skia.Paint(
-                    AntiAlias=self.anti_alias,
-                    Style=skia.Paint.kStroke_Style,
-                )
-                bd = skcolor_to_color(style_to_color(bd, self.theme))
                 bd_paint.setStrokeWidth(width)
                 bd_paint.setColor(bd)
-                canvas.drawPath(path, bd_paint)
+                if bd_shader:
+                    if isinstance(bd_shader, dict):
+                        if "linear_gradient" in bd_shader:
+                            self.gradient.linear(
+                                widget=self,
+                                config=bd_shader["linear_gradient"],
+                                paint=bd_paint,
+                            )
+                            # print(bd_shader["linear_gradient"])
+                canvas.drawRRect(rrect, bd_paint)
         return None
 
     # endregion

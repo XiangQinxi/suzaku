@@ -434,30 +434,6 @@ class SkWidget(SkEventHandling, SkMisc):
                 )
         return None
 
-    def _rect_path(
-        self,
-        rect: skia.Rect,
-        radius: int | tuple[int, int, int, int] = 0,
-    ):
-        rrect: skia.RRect = skia.RRect.MakeRect(skia.Rect.MakeLTRB(*rect))
-        radii: tuple[tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]] = (
-            self.unpack_radius(radius)
-        )
-        # 设置每个角的半径（支持X/Y不对称）
-        rrect.setRectRadii(
-            skia.Rect.MakeLTRB(*rect),
-            [
-                skia.Point(*radii[0]),  # 左上
-                skia.Point(*radii[1]),  # 右上
-                skia.Point(*radii[2]),  # 右下
-                skia.Point(*radii[3]),  # 左下
-            ],
-        )
-
-        path = skia.Path()
-        path.addRRect(rrect)
-        return path
-
     def _draw_rect(
         self,
         canvas: skia.Canvas,
@@ -482,10 +458,17 @@ class SkWidget(SkEventHandling, SkMisc):
         :param bd_shader: The shader of the border
 
         """
-        is_custom_radius = isinstance(radius, tuple | list)
-        if is_custom_radius:
-            path = self._rect_path(rect, radius)
-
+        radius = self.unpack_radius(radius)
+        rrect = skia.RRect()
+        rrect.setRectRadii(
+            skia.Rect.MakeLTRB(*rect),
+            [
+                skia.Point(*radius[0]),  # 左上
+                skia.Point(*radius[1]),  # 右上
+                skia.Point(*radius[2]),  # 右下
+                skia.Point(*radius[3]),  # 左下
+            ],
+        )
         if bg:
             bg_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
@@ -506,10 +489,7 @@ class SkWidget(SkEventHandling, SkMisc):
                             config=bg_shader["linear_gradient"],
                             paint=bg_paint,
                         )
-            if is_custom_radius:
-                canvas.drawPath(path, bg_paint)
-            else:
-                canvas.drawRoundRect(rect, radius, radius, bg_paint)
+            canvas.drawRRect(rrect, bg_paint)
         if bd and width > 0:
             bd_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
@@ -529,10 +509,8 @@ class SkWidget(SkEventHandling, SkMisc):
                             paint=bd_paint,
                         )
                         # print(bd_shader["linear_gradient"])
-            if is_custom_radius:
-                canvas.drawPath(path, bd_paint)
-            else:
-                canvas.drawRoundRect(rect, radius, radius, bd_paint)
+            canvas.drawRRect(rrect, bd_paint)
+        return rrect
 
     def _draw_circle(
         self,

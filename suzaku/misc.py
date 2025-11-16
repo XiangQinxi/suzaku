@@ -60,9 +60,7 @@ class SkMisc:
         :return: str: The path of the TabTip.exe file.
         """
         base = self.get_program_files()
-        return os.path.join(
-            base, "Common Files", "Microsoft Shared", "ink", "TabTip.exe"
-        )
+        return os.path.join(base, "Common Files", "Microsoft Shared", "ink", "TabTip.exe")
 
     def _keyboard_open_win32(self):
         """Open the on-screen keyboard on Windows."""
@@ -127,18 +125,23 @@ class SkMisc:
 
     @staticmethod
     def unpack_radius(
-        radius: tuple[
-            tuple[int, int],
-            tuple[int, int],
-            tuple[int, int],
-            tuple[int, int],
-        ],
+        radius: (
+            tuple[
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+                tuple[int, int],
+            ]
+            | int
+        ),
     ) -> tuple[tuple[int, int], ...]:
         """Unpack the radius.
 
         :param radius: The radius to unpack.
         :return: tuple[tuple[int, int], ...]: The unpacked radius.
         """
+        if isinstance(radius, int):
+            radius = (radius, radius, radius, radius)
         _radius: list[tuple[int, int]] = list(radius)
         for i, r in enumerate(_radius):
             if isinstance(r, int):
