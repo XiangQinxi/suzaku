@@ -111,6 +111,7 @@ class SkTextButton(SkButton, SkText):
 class SkCloseButton(SkTextButton):
     def __init__(self, parent: SkContainer, *, style: str = "SkCloseButton", **kwargs):
         super().__init__(parent, style=style, **kwargs)
+        self.focusable = False
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
         """Draw button
@@ -148,6 +149,7 @@ class SkCloseButton(SkTextButton):
 class SkMaximizeButton(SkTextButton):
     def __init__(self, parent: SkContainer, *, style: str = "SkMaximizeButton", **kwargs):
         super().__init__(parent, style=style, command=self.toggle_maximize, **kwargs)
+        self.focusable = False
 
     def toggle_maximize(self):
         if self.window.window_attr("maximized"):
@@ -232,6 +234,7 @@ class SkMaximizeButton(SkTextButton):
 class SkMinimizeButton(SkTextButton):
     def __init__(self, parent: SkContainer, *, style: str = "SkMinimizeButton", **kwargs):
         super().__init__(parent, style=style, command=self.click, **kwargs)
+        self.focusable = False
 
     def click(self):
         self.window.iconify()

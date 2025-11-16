@@ -455,7 +455,7 @@ class SkTheme:
             except SkStyleNotFoundError:
                 # If this fails, then the selector is invalid
                 raise SkStyleNotFoundError(
-                    "Style is not exsited in the default theme. Check your selector!"
+                    f"Style [{selector}] is not exsited in the default theme. Check your selector!"
                 )
 
             for selector_level in selector_parsed:

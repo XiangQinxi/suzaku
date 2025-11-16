@@ -23,6 +23,7 @@ class SkTabButton(SkTextButton):
             command=lambda: self._on_click(),
             **kwargs,
         )
+        self.focusable = False
 
     @property
     def selected(self):
