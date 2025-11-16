@@ -10,7 +10,7 @@ from .checkitem import SkCheckItem  # ✅
 
 SkCheckButton = SkCheckbutton = SkCheckitem = SkCheckItem
 
-from .combobox import SkComboBox
+from .combobox import SkComboBox  # ✅
 
 SkCombobox = SkComboBox
 from .container import SkContainer  # ✅
@@ -47,6 +47,7 @@ from .sizegrip import SkSizeGrip  # ✅
 
 SkSizegrip = SkSizeGrip
 from .slider import SkSlider  # ⛔
+from .stack import SkStack
 from .switch import SkSwitch  # ✅
 from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar  # ✅

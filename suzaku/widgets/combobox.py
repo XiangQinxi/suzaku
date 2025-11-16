@@ -21,6 +21,7 @@ class SkComboBox(SkButton):
         values: list | None = None,
         style: str = "SkComboBox",
         readonly: bool = False,
+        placeholder: str = None,
         textvariable: None | SkStringVar = None,
         **kwargs,
     ):
@@ -33,13 +34,16 @@ class SkComboBox(SkButton):
         self.attributes["readonly"]: bool = readonly
         self.attributes["values"]: list | None = values
         self.attributes["command"]: None | typing.Callable = None
+        self.attributes["placeholder"]: str = placeholder
 
         self.popupmenu = SkPopupMenu(self.window)
         self.popupmenu.bind_scroll_event()
 
         for item in values:
             self.popupmenu.add_command(item)
-        self.input = SkLineInput(self, textvariable=textvariable, readonly=readonly)
+        self.input = SkLineInput(
+            self, textvariable=textvariable, readonly=readonly, placeholder=placeholder
+        )
         self.bind("click", self._on_click)
         self.bind("command", lambda evt: self.cget("textvariable").set(evt["text"]))
         self.parent.bind("scrolled", self._on_parent_scrolled)
@@ -62,6 +66,10 @@ class SkComboBox(SkButton):
             readonly = kwargs.pop("readonly")
             self.attributes["readonly"] = readonly
             self.input.set_attribute(readonly=readonly)
+        if "placeholder" in kwargs:
+            placeholder = kwargs.pop("placeholder")
+            self.attributes["placeholder"] = placeholder
+            self.input.set_attribute(placeholder=placeholder)
         return super().set_attribute(**kwargs)
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:

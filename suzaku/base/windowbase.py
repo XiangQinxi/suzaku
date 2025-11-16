@@ -3,6 +3,7 @@ import os
 import os.path
 import sys
 import typing
+import warnings
 
 import glfw
 import skia
@@ -406,6 +407,9 @@ class SkWindowBase(SkEventHandling, SkMisc):
                                     self.draw_func(canvas)
 
                             self.surface.flushAndSubmit()
+                            self.trigger(
+                                "redrawing", SkEvent(self, "redrawing", surface=self.surface)
+                            )
 
                     glfw.swap_buffers(self.the_window)
                 case "sdl2":
@@ -428,15 +432,36 @@ class SkWindowBase(SkEventHandling, SkMisc):
         self.trigger("redraw", SkEvent(self, "redraw"))
 
     def save(self, path: str = "snapshot.png", _format: str = "png"):
+        """Save a snapshot of the window.
+
+        :param path: Path to save the snapshot
+        :param _format: Format of the snapshot, default is "png"
+        :return: Whether the snapshot is saved successfully
+        """
         if _format == "png":
             _format = skia.kPNG
-        if self.surface:
-            snapshot = self.surface.makeImageSnapshot()
-            if snapshot:
-                return snapshot.save(path, _format)
+        elif _format == "jpg":
+            _format = skia.kJPEG
+        elif _format == "webp":
+            _format = skia.kWEBP
+
+        self.image_snapshot = None
+
+        def _(evt):
+            self.image_snapshot = evt["surface"].makeImageSnapshot()
+            if self.surface:
+                snapshot = self.surface.makeImageSnapshot()
+                if snapshot:
+                    return snapshot.save(path, _format)
+                else:
+                    warnings.warn("Cannot save snapshot")
             else:
-                return False
-        return None
+                warnings.warn("No surface to save")
+            return None
+
+        task_id = self.bind("redrawing", _)
+        self.draw(None)
+        self.unbind(task_id)
 
     snapshot = save
 
