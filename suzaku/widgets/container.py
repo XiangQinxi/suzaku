@@ -305,6 +305,9 @@ class SkContainer:
         for widget in self.children:
             widget.trigger("resize", SkEvent(widget=self, event_type="resize"))
 
+    def reset_content_size(self):
+        self.content_width, self.content_height = 0, 0
+
     def record_content_size(self, child, padx=0, pady=0):
         self.content_width = max(child.x + child.dwidth + padx, self.content_width)
         self.content_height = max(child.y + child.dheight + pady, self.content_height)
@@ -345,45 +348,80 @@ class SkContainer:
         pass
 
     def _handle_grid(self):
+        self.reset_content_size()
 
         # Grid
         col_heights: list[int | float] = []
         row_widths: list[int | float] = []
         grid_map = self.grid_map()
 
-        # 第一步：计算行列尺寸
+        # 第一步：计算行列尺寸（包含ipadx/ipady）
         for col, cols in enumerate(grid_map):
             for row, widget in enumerate(cols):
                 child_config = widget.layout_config["grid"]
-                left, top, right, bottom = self.unpack_padding(
+
+                # 解包外部padding
+                pad_left, pad_top, pad_right, pad_bottom = self.unpack_padding(
                     child_config["padx"],
                     child_config["pady"],
                 )
+
+                # 解包内部padding（形式相同）
+                ipad_left, ipad_top, ipad_right, ipad_bottom = self.unpack_padding(
+                    child_config["ipadx"],
+                    child_config["ipady"],
+                )
+
                 if len(row_widths) <= row:
                     row_widths.append(0)
-                row_widths[row] = max(row_widths[row], widget.dwidth + left + right)
+                # 总宽度 = 内容宽度 + 内部padding
+                total_width = widget.dwidth + ipad_left + ipad_right + pad_left + pad_right
+                row_widths[row] = max(row_widths[row], total_width)
+
                 if len(col_heights) <= col:
                     col_heights.append(0)
-                col_heights[col] = max(col_heights[col], widget.dheight + top + bottom)
+                # 总高度 = 内容高度 + 内部padding
+                total_height = widget.dheight + ipad_top + ipad_bottom + pad_top + pad_bottom
+                col_heights[col] = max(col_heights[col], total_height)
 
-        # 第二步：定位widgets
+        self.content_height = total_col_height = sum(col_heights)
+        self.content_width = total_row_width = sum(row_widths)
+
+        # 第二步：定位widgets（包含ipadx/ipady）
         for col, cols in enumerate(grid_map):
-            col_top = sum(col_heights[:col])  # 当前列的顶部位置
-            row_left = 0  # 每列开始时重置行左边位置
+            col_top = sum(col_heights[:col])
+            row_left = 0
 
             for row, widget in enumerate(cols):
                 child_config = widget.layout_config["grid"]
-                left, top, right, bottom = self.unpack_padding(
+
+                # 解包外部padding
+                pad_left, pad_top, pad_right, pad_bottom = self.unpack_padding(
                     child_config["padx"],
                     child_config["pady"],
                 )
 
-                widget.width, widget.height = (
-                    row_widths[row] - left - right,
-                    col_heights[col] - top - bottom,
+                # 解包内部padding
+                ipad_left, ipad_top, ipad_right, ipad_bottom = self.unpack_padding(
+                    child_config["ipadx"],
+                    child_config["ipady"],
                 )
-                widget.x, widget.y = row_left + left, col_top + top
-                row_left = widget.x + widget.width + right  # 更新下一行的起始位置
+
+                # widget实际尺寸 = 单元格尺寸 - 外部padding - 内部padding
+                widget.width, widget.height = (
+                    row_widths[row] - pad_left - pad_right,
+                    col_heights[col] - pad_top - pad_bottom,
+                )
+
+                # widget位置 = 单元格位置 + 外部padding + 内部padding
+                widget.x, widget.y = (
+                    row_left + pad_left,
+                    col_top + pad_top,
+                )
+                widget.x += self.x_offset
+                widget.y += self.y_offset
+
+                row_left = widget.x + widget.width + ipad_right
 
     def _handle_box(self) -> None:
         """Process box layout.
@@ -392,6 +430,7 @@ class SkContainer:
         """
 
         # TODO 做好ipadx、ipady的处理
+        self.reset_content_size()
 
         width = self.width  # container width
         height = self.height  # container height

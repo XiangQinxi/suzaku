@@ -1,6 +1,7 @@
 from suzaku import *
 
 root = Sk()
+root.bind_scroll_event()
 
 for row in range(5):
     for col in range(5):
@@ -11,10 +12,16 @@ for row in range(5):
             text = "End"
         padx = 5
         pady = 5
-        if row == 2 and col == 2:
+        ipadx = 5
+        ipady = 5
+        if row == 1 and col == 1 or row == 2 and col == 2:
             padx = 10
             pady = 10
-        SkTextButton(root, text=text).grid(row=row, column=col, padx=padx, pady=pady)
+            ipadx = 10
+            ipady = 10
+        SkTextButton(root, text=text).grid(
+            row=row, column=col, padx=padx, pady=pady, ipadx=ipadx, ipady=ipady
+        )
 
 
 root.mainloop()

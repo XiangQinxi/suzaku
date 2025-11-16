@@ -33,7 +33,7 @@ class MainWindow(SkWindow):
             if file:
                 self.configs = json.load(open(file, "r", encoding="utf-8"))
                 self.apply_theme(SkTheme().load_from_file(file))
-                self.config(title=f"Suzaku Theme Builder - {self.configs['friendly_name']}")
+                self.config(title=f"Theme Builder - {self.configs['friendly_name']}")
                 self.setup_tabs_pages()
                 self.loaded = True
 
@@ -61,9 +61,14 @@ class MainWindow(SkWindow):
         self.tabs = SkTabs(self, expand=False)
         self.tabs.box(side="top", expand=True, padx=10, pady=10)
 
+        text = SkText(self.tabs, "Please import a theme first.")
+        self.tabs.add(text)
+        self.tabs.select(0)
+
     def setup_tabs_pages(self):
         self.tabs.delete_all()
 
+        #####################
         self.tab_config = SkFrame(self.tabs)
         SkText(self.tab_config, "Theme name:", align="left").grid(row=0, column=0, padx=(10, 0))
         SkEntry(self.tab_config, text=self.theme.name).grid(row=1, column=0)
@@ -76,9 +81,25 @@ class MainWindow(SkWindow):
             base = self.theme.parent.name
         else:
             base = "ROOT"
-        SkEntry(self.tab_config, text=base).grid(row=1, column=2)
+        SkCombobox(self.tab_config, text=base, readonly=True).grid(row=1, column=2)
 
+        #####################
         self.tab_styles = SkFrame(self.tabs)
+        self.tab_styles.bind_scroll_event()
+        SkLabel(self.tab_styles, "Color palette").grid(row=0, column=0, padx=(10, 0), pady=(10, 0))
+
+        for index, color_name in enumerate(self.configs["color_palette"]):
+            SkText(self.tab_styles, color_name, align="left").grid(
+                row=0,
+                column=index + 1,
+                padx=(10, 0),
+            )
+            SkEntry(self.tab_styles, text=str(self.configs["color_palette"][color_name])).grid(
+                row=1,
+                column=index + 1,
+                padx=(10, 0),
+                ipadx=(0, 60),
+            )
 
         self.tabs.add(self.tab_config, "Config")
         self.tabs.add(self.tab_styles, "Styles")

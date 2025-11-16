@@ -937,6 +937,8 @@ class SkWidget(SkEventHandling, SkMisc):
         columnspan: int = 1,
         padx: int | float | None = 5,
         pady: int | float | None = 5,
+        ipadx: int | float | None = 0,
+        ipady: int | float | None = 0,
     ):
 
         self.show()
@@ -948,6 +950,8 @@ class SkWidget(SkEventHandling, SkMisc):
                 "columnspan": columnspan,
                 "padx": padx,
                 "pady": pady,
+                "ipadx": ipadx,
+                "ipady": ipady,
             }
         }
         self.parent.add_layer1_child(self)

@@ -17,7 +17,7 @@ class SkComboBox(SkButton):
         self,
         parent: SkContainer,
         *,
-        default: str = None,
+        text: str = None,
         values: list | None = None,
         style: str = "SkComboBox",
         readonly: bool = False,
@@ -28,7 +28,7 @@ class SkComboBox(SkButton):
         super().__init__(parent, style=style, **kwargs)
 
         if textvariable is None:
-            textvariable = SkStringVar(default_value=default)
+            textvariable = SkStringVar(default_value=text)
 
         self.attributes["textvariable"] = textvariable
         self.attributes["readonly"]: bool = readonly
@@ -39,8 +39,9 @@ class SkComboBox(SkButton):
         self.popupmenu = SkPopupMenu(self.window)
         self.popupmenu.bind_scroll_event()
 
-        for item in values:
-            self.popupmenu.add_command(item)
+        if values:
+            for value in values:
+                self.popupmenu.add_command(value)
         self.input = SkLineInput(
             self, textvariable=textvariable, readonly=readonly, placeholder=placeholder
         )
