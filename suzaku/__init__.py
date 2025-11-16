@@ -1,4 +1,4 @@
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 from .const import HORIZONTAL, VERTICAL, H, Orient, V
 from .event import SkEvent
