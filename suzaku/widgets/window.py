@@ -213,7 +213,7 @@ class SkWindow(SkWindowBase, SkContainer):
         # children.reverse()
         for widget in reversed(children):
             if self.is_widget_mouse_floating(widget, event):
-                if widget.focusable:
+                if widget.focusable and not widget.cget("disabled"):
                     widget.focus_set()
                 self.pressing_widget = widget
                 widget.is_mouse_floating = True
@@ -381,7 +381,7 @@ class SkWindow(SkWindowBase, SkContainer):
                     rootx=self.mouse_rootx,
                     rooty=self.mouse_rooty,
                 )
-                if self.pressing_widget:
+                if self.pressing_widget and not self.pressing_widget.cget("disabled"):
                     self.pressing_widget.trigger(name, event)
                     self.pressing_widget = None
         return None

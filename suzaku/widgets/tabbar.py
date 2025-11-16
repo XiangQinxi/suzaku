@@ -22,6 +22,23 @@ class SkTabBar(SkFrame):
         self.items: list[SkTabButton] = []
         self.selected_item: SkWidget | None = None
 
+    def delete_all(self):
+        """Delete all tab buttons"""
+        for item in self.items:
+            item.layout_forget()
+            item.destroy()
+        self.items.clear()
+        self.selected_item = None
+
+    def delete(self, index: int):
+        """Delete a tab button by index
+
+        :param index: The index of the tab button
+        :return: None
+        """
+        self.items.pop(index).layout_forget()
+        self.update_order()
+
     def select(self, index: int):
         """Select item by index
 
@@ -50,9 +67,7 @@ class SkTabBar(SkFrame):
                 padx = (3, 1)
             item.box(side="left", padx=padx, pady=3, expand=self.cget("expand"))
 
-    def add(
-        self, text: str | None = None, widget: SkWidget = None, **kwargs
-    ) -> SkTabButton:
+    def add(self, text: str | None = None, widget: SkWidget = None, **kwargs) -> SkTabButton:
         """Add a tab button
 
         :param text: The text of the tab button

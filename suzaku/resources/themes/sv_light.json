@@ -322,10 +322,9 @@
         "bd": {"color_palette": "default_bd"}
       },
       "disabled": {
-        "bg": {"color_palette": "disabled_bg"},
+        "bg": "transparent",
         "fg": {"color_palette": "disabled_fg"},
-        "bd": {"color_palette": "disabled_bg"},
-        "width": 2
+        "width": 0
       }
     },
 

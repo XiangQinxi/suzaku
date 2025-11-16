@@ -29,6 +29,22 @@ class SkTabs(SkCard):
         self.separator = SkSeparator(self, orient=Orient.H)
         self.separator.box(side="top", padx=0, pady=0)
 
+    def delete_all(self):
+        """Delete all tabs"""
+        for tab in self.tabs:
+            tab.layout_forget()
+        self.tabs.clear()
+        self.tabbar.delete_all()
+
+    def delete(self, index: int):
+        """Delete a tab by index
+
+        :param index: The index of the tab
+        :return: None
+        """
+        self.tabs.pop(index)
+        self.tabbar.delete(index)
+
     def select(self, index: int) -> None:
         """Select a tab by index
         :param index: The tab index

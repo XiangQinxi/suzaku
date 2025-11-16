@@ -58,7 +58,6 @@ class SkPopupMenu(SkPopup):
 
             def command_wrapper():
                 command()
-                print(button.index)
                 self.trigger(
                     "command",
                     SkEvent(button, "command", text=text, index=button.index),

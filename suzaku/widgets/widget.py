@@ -935,8 +935,8 @@ class SkWidget(SkEventHandling, SkMisc):
         column: int = 0,  # 列 竖
         rowspan: int = 1,
         columnspan: int = 1,
-        padx: int | float | None = None,
-        pady: int | float | None = None,
+        padx: int | float | None = 5,
+        pady: int | float | None = 5,
     ):
 
         self.show()
@@ -1041,7 +1041,7 @@ class SkWidget(SkEventHandling, SkMisc):
         """
         Set focus
         """
-        if self.focusable:
+        if self.focusable and not self.cget("disabled"):
             if not self.is_focus:
                 self.window.focus_get().trigger("focus_loss", SkEvent(event_type="focus_loss"))
                 self.window.focus_get().is_focus = False

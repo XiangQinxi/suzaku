@@ -349,41 +349,41 @@ class SkContainer:
         # Grid
         col_heights: list[int | float] = []
         row_widths: list[int | float] = []
-        # children: list[SkWidget] = self.draw_list[0]
         grid_map = self.grid_map()
 
+        # 第一步：计算行列尺寸
         for col, cols in enumerate(grid_map):
-
             for row, widget in enumerate(cols):
                 child_config = widget.layout_config["grid"]
-
                 left, top, right, bottom = self.unpack_padding(
                     child_config["padx"],
                     child_config["pady"],
                 )
                 if len(row_widths) <= row:
                     row_widths.append(0)
-                row_widths[row] = max(row_widths[row], widget.dwidth)
+                row_widths[row] = max(row_widths[row], widget.dwidth + left + right)
                 if len(col_heights) <= col:
                     col_heights.append(0)
-                col_heights[col] = max(col_heights[col], widget.dheight + left + bottom)
-            # print(row_widths, col_heights)
-            row_left = 0
+                col_heights[col] = max(col_heights[col], widget.dheight + top + bottom)
+
+        # 第二步：定位widgets
+        for col, cols in enumerate(grid_map):
+            col_top = sum(col_heights[:col])  # 当前列的顶部位置
+            row_left = 0  # 每列开始时重置行左边位置
 
             for row, widget in enumerate(cols):
                 child_config = widget.layout_config["grid"]
-                # print(child_config)
-                col_top = sum(col_heights[:col])
                 left, top, right, bottom = self.unpack_padding(
                     child_config["padx"],
                     child_config["pady"],
                 )
+
                 widget.width, widget.height = (
-                    row_widths[row],
+                    row_widths[row] - left - right,
                     col_heights[col] - top - bottom,
                 )
                 widget.x, widget.y = row_left + left, col_top + top
-                row_left = widget.x + widget.width + right
+                row_left = widget.x + widget.width + right  # 更新下一行的起始位置
 
     def _handle_box(self) -> None:
         """Process box layout.
