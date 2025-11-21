@@ -23,7 +23,7 @@ class SkSwitch(SkFrame):
         default: bool = False,
         **kwargs,
     ) -> None:
-        super().__init__(parent, style=style, **kwargs)
+        super().__init__(parent, style=style, is_combo_widget=True, **kwargs)
 
         self.attributes["cursor"] = cursor
         self.attributes["border"] = border

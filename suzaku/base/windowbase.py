@@ -325,11 +325,15 @@ class SkWindowBase(SkEventHandling, SkMisc):
             self.trigger("update", SkEvent(event_type="update"))
 
             if self.mode == "input" or redraw:
+                print(self.id)
                 self.draw()
             else:
-                if all([not child.need_redraw for child in self.children]):
-                    return
-                self.draw()
+                for child in self.children:
+                    if not isinstance(child, SkWindowBase):
+                        if child.need_redraw:
+                            self.draw()
+                            return
+
             # self.update_layout: typing.Callable
             # self.post()
 
@@ -410,8 +414,8 @@ class SkWindowBase(SkEventHandling, SkMisc):
                             self.trigger(
                                 "redrawing", SkEvent(self, "redrawing", surface=self.surface)
                             )
-
-                    glfw.swap_buffers(self.the_window)
+                    if self.alive:
+                        glfw.swap_buffers(self.the_window)
                 case "sdl2":
                     import sdl2
 

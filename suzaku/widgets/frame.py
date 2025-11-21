@@ -19,10 +19,18 @@ class SkFrame(SkWidget, SkContainer):
     """
 
     def __init__(
-        self, parent: SkContainer, *, style: str = "SkFrame", **kwargs
+        self,
+        parent: SkContainer,
+        *,
+        style: str = "SkFrame",
+        allowed_out_of_bounds: bool = False,
+        is_combo_widget: bool = False,
+        **kwargs,
     ) -> None:
         SkWidget.__init__(self, parent, style_name=style, **kwargs)
-        SkContainer.__init__(self)
+        SkContainer.__init__(
+            self, allowed_out_of_bounds=allowed_out_of_bounds, is_combo_widget=is_combo_widget
+        )
 
     @property
     def dwidth(self):

@@ -71,9 +71,12 @@ class SkContainer:
             self.trigger("update", SkEvent(widget=self, event_type="update"))
             self.update()
 
-    def __init__(self, allowed_out_of_bounds: bool = False):
+    def __init__(self, allowed_out_of_bounds: bool = False, is_combo_widget: bool = False):
 
         # self.parent = None
+        self.is_combo_widget: bool = (
+            is_combo_widget  # if True, then this container is a combo widget and help parent scroll
+        )
         self.need_redraw: bool
         self.is_mouse_floating: bool
         self.children: list[SkWidget] = []  # Children
@@ -121,6 +124,9 @@ class SkContainer:
 
             for child in self.children:
                 if child.is_mouse_floating and child.help_parent_scroll and child.parent == self:
+                    if isinstance(child, SkContainer):
+                        if not child.is_combo_widget:
+                            break
                     self.scroll(event["x_offset"] * 18, event["y_offset"] * 18)
                     return
 

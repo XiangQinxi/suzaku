@@ -45,10 +45,11 @@ class SkWindow(SkWindowBase, SkContainer):
         self.attributes["enabled_radius"] = False
         self.attributes["resizable_margin"] = 8
 
-        if isinstance(self.parent, SkWindow):
-            self.theme = self.parent.theme if self.parent.theme else theme
         if theme is None:
             theme = default_theme
+        if isinstance(self.parent, SkWindow):
+            theme = self.parent.theme if self.parent.theme else theme
+            self.parent.add_child(self)
         self.apply_theme(theme)
 
         self.focus_widget = self
@@ -124,6 +125,8 @@ class SkWindow(SkWindowBase, SkContainer):
 
     def destroy(self) -> None:
         super().destroy()
+        if isinstance(self.parent, SkWindowBase):
+            self.parent.remove_child(self)
 
     def _scroll(self, event: SkEvent) -> None:
         if self.focus_get() is not self:

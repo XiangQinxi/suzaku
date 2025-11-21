@@ -23,7 +23,7 @@ class SkRadioItem(SkFrame):
         variable: SkVar | None = None,
         **kwargs,
     ) -> None:
-        super().__init__(*args, style=style, **kwargs)
+        super().__init__(*args, style=style, is_combo_widget=True, **kwargs)
 
         self.attributes["cursor"] = cursor
         self.attributes["border"] = border

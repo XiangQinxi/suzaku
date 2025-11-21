@@ -26,7 +26,7 @@ class SkButton(SkFrame):
         command: typing.Union[typing.Callable, None] = None,
         **kwargs,
     ) -> None:
-        super().__init__(parent, style=style, **kwargs)
+        super().__init__(parent, style=style, is_combo_widget=True, **kwargs)
 
         self.attributes["cursor"] = cursor
         self.attributes["command"] = command
