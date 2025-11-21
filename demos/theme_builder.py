@@ -72,17 +72,17 @@ class MainWindow(SkWindow):
         self.tab_config = SkFrame(self.tabs)
         self.tab_config.bind_scroll_event()
         SkText(self.tab_config, "Theme name:", align="left").grid(row=0, column=0, padx=(10, 0))
-        SkEntry(self.tab_config, text=self.theme.name).grid(row=1, column=0)
+        SkEntry(self.tab_config, text=self.theme.name).grid(row=0, column=1)
         SkText(self.tab_config, "Theme friendly name:", align="left").grid(
-            row=0, column=1, padx=(10, 0)
+            row=1, column=0, padx=(10, 0)
         )
         SkEntry(self.tab_config, text=self.theme.friendly_name).grid(row=1, column=1)
-        SkText(self.tab_config, "Theme base:", align="left").grid(row=0, column=2, padx=(10, 0))
+        SkText(self.tab_config, "Theme base:", align="left").grid(row=2, column=0, padx=(10, 0))
         if self.theme.parent:
             base = self.theme.parent.name
         else:
             base = "ROOT"
-        SkCombobox(self.tab_config, text=base, readonly=True).grid(row=1, column=2)
+        SkCombobox(self.tab_config, text=base, readonly=True).grid(row=2, column=1)
 
         #####################
         self.tab_color_palette = SkFrame(self.tabs)
@@ -90,15 +90,15 @@ class MainWindow(SkWindow):
 
         for index, color_name in enumerate(self.configs["color_palette"]):
             SkText(self.tab_color_palette, color_name, align="left").grid(
-                row=0,
-                column=index,
+                row=index,
+                column=0,
                 padx=(10, 0),
             )
             SkEntry(
                 self.tab_color_palette, text=str(self.configs["color_palette"][color_name])
             ).grid(
-                row=1,
-                column=index,
+                row=index,
+                column=1,
                 padx=(10, 0),
                 ipadx=(0, 60),
             )

@@ -188,21 +188,33 @@ class SkContainer:
 
     def grid_map(self):
         # Grid Map
+        # [ [widget1, widget2, ...], [widget3, widget4, ...], ... ]
+        # 【根据网格布局配置，将子元素组织成网格地图】
 
         grid_map: list[list[SkWidget | None]] = []
         children: list[SkWidget] = self.draw_list[0]
 
         for child in children:
+            if child is None:
+                continue
             child_config = child.layout_config["grid"]
             row, col = child_config["row"], child_config["column"]
 
-            if col > len(grid_map) - 1:
-                while col > len(grid_map) - 1:
-                    grid_map.append([])
-            if row > len(grid_map[col]) - 1:
-                while row > len(grid_map[col]) - 1:
-                    grid_map[col].append(None)
-            grid_map[col][row] = child
+            if row < 0 or col < 0:
+                continue
+
+            # 确保有足够的行
+            while len(grid_map) <= row:
+                grid_map.append([])
+
+            # 确保当前行有足够的列
+            current_row = grid_map[row]
+            while len(current_row) <= col:
+                current_row.append(None)
+
+            # 放置组件
+            grid_map[row][col] = child
+
         return grid_map
 
     def add_layer_child(self, layer, child):
@@ -357,13 +369,15 @@ class SkContainer:
         self.reset_content_size()
 
         # Grid
-        col_heights: list[int | float] = []
-        row_widths: list[int | float] = []
+        row_heights: list[int | float] = []
+        col_widths: list[int | float] = []
         grid_map = self.grid_map()
 
         # 第一步：计算行列尺寸（包含ipadx/ipady）
-        for col, cols in enumerate(grid_map):
-            for row, widget in enumerate(cols):
+        for row, rows in enumerate(grid_map):
+            for col, widget in enumerate(rows):
+                if widget is None:
+                    continue
                 child_config = widget.layout_config["grid"]
 
                 # 解包外部padding
@@ -378,27 +392,29 @@ class SkContainer:
                     child_config["ipady"],
                 )
 
-                if len(row_widths) <= row:
-                    row_widths.append(0)
+                if len(col_widths) <= col:
+                    col_widths.append(0)
                 # 总宽度 = 内容宽度 + 内部padding
                 total_width = widget.dwidth + ipad_left + ipad_right + pad_left + pad_right
-                row_widths[row] = max(row_widths[row], total_width)
+                col_widths[col] = max(col_widths[col], total_width)
 
-                if len(col_heights) <= col:
-                    col_heights.append(0)
+                if len(row_heights) <= row:
+                    row_heights.append(0)
                 # 总高度 = 内容高度 + 内部padding
                 total_height = widget.dheight + ipad_top + ipad_bottom + pad_top + pad_bottom
-                col_heights[col] = max(col_heights[col], total_height)
+                row_heights[row] = max(row_heights[row], total_height)
 
-        self.content_height = total_col_height = sum(col_heights)
-        self.content_width = total_row_width = sum(row_widths)
+        self.content_height = total_row_height = sum(row_heights)
+        self.content_width = total_col_width = sum(col_widths)
 
         # 第二步：定位widgets（包含ipadx/ipady）
-        for col, cols in enumerate(grid_map):
-            col_top = sum(col_heights[:col])
-            row_left = 0
+        for row, rows in enumerate(grid_map):
+            row_top = sum(row_heights[:row])
+            col_left = 0
 
-            for row, widget in enumerate(cols):
+            for col, widget in enumerate(rows):
+                if widget is None:
+                    continue
                 child_config = widget.layout_config["grid"]
 
                 # 解包外部padding
@@ -413,21 +429,24 @@ class SkContainer:
                     child_config["ipady"],
                 )
 
+                col_width = sum(col_widths[col : col + child_config["columnspan"]])
+                row_height = sum(row_heights[row : row + child_config["rowspan"]])
+
                 # widget实际尺寸 = 单元格尺寸 - 外部padding - 内部padding
                 widget.width, widget.height = (
-                    row_widths[row] - pad_left - pad_right,
-                    col_heights[col] - pad_top - pad_bottom,
+                    col_width - pad_left - pad_right,
+                    row_height - pad_top - pad_bottom,
                 )
 
                 # widget位置 = 单元格位置 + 外部padding + 内部padding
                 widget.x, widget.y = (
-                    row_left + pad_left,
-                    col_top + pad_top,
+                    col_left + pad_left,
+                    row_top + pad_top,
                 )
                 widget.x += self.x_offset
                 widget.y += self.y_offset
 
-                row_left = widget.x + widget.width + ipad_right
+                col_left = widget.x + widget.width + ipad_right
 
     def _handle_box(self) -> None:
         """Process box layout.

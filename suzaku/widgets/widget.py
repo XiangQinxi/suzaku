@@ -932,13 +932,13 @@ class SkWidget(SkEventHandling, SkMisc):
     def grid(
         self,
         row: int = 0,  # 行 横
-        column: int = 0,  # 列 竖
+        column: int = 1,  # 列 竖
         rowspan: int = 1,
         columnspan: int = 1,
-        padx: int | float | None = 5,
-        pady: int | float | None = 5,
-        ipadx: int | float | None = 0,
-        ipady: int | float | None = 0,
+        padx: int | float | tuple[int | float, int | float] | None = 5,
+        pady: int | float | tuple[int | float, int | float] | None = 5,
+        ipadx: int | float | tuple[int | float, int | float] | None = 0,
+        ipady: int | float | tuple[int | float, int | float] | None = 0,
     ):
 
         self.show()

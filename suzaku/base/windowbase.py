@@ -325,7 +325,6 @@ class SkWindowBase(SkEventHandling, SkMisc):
             self.trigger("update", SkEvent(event_type="update"))
 
             if self.mode == "input" or redraw:
-                print(self.id)
                 self.draw()
             else:
                 for child in self.children:

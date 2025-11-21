@@ -46,6 +46,7 @@ class SkCheckBox(SkWidget):
             self.cget("variable").set(self._checked)
         if self.cget("command"):
             self.cget("command")()
+        self.update(True)
 
     def _on_click(self, event: SkEvent):
         """【处理点击事件，切换复选框的选中状态】"""
