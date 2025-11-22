@@ -46,8 +46,8 @@ from .separator import SkSeparator  # ✅
 from .sizegrip import SkSizeGrip  # ✅
 
 SkSizegrip = SkSizeGrip
-from .slider import SkSlider  # ⛔
-from .stack import SkStack
+from .slider import SkSlider  # ✅
+from .stack import SkStack  # ✅
 from .switch import SkSwitch  # ✅
 from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar  # ✅

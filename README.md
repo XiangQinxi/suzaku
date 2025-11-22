@@ -2,28 +2,29 @@
 
 Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 
-基于`skia-python`、`pyopengl`与`glfw`高级界面库。
-
-> Still under developing... / 正在抓紧制作中...
+> Still under developing...
 > 
 > versions under dev are provided for evulation purposes.
-> 
-> 您可以下载正在开发的版本来进行评估。
-> 
+
 
 ---
 
-## Basic Example / 简单示例
+## Basic Example
 
 ```bash
 python3 -m suzaku
 ```
 
+### 0.1.9
+![0.1.9.png](https://i.postimg.cc/HxvvFF3B/0-1-9.png)
+![0.1.9-Dark.png](https://i.postimg.cc/2yBGMyVJ/0-1-9-Dark.png)
+![0.1.9-SV.png](https://i.postimg.cc/1z5LT0s5/0-1-9-SV.png)
+
 ### 0.1.1
 ![0.1.1.png](https://i.postimg.cc/nLQnc4Kx/18c79b883afd9b6d1b44139b6fa2f1ec.png)
 ![0.1.1-Dark.png](https://i.postimg.cc/gjc9R8hn/d3b64d01e06c87b8abc26efb99aa0663.png)
 
-## Layout / 布局
+## Layout
 Each component can use layout methods to arrange itself using, for instance, `widget.box()`, which is similar to how things work in `tkinter`. Comparing to other solutions used in Qt or other UI frameworks, we believe this approach is more simple and user-friendly.
 
 每个组件都可以使用布局方法来布局自己，例如`widget.box()`，类似于`tkinter`，我觉得这样更简洁易用点。
