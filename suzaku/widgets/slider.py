@@ -40,6 +40,7 @@ class SkSlider(SkWidget):
         self.focusable = True
         self._x1 = None
         self._pressing = False
+        self.bind("mouse_motion", lambda event: self.update(True))
         self.bind("mouse_press", record_mouse_pressing)
         self.window.bind("mouse_move", record_mouse_pos)
         self.window.bind("mouse_release", record_mouse_released)
@@ -83,24 +84,23 @@ class SkSlider(SkWidget):
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         if not self.cget("disabled"):
             if self.is_mouse_floating:
-                if self.is_mouse_press:
-                    state = "pressed"
+                if self._pressing:
+                    state = "press"
                 else:
                     state = "hover"
             else:
-                if self.is_focus:
-                    state = "focus"
+                if self._pressing:
+                    state = "press"
                 else:
                     state = ""
         else:
             state = "disabled"
 
         if state:
-            selector = f"{self.style_name}:{state}"
+            thumb_selector = f"{self.style_name}.Thumb:{state}"
         else:
-            selector = self.style_name
+            thumb_selector = f"{self.style_name}.Thumb"
 
-        thumb_selector = self.style_name + ".Thumb"
         size = self._style2(self.theme, thumb_selector, "size", (20, 20))
         thumb_width, thumb_height = size
 
@@ -149,6 +149,9 @@ class SkSlider(SkWidget):
                     bg=self._style2(self.theme, rail_selector, "bg", skia.ColorBLACK),
                     bd=self._style2(self.theme, rail_selector, "bd", 0),
                     width=self._style2(self.theme, rail_selector, "width", 0),
+                    bd_shader=self._style2(self.theme, rail_selector, "bd_shader"),
+                    bd_shadow=self._style2(self.theme, rail_selector, "bd_shadow"),
+                    bg_shader=self._style2(self.theme, rail_selector, "bg_shader"),
                 )
 
         # Progress进度条
@@ -168,26 +171,31 @@ class SkSlider(SkWidget):
                     self._draw_rect(
                         canvas,
                         progress_rect,
-                        self._style2(self.theme, progress_selector, "radius", 0),
+                        radius=self._style2(self.theme, progress_selector, "radius", 0),
                         bg=self._style2(self.theme, progress_selector, "bg", skia.ColorBLACK),
                         bd=self._style2(self.theme, progress_selector, "bd", 0),
                         width=self._style2(self.theme, progress_selector, "width", 0),
+                        bd_shader=self._style2(self.theme, progress_selector, "bd_shader"),
+                        bd_shadow=self._style2(self.theme, progress_selector, "bd_shadow"),
+                        bg_shader=self._style2(self.theme, progress_selector, "bg_shader"),
                     )
 
         # Thumb滑块
         thumb_half_height = thumb_height / 2
-        thumb_top = rect.centerY() - thumb_half_height
-        thumb_bottom = rect.centerY() + thumb_half_height
-
-        thumb_top = max(rect.top(), thumb_top)
-        thumb_bottom = min(rect.bottom(), thumb_bottom)
 
         thumb_rect = skia.Rect.MakeLTRB(
             max(rect.left(), x - thumb_half_width),
-            thumb_top,
+            rect.centerY() - thumb_half_height,
             min(rect.right(), x + thumb_half_width),
-            thumb_bottom,
+            rect.centerY() + thumb_half_height,
         )
+
+        if not thumb_rect.contains(self.window.mouse_x, self.window.mouse_y):
+            if state == "hover":
+                thumb_selector = f"{self.style_name}.Thumb"
+        else:
+            if state != "press":
+                thumb_selector = f"{self.style_name}.Thumb:hover"
 
         if thumb_rect.width() > 0 and thumb_rect.height() > 0:
             self._draw_rect(
@@ -197,6 +205,9 @@ class SkSlider(SkWidget):
                 bg=self._style2(self.theme, thumb_selector, "bg", skia.ColorBLACK),
                 bd=self._style2(self.theme, thumb_selector, "bd", 0),
                 width=self._style2(self.theme, thumb_selector, "width", 0),
+                bd_shader=self._style2(self.theme, thumb_selector, "bd_shader"),
+                bd_shadow=self._style2(self.theme, thumb_selector, "bd_shadow"),
+                bg_shader=self._style2(self.theme, thumb_selector, "bg_shader"),
             )
 
         if self._style2(self.theme, thumb_selector, "inner", False):
@@ -207,17 +218,20 @@ class SkSlider(SkWidget):
 
             inner_thumb_rect = skia.Rect.MakeLTRB(
                 max(rect.left(), x - inner_thumb_half_width),
-                thumb_top,
+                rect.centerY() - inner_thumb_half_height,
                 min(rect.right(), x + inner_thumb_half_width),
-                thumb_bottom,
+                rect.centerY() + inner_thumb_half_height,
             )
 
             if inner_thumb_rect.width() > 0 and inner_thumb_rect.height() > 0:
                 self._draw_rect(
                     canvas,
                     inner_thumb_rect,
-                    self._style2(self.theme, thumb_selector, "radius", 0),
-                    bg=self._style2(self.theme, thumb_selector, "bg", skia.ColorBLACK),
-                    bd=self._style2(self.theme, thumb_selector, "bd", 0),
-                    width=self._style2(self.theme, thumb_selector, "width", 0),
+                    self._style2(self.theme, thumb_selector, "inner_radius", 0),
+                    bg=self._style2(self.theme, thumb_selector, "inner_bg", skia.ColorBLACK),
+                    bd=self._style2(self.theme, thumb_selector, "inner_bd", 0),
+                    width=self._style2(self.theme, thumb_selector, "inner_width", 0),
+                    bd_shader=self._style2(self.theme, thumb_selector, "inner_bd_shader"),
+                    bd_shadow=self._style2(self.theme, thumb_selector, "inner_bd_shadow"),
+                    bg_shader=self._style2(self.theme, thumb_selector, "inner_bg_shader"),
                 )

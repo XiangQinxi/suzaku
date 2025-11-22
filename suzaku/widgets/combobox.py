@@ -49,6 +49,7 @@ class SkComboBox(SkButton):
         self.bind("command", lambda evt: self.cget("textvariable").set(evt["text"]))
         self.parent.bind("scrolled", self._on_parent_scrolled)
         self.popupmenu.bind("command", lambda evt: self.trigger("command", evt))
+        self.popupmenu.bind("command", lambda evt: self.focus_set())
 
         self.help_parent_scroll = True
 

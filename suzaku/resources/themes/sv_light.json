@@ -505,14 +505,31 @@
       "rest": {
         "size": [20, 20],
         "bg": [255, 255, 255, 255],
-        "bd": [0, 0, 0, 45],
+        "bd": [0, 0, 0, 255],
         "width": 1,
         "radius": 99,
-
-        "inner": false,
-        "inner_bg": [40, 130, 255, 235],
-        "inner_width": 20,
-        "inner_radius": 4
+        "bd_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "50%": [0, 0, 0, 15],
+              "95%": [0, 0, 0, 40]
+            }
+          }
+        },
+        "inner": true,
+        "inner_size": [10, 10],
+        "inner_bg": {"color_palette": "secondary_accent"},
+        "inner_width": 0,
+        "inner_radius": 99
+      },
+      "hover": {
+        "inner_size": [13, 13]
+      },
+      "press": {
+        "inner_size": [9, 9],
+        "inner_bg": {"color_palette": "tertiary_accent"}
       }
     },
 
