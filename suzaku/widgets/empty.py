@@ -16,6 +16,22 @@ class SkEmpty(SkWidget):
         super().__init__(parent, **kwargs)
         self.help_parent_scroll = True
 
+    @property
+    def dwidth(self):
+        """Get default width.
+
+        :return: Default width
+        """
+        return 0
+
+    @property
+    def dheight(self):
+        """Get default height.
+
+        :return: Default height
+        """
+        return 0
+
     def draw_widget(self, canvas, rect) -> None:
         """Draw method, does nothing.
 

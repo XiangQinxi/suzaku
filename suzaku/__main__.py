@@ -87,6 +87,8 @@ if __name__ == "__main__":
 
             SkSwitch(tab_widgets, text="SkSwitch", variable=var1).box(padx=10, pady=(10, 0))
 
+            SkSlider(tab_widgets).box(padx=10, pady=(10, 0))
+
             SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
             SkText(tab_widgets, text="SkText").box(padx=10, pady=(10, 0))
@@ -122,7 +124,7 @@ if __name__ == "__main__":
                 "changed",
                 change_theme,
             )
-            listbox.select(index=3)
+            listbox.select(index=0)
             listbox.box(padx=10, pady=(10, 0))
 
             SkTextButton(

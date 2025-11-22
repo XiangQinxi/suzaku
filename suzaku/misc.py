@@ -204,6 +204,13 @@ class SkMisc:
             return default
 
     @staticmethod
+    def _style2(theme, selector, name, default=None):
+        attr = theme.get_style_attr(selector, name)
+        if not attr:
+            attr = default
+        return attr
+
+    @staticmethod
     def sk_get_type(obj_or_cls: typing.Any) -> list[str]:
         """
         Returns a list of names of a class/object's parent classes. Written by Google Gemini.
