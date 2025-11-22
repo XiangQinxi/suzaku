@@ -16,6 +16,6 @@ switch_theme = SkSwitch(titlebar, text="Dark mode", command=switch).box(
     padx=0,
 )
 
-slider = SkSlider(root).box(side="top")
+slider = SkSlider(root, tick=10).box(side="top")
 
 root.mainloop()

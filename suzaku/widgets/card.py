@@ -26,16 +26,13 @@ class SkCard(SkFrame):
         :param rect: skia.Rect
         :return: None
         """
-        styles = self.theme.select(self.style_name)
-        if self.cget("styles") is not None:
-            styles = self.cget("styles")
-        radius = self._style("radius", 0, styles)
-        bg_shader = self._style("bg_shader", None, styles)
-        bd_shadow = self._style("bd_shadow", None, styles)
-        bd_shader = self._style("bd_shader", None, styles)
-        width = self._style("width", 0, styles)
-        bd = self._style("bd", None, styles)
-        bg = self._style("bg", None, styles)
+        radius = self._style2(self.theme, self.style_name, "radius", 0)
+        bg_shader = self._style2(self.theme, self.style_name, "bg_shader", None)
+        bd_shadow = self._style2(self.theme, self.style_name, "bd_shadow", None)
+        bd_shader = self._style2(self.theme, self.style_name, "bd_shader", None)
+        width = self._style2(self.theme, self.style_name, "width", 0)
+        bd = self._style2(self.theme, self.style_name, "bd", None)
+        bg = self._style2(self.theme, self.style_name, "bg", None)
 
         self._draw_rect(
             canvas,

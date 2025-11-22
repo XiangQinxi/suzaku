@@ -28,43 +28,19 @@ class SkEntry(SkLineInput):
         else:
             style_name = self.style_name
 
-        style = self.theme.select(style_name)
-        radius = self.theme.get_style_attr(self.style_name, "radius")
-
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "selected_bg" in style:
-            selected_bg = style["selected_bg"]
-        else:
-            selected_bg = skia.ColorBLUE
-        if "selected_fg" in style:
-            selected_fg = style["selected_fg"]
-        else:
-            selected_fg = skia.ColorWHITE
-        if "cursor" in style:
-            cursor = style["cursor"]
-        else:
-            cursor = None
-        if "placeholder" in style:
-            placeholder = style["placeholder"]
-        else:
-            placeholder = None
-        if "selected_radius" in style:
-            selected_radius = style["selected_radius"]
-        else:
-            selected_radius = True
+        radius = self._style2(self.theme, style_name, "radius", 0)
+        bg_shader = self._style2(self.theme, style_name, "bg_shader")
+        bd_shader = self._style2(self.theme, style_name, "bd_shader")
+        bd_shadow = self._style2(self.theme, style_name, "bd_shadow")
+        width = self._style2(self.theme, style_name, "width", 2)
+        fg = self._style2(self.theme, style_name, "fg", "black")
+        bg = self._style2(self.theme, style_name, "bg", "black")
+        bd = self._style2(self.theme, style_name, "bd", "black")
+        selected_bg = self._style2(self.theme, style_name, "selected_bg", "blue")
+        selected_fg = self._style2(self.theme, style_name, "selected_fg", "white")
+        cursor = self._style2(self.theme, style_name, "cursor")
+        placeholder = self._style2(self.theme, style_name, "placeholder")
+        selected_radius = self._style2(self.theme, style_name, "selected_radius", True)
         if isinstance(selected_radius, bool):
             if selected_radius:
                 selected_radius = radius / 2
@@ -76,9 +52,9 @@ class SkEntry(SkLineInput):
             canvas,
             rect,
             radius=radius,
-            bg=style["bg"],
-            bd=style["bd"],
-            width=style["width"],
+            bg=bg,
+            bd=bd,
+            width=width,
             bd_shader=bd_shader,
             bg_shader=bg_shader,
             bd_shadow=bd_shadow,
@@ -96,7 +72,7 @@ class SkEntry(SkLineInput):
         self._draw_text_input(
             canvas,
             input_rect,
-            fg=style["fg"],
+            fg=fg,
             placeholder=placeholder,
             selected_bg=selected_bg,
             selected_fg=selected_fg,

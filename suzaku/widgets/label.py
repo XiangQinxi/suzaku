@@ -6,43 +6,17 @@ from .text import SkText
 class SkLabel(SkText):
     """(A SkText with border and background"""
 
-    def __init__(
-        self, parent, text: str | None = None, *, style: str = "SkLabel", **kwargs
-    ):
+    def __init__(self, parent, text: str | None = None, *, style: str = "SkLabel", **kwargs):
         super().__init__(parent, text=text, style=style, **kwargs)
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.select(self.style_name)
-
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-        if "radius" in style:
-            radius = style["radius"]
-        else:
-            radius = 0
-        if "width" in style:
-            width = style["width"]
-        else:
-            width = 0
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
+        bg_shader = self._style2(self.theme, self.style_name, "bg_shader", None)
+        bd_shadow = self._style2(self.theme, self.style_name, "bd_shadow", None)
+        bd_shader = self._style2(self.theme, self.style_name, "bd_shader", None)
+        radius = self._style2(self.theme, self.style_name, "radius", 0)
+        width = self._style2(self.theme, self.style_name, "width", 0)
+        bd = self._style2(self.theme, self.style_name, "bd", None)
+        bg = self._style2(self.theme, self.style_name, "bg", None)
 
         # Draw the button border
         self._draw_rect(

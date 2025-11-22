@@ -74,7 +74,7 @@ class SkComboBox(SkButton):
         return super().set_attribute(**kwargs)
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> None:
-        style = super().draw_widget(canvas, rect, style_selector)
+        style_selector = super().draw_widget(canvas, rect, style_selector)
         arrow_padding = 10
         button_rect: skia.Rect = skia.Rect.MakeLTRB(
             rect.right() - self.height + arrow_padding,
@@ -84,7 +84,7 @@ class SkComboBox(SkButton):
         )
         arrow = skcolor_to_color(
             style_to_color(
-                self._style("arrow", skia.ColorBLACK, self.theme.select(self.style_name)),
+                self._style2(self.theme, style_selector, "arrow", skia.ColorBLACK),
                 self.theme,
             )
         )

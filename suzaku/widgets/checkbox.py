@@ -80,54 +80,31 @@ class SkCheckBox(SkWidget):
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """【绘制复选框】"""
         if self.checked:
-            style_name = f"{self.style_name}:checked"
+            style_selector = f"{self.style_name}:checked"
         else:
-            style_name = f"{self.style_name}:unchecked"
+            style_selector = f"{self.style_name}:unchecked"
         if self.is_mouse_floating:
-            style_name = style_name + "-hover"
+            style_selector = style_selector + "-hover"
         else:
             """if self.is_focus:
                 style_selector = style_selector + "-focus"
             else:
                 style_selector = style_selector + "-rest"""
-            style_name = style_name + "-rest"
+            style_selector = style_selector + "-rest"
 
-        style = self.theme.select(style_name)
-
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in style:
-            width = style["width"]
-        else:
-            width = 0
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
-        if "fg" in style:
-            fg = style["fg"]
-        else:
-            fg = None
+        bg_shader = self._style2(self.theme, style_selector, "bg_shader", None)
+        bd_shadow = self._style2(self.theme, style_selector, "bd_shadow", None)
+        bd_shader = self._style2(self.theme, style_selector, "bd_shader", None)
+        radius = self._style2(self.theme, style_selector, "radius", 0)
+        width = self._style2(self.theme, style_selector, "width", 0)
+        bd = self._style2(self.theme, style_selector, "bd", None)
+        bg = self._style2(self.theme, style_selector, "bg", None)
+        fg = self._style2(self.theme, style_selector, "fg", None)
 
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style_attr(style_name, "radius"),
+            radius=radius,
             bg=bg,
             width=width,
             bd=bd,

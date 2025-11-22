@@ -37,6 +37,7 @@ class SkLineInput(SkWidget):
         placeholder: str | None = None,
         readonly: bool = False,
         cursor="ibeam",
+        style_name="SkEntry",
         show: str | None = None,
         **kwargs,
     ) -> None:
@@ -47,7 +48,7 @@ class SkLineInput(SkWidget):
         :param placeholder: 占位符
         :param cursor: 光标样式
         """
-        super().__init__(parent=parent, cursor=cursor, **kwargs)
+        super().__init__(parent=parent, cursor=cursor, style_name=style_name, **kwargs)
 
         # Attributes
         self.attributes["readonly"] = readonly
@@ -71,6 +72,7 @@ class SkLineInput(SkWidget):
         self.undo_stack = []
         self.redo_stack = []
         self.max_undo_stack = 30
+        self.help_parent_scroll = True
 
         # Event binding
         self.bind("double_click", self._double_click)
@@ -284,9 +286,7 @@ class SkLineInput(SkWidget):
             self.visible_start_index = self.cursor_index() - 2
             if self.visible_start_index < 0:
                 self.visible_start_index = 0
-        if self.visible_start_index > len(self.get()) or self.cursor_index() > len(
-            self.get()
-        ):
+        if self.visible_start_index > len(self.get()) or self.cursor_index() > len(self.get()):
             self.cursor_index(len(self.get()))
             self.visible_start_index = self.cursor_index()
 
@@ -371,8 +371,7 @@ class SkLineInput(SkWidget):
             # 【光标向左移动时，若文本可显的初始索引大于等于光标索引，且文本可显的初始索引不为0】
             while (
                 self.visible_start_index
-                >= self._cursor_index
-                - 1  # 【当光标向左移动时，如果光标在可显文本的第二位】
+                >= self._cursor_index - 1  # 【当光标向左移动时，如果光标在可显文本的第二位】
                 and self.visible_start_index != 0
             ):
                 self.visible_start_index -= move
@@ -437,9 +436,7 @@ class SkLineInput(SkWidget):
             return self
         if self.is_selected():
             start, end = self.sort_select()
-            self.start_index = self.end_index = self._cursor_index = len(
-                self.show_text[:start]
-            )
+            self.start_index = self.end_index = self._cursor_index = len(self.show_text[:start])
             self.set(self.get()[:start] + self.get()[end:])
             self.check()
         self.update(True)
@@ -455,10 +452,7 @@ class SkLineInput(SkWidget):
         self.record_state()
         if not self.is_selected():
             if self.cursor_index() > 0:
-                self.set(
-                    self.get()[: self.cursor_index() - 1]
-                    + self.get()[self.cursor_index() :]
-                )
+                self.set(self.get()[: self.cursor_index() - 1] + self.get()[self.cursor_index() :])
                 self.cursor_left()
         else:
             self.delete_selected()
@@ -512,9 +506,7 @@ class SkLineInput(SkWidget):
         self._cursor_index = len(self.get())
         while (
             self.measure_text(
-                self.show_text[
-                    self.visible_start_index : self.cursor_index()
-                ]  # 光标左边的可显文本
+                self.show_text[self.visible_start_index : self.cursor_index()]  # 光标左边的可显文本
             )
             >= self._rect.width()
         ):
@@ -539,9 +531,7 @@ class SkLineInput(SkWidget):
 
             # 【如没有选中文本，则在光标后粘贴文本】
             if not self.is_selected():
-                self.set(
-                    text[: self._cursor_index] + clipboard + text[self._cursor_index :]
-                )
+                self.set(text[: self._cursor_index] + clipboard + text[self._cursor_index :])
                 self.cursor_right(len(clipboard))
             # 【如选中文本，则粘贴并覆盖选中文本】
             else:
@@ -604,48 +594,36 @@ class SkLineInput(SkWidget):
         """Draw the text input
         【绘制输入框（不含边框）】
         """
-        if self.is_mouse_floating:
-            if self.is_focus:
-                style_name = "SkEntry:focus"
+        if not self.cget("disabled"):
+            if self.is_mouse_floating:
+                if self.is_focus:
+                    style_selector = f"{self.style_name}:focus"
+                else:
+                    style_selector = f"{self.style_name}:hover"
+            elif self.is_focus:
+                style_selector = f"{self.style_name}:focus"
             else:
-                style_name = "SkEntry:hover"
-        elif self.is_focus:
-            style_name = "SkEntry:focus"
+                style_selector = self.style_name
         else:
-            style_name = "SkEntry"
+            style_selector = f"{self.style_name}:disabled"
 
-        style = self.theme.select(style_name)
-        radius = self.theme.get_style_attr("SkEntry", "radius")
-
-        if "selected_bg" in style:
-            selected_bg = style["selected_bg"]
-        else:
-            selected_bg = skia.ColorBLUE
-        if "selected_fg" in style:
-            selected_fg = style["selected_fg"]
-        else:
-            selected_fg = skia.ColorWHITE
-        if "cursor" in style:
-            cursor = style["cursor"]
-        else:
-            cursor = None
-        if "placeholder" in style:
-            placeholder = style["placeholder"]
-        else:
-            placeholder = None
-        if "selected_radius" in style:
-            selected_radius = style["selected_radius"]
-        else:
-            selected_radius = True
+        radius = self._style2(self.theme, style_selector, "radius", 0)
+        fg = self._style2(self.theme, style_selector, "fg")
+        selected_bg = self._style2(self.theme, style_selector, "selected_bg")
+        selected_fg = self._style2(self.theme, style_selector, "selected_fg")
+        cursor = self._style2(self.theme, style_selector, "cursor")
+        placeholder = self._style2(self.theme, style_selector, "placeholder")
+        selected_radius = self._style2(self.theme, style_selector, "selected_radius", True)
         if isinstance(selected_radius, bool):
             if selected_radius:
                 selected_radius = radius
             else:
                 selected_radius = 0
+
         self._draw_text_input(
             canvas,
             rect,
-            fg=style["fg"],
+            fg=fg,
             placeholder=placeholder,
             selected_bg=selected_bg,
             selected_fg=selected_fg,
@@ -687,9 +665,7 @@ class SkLineInput(SkWidget):
             placeholder = fg
 
         if cursor:
-            cursor = skcolor_to_color(
-                style_to_color(cursor, self.theme)
-            )  # 设置光标颜色
+            cursor = skcolor_to_color(style_to_color(cursor, self.theme))  # 设置光标颜色
         else:
             cursor = fg
 
@@ -777,9 +753,7 @@ class SkLineInput(SkWidget):
             if self.cursor_visible:
                 # 【计算出的光标位置】
                 cursor_x = self._rect.left() + self.measure_text(
-                    text[
-                        self.visible_start_index : self.cursor_index()
-                    ]  # 光标左边的可显文本
+                    text[self.visible_start_index : self.cursor_index()]  # 光标左边的可显文本
                 )
                 canvas.drawLine(
                     x0=cursor_x,

@@ -47,58 +47,33 @@ class SkSwitchBox(SkCheckBox):
                 return
         self.invoke()
 
-    def draw_widget(
-        self, canvas: skia.Canvas, rect: skia.Rect, style_name=None
-    ) -> None:
-        rest_style = self.theme.select(self.style_name)
-
-        if style_name is None:
+    def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect, style_selector=None) -> None:
+        if style_selector is None:
             if self.checked:
-                style_name = f"{self.style_name}:checked"
+                style_selector = f"{self.style_name}:checked"
             else:
-                style_name = f"{self.style_name}:unchecked"
+                style_selector = f"{self.style_name}:unchecked"
 
             if self.is_mouse_floating:
                 if self.is_mouse_press:
-                    style_name = style_name + "-press"
+                    style_selector = style_selector + "-press"
                 else:
-                    style_name = style_name + "-hover"
+                    style_selector = style_selector + "-hover"
             else:
-                style_name = style_name + "-rest"
+                style_selector = style_selector + "-rest"
 
-        style = self.theme.select(style_name)
-
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in style:
-            width = style["width"]
-        else:
-            width = 0
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
+        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
+        bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
+        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
+        width = self._style2(self.theme, style_selector, "width", 0)
+        bd = self._style2(self.theme, style_selector, "bd")
+        bg = self._style2(self.theme, style_selector, "bg")
+        radius = self._style2(self.theme, style_selector, "radius", 0)
 
         self._draw_rect(
             canvas,
             rect,
-            radius=rest_style["radius"],
+            radius=radius,
             bg_shader=bg_shader,
             bd_shadow=bd_shadow,
             bd_shader=bd_shader,
@@ -122,22 +97,10 @@ class SkSwitchBox(SkCheckBox):
             else:
                 x = left
 
-        if "button" in style:
-            button = style["button"]
-        else:
-            button = None
-        if "button-padding" in style:
-            padding = style["button-padding"]
-        else:
-            padding = 0
-        if "shape" in rest_style:
-            shape = rest_style["shape"]
-        else:
-            shape = "circle"
-        if "radius2" in rest_style:
-            radius2 = rest_style["radius2"]
-        else:
-            radius2 = rest_style["radius"] / 2
+        button = self._style2(self.theme, style_selector, "button")
+        padding = self._style2(self.theme, style_selector, "button-padding", 0)
+        shape = self._style2(self.theme, style_selector, "shape", "circle")
+        radius2 = self._style2(self.theme, style_selector, "radius2", radius / 2)
 
         match shape:
             case "circle":

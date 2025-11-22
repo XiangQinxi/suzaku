@@ -31,7 +31,6 @@ class SkSeparator(SkWidget):
         self.help_parent_scroll = True
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.select(self.style_name)
         orient = self.cget("orient")
         width = self.theme.get_style_attr(self.style_name, "width")
         # print(self.id, orient)
@@ -48,8 +47,8 @@ class SkSeparator(SkWidget):
                 y0=rect.centerY(),
                 x1=rect.right(),
                 y1=rect.centerY(),
-                fg=style["fg"],
-                width=style["width"],
+                fg=self._style2(self.theme, self.style_name, "fg", "gray"),
+                width=self._style2(self.theme, self.style_name, "width", 2),
             )
         else:
             self._draw_line(
@@ -58,6 +57,6 @@ class SkSeparator(SkWidget):
                 y0=rect.top(),
                 x1=rect.centerX(),
                 y1=rect.bottom(),
-                fg=style["fg"],
-                width=style["width"],
+                fg=self._style2(self.theme, self.style_name, "fg", "gray"),
+                width=self._style2(self.theme, self.style_name, "width", 2),
             )

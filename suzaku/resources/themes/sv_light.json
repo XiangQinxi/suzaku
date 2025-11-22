@@ -10,6 +10,7 @@
     "disabled_fg": [150, 150, 150, 235],
 
     "default_bg": [255, 255, 255, 180],
+    "default_strong_bg": [0, 0, 0, 115],
     "default_card_bg": [251, 251, 251, 255],
     "default_surface_bg": [245, 245, 245, 255],
     "secondary_bg": [249, 249, 249, 130],
@@ -473,6 +474,45 @@
         "width": 1,
         "button": {"color_palette": "default_accent_fg"},
         "button-padding": 4
+      }
+    },
+
+    "SkSlider": {
+      "rest": {
+        "size": [120, 20]
+      }
+    },
+
+    "SkSlider.Progress": {
+      "rest": {
+        "size": 4,
+        "bg": {"color_palette": "default_accent"},
+        "width": 0,
+        "radius": 99
+      }
+    },
+
+    "SkSlider.Rail": {
+      "rest": {
+        "size": 4,
+        "bg": {"color_palette": "default_strong_bg"},
+        "width": 0,
+        "radius": 99
+      }
+    },
+
+    "SkSlider.Thumb": {
+      "rest": {
+        "size": [20, 20],
+        "bg": [255, 255, 255, 255],
+        "bd": [0, 0, 0, 45],
+        "width": 1,
+        "radius": 99,
+
+        "inner": false,
+        "inner_bg": [40, 130, 255, 235],
+        "inner_width": 20,
+        "inner_radius": 4
       }
     },
 

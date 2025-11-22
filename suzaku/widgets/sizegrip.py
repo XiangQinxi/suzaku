@@ -45,17 +45,15 @@ class SkSizeGrip(SkWidget):
         self._y1 = None
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        style = self.theme.select(self.style_name)
-
         canvas.save()
         canvas.clipRect(rect)
 
-        fg = self._style("fg", skia.ColorGRAY, style)
+        fg = self._style2(self.theme, self.style_name, "fg", skia.ColorGRAY)
 
-        match style["grip_style"]:
+        match self._style2(self.theme, self.style_name, "grip_style"):
             case "dotted":
-                dot_size = self._style("dot_size", 2, style)
-                dot_spacing = self._style("dot_spacing", 5, style)
+                dot_size = self._style2(self.theme, self.style_name, "dot_size", 2)
+                dot_spacing = self._style2(self.theme, self.style_name, "dot_spacing", 5)
                 self._draw_dotted_size_grip(
                     canvas,
                     rect,

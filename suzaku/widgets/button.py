@@ -84,33 +84,19 @@ class SkButton(SkFrame):
             else:
                 style_selector = f"{self.style_name}:disabled"
 
-        bg_shader = self.theme.get_style_attr(style_selector, "bg_shader")
-        if not bg_shader:
-            bg_shader = None
-        # bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
-        bd_shadow = self.theme.get_style_attr(style_selector, "bd_shadow")
-        if not bd_shadow:
-            bd_shadow = None
-        bd_shader = self.theme.get_style_attr(style_selector, "bd_shader")
-        if not bd_shader:
-            bd_shader = None
-        width = self.theme.get_style_attr(style_selector, "width")
-        if not width:
-            width = 0
-        # bd = self.theme.get_style_attr(style_selector, "bd")
-        bd = self.theme.get_style_attr(style_selector, "bd")
-        if not bd:
-            bd = None
-        # bg = self.theme.get_style_attr(style_selector, "bg")
-        bg = self.theme.get_style_attr(style_selector, "bg")
-        if not bg:
-            bg = None
+        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
+        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
+        bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
+        width = self._style2(self.theme, style_selector, "width", 0)
+        bd = self._style2(self.theme, style_selector, "bd")
+        bg = self._style2(self.theme, style_selector, "bg")
+        radius = self._style2(self.theme, style_selector, "radius", 0)
 
         # Draw the button border
         self._draw_rect(
             canvas,
             rect,
-            radius=self.theme.get_style_attr(self.style_name, "radius"),
+            radius=radius,
             bg=bg,
             width=width,
             bd=bd,

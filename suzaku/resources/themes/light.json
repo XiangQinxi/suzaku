@@ -508,30 +508,29 @@
 
     "SkSlider.Progress": {
       "rest": {
+        "size": 9,
         "bg": [40, 130, 255, 215],
-        "bd": [40, 130, 255, 235],
         "width": 0,
-        "radius": [4, 0, 0, 4],
-        "pady": 5
+        "radius": [4, 0, 0, 4]
       }
     },
 
     "SkSlider.Rail": {
       "rest": {
+        "size": 8,
         "bg": [0, 0, 0, 30],
         "width": 0,
-        "radius": 4,
-        "pady": 5
+        "radius": 4
       }
     },
 
     "SkSlider.Thumb": {
       "rest": {
-        "size": [30, 20],
-        "bg": [230, 230, 230, 255],
-        "bd": [200, 200, 200, 255],
+        "size": [25, 20],
+        "bg": [220, 220, 220, 255],
+        "bd": [0, 0, 0, 45],
         "width": 2,
-        "radius": 4,
+        "radius": 6,
 
         "inner": false,
         "inner_bg": [40, 130, 255, 235],

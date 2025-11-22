@@ -99,7 +99,8 @@ class SkTextButton(SkButton, SkText):
                 rect.bottom(),
             ),
             text=self.get(),
-            fg=self.theme.get_style_attr(style_selector, "fg"),
+            fg=self._style2(self.theme, style_selector, "fg"),
+            font=self._style2(self.theme, style_selector, "font"),
             align=self.cget("align"),
         )
         canvas.restore()
@@ -244,10 +245,8 @@ class SkMinimizeButton(SkTextButton):
         :param canvas: skia.Surface to draw on
         """
         style_selector = super().draw_widget(canvas, rect, style_selector)
-
-        icon_width = self.theme.get_style_attr(style_selector, "icon_width")
-        if not icon_width:
-            icon_width = 1
+        fg = self._style2(self.theme, style_selector, "fg")
+        width = self._style2(self.theme, style_selector, "width", 1)
 
         self._draw_line(
             canvas,
@@ -255,6 +254,6 @@ class SkMinimizeButton(SkTextButton):
             rect.centerY(),
             rect.right() - rect.width() * 0.32,
             rect.centerY(),
-            fg=self.theme.get_style_attr(style_selector, "fg"),
-            width=icon_width,
+            fg=fg,
+            width=width,
         )

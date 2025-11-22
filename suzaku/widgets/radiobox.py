@@ -57,53 +57,27 @@ class SkRadioBox(SkWidget):
                 style_selector = "SkCheckBox:focus"
             else:"""
         if self.checked:
-            style_name = f"{self.style_name}:checked"
+            style_selector = f"{self.style_name}:checked"
         else:
-            style_name = f"{self.style_name}:unchecked"
+            style_selector = f"{self.style_name}:unchecked"
         if self.is_mouse_floating:
-            style_name = style_name + "-hover"
+            style_selector = style_selector + "-hover"
         else:
             """if self.is_focus:
                 style_selector = style_selector + "-focus"
             else:
                 style_selector = style_selector + "-rest"""
-            style_name = style_name + "-rest"
+            style_selector = style_selector + "-rest"
 
-        style = self.theme.select(style_name)
+        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
+        bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
+        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
+        width = self._style2(self.theme, style_selector, "width", 0)
+        inner_width = self._style2(self.theme, style_selector, "inner_width", 3)
+        bd = self._style2(self.theme, style_selector, "bd")
+        bg = self._style2(self.theme, style_selector, "bg")
+        fg = self._style2(self.theme, style_selector, "fg")
 
-        if "bg_shader" in style:
-            bg_shader = style["bg_shader"]
-        else:
-            bg_shader = None
-        if "bd_shadow" in style:
-            bd_shadow = style["bd_shadow"]
-        else:
-            bd_shadow = None
-        if "bd_shader" in style:
-            bd_shader = style["bd_shader"]
-        else:
-            bd_shader = None
-
-        if "width" in style:
-            width: int | float = style["width"]
-        else:
-            width: int | float = 0
-        if "inner_width" in style:
-            inner_width: int | float = style["inner_width"]
-        else:
-            inner_width: int | float = 3
-        if "bd" in style:
-            bd = style["bd"]
-        else:
-            bd = None
-        if "bg" in style:
-            bg = style["bg"]
-        else:
-            bg = None
-        if "fg" in style:
-            fg = style["fg"]
-        else:
-            fg = None
         _ = min(rect.width(), rect.height())
         self._draw_circle(
             canvas,

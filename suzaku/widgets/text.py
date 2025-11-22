@@ -72,7 +72,6 @@ class SkText(SkWidget):
     # region Draw
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
-        style = self.theme.select(self.style_name)
         canvas.save()
         canvas.clipRect(rect)
         self._draw_text(
@@ -84,8 +83,8 @@ class SkText(SkWidget):
                 rect.bottom(),
             ),
             text=self.get(),
-            fg=style["fg"],
-            font=self.attributes["font"],
+            fg=self._style2(self.theme, self.style_name, "fg"),
+            font=self._style2(self.theme, self.style_name, "font", default_font),
             align=self.cget("align"),
         )
         canvas.restore()

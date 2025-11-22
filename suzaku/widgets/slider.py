@@ -36,6 +36,8 @@ class SkSlider(SkWidget):
                 self.trigger("changed", SkEvent(self, event_type="changed"))
                 self.update(True)
 
+        self.help_parent_scroll = True
+        self.focusable = True
         self._x1 = None
         self._pressing = False
         self.bind("mouse_press", record_mouse_pressing)
@@ -130,47 +132,47 @@ class SkSlider(SkWidget):
 
         # Rail轨道
         rail_selector = self.style_name + ".Rail"
-        rail_pady = self._style2(self.theme, rail_selector, "pady", 0)
-
-        rail_rect = skia.Rect.MakeLTRB(
-            rect.left(),
-            max(rect.top(), rect.top() + rail_pady),
-            rect.right(),
-            min(rect.bottom(), rect.bottom() - rail_pady),
-        )
-
-        if rail_rect.height() > 0 and rail_rect.width() > 0:
-            self._draw_rect(
-                canvas,
-                rail_rect,
-                self._style2(self.theme, rail_selector, "radius", 0),
-                bg=self._style2(self.theme, rail_selector, "bg", skia.ColorBLACK),
-                bd=self._style2(self.theme, rail_selector, "bd", 0),
-                width=self._style2(self.theme, rail_selector, "width", 0),
+        rail_half_size = self._style2(self.theme, rail_selector, "size", 0) / 2
+        if rail_half_size > 0:
+            rail_rect = skia.Rect.MakeXYWH(
+                rect.x(),
+                rect.centerY() - rail_half_size,
+                rect.width(),
+                rail_half_size * 2,
             )
+
+            if rail_rect.height() > 0 and rail_rect.width() > 0:
+                self._draw_rect(
+                    canvas,
+                    rail_rect,
+                    self._style2(self.theme, rail_selector, "radius", 0),
+                    bg=self._style2(self.theme, rail_selector, "bg", skia.ColorBLACK),
+                    bd=self._style2(self.theme, rail_selector, "bd", 0),
+                    width=self._style2(self.theme, rail_selector, "width", 0),
+                )
 
         # Progress进度条
         if self.cget("value") > self.cget("minvalue"):
             progress_selector = self.style_name + ".Progress"
-            progress_pady = self._style2(self.theme, progress_selector, "pady", 0)
-
-            progress_rect = skia.Rect.MakeLTRB(
-                rect.left(),
-                max(rect.top(), rect.top() + progress_pady),
-                min(rect.right(), x),  # 关键：使用x而不是rect.left() + x
-                min(rect.bottom(), rect.bottom() - progress_pady),
-            )
-
-            # 确保进度条矩形有效且不为空
-            if progress_rect.width() > 0 and progress_rect.height() > 0:
-                self._draw_rect(
-                    canvas,
-                    progress_rect,
-                    self._style2(self.theme, progress_selector, "radius", 0),
-                    bg=self._style2(self.theme, progress_selector, "bg", skia.ColorBLACK),
-                    bd=self._style2(self.theme, progress_selector, "bd", 0),
-                    width=self._style2(self.theme, progress_selector, "width", 0),
+            progress_half_size = self._style2(self.theme, progress_selector, "size", 0) / 2
+            if progress_half_size > 0:
+                progress_rect = skia.Rect.MakeXYWH(
+                    rect.x(),
+                    rect.centerY() - progress_half_size,
+                    min(rect.right(), x) - rect.left(),  # 关键：使用x而不是rect.left() + x
+                    progress_half_size * 2,
                 )
+
+                # 确保进度条矩形有效且不为空
+                if progress_rect.width() > 0 and progress_rect.height() > 0:
+                    self._draw_rect(
+                        canvas,
+                        progress_rect,
+                        self._style2(self.theme, progress_selector, "radius", 0),
+                        bg=self._style2(self.theme, progress_selector, "bg", skia.ColorBLACK),
+                        bd=self._style2(self.theme, progress_selector, "bd", 0),
+                        width=self._style2(self.theme, progress_selector, "width", 0),
+                    )
 
         # Thumb滑块
         thumb_half_height = thumb_height / 2
@@ -196,3 +198,26 @@ class SkSlider(SkWidget):
                 bd=self._style2(self.theme, thumb_selector, "bd", 0),
                 width=self._style2(self.theme, thumb_selector, "width", 0),
             )
+
+        if self._style2(self.theme, thumb_selector, "inner", False):
+            size = self._style2(self.theme, thumb_selector, "inner_size", (10, 10))
+            inner_thumb_width, inner_thumb_height = size
+            inner_thumb_half_width = inner_thumb_width / 2
+            inner_thumb_half_height = inner_thumb_height / 2
+
+            inner_thumb_rect = skia.Rect.MakeLTRB(
+                max(rect.left(), x - inner_thumb_half_width),
+                thumb_top,
+                min(rect.right(), x + inner_thumb_half_width),
+                thumb_bottom,
+            )
+
+            if inner_thumb_rect.width() > 0 and inner_thumb_rect.height() > 0:
+                self._draw_rect(
+                    canvas,
+                    inner_thumb_rect,
+                    self._style2(self.theme, thumb_selector, "radius", 0),
+                    bg=self._style2(self.theme, thumb_selector, "bg", skia.ColorBLACK),
+                    bd=self._style2(self.theme, thumb_selector, "bd", 0),
+                    width=self._style2(self.theme, thumb_selector, "width", 0),
+                )
