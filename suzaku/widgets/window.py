@@ -1,4 +1,3 @@
-import copy
 import typing
 
 import glfw
@@ -148,6 +147,9 @@ class SkWindow(SkWindowBase, SkContainer):
                     self.destroy()
         if self.focus_get() is not self:
             self.focus_get().trigger("key_press", event)
+            if event["key"] == glfw.KEY_ENTER:
+                if hasattr(self.focus_get(), "invoke"):
+                    self.focus_get().invoke()
 
     def _key_repeat(self, event: SkEvent) -> None:
         if self.focus_get() is not self:

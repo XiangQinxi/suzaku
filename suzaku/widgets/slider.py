@@ -92,7 +92,10 @@ class SkSlider(SkWidget):
                 if self._pressing:
                     state = "press"
                 else:
-                    state = ""
+                    if self.is_focus:
+                        state = "focus"
+                    else:
+                        state = ""
         else:
             state = "disabled"
 

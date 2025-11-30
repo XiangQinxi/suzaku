@@ -1,0 +1,575 @@
+{
+  "name": "default.light.flat",
+  "base": "default.light",
+  "friendly_name": "Default Light Flat",
+
+  "color_palette": {
+    "bg": [240, 240, 240, 255],
+    "second_bg": [245, 245, 245, 245],
+    "fg": [0, 0, 0, 235],
+    "inverse_fg": [255, 255, 255, 235],
+    "bd": [220, 220, 220, 255],
+    "accent": [41, 128, 185, 235],
+    "success": [46, 204, 113, 235],
+    "warning": [241, 196, 15, 235],
+    "error": [231, 76, 60, 235]
+  },
+
+  "styles": {
+    "SkEmpty": {
+      "rest": {
+        "size": [0, 0]
+      }
+    },
+
+    "SkBadge": {
+      "rest": {
+        "size": [0, 28],
+        "radius": 14,
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkButton": {
+      "rest": {
+        "size": [0, 40],
+        "radius": 6,
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [220, 220, 220, 255],
+        "width": 1,
+        "font_weight": "normal"
+      },
+      "hover": {
+        "bg": [248, 249, 250, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "width": 1
+      },
+      "press": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": [41, 128, 185, 255],
+        "width": 1
+      },
+      "focus": {
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "bd_shadow": [0, 0, 0, 0, [41, 128, 185, 100]],
+        "width": 2
+      },
+      "disabled": {
+        "bg": [240, 240, 240, 240],
+        "fg": [189, 195, 199, 235],
+        "bd": [224, 224, 224, 255],
+        "width": 1
+      }
+    },
+
+    "SkCloseButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [231, 76, 60, 200],
+        "fg": "white",
+        "width": 0
+      },
+      "press": {
+        "bg": [192, 57, 43, 255],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": [189, 195, 199, 235],
+        "width": 0
+      }
+    },
+
+    "SkComboBox": {
+      "rest": {
+        "size": [0, 40],
+        "radius": 6,
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [220, 220, 220, 255],
+        "width": 1,
+        "arrow": [127, 140, 141, 255]
+      },
+      "hover": {
+        "bg": [248, 249, 250, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "width": 1
+      },
+      "press": {
+        "bg": [236, 240, 241, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "width": 1
+      },
+      "focus": {
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "bd_shadow": [0, 0, 0, 0, [41, 128, 185, 100]],
+        "width": 2
+      },
+      "disabled": {
+        "bg": [240, 240, 240, 240],
+        "fg": [189, 195, 199, 235],
+        "bd": [224, 224, 224, 255],
+        "width": 1
+      }
+    },
+
+    "SkMaximizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [46, 204, 113, 200],
+        "fg": "white",
+        "width": 0
+      },
+      "press": {
+        "bg": [39, 174, 96, 255],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": [189, 195, 199, 235],
+        "width": 0
+      }
+    },
+
+    "SkMinimizeButton": {
+      "rest": {
+        "size": [35, 35],
+        "radius": 0,
+        "icon_radius": 1,
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [241, 196, 15, 200],
+        "fg": "white",
+        "width": 0
+      },
+      "press": {
+        "bg": [243, 156, 18, 255],
+        "fg": "white",
+        "width": 0
+      },
+      "disabled": {
+        "bg": "transparent",
+        "fg": [189, 195, 199, 235],
+        "width": 0
+      }
+    },
+
+    "SkMenu": {
+      "rest": {
+        "size": [0, 40],
+        "radius": 6,
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [220, 220, 220, 255],
+        "width": 1
+      },
+      "hover": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": [41, 128, 185, 255],
+        "width": 1
+      },
+      "press": {
+        "bg": [34, 116, 165, 255],
+        "fg": [255, 255, 255, 235],
+        "bd": [34, 116, 165, 255],
+        "width": 1
+      },
+      "focus": {
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "width": 1
+      },
+      "disabled": {
+        "bg": [255, 255, 255, 255],
+        "fg": [189, 195, 199, 235],
+        "bd": [224, 224, 224, 255],
+        "width": 1
+      }
+    },
+
+    "SkMenuBar": {
+      "rest": {
+        "size": [0, 40],
+        "fg": [52, 73, 94, 235],
+        "bg": [245, 245, 245, 255],
+        "width": 0
+      }
+    },
+
+    "SkCard": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [255, 255, 255, 255],
+        "bd": [220, 220, 220, 255],
+        "width": 1
+      }
+    },
+
+    "SkCheckBox": {
+      "rest": {
+        "radius": 4,
+        "size": [22, 22]
+      },
+      "unchecked-rest": {
+        "bg": [255, 255, 255, 255],
+        "bd": [189, 195, 199, 255],
+        "width": 2
+      },
+      "unchecked-hover": {
+        "bg": [255, 255, 255, 255],
+        "bd": [149, 165, 166, 255],
+        "width": 2
+      },
+      "checked-rest": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 255],
+        "width": 2
+      },
+      "checked-hover": {
+        "bg": [34, 116, 165, 255],
+        "fg": [255, 255, 255, 255],
+        "width": 2
+      }
+    },
+
+    "SkCheckItem": {
+      "rest": {
+        "size": [0, 40]
+      }
+    },
+
+    "SkEntry": {
+      "rest": {
+        "size": [200, 40],
+        "radius": 6,
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [189, 195, 199, 255],
+        "width": 1,
+       "placeholder": [127, 140, 141, 200]
+      },
+      "hover": {
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [149, 165, 166, 255],
+        "width": 1,
+        "placeholder": [127, 140, 141, 200]
+      },
+      "focus": {
+        "bg": [255, 255, 255, 255],
+        "fg": [52, 73, 94, 235],
+        "bd": [41, 128, 185, 255],
+        "bd_shadow": [0, 0, 0, 0, [41, 128, 185, 50]],
+        "width": 2,
+        "cursor": [41, 128, 185, 200],
+        "selected_bg": [41, 128, 185, 200],
+        "selected_fg": [255, 255, 255, 255],
+        "selected_radius": true
+      }
+    },
+
+    "SkFrame": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 0,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkLabel": {
+      "rest": {
+        "size": [0, 0],
+        "fg": [52, 73, 94, 235],
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkListBox": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [255, 255, 255, 255],
+        "bd": [220, 220, 220, 255],
+        "width": 1
+      }
+    },
+
+    "SkListBox.Item": {
+      "rest": {
+        "size": [0, 40],
+        "radius": 4,
+        "bg": "transparent",
+        "fg": [52, 73, 94, 235],
+        "width": 0
+      },
+      "hover": {
+        "bg": [236, 240, 241, 255],
+        "fg": [52, 73, 94, 235],
+        "width": 0
+      },
+      "press": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "width": 0
+      },
+      "selected": {
+        "bg": [41, 128, 185, 255],
+        "bd": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "width": 0
+      }
+    },
+
+    "SkRadioBox": {
+      "rest": {
+        "radius": 11,
+        "size": [22, 22]
+      },
+      "unchecked-rest": {
+        "bg": [255, 255, 255, 255],
+        "bd": [189, 195, 199, 255],
+        "width": 2
+      },
+      "unchecked-hover": {
+        "bg": [255, 255, 255, 255],
+        "bd": [149, 165, 166, 255],
+        "width": 2
+      },
+      "checked-rest": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 255],
+        "width": 2,
+        "inner_width": 6
+      },
+      "checked-hover": {
+        "bg": [34, 116, 165, 255],
+        "fg": [255, 255, 255, 255],
+        "width": 2,
+        "inner_width": 7
+      }
+    },
+
+    "SkRadioItem": {
+      "rest": {
+        "size": [0, 40]
+      }
+    },
+
+    "SkSeparator": {
+      "rest": {
+        "fg": [220, 220, 220, 255],
+        "width": 1
+      }
+    },
+
+    "SkSizeGrip": {
+      "rest": {
+        "size": [15, 15],
+        "grip_style": "dotted",
+        "dot_size": 2,
+        "dot_spacing": 5,
+        "fg": [149, 165, 166, 255]
+      }
+    },
+
+    "SkSlider": {
+      "rest": {
+        "size": [120, 20]
+      }
+    },
+
+    "SkSlider.Progress": {
+      "rest": {
+        "size": 4,
+        "bg": [41, 128, 185, 255],
+        "width": 0,
+        "radius": 2
+      }
+    },
+
+    "SkSlider.Rail": {
+      "rest": {
+        "size": 4,
+        "bg": [236, 240, 241, 255],
+        "width": 0,
+        "radius": 2
+      }
+    },
+
+    "SkSlider.Thumb": {
+      "rest": {
+        "size": [20, 20],
+        "bg": [255, 255, 255, 255],
+        "bd": [149, 165, 166, 255],
+        "width": 2,
+        "radius": 10,
+        "inner": false
+      },
+      "hover": {
+        "bg": [255, 255, 255, 255],
+        "bd": [41, 128, 185, 255]
+      },
+      "press": {
+        "bg": [236, 240, 241, 255],
+        "bd": [34, 116, 165, 255]
+      },
+      "focus": {
+        "bg": [255, 255, 255, 255],
+        "bd": [41, 128, 185, 255],
+        "bd_shadow": [0, 0, 0, 0, [41, 128, 185, 100]]
+      }
+    },
+
+  "SkSwitchBox": {
+    "rest": {
+      "size": [52, 26],
+      "radius": 13,
+      "shape": "circle"
+    },
+    "unchecked-rest": {
+      "bg": [189, 195, 199, 255],
+      "bd": [149, 165, 166, 255],
+      "width": 0,
+      "button": [127, 140, 141, 180],
+      "button-padding": 2
+    },
+    "unchecked-hover": {
+      "bg": [189, 195, 199, 255],
+      "bd": [149, 165, 166, 255],
+      "width": 0,
+      "button": [125, 135, 140, 180]
+    },
+    "checked-rest": {
+      "bg": [41, 128, 185, 255],
+      "bd": [41, 128, 185, 255],
+      "width": 0,
+      "button": [255, 255, 255, 255],
+      "button-padding": 2
+    },
+    "checked-hover": {
+      "bg": [34, 116, 165, 255],
+      "bd": [34, 116, 165, 255],
+      "width": 0,
+      "button": [255, 255, 255, 255]
+    }
+  },
+
+    "SkTabs": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [255, 255, 255, 255],
+        "bd": [220, 220, 220, 255],
+        "width": 1
+      }
+    },
+
+    "SkTabBar": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 0,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkTabBar.Button": {
+      "rest": {
+        "size": [0, 40],
+        "radius": [6, 6, 0, 0],
+        "bg": "transparent",
+        "fg": [52, 73, 94, 235],
+        "width": 0
+      },
+      "hover": {
+        "bg": [236, 240, 241, 255],
+        "fg": [52, 73, 94, 235],
+        "width": 0
+      },
+      "press": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "width": 0
+      },
+      "selected": {
+        "bg": [41, 128, 185, 255],
+        "fg": [255, 255, 255, 235],
+        "width": 0,
+        "bd": [41, 128, 185, 255]
+      }
+    },
+
+    "SkText": {
+      "rest": {
+        "size": [0, 0],
+        "fg": [52, 73, 94, 235]
+      }
+    },
+
+    "SkTitleBar": {
+      "rest": {
+        "size": [0, 40],
+        "radius": 0,
+        "width": 0,
+        "bg": [245, 245, 245, 255]
+      }
+    },
+
+    "SkWindow": {
+      "rest": {
+        "bg": [240, 240, 240, 255],
+        "radius": [8, 8, 0, 0],
+        "width": 1,
+        "bd": [220, 220, 220, 255]
+      }
+    },
+
+    "SkWindowCommand": {
+      "rest": {
+        "size": [0, 40],
+        "radius": [8, 8, 0, 0],
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    }
+
+  }
+}

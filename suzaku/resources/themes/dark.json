@@ -108,8 +108,6 @@
 
     "SkComboBox": {
       "rest": {
-        "size": [0, 35],
-        "radius": 5,
         "bg": [40, 40, 40, 255],
         "bg_shader": {
           "linear_gradient": {
@@ -124,7 +122,6 @@
         "fg": {"color_palette": "fg"},
         "bd": [50, 50, 50, 255],
         "bd_shadow": [0, 3, 1, 1, [255, 255, 255, 30]],
-        "width": 2,
         "arrow": "white"
       },
       "hover": {
@@ -177,53 +174,39 @@
 
     "SkMaximizeButton": {
       "rest": {
-        "size": [35, 35],
-        "radius": 0,
-        "icon_radius": 1,
         "bg": "transparent",
-        "fg": {"color_palette": "fg"},
-        "width": 0
+        "fg": {"color_palette": "fg"}
       },
       "hover": {
         "bg": [50, 100, 210, 155],
-        "fg": "white",
-        "width": 0
+        "fg": "white"
       },
       "press": {
         "bg": [40, 80, 160],
-        "fg": "white",
-        "width": 0
+        "fg": "white"
       },
       "disabled": {
         "bg": "transparent",
-        "fg": "gray",
-        "width": 0
+        "fg": "gray"
       }
     },
 
     "SkMinimizeButton": {
       "rest": {
-        "size": [35, 35],
-        "radius": [5, 0, 0, 5],
-        "icon_radius": 1,
         "bg": "transparent",
-        "fg": {"color_palette": "fg"},
-        "width": 0
+        "fg": {"color_palette": "fg"}
       },
       "hover": {
         "bg": [255, 255, 255, 20],
-        "fg": "white",
-        "width": 0
+        "fg": "white"
       },
       "press": {
         "bg": [255, 255, 255, 40],
-        "fg": "white",
-        "width": 0
+        "fg": "white"
       },
       "disabled": {
         "bg": "transparent",
-        "fg": "gray",
-        "width": 0
+        "fg": "gray"
       }
     },
 

@@ -673,3 +673,4 @@ light_theme = default_theme = SkTheme.DEFAULT_THEME
 dark_theme = SkTheme.INTERNAL_THEMES["default.dark"]
 sv_theme = sv_light_theme = SkTheme.INTERNAL_THEMES["sun_valley.light"]
 sv_dark_theme = SkTheme.INTERNAL_THEMES["sun_valley.dark"]
+neow_theme = SkTheme.INTERNAL_THEMES["neow"]

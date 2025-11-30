@@ -13,4 +13,5 @@ from .theme import (
     sv_theme,
     sv_light_theme,
     sv_dark_theme,
+    neow_theme,
 )

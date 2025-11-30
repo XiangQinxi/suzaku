@@ -146,6 +146,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.is_mouse_floating: bool = False
         self.is_focus: bool = False
         self.gradient = SkGradient()
+        self.drop_shadow = SkDropShadow()
         self.button: typing.Literal[0, 1, 2] = 0
         self.click_time: float | int = 0
         self.need_redraw: bool = False
@@ -479,14 +480,32 @@ class SkWidget(SkEventHandling, SkMisc):
             # Background
             bg_paint.setStrokeWidth(width)
             bg_paint.setColor(bg)
-            shadow = SkDropShadow(config_list=bd_shadow)
-            shadow.draw(bg_paint)
+            if bd_shadow:
+                self.drop_shadow.drop_shadow(widget=self, config=bd_shadow, paint=bg_paint)
             if bg_shader:
                 if isinstance(bg_shader, dict):
                     if "linear_gradient" in bg_shader:
                         self.gradient.linear(
                             widget=self,
                             config=bg_shader["linear_gradient"],
+                            paint=bg_paint,
+                        )
+                    if "lg" in bg_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bg_shader["lg"],
+                            paint=bg_paint,
+                        )
+                    if "sweep_gradient" in bg_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bg_shader["sweep_gradient"],
+                            paint=bg_paint,
+                        )
+                    if "sg" in bg_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bg_shader["sg"],
                             paint=bg_paint,
                         )
             canvas.drawRRect(rrect, bg_paint)
@@ -508,7 +527,24 @@ class SkWidget(SkEventHandling, SkMisc):
                             config=bd_shader["linear_gradient"],
                             paint=bd_paint,
                         )
-                        # print(bd_shader["linear_gradient"])
+                    if "lg" in bd_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bd_shader["lg"],
+                            paint=bd_paint,
+                        )
+                    if "sweep_gradient" in bd_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bd_shader["sweep_gradient"],
+                            paint=bd_paint,
+                        )
+                    if "sg" in bd_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bd_shader["sg"],
+                            paint=bd_paint,
+                        )
             canvas.drawRRect(rrect, bd_paint)
         return rrect
 
@@ -548,14 +584,32 @@ class SkWidget(SkEventHandling, SkMisc):
             # Background
             bg_paint.setStrokeWidth(width)
             bg_paint.setColor(bg)
-            shadow = SkDropShadow(config_list=bd_shadow)
-            shadow.draw(bg_paint)
+            if bd_shadow:
+                self.drop_shadow.drop_shadow(widget=self, config=bd_shadow, paint=bg_paint)
             if bg_shader:
                 if isinstance(bg_shader, dict):
                     if "linear_gradient" in bg_shader:
                         self.gradient.linear(
                             widget=self,
                             config=bg_shader["linear_gradient"],
+                            paint=bg_paint,
+                        )
+                    if "lg" in bg_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bg_shader["lg"],
+                            paint=bg_paint,
+                        )
+                    if "sweep_gradient" in bg_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bg_shader["sweep_gradient"],
+                            paint=bg_paint,
+                        )
+                    if "sg" in bg_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bg_shader["sg"],
                             paint=bg_paint,
                         )
             canvas.drawCircle(cx, cy, radius, bg_paint)
@@ -575,6 +629,24 @@ class SkWidget(SkEventHandling, SkMisc):
                         self.gradient.linear(
                             widget=self,
                             config=bd_shader["linear_gradient"],
+                            paint=bd_paint,
+                        )
+                    if "lg" in bd_shader:
+                        self.gradient.linear(
+                            widget=self,
+                            config=bd_shader["lg"],
+                            paint=bd_paint,
+                        )
+                    if "sweep_gradient" in bd_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bd_shader["sweep_gradient"],
+                            paint=bd_paint,
+                        )
+                    if "sg" in bd_shader:
+                        self.gradient.sweep(
+                            widget=self,
+                            config=bd_shader["sg"],
                             paint=bd_paint,
                         )
             canvas.drawCircle(cx, cy, radius, bd_paint)
@@ -636,6 +708,24 @@ class SkWidget(SkEventHandling, SkMisc):
                     self.gradient.linear(
                         widget=self,
                         config=shader["linear_gradient"],
+                        paint=paint,
+                    )
+                if "lg" in shader:
+                    self.gradient.linear(
+                        widget=self,
+                        config=shader["lg"],
+                        paint=paint,
+                    )
+                if "sweep_gradient" in shader:
+                    self.gradient.sweep(
+                        widget=self,
+                        config=shader["sweep_gradient"],
+                        paint=paint,
+                    )
+                if "sg" in shader:
+                    self.gradient.sweep(
+                        widget=self,
+                        config=shader["sg"],
                         paint=paint,
                     )
         if shadow:

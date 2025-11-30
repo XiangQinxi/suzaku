@@ -6,6 +6,7 @@ keywords = ["suzaku","future","lightweight","gui","framework"]
 authors = [
     {name = "XiangQinxi",email = "XiangQinxi@outlook.com"},
     {name = "rgzz666", email = "tt1224@hotmail.com"},
+    {name = "littlewhitecloud"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"

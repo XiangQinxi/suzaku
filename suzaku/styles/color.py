@@ -60,9 +60,7 @@ class SkColor:
             elif len(color) == 4:
                 self.set_color_rgba(color[0], color[1], color[2], color[3])
             else:
-                raise ValueError(
-                    "Color tuple / list must have 3 (RGB) or 4 (RGBA) elements"
-                )
+                raise ValueError("Color tuple / list must have 3 (RGB) or 4 (RGBA) elements")
         else:
             return self
         return self
@@ -126,6 +124,8 @@ class SkColor:
 class SkGradient:
     """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use."""
 
+    gradient: skia.GradientShader | None
+
     @staticmethod
     def get_anchor_pos(widget: SkWidget, anchor) -> tuple[int | float, int | float]:
         """Get widget`s anchor position
@@ -174,9 +174,17 @@ class SkGradient:
         start_pos: tuple[int | float, int | float] | None = None,
         end_pos: tuple[int | float, int | float] | None = None,
     ):
-        self.set_linear(
-            config=config, widget=widget, start_pos=start_pos, end_pos=end_pos
-        )
+        self.set_linear(config=config, widget=widget, start_pos=start_pos, end_pos=end_pos)
+        self.draw(paint)
+
+    def sweep(
+        self,
+        paint: skia.Paint,
+        config: dict | None = None,
+        widget=None,
+        center_pos: tuple[int | float, int | float] | None = None,
+    ):
+        self.set_sweep(config=config, widget=widget, center_pos=center_pos)
         self.draw(paint)
 
     def set_linear(
@@ -212,9 +220,7 @@ class SkGradient:
         if config:
 
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
-            colors: list[
-                tuple[int | float, int | float, int | float, int | float] | str
-            ] = []
+            colors: list[tuple[int | float, int | float, int | float, int | float] | str] = []
             positions: list[float] = []
             for position, color in config["colors"].items():
                 position: str  # ["0%", "0.5", "100%"]
@@ -223,7 +229,10 @@ class SkGradient:
                     positions.append(float(position.strip("%")) / 100)
                 else:
                     positions.append(float(position))
-                colors.append(SkColor(color).color)
+                if widget:
+                    colors.append(skcolor_to_color(style_to_color(color, widget.theme)))
+                else:
+                    colors.append(SkColor(color).color)
 
             if start_pos is None or end_pos is None:
                 if widget:
@@ -231,13 +240,13 @@ class SkGradient:
                         start_anchor = config["start_anchor"]
                     else:
                         start_anchor: typing.Literal[
-                            "nw", "n", "ne", "w", "e", "sw", "s", "se"
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se", "center"
                         ] = "n"
                     if "end_anchor" in config:
                         end_anchor = config["end_anchor"]
                     else:
                         end_anchor: typing.Literal[
-                            "nw", "n", "ne", "w", "e", "sw", "s", "se"
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se", "center"
                         ] = "s"
 
             if widget:
@@ -251,7 +260,57 @@ class SkGradient:
                 )
             else:
                 self.gradient = skia.GradientShader.MakeLinear(
+                    positions=positions,
                     points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
+                    colors=colors,  # [ Color1, Color2, Color3 ]
+                )
+
+            return self
+        else:
+            return None
+
+    def set_sweep(
+        self,
+        config: dict | None = None,
+        widget=None,
+        center_pos: tuple[int | float, int | float] | None = None,
+    ):
+        self.gradient = None
+        if config:
+            # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
+            colors: list[tuple[int | float, int | float, int | float, int | float] | str] = []
+            positions: list[float] = []
+            for position, color in config["colors"].items():
+                position: str  # ["0%", "0.5", "100%"]
+
+                if position.endswith("%"):
+                    positions.append(float(position.strip("%")) / 100)
+                else:
+                    positions.append(float(position))
+                colors.append(SkColor(color).color)
+
+            if center_pos is None:
+                if widget:
+                    if "center_pos" in config:
+                        center_pos = config["center_pos"]
+                    else:
+                        center_pos: typing.Literal[
+                            "nw", "n", "ne", "w", "e", "sw", "s", "se", "center"
+                        ] = "center"
+            if widget:
+                _center_pos = self.get_anchor_pos(widget, center_pos)
+                self.gradient = skia.GradientShader.MakeSweep(
+                    cx=_center_pos[0],
+                    cy=_center_pos[1],
+                    positions=positions,
+                    colors=colors,  # [ Color1, Color2, Color3 ]
+                )
+            else:
+                _center_pos = center_pos
+                self.gradient = skia.GradientShader.MakeSweep(
+                    cx=_center_pos[0],
+                    cy=_center_pos[1],
+                    positions=positions,
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
 
@@ -289,9 +348,7 @@ def style_to_color(
                     if type(theme) is str:
                         theme = SkTheme.find_loaded_theme(theme)
                         if theme == False:
-                            warnings.warn(
-                                "No theme found using given name!", SkColorWarning
-                            )
+                            warnings.warn("No theme found using given name!", SkColorWarning)
                             return SkColor(ERR_COLOR)
                     return style_to_color(
                         theme.get_preset_color(style_attr_value["color_palette"]), theme

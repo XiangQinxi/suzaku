@@ -204,7 +204,7 @@
     "SkMinimizeButton": {
       "rest": {
         "size": [35, 35],
-        "radius": [5, 0, 0, 5],
+        "radius": 0,
         "icon_radius": 1,
         "bg": "transparent",
         "fg": {"color_palette": "default_fg"},
@@ -518,6 +518,7 @@
             }
           }
         },
+        "bd_shadow": null,
         "inner": true,
         "inner_size": [10, 10],
         "inner_bg": {"color_palette": "secondary_accent"},
@@ -525,7 +526,7 @@
         "inner_radius": 99
       },
       "hover": {
-        "inner_size": [13, 13]
+        "inner_size": [15, 15]
       },
       "press": {
         "inner_size": [9, 9],

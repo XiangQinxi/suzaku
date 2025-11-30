@@ -53,6 +53,13 @@ class SkComboBox(SkButton):
 
         self.help_parent_scroll = True
 
+    def invoke(self):
+        if self.popupmenu and not self.cget("disabled"):
+            if self.popupmenu.is_popup:
+                self.popupmenu.hide()
+            else:
+                self.popup()
+
     def _on_parent_scrolled(self, event: SkEvent):
         if self.popupmenu.is_popup:
             self.popup()
@@ -110,11 +117,7 @@ class SkComboBox(SkButton):
             )
 
     def _on_click(self, event: SkEvent):
-        if self.popupmenu and not self.cget("disabled"):
-            if self.popupmenu.is_popup:
-                self.popupmenu.hide()
-            else:
-                self.popup()
+        self.invoke()
 
     @staticmethod
     def _draw_arrow(

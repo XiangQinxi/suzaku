@@ -18,6 +18,13 @@ class SkLayoutError(TypeError):
     pass
 
 
+def get_padding_value(padding):
+    """Helper to handle tuple or single padding values"""
+    if isinstance(padding, tuple):
+        return padding[0], padding[1]
+    return padding, padding
+
+
 class SkContainer:
     """A SkContainer represents a widget that has the ability to contain other widgets inside.
 
@@ -459,149 +466,161 @@ class SkContainer:
 
         width = self.width  # container width
         height = self.height  # container height
+        children: list[SkWidget] = self.draw_list[0]  # Components using the Box layout
+
+        # Categorize children by side and expand
         start_children: list[SkWidget] = []  # side="top" or "left" children
         end_children: list[SkWidget] = []  # side="bottom" or "right" children
         expanded_children: list[SkWidget] = []  # expand=True children
         fixed_children: list[SkWidget] = []  # expand=False children
-        children: list[SkWidget] = self.draw_list[0]  # Components using the Box layout
 
-        # Iterate through all the subcomponents first, categorize them, and separate components with different values for expand, side.
-        # 先遍历一遍所有子组件，将它们分类，将expand、side值不同的组件分开
         for child in children:
-            layout_config = child.layout_config
-            match layout_config["box"]["side"].lower():
-                case "top" | "left":
-                    start_children.append(child)
-                case "bottom" | "right":
-                    end_children.append(child)
-            if layout_config["box"]["expand"]:
+            layout_config = child.layout_config["box"]
+            side = layout_config["side"].lower()
+
+            if side in ("top", "left"):
+                start_children.append(child)
+            elif side in ("bottom", "right"):
+                end_children.append(child)
+
+            if layout_config["expand"]:
                 expanded_children.append(child)
             else:
                 fixed_children.append(child)
 
-        # Horizontal Layout
         if self._box_direction == Orient.H:
-            # Calculate the width of the fixed children
-            fixed_width: int | float = 0  # Occupied width of all fixed widgets enabled
+            # Horizontal Layout
+            # Calculate total fixed width
+            fixed_width = 0
             for fixed_child in fixed_children:
-                fixed_child_layout_config = fixed_child.layout_config["box"]
+                padx_left, padx_right = get_padding_value(fixed_child.layout_config["box"]["padx"])
+                fixed_width += padx_left + fixed_child.width + padx_right
 
-                if type(fixed_child_layout_config["padx"]) is tuple:
-                    fixed_width += fixed_child_layout_config["padx"][0]
-                else:
-                    fixed_width += fixed_child_layout_config["padx"]
-                fixed_width += fixed_child.width
+            expanded_width = (
+                (width - fixed_width) / len(expanded_children) if expanded_children else 0
+            )
 
-                if type(fixed_child_layout_config["padx"]) is tuple:
-                    fixed_width += fixed_child_layout_config["padx"][1]
-                else:
-                    fixed_width += fixed_child_layout_config["padx"]
-
-            if len(expanded_children):
-                expanded_width = (width - fixed_width) / len(expanded_children)
-            else:
-                expanded_width = 0
-
-            # Left side
-            last_child_left_x = 0
+            # Process start children (left side)
+            last_x = 0
             for child in start_children:
-                child_layout_config = child.layout_config["box"]
-                left, top, right, bottom = self.unpack_padding(
-                    child_layout_config["padx"],
-                    child_layout_config["pady"],
+                self._process_child_layout(
+                    child, width, height, expanded_width, last_x, is_start=True, is_horizontal=True
                 )
-
-                child.width = width - left - right
-                if not child_layout_config["expand"]:
-                    child.width = child.dwidth
-                else:
-                    child.width = expanded_width - left - right
-                child.height = height - top - bottom
-                child.x = last_child_left_x + left
-                child.y = top + self.y_offset
-                self.record_content_size(child, right, bottom)
-                last_child_left_x = child.x + child.width + right
+                last_x = child.x + child.width + self._get_padding_right(child)
                 child.x += self.x_offset
 
-            # Right side
-            last_child_right_x = width
+            # Process end children (right side)
+            last_x = width
             for child in end_children:
-                child_layout_config = child.layout_config["box"]
-                left, top, right, bottom = self.unpack_padding(
-                    child_layout_config["padx"],
-                    child_layout_config["pady"],
+                self._process_child_layout(
+                    child, width, height, expanded_width, last_x, is_start=False, is_horizontal=True
                 )
+                last_x = last_x - child.width - self._get_padding_left(child) * 2
+                child.x += self.x_offset
 
-                child.width = width - left - right
-                if not child_layout_config["expand"]:
-                    child.width = child.dwidth
-                else:
-                    child.width = expanded_width - left - right
-                child.height = height - top - bottom
-                child.x = last_child_right_x - child.width - right + self.x_offset
-                child.y = top + self.y_offset
-                self.record_content_size(child, right, bottom)
-                last_child_right_x = last_child_right_x - child.width - left * 2
-        else:  # Vertical Layout
-            # Calculate the height of the fixed children
-            fixed_height = 0  # Occupied height of all fixed widgets enabled
+        else:
+            # Vertical Layout
+            # Calculate total fixed height
+            fixed_height = 0
             for fixed_child in fixed_children:
-                fixed_child_layout_config = fixed_child.layout_config["box"]
+                pady_top, pady_bottom = get_padding_value(fixed_child.layout_config["box"]["pady"])
+                fixed_height += pady_top + fixed_child.height + pady_bottom
 
-                if type(fixed_child_layout_config["pady"]) is tuple:
-                    fixed_height += fixed_child_layout_config["pady"][0]
-                else:
-                    fixed_height += fixed_child_layout_config["pady"]
-                fixed_height += fixed_child.height
+            expanded_height = (
+                (height - fixed_height) / len(expanded_children) if expanded_children else 0
+            )
 
-                if type(fixed_child_layout_config["pady"]) is tuple:
-                    fixed_height += fixed_child_layout_config["pady"][1]
-                else:
-                    fixed_height += fixed_child_layout_config["pady"]
-
-            if len(expanded_children):
-                expanded_height = (height - fixed_height) / len(
-                    expanded_children
-                )  # Height of expanded children
-            else:
-                expanded_height = 0
-
-            last_child_bottom_y = 0  # Last bottom y position of the child component
-            for child in start_children:  # Top side
-                child_layout_config = child.layout_config["box"]
-                left, top, right, bottom = self.unpack_padding(
-                    child.layout_config["box"]["padx"],
-                    child.layout_config["box"]["pady"],
+            # Process start children (top side)
+            last_y = 0
+            for child in start_children:
+                self._process_child_layout(
+                    child,
+                    width,
+                    height,
+                    expanded_height,
+                    last_y,
+                    is_start=True,
+                    is_horizontal=False,
                 )
-
-                child.width = width - left - right
-                if not child_layout_config["expand"]:
-                    child.height = child.dheight
-                else:
-                    child.height = expanded_height - top - bottom
-                child.x = left + self.x_offset
-                child.y = last_child_bottom_y + top
-                self.record_content_size(child, right, bottom)
-                last_child_bottom_y = child.y + child.height + bottom
+                last_y = child.y + child.height + self._get_padding_bottom(child)
                 child.y += self.y_offset
 
-            last_child_top_y = height  # Last top y position of the child component
-            for child in end_children:  # Bottom side
-                child_layout_config = child.layout_config["box"]
-                left, top, right, bottom = self.unpack_padding(
-                    child.layout_config["box"]["padx"],
-                    child.layout_config["box"]["pady"],
+            # Process end children (bottom side)
+            last_y = height
+            for child in end_children:
+                self._process_child_layout(
+                    child,
+                    width,
+                    height,
+                    expanded_height,
+                    last_y,
+                    is_start=False,
+                    is_horizontal=False,
                 )
+                last_y = last_y - child.height - self._get_padding_top(child) * 2
+                child.y += self.y_offset
 
-                child.width = width - left - right
-                if not child_layout_config["expand"]:
-                    child.height = child.dheight
-                else:
-                    child.height = expanded_height - top - bottom
-                child.x = left + self.x_offset
-                child.y = last_child_top_y - child.height - bottom + self.x_offset
-                self.record_content_size(child, right, bottom)
-                last_child_top_y = last_child_top_y - child.height - top * 2
+    def _process_child_layout(
+        self,
+        child,
+        container_size1,
+        container_size2,
+        expanded_size,
+        last_position,
+        is_start,
+        is_horizontal,
+    ):
+        """Process individual child layout positioning"""
+        layout_config = child.layout_config["box"]
+        padx_left, padx_right = get_padding_value(layout_config["padx"])
+        pady_top, pady_bottom = get_padding_value(layout_config["pady"])
+
+        if is_horizontal:
+            # Horizontal layout
+            child.width = container_size1 - padx_left - padx_right
+            if not layout_config["expand"]:
+                child.width = child.dwidth
+            else:
+                child.width = expanded_size - padx_left - padx_right
+            child.height = container_size2 - pady_top - pady_bottom
+
+            if is_start:
+                child.x = last_position + padx_left
+                child.y = pady_top + self.y_offset
+            else:
+                child.x = last_position - child.width - padx_right + self.x_offset
+                child.y = pady_top + self.y_offset
+        else:
+            # Vertical layout
+            child.width = container_size1 - padx_left - padx_right
+            if not layout_config["expand"]:
+                child.height = child.dheight
+            else:
+                child.height = expanded_size - pady_top - pady_bottom
+            child.x = padx_left + self.x_offset
+
+            if is_start:
+                child.y = last_position + pady_top
+            else:
+                child.y = last_position - child.height - pady_bottom + self.x_offset
+
+        self.record_content_size(child, padx_right, pady_bottom)
+
+    def _get_padding_left(self, child):
+        padx = child.layout_config["box"]["padx"]
+        return padx[0] if isinstance(padx, tuple) else padx
+
+    def _get_padding_right(self, child):
+        padx = child.layout_config["box"]["padx"]
+        return padx[1] if isinstance(padx, tuple) else padx
+
+    def _get_padding_top(self, child):
+        pady = child.layout_config["box"]["pady"]
+        return pady[0] if isinstance(pady, tuple) else pady
+
+    def _get_padding_bottom(self, child):
+        pady = child.layout_config["box"]["pady"]
+        return pady[1] if isinstance(pady, tuple) else pady
 
     def _handle_fixed(self, child):
         """Process fixed layout.

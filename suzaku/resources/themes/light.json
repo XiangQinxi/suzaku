@@ -38,7 +38,7 @@
         "radius": 5,
         "bg": [255, 255, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -55,7 +55,7 @@
       "hover": {
         "bg": [255, 255, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -72,7 +72,7 @@
       "press": {
         "bg": [255, 255, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -132,7 +132,7 @@
         "radius": 5,
         "bg": [255, 255, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -150,7 +150,7 @@
       "hover": {
         "bg": [255, 255, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -167,7 +167,7 @@
       "press": {
         "bg": [255, 255, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -225,7 +225,7 @@
     "SkMinimizeButton": {
       "rest": {
         "size": [35, 35],
-        "radius": [5, 0, 0, 5],
+        "radius": 0,
         "icon_radius": 1,
         "bg": "transparent",
         "fg": {"color_palette": "fg"},
@@ -310,7 +310,7 @@
       "unchecked-rest": {
         "bg": [240, 240, 240, 240],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -330,7 +330,7 @@
       "checked-rest": {
         "bg": [40, 130, 255, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -526,8 +526,8 @@
 
     "SkSlider.Thumb": {
       "rest": {
-        "size": [22, 22],
-        "bg": [220, 220, 220, 255],
+        "size": [20, 20],
+        "bg": [245, 245, 245, 255],
         "bd": [0, 0, 0, 25],
         "width": 2,
         "radius": 99,
@@ -536,10 +536,10 @@
         "inner": false
       },
       "hover": {
-        "bg": [235, 235, 235, 255]
+        "bg": [255, 255, 255, 255]
       },
       "press": {
-        "bg": [210, 210, 210, 255]
+        "bg": [220, 220, 220, 255]
       },
       "focus": {}
     },
@@ -548,12 +548,13 @@
       "rest": {
         "size": [48, 20],
         "radius": 99,
+        "radius2": 99,
         "shape": "circle"
       },
       "unchecked-rest": {
         "bg": [230, 230, 230, 245],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -570,7 +571,7 @@
       "unchecked-hover": {
         "bg": [210, 210, 210, 245],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -587,7 +588,7 @@
       "unchecked-press": {
         "bg": [180, 180, 180, 245],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -604,7 +605,7 @@
       "checked-rest": {
         "bg": [0, 0, 0, 255],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -621,7 +622,7 @@
       "checked-hover": {
         "bg": [40, 130, 255, 215],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -638,7 +639,7 @@
       "checked-press": {
         "bg": [40, 130, 255, 180],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "center",
             "end_anchor": "s",
             "colors": {
@@ -697,7 +698,7 @@
         "bg": [0, 0, 0, 255],
         "bd": [40, 130, 255, 10],
         "bg_shader": {
-          "linear_gradient": {
+          "lg": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
