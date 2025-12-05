@@ -5,8 +5,8 @@ from .window import SkWindow
 
 
 class SkPopup(SkCard):
-    def __init__(self, parent: SkWindow | SkContainer, **kwargs):
-        super().__init__(parent, **kwargs)
+    def __init__(self, parent: SkWindow | SkContainer, *, style: str = "SkPopup", **kwargs):
+        super().__init__(parent, style=style, **kwargs)
 
         self.focusable = True
 

@@ -1,36 +1,41 @@
 {
-  "name": "sun_valley.dark",
-  "base": "default.dark",
-  "friendly_name": "SunValley Dark",
+  "name": "sun_valley.light",
+  "base": "default.light",
+  "friendly_name": "SunValley Light",
 
   "color_palette": {
-    "default_fg": [255, 255, 255, 255],
-    "secondary_fg": [255, 255, 255, 180],
+    "default_fg": [0, 0, 0, 230],
+    "secondary_fg": [0, 0, 0, 180],
     "tertiary_fg": [0, 0, 0, 100],
     "disabled_fg": [150, 150, 150, 235],
 
-    "default_bg": [255, 255, 255, 15],
-    "default_card_bg": [30, 30, 30, 255],
-    "default_surface_bg": [45, 45, 45, 255],
-    "secondary_bg": [255, 255, 255, 20],
+    "default_bg": [255, 255, 255, 180],
+    "default_strong_bg": [0, 0, 0, 115],
+    "default_card_bg": [251, 251, 251, 255],
+    "default_surface_bg": [245, 245, 245, 255],
+    "default_solid_bg": [255, 255, 255, 255],
+    "secondary_bg": [249, 249, 249, 130],
     "secondary_alt_bg": [0, 0, 0, 5],
-    "tertiary_bg": [255, 255, 255, 8],
+    "tertiary_bg": [250, 250, 250, 75],
     "tertiary_alt_bg": [0, 0, 0, 15],
     "quarternary_bg": [0, 0, 0, 24],
     "disabled_bg": [240, 240, 240, 240],
 
-    "default_bd": [255, 255, 255, 125],
-    "default_strong_bd": [255, 255, 255, 130],
-    "default_card_bd": [65, 65, 65],
-    "default_surface_bd": [65, 65, 65, 255],
+    "default_bd": [0, 0, 0, 255],
+    "default_strong_bd": [0, 0, 0, 155],
+    "default_card_bd": [229, 229, 229],
+    "default_surface_bd": [193, 193, 193, 255],
     "secondary_bd": [0, 0, 0, 255],
     "secondary_surface_bd": [229, 229, 229, 255],
     "tertiary_bd": [0, 0, 0, 15],
 
-    "default_accent": [96, 205, 255, 255],
-    "default_accent_fg": [0, 0, 0, 255],
-    "secondary_accent": [96, 205, 255, 230],
-    "tertiary_accent": [96, 205, 255, 205]
+    "default_accent": [0, 95, 185, 255],
+    "default_accent_fg": [250, 250, 250, 255],
+    "secondary_accent": [0, 95, 185, 230],
+    "tertiary_accent": [0, 95, 185, 205],
+
+    "default_lg_color1": [0, 0, 0, 15],
+    "default_lg_color2": [0, 0, 0, 40]
   },
 
   "styles": {
@@ -39,7 +44,7 @@
       "rest": {
         "size": [0, 35],
         "radius": 4,
-        "width": 1.3,
+        "width": 1,
         "bg": {"color_palette": "default_bg"},
         "fg": {"color_palette": "default_fg"},
         "bd": {"color_palette": "default_bd"},
@@ -48,41 +53,41 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "0%": [255, 255, 255, 23],
-              "10%": [255, 255, 255, 18]
+              "91%": {"color_palette": "default_lg_color1"},
+              "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        }
+        },
+        "bd_shadow": null,
+        "bg_shader": null
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "default_bd"},
+        "bd": {"color_palette": "secondary_bd"},
         "bd_shader": {
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "0%": [255, 255, 255, 23],
-              "10%": [255, 255, 255, 18]
+              "91%": {"color_palette": "default_lg_color1"},
+              "100%": {"color_palette": "default_lg_color2"}
             }
           }
         }
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
-        "fg": {"color_palette": "secondary_fg"},
+        "fg": {"color_palette": "tertiary_fg"},
+        "bd": {"color_palette": "tertiary_bd"},
+        "bd_shader": null
+      },
+      "focus": {
+        "width": 2,
+        "bg": {"color_palette": "default_bg"},
+        "fg": {"color_palette": "default_fg"},
         "bd": {"color_palette": "default_bd"},
-        "bd_shader": {
-          "linear_gradient": {
-            "start_anchor": "n",
-            "end_anchor": "s",
-            "colors": {
-              "0%": [255, 255, 255, 23],
-              "10%": [255, 255, 255, 18]
-            }
-          }
-        }
+        "bd_shader": null
       },
       "disabled": {
         "bg": {"color_palette": "disabled_bg"},
@@ -96,7 +101,7 @@
       "rest": {
         "size": [0, 35],
         "radius": 4,
-        "width": 1.3,
+        "width": 1,
         "bg": {"color_palette": "default_bg"},
         "fg": {"color_palette": "default_fg"},
         "bd": {"color_palette": "default_bd"},
@@ -105,51 +110,47 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "0%": [255, 255, 255, 23],
-              "10%": [255, 255, 255, 18]
+              "91%": {"color_palette": "default_lg_color1"},
+              "100%": {"color_palette": "default_lg_color2"}
             }
           }
         },
-        "arrow": {"color_palette": "default_fg"}
+        "bd_shadow": null,
+        "bg_shader": null
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "default_bd"},
+        "bd": {"color_palette": "secondary_bd"},
         "bd_shader": {
           "linear_gradient": {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "0%": [255, 255, 255, 23],
-              "10%": [255, 255, 255, 18]
+              "91%": {"color_palette": "default_lg_color1"},
+              "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        },
-        "arrow": {"color_palette": "default_fg"}
+        }
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
-        "fg": {"color_palette": "secondary_fg"},
+        "fg": {"color_palette": "tertiary_fg"},
+        "bd": {"color_palette": "tertiary_bd"},
+        "bd_shader": null
+      },
+      "focus": {
+        "width": 2,
+        "bg": {"color_palette": "default_bg"},
+        "fg": {"color_palette": "default_fg"},
         "bd": {"color_palette": "default_bd"},
-        "bd_shader": {
-          "linear_gradient": {
-            "start_anchor": "n",
-            "end_anchor": "s",
-            "colors": {
-              "0%": [255, 255, 255, 23],
-              "10%": [255, 255, 255, 18]
-            }
-          }
-        },
-        "arrow": {"color_palette": "default_fg"}
+        "bd_shader": null
       },
       "disabled": {
         "bg": {"color_palette": "disabled_bg"},
         "fg": {"color_palette": "disabled_fg"},
         "bd": {"color_palette": "disabled_bg"},
-        "width": 2,
-        "arrow": {"color_palette": "default_fg"}
+        "width": 2
       }
     },
 
@@ -207,7 +208,7 @@
     "SkMinimizeButton": {
       "rest": {
         "size": [35, 35],
-        "radius": [5, 0, 0, 5],
+        "radius": 0,
         "icon_radius": 1,
         "bg": "transparent",
         "fg": {"color_palette": "default_fg"},
@@ -277,7 +278,7 @@
             "end_anchor": "s",
             "colors": {
               "95.9%": [0, 0, 0, 20],
-              "96%": [0, 95, 185, 255]
+              "96%": {"color_palette": "default_accent"}
             }
           }
         },
@@ -294,8 +295,10 @@
         "size": [0, 35],
         "radius": 4,
         "width": 1.3,
-        "bg": {"color_palette": "default_bg"},
-        "fg": {"color_palette": "default_fg"}
+        "bg": "transparent",
+        "fg": {"color_palette": "default_fg"},
+        "bd_shadow": null,
+        "bg_shader": null
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
@@ -306,8 +309,8 @@
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
-              "91%": [0, 0, 0, 15],
-              "100%": [0, 0, 0, 40]
+              "91%": {"color_palette": "default_lg_color1"},
+              "100%": {"color_palette": "default_lg_color2"}
             }
           }
         }
@@ -315,7 +318,15 @@
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
         "fg": {"color_palette": "tertiary_fg"},
-        "bd": {"color_palette": "tertiary_bd"}
+        "bd": {"color_palette": "tertiary_bd"},
+        "bd_shader": null
+      },
+      "focus": {
+        "width": 2,
+        "bg": {"color_palette": "default_bg"},
+        "fg": {"color_palette": "default_fg"},
+        "bd": {"color_palette": "default_bd"},
+        "bd_shader": null
       },
       "disabled": {
         "bg": {"color_palette": "disabled_bg"},
@@ -344,6 +355,17 @@
         "bd": {"color_palette": "default_card_bd"},
         "width": 2,
         "bd_shadow": [0, 2, 4, 4, [0, 0, 0, 20]]
+      }
+    },
+
+    "SkPopup": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 8,
+        "bg": [255, 255, 255, 245],
+        "bd": {"color_palette": "default_card_bd"},
+        "width": 2,
+        "bd_shadow": [0, 2, 1, 1, [0, 0, 0, 20]]
       }
     },
 
@@ -379,7 +401,7 @@
         "size": [0, 30],
         "fg": {"color_palette": "default_card_bd"},
         "bg": {"color_palette": "default_card_bg"},
-        "bd_shadow": [0, 1, 1, 2, [0, 0, 0, 20]],
+        "bd_shadow": [0, 2, 1, 2, [0, 0, 0, 10]],
         "width": 0
       }
     },
@@ -473,6 +495,63 @@
       }
     },
 
+    "SkSlider": {
+      "rest": {
+        "size": [120, 20]
+      }
+    },
+
+    "SkSlider.Progress": {
+      "rest": {
+        "size": 4,
+        "bg": {"color_palette": "default_accent"},
+        "width": 0,
+        "radius": 99
+      }
+    },
+
+    "SkSlider.Rail": {
+      "rest": {
+        "size": 4,
+        "bg": {"color_palette": "default_strong_bg"},
+        "width": 0,
+        "radius": 99
+      }
+    },
+
+    "SkSlider.Thumb": {
+      "rest": {
+        "size": [20, 20],
+        "bg": {"color_palette": "default_solid_bg"},
+        "bd": [0, 0, 0, 255],
+        "width": 1,
+        "radius": 99,
+        "bd_shader": {
+          "linear_gradient": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "50%": [0, 0, 0, 15],
+              "95%": [0, 0, 0, 40]
+            }
+          }
+        },
+        "bd_shadow": null,
+        "inner": true,
+        "inner_size": [10, 10],
+        "inner_bg": {"color_palette": "secondary_accent"},
+        "inner_width": 0,
+        "inner_radius": 99
+      },
+      "hover": {
+        "inner_size": [15, 15]
+      },
+      "press": {
+        "inner_size": [9, 9],
+        "inner_bg": {"color_palette": "tertiary_accent"}
+      }
+    },
+
     "SkTitleBar": {
       "rest": {
         "size": [0, 0],
@@ -511,7 +590,7 @@
         "fg": {"color_palette": "default_fg"}
       },
       "selected": {
-        "bg": [220, 220, 220, 25],
+        "bg": [220, 220, 220, 100],
         "fg": {"color_palette": "default_fg"},
         "underline": {"color_palette": "default_accent"},
         "underline_width": 2,
@@ -555,10 +634,10 @@
       "selected": {
         "bg": {"color_palette": "default_card_bd"},
         "fg": {"color_palette": "default_fg"},
-        "leftline": {"color_palette": "default_accent"},
-        "leftline_width": 2,
-        "leftline_ipady": 5,
-        "leftline_ipadx": 2
+        "sideline": {"color_palette": "default_accent"},
+        "sideline_width": 2,
+        "sideline_ipady": 5,
+        "sideline_ipadx": 2
       }
     },
 

@@ -291,14 +291,14 @@ class SkGradient:
 
             if center_pos is None:
                 if widget:
-                    if "center_pos" in config:
-                        center_pos = config["center_pos"]
+                    if "center_anchor" in config:
+                        center_anchor = config["center_anchor"]
                     else:
-                        center_pos: typing.Literal[
+                        center_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se", "center"
                         ] = "center"
             if widget:
-                _center_pos = self.get_anchor_pos(widget, center_pos)
+                _center_pos = self.get_anchor_pos(widget, center_anchor)
                 self.gradient = skia.GradientShader.MakeSweep(
                     cx=_center_pos[0],
                     cy=_center_pos[1],
@@ -306,10 +306,9 @@ class SkGradient:
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
             else:
-                _center_pos = center_pos
                 self.gradient = skia.GradientShader.MakeSweep(
-                    cx=_center_pos[0],
-                    cy=_center_pos[1],
+                    cx=center_pos[0],
+                    cy=center_pos[1],
                     positions=positions,
                     colors=colors,  # [ Color1, Color2, Color3 ]
                 )
@@ -322,7 +321,7 @@ class SkGradient:
 def style_to_color(
     style_attr_value: list[int] | tuple[int, int, int, int] | dict | str,
     theme: str | SkTheme,
-) -> None | SkColor | SkGradient:
+) -> None | SkColor | SkGradient | typing.Any:
     """Returns the color object indicated by the color style attribute _value.
 
     Example
@@ -347,16 +346,19 @@ def style_to_color(
                     # If is set to a color in color palette
                     if type(theme) is str:
                         theme = SkTheme.find_loaded_theme(theme)
-                        if theme == False:
+                        if not theme:
                             warnings.warn("No theme found using given name!", SkColorWarning)
                             return SkColor(ERR_COLOR)
                     return style_to_color(
                         theme.get_preset_color(style_attr_value["color_palette"]), theme
                     )
                 case "texture":
-                    warnings.warn("Texture is currently not implemented", FutureWarning)
-                    NotImplemented
-                    return SkColor(ERR_COLOR)
+                    if type(theme) is str:
+                        theme: SkTheme = SkTheme.find_loaded_theme(theme)
+                        if not theme:
+                            warnings.warn("No theme found using given name!", SkColorWarning)
+                            return SkColor(ERR_COLOR)
+                    return theme.get_preset_color(style_attr_value["texture"]), theme
             return None
         case int():
             return style_attr_value

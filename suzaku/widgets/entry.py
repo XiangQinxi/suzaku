@@ -17,30 +17,34 @@ class SkEntry(SkLineInput):
 
     # region Draw 绘制
 
-    def draw_widget(self, canvas, rect) -> None:
-        if self.is_mouse_floating:
-            if self.is_focus:
-                style_name = self.style_name + ":focus"
+    def draw_widget(self, canvas, rect, style_selector: str | None = None) -> str:
+        if style_selector is None:
+            if not self.cget("disabled"):
+                if self.is_mouse_floating:
+                    style_selector = f"{self.style_name}:hover"
+                    if self.is_focus:
+                        style_selector = f"{self.style_name}:focus"
+                else:
+                    if self.is_focus:
+                        style_selector = f"{self.style_name}:focus"
+                    else:
+                        style_selector = self.style_name
             else:
-                style_name = self.style_name + ":hover"
-        elif self.is_focus:
-            style_name = self.style_name + ":focus"
-        else:
-            style_name = self.style_name
+                style_selector = f"{self.style_name}:disabled"
 
-        radius = self._style2(self.theme, style_name, "radius", 0)
-        bg_shader = self._style2(self.theme, style_name, "bg_shader")
-        bd_shader = self._style2(self.theme, style_name, "bd_shader")
-        bd_shadow = self._style2(self.theme, style_name, "bd_shadow")
-        width = self._style2(self.theme, style_name, "width", 2)
-        fg = self._style2(self.theme, style_name, "fg", "black")
-        bg = self._style2(self.theme, style_name, "bg", "black")
-        bd = self._style2(self.theme, style_name, "bd", "black")
-        selected_bg = self._style2(self.theme, style_name, "selected_bg", "blue")
-        selected_fg = self._style2(self.theme, style_name, "selected_fg", "white")
-        cursor = self._style2(self.theme, style_name, "cursor")
-        placeholder = self._style2(self.theme, style_name, "placeholder")
-        selected_radius = self._style2(self.theme, style_name, "selected_radius", True)
+        radius = self._style2(self.theme, style_selector, "radius", 0)
+        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
+        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
+        bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
+        width = self._style2(self.theme, style_selector, "width", 2)
+        fg = self._style2(self.theme, style_selector, "fg", "black")
+        bg = self._style2(self.theme, style_selector, "bg", "black")
+        bd = self._style2(self.theme, style_selector, "bd", "black")
+        selected_bg = self._style2(self.theme, style_selector, "selected_bg", "blue")
+        selected_fg = self._style2(self.theme, style_selector, "selected_fg", "white")
+        cursor = self._style2(self.theme, style_selector, "cursor")
+        placeholder = self._style2(self.theme, style_selector, "placeholder")
+        selected_radius = self._style2(self.theme, style_selector, "selected_radius", True)
         if isinstance(selected_radius, bool):
             if selected_radius:
                 selected_radius = radius / 2

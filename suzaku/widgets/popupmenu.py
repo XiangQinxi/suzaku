@@ -13,8 +13,8 @@ from .. import SkEvent
 
 class SkPopupMenu(SkPopup):
 
-    def __init__(self, parent: SkWindow | SkContainer, **kwargs):
-        super().__init__(parent, **kwargs)
+    def __init__(self, parent: SkWindow | SkContainer, *, style: str = "SkPopup", **kwargs):
+        super().__init__(parent, style=style, **kwargs)
 
         self.items: list[SkMenuItem | SkSeparator | SkCheckItem | SkRadioItem | SkSwitch] = []
 

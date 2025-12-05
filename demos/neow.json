@@ -1,0 +1,298 @@
+{
+  "name": "neow",
+  "base": "default.dark",
+  "friendly_name": "Neow",
+
+  "color_palette": {
+    "window_bg": [15, 15, 15, 255],
+    "window_bd": [255, 255, 255, 40],
+    "card_bg": [255, 255, 255, 10],
+    "popup_bg": [40, 40, 40, 255],
+
+    "bg": [255, 255, 255, 20],
+    "second_bg": [225, 225, 225, 40],
+    "third_bg": [225, 225, 225, 10],
+
+    "bd": [255, 255, 255, 10],
+
+    "fg": [255, 255, 255, 235],
+    "second_fg": [255, 255, 255, 165],
+
+    "accent": [25, 145, 225, 255]
+  },
+
+  "texture": {
+
+  },
+
+  "styles": {
+
+    "SkButton": {
+      "rest": {
+        "size": [0, 30],
+        "radius": 8,
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": {"color_palette": "bd"},
+        "bg_shader": null,
+        "bd_shader": null,
+        "bd_shadow": null,
+        "width": 2
+      },
+      "hover": {
+        "bg": {"color_palette": "second_bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": {"color_palette": "accent"}
+      },
+      "press": {
+        "bg": {"color_palette": "third_bg"},
+        "fg": {"color_palette": "second_fg"},
+        "bd": {"color_palette": "accent"},
+        "width": 3
+      },
+      "focus": {
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": [0, 0, 0, 200],
+        "bd_shader": {
+          "sg": {
+            "center_anchor": "center",
+            "colors": {
+              "0%": "cyan",
+              "30%": "magenta",
+              "60%": "yellow",
+              "100%": "cyan"
+            }
+          }
+        },
+        "width": 3
+      },
+      "disabled": {
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "second_fg"},
+        "bd": {"color_palette": "bd"}
+      }
+    },
+
+    "SkComboBox": {
+      "rest": {
+        "size": [0, 30],
+        "radius": 8,
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": {"color_palette": "bd"},
+        "bg_shader": null,
+        "bd_shader": null,
+        "bd_shadow": null,
+        "width": 2
+      },
+      "hover": {
+        "bg": {"color_palette": "second_bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": {"color_palette": "accent"}
+      },
+      "press": {
+        "bg": {"color_palette": "third_bg"},
+        "fg": {"color_palette": "second_fg"},
+        "bd": {"color_palette": "accent"},
+        "width": 3
+      },
+      "focus": {
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": {"color_palette": "accent"},
+        "bd_shader": {
+          "sg": {
+            "center_anchor": "center",
+            "colors": {
+              "0%": "cyan",
+              "30%": "magenta",
+              "60%": "yellow",
+              "100%": "cyan"
+            }
+          }
+        },
+        "width": 3
+      },
+      "disabled": {
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "second_fg"},
+        "bd": {"color_palette": "bd"}
+      }
+    },
+
+    "SkCard": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 12,
+        "bg": {"color_palette": "card_bg"},
+        "bd": {"color_palette": "bd"},
+        "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 20]],
+        "bg_Shader": null,
+        "bd_shader": null,
+        "width": 2
+      }
+    },
+
+    "SkTabs": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 12,
+        "bg": {"color_palette": "card_bg"},
+        "bd": {"color_palette": "bd"},
+        "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 20]],
+        "bg_Shader": null,
+        "bd_shader": null,
+        "width": 2
+      }
+    },
+
+    "SkTabBar": {
+      "rest": {
+        "size": [0, 0],
+        "radius": 0,
+        "bg": "transparent",
+        "bd": "transparent",
+        "width": 0
+      }
+    },
+
+    "SkTabBar.Button": {
+      "rest": {
+        "size": [0, 25],
+        "radius": [4, 4, 0, 0],
+        "bg": "transparent",
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "hover": {
+        "bg": [0, 0, 0, 25],
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "press": {
+        "bg": [0, 0, 0, 45],
+        "fg": {"color_palette": "fg"},
+        "width": 0
+      },
+      "selected": {
+        "bg": [0, 0, 0, 255],
+        "bd": [40, 130, 255, 10],
+        "bg_shader": {
+          "lg": {
+            "start_anchor": "n",
+            "end_anchor": "s",
+            "colors": {
+              "0%": [0, 0, 0, 0],
+              "45%": [0,0,0,0],
+              "95%": [40, 130, 255, 20],
+              "100%": [40, 130, 255, 40]
+            }
+          }
+        },
+        "fg": {"color_palette": "fg"},
+        "width": 1,
+        "bd_shadow": [0, 0, 0, 0, [40, 130, 255, 255]],
+        "underline": [40, 130, 255, 255],
+        "underline_width": 2,
+        "underline_ipadx": 1
+      }
+    },
+
+    "SkPopup": {
+      "rest": {
+        "size": [0, 0],
+        "radius": [0, 0, 12, 12],
+        "bg": {"color_palette": "popup_bg"},
+        "bd": {"color_palette": "bd"},
+        "bd_shadow": [0, 3, 3, 3, [255, 255, 255, 20]],
+        "bg_Shader": null,
+        "bd_shader": null,
+        "width": 2
+      }
+    },
+
+    "SkEntry": {
+      "rest": {
+        "size": [0, 35],
+        "radius": 8,
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": {"color_palette": "bd"},
+        "bg_Shader": null,
+        "bd_shader": null,
+        "bd_shadow": null,
+        "width": 2,
+        "placeholder": {"color_palette": "second_fg"}
+      },
+      "hover": {
+        "bg": {"color_palette": "second_bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": [0, 0, 0, 50],
+        "bd_shader": {
+          "sg": {
+            "center_anchor": "center",
+            "colors": {
+              "0%": "cyan",
+              "30%": "magenta",
+              "60%": "yellow",
+              "100%": "cyan"
+            }
+          }
+        }
+      },
+      "focus": {
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "fg"},
+        "bd": [0,0,0,255],
+        "bd_shader": {
+          "sg": {
+            "center_anchor": "center",
+            "colors": {
+              "0%": "cyan",
+              "30%": "magenta",
+              "60%": "yellow",
+              "100%": "cyan"
+            }
+          }
+        }
+      },
+      "disabled": {
+        "bg": {"color_palette": "bg"},
+        "fg": {"color_palette": "second_fg"},
+        "bd": {"color_palette": "bd"}
+      }
+    },
+
+    "SkFrame": {
+      "rest": {
+        "size": [0, 0]
+      }
+    },
+
+    "SkSeparator": {
+      "rest": {
+        "fg": {"color_palette": "bd"},
+        "width": 2
+      }
+    },
+
+    "SkText": {
+      "rest": {
+        "size": [0, 0],
+        "fg": {"color_palette": "fg"}
+      }
+    },
+
+
+    "SkWindow": {
+      "rest": {
+        "bg": {"color_palette": "window_bg"},
+        "bd": {"color_palette": "window_bd"},
+        "radius": 12,
+        "width": 3
+      }
+    }
+
+  }
+}

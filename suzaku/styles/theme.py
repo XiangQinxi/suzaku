@@ -512,7 +512,7 @@ class SkTheme:
             if self.parent is not None:
                 return self.parent.get_style_attr(selector, attr_name)
             elif self.parent is None and self.name != SkTheme.DEFAULT_THEME.name:
-                SkTheme.DEFAULT_THEME.get_style_attr(selector, attr_name)
+                return SkTheme.DEFAULT_THEME.get_style_attr(selector, attr_name)
             # If is already default theme (no parent), then go fuck your selector
             if self.name == SkTheme.DEFAULT_THEME.name:
                 if allow_not_found:
@@ -522,7 +522,6 @@ class SkTheme:
                         f"Attribute <{attr_name}> is not exsited in the default theme. "
                         "Check your selector!"
                     )
-
         if type(style[attr_name]) is dict:
             return style[attr_name].copy()
         else:
@@ -553,6 +552,7 @@ class SkTheme:
             result = keywords[color_name]
         else:
             # If not a keyword
+
             if color_name in self.color_palette:
                 # If existed
                 result = self.color_palette[color_name]
@@ -673,4 +673,3 @@ light_theme = default_theme = SkTheme.DEFAULT_THEME
 dark_theme = SkTheme.INTERNAL_THEMES["default.dark"]
 sv_theme = sv_light_theme = SkTheme.INTERNAL_THEMES["sun_valley.light"]
 sv_dark_theme = SkTheme.INTERNAL_THEMES["sun_valley.dark"]
-neow_theme = SkTheme.INTERNAL_THEMES["neow"]

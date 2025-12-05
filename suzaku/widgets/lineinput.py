@@ -74,6 +74,8 @@ class SkLineInput(SkWidget):
         self.max_undo_stack = 30
         self.help_parent_scroll = True
 
+        self.ipadx = 10
+
         # Event binding
         self.bind("double_click", self._double_click)
         self.bind("focus_gain", self._focus_gain)
@@ -87,6 +89,24 @@ class SkLineInput(SkWidget):
         # self.window
 
     # endregion
+
+    @property
+    def dwidth(self):
+        _width = self.cget("dwidth")
+        if _width <= 0:
+            if not self.get():
+                if self.cget("placeholder"):
+                    _width = self.measure_text(self.cget("placeholder")) + self.ipadx * 2
+            else:
+                _width = self.measure_text(self.get()) + self.ipadx * 2
+        return _width
+
+    @property
+    def dheight(self):
+        _height = self.cget("dheight")
+        if _height <= 0:
+            _height = self.text_height + 8 + self.ipady * 2
+        return _height
 
     # region Text&Cursor 文本、光标操作
 
@@ -251,6 +271,8 @@ class SkLineInput(SkWidget):
             self.attributes["text"] = text
         self.update(True)
 
+        if self.cget("dwidth") <= 0:
+            self.parent.update_layout()
         return self
 
     def index(self, mouse_x: int) -> int:

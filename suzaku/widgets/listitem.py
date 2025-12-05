@@ -44,21 +44,22 @@ class SkListItem(SkTextButton):
                     style_selector = f"{self.style_name}:press"
                 else:
                     style_selector = f"{self.style_name}:hover"
-        style = self.theme.select(style_selector)
         super().draw_widget(canvas, rect, style_selector)
 
         if self.selected:
-            if "leftline" in style and "leftline_width" in style:
-                leftline = self._style("leftline", None, style)
-                leftline_width = self._style("leftline_width", 0, style)
-                leftline_ipadx = self._style("leftline_ipadx", 2, style)
-                leftline_ipady = self.unpack_pady(self._style("leftline_ipady", (5, 5), style))
+            sideline = self._style2(self.theme, style_selector, "sideline")
+            sideline_width = self._style2(self.theme, style_selector, "sideline_width")
+            if sideline and sideline_width:
+                sideline_ipadx = self._style2(self.theme, style_selector, "sideline_ipadx", 0)
+                sideline_ipady = self.unpack_pady(
+                    self._style2(self.theme, style_selector, "sideline_ipady", 0)
+                )
                 self._draw_line(
                     canvas,
-                    rect.left() + leftline_ipadx,
-                    rect.top() + leftline_ipady[0],
-                    rect.left() + leftline_ipadx,
-                    rect.bottom() - leftline_ipady[1],
-                    width=leftline_width,
-                    fg=leftline,
+                    rect.left() + sideline_ipadx,
+                    rect.top() + sideline_ipady[0],
+                    rect.left() + sideline_ipadx,
+                    rect.bottom() - sideline_ipady[1],
+                    width=sideline_width,
+                    fg=sideline,
                 )

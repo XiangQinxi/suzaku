@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 "changed",
                 change_theme,
             )
-            listbox.select(index=3)
+            listbox.select(index=2)
             listbox.box(padx=10, pady=(10, 0))
 
             SkTextButton(
