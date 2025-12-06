@@ -74,10 +74,10 @@ class SkListBox(SkCard):
         if item:
             self.selected_item: SkListItem = item
             self.trigger(
-                f"changed",
+                f"change",
                 SkEvent(
                     self,
-                    event_type="changed",
+                    event_type="change",
                     index=self.index(item),
                     item=item,
                     text=item.cget("text"),
@@ -87,10 +87,10 @@ class SkListBox(SkCard):
         if index:
             self.selected_item: SkListItem = self.item(index)
             self.trigger(
-                f"changed",
+                f"change",
                 SkEvent(
                     self,
-                    event_type="changed",
+                    event_type="change",
                     index=index,
                     item=self.selected_item,
                     text=self.selected_item.cget("text"),

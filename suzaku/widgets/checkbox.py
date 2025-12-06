@@ -30,7 +30,30 @@ class SkCheckBox(SkWidget):
         self._checked: bool = default
         self.help_parent_scroll = True
 
+        self._state = "checked" if self._checked else "unchecked"
+
         self.bind("click", self._on_click)
+        if variable:
+            variable.bind("change", self._on_variable_change)
+
+    def _on_variable_change(self, event: SkEvent):
+        """【处理变量变化事件，更新复选框的选中状态】"""
+        # print(self.checked)
+        self._checked = event["value"]
+        self.style_state("checked" if self.checked else "unchecked")
+        self.update(True)
+
+    def _on_mouse_leave(self, event: SkEvent):
+        pass
+
+    def _on_mouse_press(self, event: SkEvent):
+        pass
+
+    def _on_mouse_enter(self, event: SkEvent):
+        pass
+
+    def _on_focus_loss(self, event: SkEvent):
+        pass
 
     @property
     def checked(self) -> bool:
@@ -46,6 +69,10 @@ class SkCheckBox(SkWidget):
             self.cget("variable").set(self._checked)
         if self.cget("command"):
             self.cget("command")()
+        if self.checked:
+            self.style_state("checked")
+        else:
+            self.style_state("unchecked")
         self.update(True)
 
     def _on_click(self, event: SkEvent):
@@ -79,10 +106,7 @@ class SkCheckBox(SkWidget):
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """【绘制复选框】"""
-        if self.checked:
-            style_selector = f"{self.style_name}:checked"
-        else:
-            style_selector = f"{self.style_name}:unchecked"
+        style_selector = self.style_selector()
         if self.is_mouse_floating:
             style_selector = style_selector + "-hover"
         else:

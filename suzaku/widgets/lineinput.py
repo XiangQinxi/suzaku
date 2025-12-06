@@ -84,7 +84,6 @@ class SkLineInput(SkWidget):
         self.bind("key_repeat", self._key)
         self.bind("mouse_press[b1]", self._press)
         self.window.bind("mouse_motion", self._motion)
-        self.bind("mouse_motion", self._motion)
         self.bind("scroll", self._scroll)
         # self.window
 
@@ -151,8 +150,8 @@ class SkLineInput(SkWidget):
         :param event: SkEvent
         """
         # 【只有在左键按下时，才记录end_index】
-        if self.button == 0:
-            if self.is_mouse_press:
+        if self.window.button == 0:
+            if self.window.is_mouse_press and self.is_focus:
                 self.end_index = self.index(event["x"])
                 self.update(True)
 
@@ -612,22 +611,26 @@ class SkLineInput(SkWidget):
             blink_interval = self.cget("blink_interval")
             self.bind(f"delay[{blink_interval}]", self.blink)
 
+    def _on_mouse_press(self, event: SkEvent):
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            self.style_state("focus")
+
+    def _on_mouse_enter(self, event: SkEvent):
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            if self.is_focus:
+                self.style_state("focus")
+            else:
+                self.style_state("hover")
+
     def draw_widget(self, canvas: skia.Surface, rect: skia.Rect) -> None:
         """Draw the text input
         【绘制输入框（不含边框）】
         """
-        if not self.cget("disabled"):
-            if self.is_mouse_floating:
-                if self.is_focus:
-                    style_selector = f"{self.style_name}:focus"
-                else:
-                    style_selector = f"{self.style_name}:hover"
-            elif self.is_focus:
-                style_selector = f"{self.style_name}:focus"
-            else:
-                style_selector = self.style_name
-        else:
-            style_selector = f"{self.style_name}:disabled"
+        style_selector = self.style_selector()
 
         radius = self._style2(self.theme, style_selector, "radius", 0)
         fg = self._style2(self.theme, style_selector, "fg")

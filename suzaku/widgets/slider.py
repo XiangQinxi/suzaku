@@ -82,27 +82,9 @@ class SkSlider(SkWidget):
     config = configure = set_attribute
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
-        if not self.cget("disabled"):
-            if self.is_mouse_floating:
-                if self._pressing:
-                    state = "press"
-                else:
-                    state = "hover"
-            else:
-                if self._pressing:
-                    state = "press"
-                else:
-                    if self.is_focus:
-                        state = "focus"
-                    else:
-                        state = ""
-        else:
-            state = "disabled"
+        state = self.style_state()
 
-        if state:
-            thumb_selector = f"{self.style_name}.Thumb:{state}"
-        else:
-            thumb_selector = f"{self.style_name}.Thumb"
+        thumb_selector = f"{self.style_name}.Thumb:{state}"
 
         size = self._style2(self.theme, thumb_selector, "size", (20, 20))
         thumb_width, thumb_height = size

@@ -2,6 +2,7 @@ import skia
 
 from .container import SkContainer
 from .textbutton import SkTextButton
+from ..event import SkEvent
 
 
 class SkTabButton(SkTextButton):
@@ -24,6 +25,14 @@ class SkTabButton(SkTextButton):
             **kwargs,
         )
         self.focusable = False
+        self.has_focus_style = False
+        self.parent.bind("change", self._on_change)
+
+    def _on_change(self, event: SkEvent):
+        if event["item"] is self:
+            self.style_state("selected")
+        else:
+            self.style_state("rest")
 
     @property
     def selected(self):
@@ -31,6 +40,21 @@ class SkTabButton(SkTextButton):
         if self.parent.selected_item is None:
             return False
         return self.parent.selected_item == self
+
+    def _on_mouse_enter(self, event: SkEvent):
+        if not self.selected:
+            super()._on_mouse_enter(event)
+
+    def _on_mouse_leave(self, event: SkEvent):
+        if not self.selected:
+            super()._on_mouse_leave(event)
+
+    def _on_mouse_press(self, event: SkEvent):
+        if not self.selected:
+            super()._on_mouse_press(event)
+
+    def _on_focus_loss(self, event: SkEvent):
+        pass
 
     def _on_click(self):
         """Handle click event"""
@@ -46,33 +70,23 @@ class SkTabButton(SkTextButton):
         :param style_selector: The style name
         :return: None
         """
-        if self.selected:
-            style_selector = f"{self.style_name}:selected"
-        else:
-            if self.is_mouse_floating:
-                if self.is_mouse_press:
-                    style_selector = f"{self.style_name}:press"
-                else:
-                    style_selector = f"{self.style_name}:hover"
+        if style_selector is None:
+            style_selector = self.style_selector()
 
         super().draw_widget(canvas, rect, style_selector)
 
-        style = self.theme.select(style_selector)
-        underline = self._style("underline", "transparent", style)
-        underline_width = self._style("underline_width", 0, style)
-        underline_shadow = self._style("underline_shadow", 0, style)
-        underline_shader = self._style("underline_shader", None, style)
-        underline_ipadx = self.unpack_padx(self._style("underline_ipadx", (5, 5), style))
-
         if self.selected:
+            underline_ipadx = self.unpack_padx(
+                self._style2(self.theme, style_selector, "underline_ipadx", (5, 5))
+            )
             self._draw_line(
                 canvas,
                 self.canvas_x + underline_ipadx[0],
                 self.canvas_y + self.height,
                 self.canvas_x + self.width - underline_ipadx[1],
                 self.canvas_y + self.height,
-                width=underline_width,
-                fg=underline,
-                shader=underline_shader,
-                shadow=underline_shadow,
+                width=self._style2(self.theme, style_selector, "underline_width", 0),
+                fg=self._style2(self.theme, style_selector, "underline", "transparent"),
+                shader=self._style2(self.theme, style_selector, "underline_shader", None),
+                shadow=self._style2(self.theme, style_selector, "underline_shadow", None),
             )

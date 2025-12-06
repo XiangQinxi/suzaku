@@ -36,6 +36,17 @@ class SkButton(SkFrame):
 
         self.bind("click", lambda _: self.invoke)
 
+        self.has_focus_style = True
+
+    def _on_mouse_leave(self, event: SkEvent):
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            if all((self.focusable, self.is_focus, self.has_focus_style)):
+                self.style_state("focus")
+            else:
+                self.style_state("rest")
+
     def _click(self, event) -> None:
         """
         Check click event (not press)
@@ -70,19 +81,7 @@ class SkButton(SkFrame):
         :return: None
         """
         if style_selector is None:
-            if not self.cget("disabled"):
-                if self.is_mouse_floating:
-                    if self.is_mouse_press:
-                        style_selector = f"{self.style_name}:press"
-                    else:
-                        style_selector = f"{self.style_name}:hover"
-                else:
-                    if self.is_focus and self.focusable:
-                        style_selector = f"{self.style_name}:focus"
-                    else:
-                        style_selector = self.style_name
-            else:
-                style_selector = f"{self.style_name}:disabled"
+            style_selector = self.style_selector()
 
         bg_shader = self._style2(self.theme, style_selector, "bg_shader")
         bd_shader = self._style2(self.theme, style_selector, "bd_shader")

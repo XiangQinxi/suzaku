@@ -45,15 +45,12 @@ class SkTabBar(SkFrame):
         :param index: The index of the item
         :return: None
         """
-        self.selected_item = self.items[index]
-        self.trigger(
-            "selected",
-            SkEvent(
-                widget=self,
-                event_type="selected",
-                index=index,
-            ),
-        )
+        if self.selected_item is not self.items[index]:
+            self.selected_item = self.items[index]
+            self.trigger(
+                "change",
+                SkEvent(widget=self, event_type="change", index=index, item=self.selected_item),
+            )
 
     def update_order(self):
         """Update the order of the tab buttons

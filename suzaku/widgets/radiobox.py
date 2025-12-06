@@ -30,6 +30,29 @@ class SkRadioBox(SkWidget):
         self.command = command
         self.bind("click", lambda _: self.invoke())
 
+        self._state = "checked" if self.checked else "unchecked"
+
+        if variable:
+            variable.bind("change", self._on_variable_change)
+
+    def _on_variable_change(self, event: SkEvent):
+        """【处理变量变化事件，更新复选框的选中状态】"""
+        self._checked = self.cget("variable").get()
+        self.style_state("checked" if self.checked else "unchecked")
+        self.update(True)
+
+    def _on_mouse_leave(self, event: SkEvent):
+        pass
+
+    def _on_mouse_press(self, event: SkEvent):
+        pass
+
+    def _on_mouse_enter(self, event: SkEvent):
+        pass
+
+    def _on_focus_loss(self, event: SkEvent):
+        pass
+
     @property
     def checked(self) -> bool:
         if self.cget("variable"):
@@ -42,6 +65,11 @@ class SkRadioBox(SkWidget):
             self.attributes["variable"].set(self.cget("value"))
         if self.command:
             self.command()
+        if self.checked:
+            self.style_state("checked")
+        else:
+            self.style_state("unchecked")
+        self.update(True)
 
     def _on_click(self, event: SkEvent):
         self.invoke()
@@ -56,10 +84,7 @@ class SkRadioBox(SkWidget):
             if self.is_focus:
                 style_selector = "SkCheckBox:focus"
             else:"""
-        if self.checked:
-            style_selector = f"{self.style_name}:checked"
-        else:
-            style_selector = f"{self.style_name}:unchecked"
+        style_selector = self.style_selector()
         if self.is_mouse_floating:
             style_selector = style_selector + "-hover"
         else:

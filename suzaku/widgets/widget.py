@@ -108,6 +108,7 @@ class SkWidget(SkEventHandling, SkMisc):
         self.apply_theme(self.parent.theme)
         self.styles = self.theme.styles
 
+        self._state = "rest"
         # 相对于父组件的坐标
         self._x: int | float = 0
         self._y: int | float = 0
@@ -165,12 +166,55 @@ class SkWidget(SkEventHandling, SkMisc):
 
         self.bind("mouse_release", self._on_mouse_release)
 
+        self.bind("mouse_enter", self._on_mouse_enter)
+        self.bind("mouse_leave", self._on_mouse_leave)
+        self.bind("mouse_press", self._on_mouse_press)
+        self.bind("mouse_release", self._on_mouse_release2)
+        self.bind("focus_loss", self._on_focus_loss)
+
     def __str__(self):
         return self.id
 
     # endregion
 
     # region Event
+
+    def _on_focus_loss(self, event: SkEvent):
+        """【失去焦点时，组件样式设为rest】"""
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            self.style_state("rest")
+
+    def _on_mouse_enter(self, event: SkEvent):
+        """【鼠标悬停在组件上时，组件样式设为hover】"""
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            self.style_state("hover")
+
+    def _on_mouse_leave(self, event: SkEvent):
+        """【鼠标离开组件时，组件样式设为rest或focus】"""
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            if self.focusable and self.is_focus:
+                self.style_state("focus")
+            else:
+                self.style_state("rest")
+
+    def _on_mouse_press(self, event: SkEvent):
+        """【鼠标按下在组件上时，组件样式设为press】"""
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            self.style_state("press")
+
+    def _on_mouse_release2(self, event: SkEvent):
+        if self.is_mouse_floating:
+            self._on_mouse_enter(event)
+        else:
+            self._on_mouse_leave(event)
 
     def _pos_update(self, event: SkEvent | None = None):
         # 更新组件的位置
@@ -744,6 +788,31 @@ class SkWidget(SkEventHandling, SkMisc):
     # endregion
 
     # region Widget attribute configs 组件属性配置
+
+    def style_selector(self, style_name=None, state=None):
+        if style_name is None:
+            style_name = self.style_name
+        if state is None:
+            state = self.style_state()
+        return f"{style_name}:{state}"
+
+    def style_state(self, state: str | None = None) -> typing.Self | str:
+        """Style the widget according to the state.
+        【根据状态为组件设置样式】
+        :param state: str
+        :return: None
+        """
+        if state:
+            if state == self._state:
+                return self
+            self.trigger(
+                "style_state_change",
+                SkEvent(self, "style_state_change", preview_state=self._state, new_state=state),
+            )
+            self._state = state
+            return self
+        else:
+            return self._state
 
     def is_entered(self, mouse_x, mouse_y) -> bool:
         """Check if within the widget's bounds.

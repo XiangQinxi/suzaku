@@ -2,6 +2,7 @@ import skia
 
 from .container import SkContainer
 from .lineinput import SkLineInput
+from .. import SkEvent
 
 
 class SkEntry(SkLineInput):
@@ -13,24 +14,28 @@ class SkEntry(SkLineInput):
 
         self.padding = 5
 
+    def _on_mouse_press(self, event: SkEvent):
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            self.style_state("focus")
+
+    def _on_mouse_enter(self, event: SkEvent):
+        if self.cget("disabled"):
+            self.style_state("disabled")
+        else:
+            if self.is_focus:
+                self.style_state("focus")
+            else:
+                self.style_state("hover")
+
     # endregion
 
     # region Draw 绘制
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> str:
         if style_selector is None:
-            if not self.cget("disabled"):
-                if self.is_mouse_floating:
-                    style_selector = f"{self.style_name}:hover"
-                    if self.is_focus:
-                        style_selector = f"{self.style_name}:focus"
-                else:
-                    if self.is_focus:
-                        style_selector = f"{self.style_name}:focus"
-                    else:
-                        style_selector = self.style_name
-            else:
-                style_selector = f"{self.style_name}:disabled"
+            style_selector = self.style_selector()
 
         radius = self._style2(self.theme, style_selector, "radius", 0)
         bg_shader = self._style2(self.theme, style_selector, "bg_shader")

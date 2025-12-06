@@ -95,7 +95,7 @@ class SkEventHandling:
     EVENT_TYPES: list[str] = [
         "resize", "move", 
         "configure", "update", "redraw", 
-        "mouse_move", "mouse_enter", "mouse_leave", "mouse_press", "mouse_release", "click", 
+        "mouse_move", "mouse_enter", "mouse_leave", "mouse_press", "mouse_release", "click", "double_click",
         "focus_gain", "focus_loss", 
         "key_press", "key_release", "key_repeat", "char", 
         "delay", "repeat", # This row shows special event type(s)
