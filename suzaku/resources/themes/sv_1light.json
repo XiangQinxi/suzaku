@@ -384,13 +384,23 @@
         "bd": {"color_palette": "default_strong_bd"},
         "width": 1
       },
+      "unchecked-press": {
+        "bg": {"color_palette": "tertiary_alt_bg"},
+        "bd": {"color_palette": "default_strong_bd"},
+        "width": 1
+      },
       "checked-rest": {
         "bg": {"color_palette": "default_accent"},
         "fg": {"color_palette": "default_accent_fg"},
         "width": 2
       },
       "checked-hover": {
-        "bg": {"color_palette": "default_accent"},
+        "bg": {"color_palette": "secondary_accent"},
+        "fg": {"color_palette": "default_accent_fg"},
+        "width": 2
+      },
+      "checked-press": {
+        "bg": {"color_palette": "tertiary_accent"},
         "fg": {"color_palette": "default_accent_fg"},
         "width": 2
       }

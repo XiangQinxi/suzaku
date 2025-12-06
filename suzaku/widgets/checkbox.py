@@ -108,7 +108,10 @@ class SkCheckBox(SkWidget):
         """【绘制复选框】"""
         style_selector = self.get_style_selector()
         if self.is_mouse_floating:
-            style_selector = style_selector + "-hover"
+            if self.is_mouse_press:
+                style_selector = style_selector + "-press"
+            else:
+                style_selector = style_selector + "-hover"
         else:
             """if self.is_focus:
                 style_selector = style_selector + "-focus"

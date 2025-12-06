@@ -53,7 +53,8 @@ class SkColor:
         if typec is str:
             if color.startswith("#"):
                 self.set_color_hex(color)
-            self.set_color_name(color)
+            else:
+                self.set_color_name(color)
         elif typec is tuple or typec is list:
             if len(color) == 3:
                 self.set_color_rgba(color[0], color[1], color[2])
@@ -90,6 +91,11 @@ class SkColor:
         Returns:
             skia.Color: 对应的RGBA颜色对象
         """
+        if isinstance(a, float):
+            if 0 <= a <= 1:
+                a = int(a * 255)
+            else:
+                a = round(a)
         self.color = skia.Color(r, g, b, a)
 
     def set_color_hex(self, _hex: str) -> None:
