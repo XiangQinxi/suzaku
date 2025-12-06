@@ -35,7 +35,7 @@ class SkEntry(SkLineInput):
 
     def draw_widget(self, canvas, rect, style_selector: str | None = None) -> str:
         if style_selector is None:
-            style_selector = self.style_selector()
+            style_selector = self.get_style_selector()
 
         radius = self._style2(self.theme, style_selector, "radius", 0)
         bg_shader = self._style2(self.theme, style_selector, "bg_shader")

@@ -630,7 +630,7 @@ class SkLineInput(SkWidget):
         """Draw the text input
         【绘制输入框（不含边框）】
         """
-        style_selector = self.style_selector()
+        style_selector = self.get_style_selector()
 
         radius = self._style2(self.theme, style_selector, "radius", 0)
         fg = self._style2(self.theme, style_selector, "fg")

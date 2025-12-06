@@ -33,11 +33,9 @@ if __name__ == "__main__":
         menubar.box(side="top", padx=0, pady=0)
 
         popupmenu = SkPopupMenu(window)
-        popupmenu.add_command("New window", command=create1window)
-        """popupmenu.add_command("New project")
+        popupmenu.add_command("New project")
         popupmenu.add_command("Open project")
-        popupmenu.add_command("Save changes")
-        popupmenu.add_command("Save as...")"""
+        # popupmenu.add_cascade("")
         popupmenu.add_separator()
         popupmenu.add_checkitem("Agreed", variable=var1)
         popupmenu.add_radioitem("Simple", value=False, variable=var1)

@@ -106,7 +106,7 @@ class SkCheckBox(SkWidget):
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect):
         """【绘制复选框】"""
-        style_selector = self.style_selector()
+        style_selector = self.get_style_selector()
         if self.is_mouse_floating:
             style_selector = style_selector + "-hover"
         else:

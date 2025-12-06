@@ -84,7 +84,7 @@ class SkRadioBox(SkWidget):
             if self.is_focus:
                 style_selector = "SkCheckBox:focus"
             else:"""
-        style_selector = self.style_selector()
+        style_selector = self.get_style_selector()
         if self.is_mouse_floating:
             style_selector = style_selector + "-hover"
         else:

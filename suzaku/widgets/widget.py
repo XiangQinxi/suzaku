@@ -789,7 +789,7 @@ class SkWidget(SkEventHandling, SkMisc):
 
     # region Widget attribute configs 组件属性配置
 
-    def style_selector(self, style_name=None, state=None):
+    def get_style_selector(self, style_name=None, state=None):
         if style_name is None:
             style_name = self.style_name
         if state is None:

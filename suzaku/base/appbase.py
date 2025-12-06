@@ -211,7 +211,8 @@ class SkAppBase(SkEventHandling, SkMisc):
     mainloop = run
 
     def destroy_window(self, window):
-        self.windows.remove(window)
+        if window in self.windows:
+            self.windows.remove(window)
 
     def cleanup(self) -> None:
         """Clean up resources."""

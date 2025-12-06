@@ -71,7 +71,7 @@ class SkTabButton(SkTextButton):
         :return: None
         """
         if style_selector is None:
-            style_selector = self.style_selector()
+            style_selector = self.get_style_selector()
 
         super().draw_widget(canvas, rect, style_selector)
 

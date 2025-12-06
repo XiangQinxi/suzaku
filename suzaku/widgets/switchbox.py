@@ -49,7 +49,7 @@ class SkSwitchBox(SkCheckBox):
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect, style_selector=None) -> None:
         if style_selector is None:
-            style_selector = self.style_selector()
+            style_selector = self.get_style_selector()
 
             if self.is_mouse_floating:
                 if self.is_mouse_press:

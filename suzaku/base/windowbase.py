@@ -1189,7 +1189,10 @@ class SkWindowBase(SkEventHandling, SkMisc):
         # self._event_init = False
         # print(self.id)
         self.application.destroy_window(self)
-        glfw.destroy_window(self.the_window)
+        try:
+            glfw.destroy_window(self.the_window)
+        except TypeError:
+            pass
 
         self.alive = False
         self.draw_func = None

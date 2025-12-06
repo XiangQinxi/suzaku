@@ -77,7 +77,10 @@ class SkPopupMenu(SkPopup):
         return button.id
 
     def add_cascade(self):
-        pass
+        button = SkMenu(self, text=text, **kwargs)
+        button.box(side="left", padx=(2, 4), pady=0)
+        self.add(button)
+        return button.id
 
     def add_checkitem(self, text: str | None = None, **kwargs):
         checkitem = SkCheckItem(self, text=text, **kwargs)

@@ -81,7 +81,7 @@ class SkButton(SkFrame):
         :return: None
         """
         if style_selector is None:
-            style_selector = self.style_selector()
+            style_selector = self.get_style_selector()
 
         bg_shader = self._style2(self.theme, style_selector, "bg_shader")
         bd_shader = self._style2(self.theme, style_selector, "bd_shader")

@@ -60,7 +60,7 @@ class SkListItem(SkTextButton):
         self, canvas: skia.Canvas, rect: skia.Rect, style_selector: str | None = None
     ) -> None:
         if style_selector is None:
-            style_selector = self.style_selector()
+            style_selector = self.get_style_selector()
 
         super().draw_widget(canvas, rect, style_selector)
 
