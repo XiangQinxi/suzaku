@@ -38,8 +38,6 @@ class SkEntry(SkLineInput):
             style_selector = self.get_style_selector()
 
         radius = self._style2(self.theme, style_selector, "radius", 0)
-        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
-        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
         bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
         width = self._style2(self.theme, style_selector, "width", 2)
         fg = self._style2(self.theme, style_selector, "fg", "black")
@@ -64,8 +62,6 @@ class SkEntry(SkLineInput):
             bg=bg,
             bd=bd,
             width=width,
-            bd_shader=bd_shader,
-            bg_shader=bg_shader,
             bd_shadow=bd_shadow,
         )
 

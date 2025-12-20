@@ -53,9 +53,9 @@
       "focus": {
         "bg": {"color_palette": "bg"},
         "fg": {"color_palette": "fg"},
-        "bd": [0, 0, 0, 200],
-        "bd_shader": {
-          "sg": {
+        "bd": [
+          "sg",
+          {
             "center_anchor": "center",
             "colors": {
               "0%": "cyan",
@@ -64,7 +64,7 @@
               "100%": "cyan"
             }
           }
-        },
+        ],
         "width": 3
       },
       "disabled": {
@@ -100,9 +100,9 @@
       "focus": {
         "bg": {"color_palette": "bg"},
         "fg": {"color_palette": "fg"},
-        "bd": {"color_palette": "accent"},
-        "bd_shader": {
-          "sg": {
+        "bd": [
+          "sg",
+          {
             "center_anchor": "center",
             "colors": {
               "0%": "cyan",
@@ -111,7 +111,7 @@
               "100%": "cyan"
             }
           }
-        },
+        ],
         "width": 3
       },
       "disabled": {
@@ -176,10 +176,10 @@
         "width": 0
       },
       "selected": {
-        "bg": [0, 0, 0, 255],
         "bd": [40, 130, 255, 10],
-        "bg_shader": {
-          "lg": {
+        "bg": [
+          "lg",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -189,7 +189,7 @@
               "100%": [40, 130, 255, 40]
             }
           }
-        },
+        ],
         "fg": {"color_palette": "fg"},
         "width": 1,
         "bd_shadow": [0, 0, 0, 0, [40, 130, 255, 255]],
@@ -228,9 +228,9 @@
       "hover": {
         "bg": {"color_palette": "second_bg"},
         "fg": {"color_palette": "fg"},
-        "bd": [0, 0, 0, 50],
-        "bd_shader": {
-          "sg": {
+        "bd": [
+          "sg",
+          {
             "center_anchor": "center",
             "colors": {
               "0%": "cyan",
@@ -239,14 +239,14 @@
               "100%": "cyan"
             }
           }
-        }
+        ]
       },
       "focus": {
         "bg": {"color_palette": "bg"},
         "fg": {"color_palette": "fg"},
-        "bd": [0,0,0,255],
-        "bd_shader": {
-          "sg": {
+        "bd": [
+          "sg",
+          {
             "center_anchor": "center",
             "colors": {
               "0%": "cyan",
@@ -255,7 +255,7 @@
               "100%": "cyan"
             }
           }
-        }
+        ]
       },
       "disabled": {
         "bg": {"color_palette": "bg"},

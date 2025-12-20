@@ -27,9 +27,7 @@ class SkCard(SkFrame):
         :return: None
         """
         radius = self._style2(self.theme, self.style_name, "radius", 0)
-        bg_shader = self._style2(self.theme, self.style_name, "bg_shader", None)
         bd_shadow = self._style2(self.theme, self.style_name, "bd_shadow", None)
-        bd_shader = self._style2(self.theme, self.style_name, "bd_shader", None)
         width = self._style2(self.theme, self.style_name, "width", 0)
         bd = self._style2(self.theme, self.style_name, "bd", None)
         bg = self._style2(self.theme, self.style_name, "bg", None)
@@ -41,8 +39,6 @@ class SkCard(SkFrame):
             bg=bg,
             width=width,
             bd=bd,
-            bg_shader=bg_shader,
             bd_shadow=bd_shadow,
-            bd_shader=bd_shader,
         )
         return None

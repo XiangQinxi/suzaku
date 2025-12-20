@@ -37,7 +37,7 @@ class SkColor:
     """
 
     def __init__(self, color: str | tuple | list | None = None) -> None:
-        self.color: str | tuple | list | int | None = None
+        self.color: str | tuple | list | int | skia.Color | None = None
         self.set_color(color)
 
     def get(self) -> skia.Color:
@@ -197,7 +197,7 @@ class SkGradient:
         self,
         config: (
             dict | None
-        ) = None,  # {"start_anchor": "n", "end_anchor": "s", "start": "red", "end": "blue"}
+        ) = None,  # {"start_anchor": "n", "end_anchor": "s", "colors": {"0%": "red", "50%": "blue", "100%": "green"}}
         widget=None,
         start_pos: tuple[int | float, int | float] | None = None,
         end_pos: tuple[int | float, int | float] | None = None,
@@ -224,7 +224,7 @@ class SkGradient:
         """
         self.gradient = None
         if config:
-
+            opacity = config.get("opacity", 1.0)
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
             colors: list[tuple[int | float, int | float, int | float, int | float] | str] = []
             positions: list[float] = []
@@ -236,9 +236,13 @@ class SkGradient:
                 else:
                     positions.append(float(position))
                 if widget:
-                    colors.append(skcolor_to_color(style_to_color(color, widget.theme)))
+                    _color = skcolor_to_color(style_to_color(color, widget.theme))
+                    skia.ColorSetA(_color, int(skia.ColorGetA(_color) * opacity))
+                    colors.append(_color)
                 else:
-                    colors.append(SkColor(color).color)
+                    _color = SkColor(color).color
+                    skia.ColorSetA(_color, int(skia.ColorGetA(_color) * opacity))
+                    colors.append(_color)
 
             if start_pos is None or end_pos is None:
                 if widget:
@@ -283,6 +287,7 @@ class SkGradient:
     ):
         self.gradient = None
         if config:
+            opacity = config.get("opacity", 1.0)
             # Convert to a color list recognizable by Skia 【转换成skia能识别的颜色列表】
             colors: list[tuple[int | float, int | float, int | float, int | float] | str] = []
             positions: list[float] = []
@@ -293,7 +298,14 @@ class SkGradient:
                     positions.append(float(position.strip("%")) / 100)
                 else:
                     positions.append(float(position))
-                colors.append(SkColor(color).color)
+                if widget:
+                    _color = skcolor_to_color(style_to_color(color, widget.theme))
+                    skia.ColorSetA(_color, int(skia.ColorGetA(_color) * opacity))
+                    colors.append(_color)
+                else:
+                    _color = SkColor(color).color
+                    skia.ColorSetA(_color, int(skia.ColorGetA(_color) * opacity))
+                    colors.append(_color)
 
             if center_pos is None:
                 if widget:

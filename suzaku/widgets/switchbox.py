@@ -59,9 +59,7 @@ class SkSwitchBox(SkCheckBox):
             else:
                 style_selector = style_selector + "-rest"
 
-        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
         bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
-        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
         width = self._style2(self.theme, style_selector, "width", 0)
         bd = self._style2(self.theme, style_selector, "bd")
         bg = self._style2(self.theme, style_selector, "bg")
@@ -71,9 +69,7 @@ class SkSwitchBox(SkCheckBox):
             canvas,
             rect,
             radius=radius,
-            bg_shader=bg_shader,
             bd_shadow=bd_shadow,
-            bd_shader=bd_shader,
             width=width,
             bd=bd,
             bg=bg,

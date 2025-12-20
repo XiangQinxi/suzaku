@@ -165,7 +165,7 @@ class SkDraw:
 
         if isinstance(arg, list):
             if arg[0] in gradients:
-                return True
+                return arg[0]
         return False
 
     def _draw_rect(
@@ -177,8 +177,6 @@ class SkDraw:
         bd: str | SkColor | int | None | tuple[int, int, int, int] = None,
         width: int | float = 0,
         bd_shadow: None | tuple[int | float, int | float, int | float, int | float, str] = None,
-        bd_shader: None | typing.Literal["linear_gradient"] = None,
-        bg_shader: None | typing.Literal["linear_gradient"] = None,
     ):
         """Draw the frame
 
@@ -204,78 +202,65 @@ class SkDraw:
             ],
         )
         if bg:
+            is_shader = self._is_shader(bg)
+
+            # Background
             bg_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStrokeAndFill_Style,
             )
-            bg = skcolor_to_color(style_to_color(bg, self.theme))
+            if is_shader:
+                bg_paint.setColor(skia.ColorWHITE)
+            else:
+                bg = skcolor_to_color(style_to_color(bg, self.theme))
+                bg_paint.setColor(bg)
 
-            # Background
             bg_paint.setStrokeWidth(width)
-            bg_paint.setColor(bg)
+
             if bd_shadow:
                 self.drop_shadow.drop_shadow(widget=self, config=bd_shadow, paint=bg_paint)
-            if bg_shader:
-                if isinstance(bg_shader, dict):
-                    if "linear_gradient" in bg_shader:
+            if is_shader:
+                match is_shader:
+                    case "linear_gradient" | "lg":
                         self.gradient.linear(
                             widget=self,
-                            config=bg_shader["linear_gradient"],
+                            config=bg[1],
                             paint=bg_paint,
                         )
-                    if "lg" in bg_shader:
-                        self.gradient.linear(
-                            widget=self,
-                            config=bg_shader["lg"],
-                            paint=bg_paint,
-                        )
-                    if "sweep_gradient" in bg_shader:
+                    case "sweep_gradient" | "sg":
                         self.gradient.sweep(
                             widget=self,
-                            config=bg_shader["sweep_gradient"],
-                            paint=bg_paint,
-                        )
-                    if "sg" in bg_shader:
-                        self.gradient.sweep(
-                            widget=self,
-                            config=bg_shader["sg"],
+                            config=bg[1],
                             paint=bg_paint,
                         )
             canvas.drawRRect(rrect, bg_paint)
         if bd and width > 0:
+            is_shader = self._is_shader(bd)
+
+            # Border
             bd_paint = skia.Paint(
                 AntiAlias=self.anti_alias,
                 Style=skia.Paint.kStroke_Style,
             )
-            bd = skcolor_to_color(style_to_color(bd, self.theme))
+            if is_shader:
+                bd_paint.setColor(skia.ColorWHITE)
+            else:
+                bd = skcolor_to_color(style_to_color(bd, self.theme))
+                bd_paint.setColor(bd)
 
-            # Border
             bd_paint.setStrokeWidth(width)
-            bd_paint.setColor(bd)
-            if bd_shader:
-                if isinstance(bd_shader, dict):
-                    if "linear_gradient" in bd_shader:
+            if is_shader:
+                match is_shader:
+                    case "linear_gradient" | "lg":
                         self.gradient.linear(
                             widget=self,
-                            config=bd_shader["linear_gradient"],
+                            config=bd[1],
                             paint=bd_paint,
                         )
-                    if "lg" in bd_shader:
-                        self.gradient.linear(
-                            widget=self,
-                            config=bd_shader["lg"],
-                            paint=bd_paint,
-                        )
-                    if "sweep_gradient" in bd_shader:
+                    case "sweep_gradient" | "sg":
                         self.gradient.sweep(
                             widget=self,
-                            config=bd_shader["sweep_gradient"],
-                            paint=bd_paint,
-                        )
-                    if "sg" in bd_shader:
-                        self.gradient.sweep(
-                            widget=self,
-                            config=bd_shader["sg"],
+                            config=bd[1],
                             paint=bd_paint,
                         )
             canvas.drawRRect(rrect, bd_paint)

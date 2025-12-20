@@ -47,9 +47,9 @@
         "width": 1,
         "bg": {"color_palette": "default_bg"},
         "fg": {"color_palette": "default_fg"},
-        "bd": {"color_palette": "default_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -57,16 +57,16 @@
               "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        },
+        ],
         "bd_shadow": null,
         "bg_shader": null
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "secondary_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -74,7 +74,9 @@
               "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        }
+        ],
+        "bd_shadow": null,
+        "bg_shader": null
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
@@ -104,9 +106,9 @@
         "width": 1,
         "bg": {"color_palette": "default_bg"},
         "fg": {"color_palette": "default_fg"},
-        "bd": {"color_palette": "default_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -114,16 +116,16 @@
               "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        },
+        ],
         "bd_shadow": null,
         "bg_shader": null
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "secondary_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -131,7 +133,7 @@
               "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        }
+        ]
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
@@ -237,9 +239,9 @@
         "radius": 6,
         "bg": {"color_palette": "default_bg"},
         "fg": {"color_palette": "default_fg"},
-        "bd": {"color_palette": "default_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -247,16 +249,16 @@
               "100%": [0, 0, 0, 115]
             }
           }
-        },
+        ],
         "width": 2,
         "placeholder": [0, 0, 0, 165]
       },
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "default_fg"},
-        "bd": {"color_palette": "default_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -264,16 +266,16 @@
               "100%": [0, 0, 0, 115]
             }
           }
-        },
+        ],
         "width": 2,
         "placeholder": [0, 0, 0, 165]
       },
       "focus": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "default_fg"},
-        "bd": {"color_palette": "default_strong_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -281,7 +283,7 @@
               "96%": {"color_palette": "default_accent"}
             }
           }
-        },
+        ],
         "width": 3,
         "cursor": [0, 0, 0, 100],
         "selected_bg": [25, 125, 225, 245],
@@ -303,9 +305,9 @@
       "hover": {
         "bg": {"color_palette": "secondary_bg"},
         "fg": {"color_palette": "secondary_fg"},
-        "bd": {"color_palette": "secondary_bd"},
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -313,7 +315,8 @@
               "100%": {"color_palette": "default_lg_color2"}
             }
           }
-        }
+        ],
+        "width": 2
       },
       "press": {
         "bg": {"color_palette": "tertiary_bg"},
@@ -533,11 +536,11 @@
       "rest": {
         "size": [20, 20],
         "bg": {"color_palette": "default_solid_bg"},
-        "bd": [0, 0, 0, 255],
         "width": 1,
         "radius": 99,
-        "bd_shader": {
-          "linear_gradient": {
+        "bd": [
+          "linear_gradient",
+          {
             "start_anchor": "n",
             "end_anchor": "s",
             "colors": {
@@ -545,7 +548,7 @@
               "95%": [0, 0, 0, 40]
             }
           }
-        },
+        ],
         "bd_shadow": null,
         "inner": true,
         "inner_size": [10, 10],

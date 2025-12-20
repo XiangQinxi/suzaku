@@ -134,9 +134,7 @@ class SkSlider(SkWidget):
                     bg=self._style2(self.theme, rail_selector, "bg", skia.ColorBLACK),
                     bd=self._style2(self.theme, rail_selector, "bd", 0),
                     width=self._style2(self.theme, rail_selector, "width", 0),
-                    bd_shader=self._style2(self.theme, rail_selector, "bd_shader"),
                     bd_shadow=self._style2(self.theme, rail_selector, "bd_shadow"),
-                    bg_shader=self._style2(self.theme, rail_selector, "bg_shader"),
                 )
 
         # Progress进度条
@@ -160,9 +158,7 @@ class SkSlider(SkWidget):
                         bg=self._style2(self.theme, progress_selector, "bg", skia.ColorBLACK),
                         bd=self._style2(self.theme, progress_selector, "bd", 0),
                         width=self._style2(self.theme, progress_selector, "width", 0),
-                        bd_shader=self._style2(self.theme, progress_selector, "bd_shader"),
                         bd_shadow=self._style2(self.theme, progress_selector, "bd_shadow"),
-                        bg_shader=self._style2(self.theme, progress_selector, "bg_shader"),
                     )
 
         # Thumb滑块
@@ -190,9 +186,7 @@ class SkSlider(SkWidget):
                 bg=self._style2(self.theme, thumb_selector, "bg", skia.ColorBLACK),
                 bd=self._style2(self.theme, thumb_selector, "bd", 0),
                 width=self._style2(self.theme, thumb_selector, "width", 0),
-                bd_shader=self._style2(self.theme, thumb_selector, "bd_shader"),
                 bd_shadow=self._style2(self.theme, thumb_selector, "bd_shadow"),
-                bg_shader=self._style2(self.theme, thumb_selector, "bg_shader"),
             )
 
         if self._style2(self.theme, thumb_selector, "inner", False):
@@ -216,7 +210,5 @@ class SkSlider(SkWidget):
                     bg=self._style2(self.theme, thumb_selector, "inner_bg", skia.ColorBLACK),
                     bd=self._style2(self.theme, thumb_selector, "inner_bd", 0),
                     width=self._style2(self.theme, thumb_selector, "inner_width", 0),
-                    bd_shader=self._style2(self.theme, thumb_selector, "inner_bd_shader"),
                     bd_shadow=self._style2(self.theme, thumb_selector, "inner_bd_shadow"),
-                    bg_shader=self._style2(self.theme, thumb_selector, "inner_bg_shader"),
                 )

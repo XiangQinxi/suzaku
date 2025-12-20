@@ -83,8 +83,6 @@ class SkButton(SkFrame):
         if style_selector is None:
             style_selector = self.get_style_selector()
 
-        bg_shader = self._style2(self.theme, style_selector, "bg_shader")
-        bd_shader = self._style2(self.theme, style_selector, "bd_shader")
         bd_shadow = self._style2(self.theme, style_selector, "bd_shadow")
         width = self._style2(self.theme, style_selector, "width", 0)
         bd = self._style2(self.theme, style_selector, "bd")
@@ -100,8 +98,6 @@ class SkButton(SkFrame):
             width=width,
             bd=bd,
             bd_shadow=bd_shadow,
-            bd_shader=bd_shader,
-            bg_shader=bg_shader,
         )
 
         return style_selector

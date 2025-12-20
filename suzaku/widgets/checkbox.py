@@ -119,9 +119,7 @@ class SkCheckBox(SkWidget):
                 style_selector = style_selector + "-rest"""
             style_selector = style_selector + "-rest"
 
-        bg_shader = self._style2(self.theme, style_selector, "bg_shader", None)
         bd_shadow = self._style2(self.theme, style_selector, "bd_shadow", None)
-        bd_shader = self._style2(self.theme, style_selector, "bd_shader", None)
         radius = self._style2(self.theme, style_selector, "radius", 0)
         width = self._style2(self.theme, style_selector, "width", 0)
         bd = self._style2(self.theme, style_selector, "bd", None)
@@ -136,8 +134,6 @@ class SkCheckBox(SkWidget):
             width=width,
             bd=bd,
             bd_shadow=bd_shadow,
-            bd_shader=bd_shader,
-            bg_shader=bg_shader,
         )
 
         if self.checked:
