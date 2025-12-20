@@ -12,12 +12,9 @@ class SkCard(SkFrame):
         parent: SkContainer,
         *,
         style: str = "SkCard",
-        styles: dict | None = None,
         **kwargs,
     ):
         super().__init__(parent, style=style, **kwargs)
-
-        self.attributes["styles"] = styles
 
     def draw_widget(self, canvas: skia.Canvas, rect: skia.Rect) -> None:
         """Draw the Frame border（If self.attributes["border"] is True）

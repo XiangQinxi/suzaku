@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import math
 import typing
 import warnings
-import math
 
 import skia
 

@@ -27,7 +27,7 @@ if __name__ == "__main__":
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt["value"]))
 
-        # headerbar = titlebar(window)
+        headerbar = titlebar(window)
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -144,12 +144,10 @@ if __name__ == "__main__":
         tab2()
 
         tabs.select(0)
-        tabs.box(padx=10, pady=10, expand=True)
+        tabs.box(padx=8, pady=8, expand=True)
 
-        statusbar = SkCard(window)
-        sizegrip = SkSizegrip(statusbar)
-        sizegrip.box(side="right", padx=5, pady=5)
-        statusbar.box(side="bottom", padx=0, pady=0)
+        tipbar = SkTipBar(window, prefix="Entered widget: ")
+        tipbar.box(side="bottom", padx=0, pady=0)
 
         window.update_layout()
 

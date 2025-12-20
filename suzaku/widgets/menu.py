@@ -1,6 +1,5 @@
 from ..event import SkEvent
 from .container import SkContainer
-from .popupmenu import SkPopupMenu
 from .textbutton import SkTextButton
 
 
@@ -9,7 +8,7 @@ class SkMenu(SkTextButton):
         self,
         parent: SkContainer,
         text: str = "",
-        menu: SkPopupMenu = None,
+        menu=None,
         style: str = "SkMenu",
         **kwargs,
     ):
@@ -20,7 +19,7 @@ class SkMenu(SkTextButton):
         self.help_parent_scroll = True
 
     def _on_click(self, event: SkEvent):
-        popupmenu: SkPopupMenu = self.cget("popupmenu")
+        popupmenu = self.cget("popupmenu")
         if popupmenu and not self.cget("disabled"):
             if popupmenu.is_popup:
                 popupmenu.hide()

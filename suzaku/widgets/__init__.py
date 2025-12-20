@@ -20,8 +20,8 @@ from .entry import SkEntry  # ✅
 from .filedialog import (
     ask_open_dir,
     ask_open_filename,
-    ask_save_as_filename,
     ask_open_filenames,
+    ask_save_as_filename,
     filedialpy_is_available,
 )
 from .frame import SkFrame  # ✅
@@ -56,6 +56,9 @@ from .sizegrip import SkSizeGrip  # ✅
 SkSizegrip = SkSizeGrip
 from .slider import SkSlider  # ✅
 from .stack import SkStack  # ✅
+from .tipbar import SkTipBar
+
+SkStatusbar = SkStatusBar = SkTipBar
 from .switch import SkSwitch  # ✅
 from .switchbox import SkSwitchBox  # ✅
 from .tabbar import SkTabBar  # ✅

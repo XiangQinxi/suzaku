@@ -3,6 +3,7 @@ import typing
 from .. import SkEvent
 from .checkitem import SkCheckItem
 from .container import SkContainer
+from .menu import SkMenu
 from .menuitem import SkMenuItem
 from .popup import SkPopup
 from .radioitem import SkRadioItem
@@ -76,9 +77,8 @@ class SkPopupMenu(SkPopup):
         button.index = self.index(button)
         return button.id
 
-    def add_cascade(self):
+    def add_cascade(self, text: str | None = None, **kwargs):
         button = SkMenu(self, text=text, **kwargs)
-        button.box(side="left", padx=(2, 4), pady=0)
         self.add(button)
         return button.id
 

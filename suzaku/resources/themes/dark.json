@@ -254,6 +254,12 @@
       }
     },
 
+    "SkTipBar": {
+      "rest": {
+        "bd_shadow": [0, 2, 4, 3, [220, 220, 220, 30]]
+      }
+    },
+
     "SkCheckBox": {
       "unchecked-rest": {
         "bg": [

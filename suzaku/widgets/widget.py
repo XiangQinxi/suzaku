@@ -32,6 +32,7 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
         style_name: str = "SkWidget",
         font: skia.Font | None = default_font,
         disabled: bool = False,
+        status_tip: str | None = None,
     ) -> None:
         """Basic visual component, telling SkWindow how to draw.
 
@@ -173,6 +174,10 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
         self.bind("mouse_press", self._on_mouse_press)
         self.bind("mouse_release", self._on_mouse_release2)
         self.bind("focus_loss", self._on_focus_loss)
+
+        if status_tip is None:
+            status_tip = self.__class__.__name__
+        self.attributes["status_tip"] = status_tip
 
     def __str__(self):
         return self.id
