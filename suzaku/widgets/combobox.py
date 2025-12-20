@@ -4,12 +4,12 @@ import skia
 
 from ..event import SkEvent
 from ..styles.color import skcolor_to_color, style_to_color
+from ..var import SkStringVar
 from .button import SkButton
 from .container import SkContainer
 from .lineinput import SkLineInput
 from .popupmenu import SkPopupMenu
 from .text import SkText
-from ..var import SkStringVar
 
 
 class SkComboBox(SkButton):
@@ -50,10 +50,12 @@ class SkComboBox(SkButton):
         self.parent.bind("scrolled", self._on_parent_scrolled)
         self.popupmenu.bind("command", lambda evt: self.trigger("command", evt))
         self.popupmenu.bind("command", lambda evt: self.focus_set())
+        self.popupmenu.bind("command", lambda evt: self.style_state("focus"))
 
         self.help_parent_scroll = True
 
     def invoke(self):
+        """Open or close the combobox."""
         if self.popupmenu and not self.cget("disabled"):
             if self.popupmenu.is_popup:
                 self.popupmenu.hide()
@@ -61,10 +63,12 @@ class SkComboBox(SkButton):
                 self.popup()
 
     def _on_parent_scrolled(self, event: SkEvent):
+        """When the parent is scrolled, the combobox`s popup menu follow the parent to move."""
         if self.popupmenu.is_popup:
             self.popup()
 
     def set_attribute(self, **kwargs):
+        """Set the attribute of the combobox."""
         if "values" in kwargs:
             values = kwargs.pop("values")
             self.attributes["values"] = values
@@ -101,9 +105,11 @@ class SkComboBox(SkButton):
         self.input.fixed(5, 0, self.width - self.height, self.height)
 
     def set(self, value: str):
+        """Set the value of the combobox."""
         self.cget("textvariable").set(value)
 
     def get(self) -> str:
+        """Get the value of the combobox."""
         return self.cget("textvariable").get()
 
     def popup(self):

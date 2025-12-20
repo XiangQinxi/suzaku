@@ -511,7 +511,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         """
 
         self.trigger("char", SkEvent(event_type="char", char=chr(char), glfw_window=window))
-        self.update()
+        self.update(True)
         # self.update(redraw=True)
 
     def _on_key(self, window: typing.Any, key: str, scancode: str, action: str, mods: int) -> None:
@@ -552,7 +552,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
                 glfw_window=window,
             ),
         )
-        self.update()
+        self.update(True)
 
     def _on_focus(self, window, focused) -> None:
         """Triggers the focus event (triggered when the window gains or loses focus).
@@ -591,7 +591,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         )
 
     def _on_framebuffer_size(self, window: typing.Any, width: int, height: int) -> None:
-        self.update()
+        pass
 
     def _on_resizing(self, window, width: int, height: int) -> None:
         """Trigger resize event (triggered when the window size changes).

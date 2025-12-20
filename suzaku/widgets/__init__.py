@@ -14,8 +14,16 @@ from .combobox import SkComboBox  # ✅
 
 SkCombobox = SkComboBox
 from .container import SkContainer  # ✅
+from .draw import SkDraw, gradients
 from .empty import SkEmpty  # ✅
 from .entry import SkEntry  # ✅
+from .filedialog import (
+    ask_open_dir,
+    ask_open_filename,
+    ask_save_as_filename,
+    ask_open_filenames,
+    filedialpy_is_available,
+)
 from .frame import SkFrame  # ✅
 from .hynix import SkHynix  # ✅
 from .image import SkImage  # ⛔ 各种颜色处理未实现

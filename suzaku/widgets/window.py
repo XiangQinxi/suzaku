@@ -13,9 +13,10 @@ from ..styles.drop_shadow import SkDropShadow
 from ..styles.theme import SkTheme, default_theme
 from .app import SkApp
 from .container import SkContainer
+from .draw import SkDraw
 
 
-class SkWindow(SkWindowBase, SkContainer):
+class SkWindow(SkWindowBase, SkContainer, SkDraw):
     # region __init__ 初始化
 
     def __init__(
@@ -452,7 +453,7 @@ class SkWindow(SkWindowBase, SkContainer):
     def _draw(self, canvas: skia.Canvas) -> None:
         # print(style_to_color())
         self.rect = skia.Rect.MakeLTRB(0, 0, self.width, self.height)
-
+        # print(self.id, "draw")
         radius = self.theme.get_style_attr(self.style, "radius")
         if not radius:
             radius = 0

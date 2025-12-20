@@ -1,5 +1,6 @@
 import typing
 
+from .. import SkEvent
 from .checkitem import SkCheckItem
 from .container import SkContainer
 from .menuitem import SkMenuItem
@@ -8,7 +9,6 @@ from .radioitem import SkRadioItem
 from .separator import SkSeparator
 from .switch import SkSwitch
 from .window import SkWindow
-from .. import SkEvent
 
 
 class SkPopupMenu(SkPopup):

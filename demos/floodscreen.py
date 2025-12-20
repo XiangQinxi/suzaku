@@ -11,8 +11,7 @@ class FloodScreen(sk.SkWindow):
         apply_style(self.window_id, "dark")
 
     def setup(self):
-        self.window_attr("border", False)
-        self.titlebar = sk.SkTitlebar(self)
+        self.titlebar = sk.titlebar(self)
         self.titlebar.box(side="top", padx=0, pady=0)
 
         self.tabs = sk.SkTabs(self, expand=False)
@@ -34,15 +33,15 @@ class FloodScreen(sk.SkWindow):
 
         def switch():
             if switch_theme.checked:
-                self.apply_theme(sk.sv_dark_theme)
+                self.apply_theme(sk.dark_theme)
             else:
-                self.apply_theme(sk.sv_light_theme)
+                self.apply_theme(sk.light_theme)
 
-        sk.SkLabel(self.tab2, "Theme", align="left").box("top", padx=5, pady=5)
-        switch_theme = sk.SkSwitch(self.tab2, text="Dark mode", command=switch).box(
-            side="top",
-            pady=5,
-            padx=5,
+        sk.SkText(self.tab2, "Theme : ", align="left").grid(row=0, column=0, padx=(10, 0))
+        switch_theme = sk.SkSwitch(self.tab2, text="Dark mode", command=switch).grid(
+            row=0,
+            column=1,
+            padx=(0, 10),
         )
         # switch_theme.invoke()
 
@@ -53,5 +52,5 @@ class FloodScreen(sk.SkWindow):
 
 if __name__ == "__main__":
     app = sk.SkApp()
-    window = FloodScreen(app, title="FloodScreen", theme=sk.sv_light_theme)
+    window = FloodScreen(app, title="FloodScreen", theme=sk.light_theme)
     app.mainloop()

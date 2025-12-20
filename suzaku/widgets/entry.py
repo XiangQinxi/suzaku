@@ -1,8 +1,8 @@
 import skia
 
+from .. import SkEvent
 from .container import SkContainer
 from .lineinput import SkLineInput
-from .. import SkEvent
 
 
 class SkEntry(SkLineInput):

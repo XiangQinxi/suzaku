@@ -36,6 +36,8 @@ class SkTabs(SkCard):
         self.tabs.clear()
         self.tabbar.delete_all()
 
+    remove_all = delete_all
+
     def delete(self, index: int):
         """Delete a tab by index
 
@@ -44,6 +46,8 @@ class SkTabs(SkCard):
         """
         self.tabs.pop(index)
         self.tabbar.delete(index)
+
+    remove = delete
 
     def select(self, index: int) -> None:
         """Select a tab by index

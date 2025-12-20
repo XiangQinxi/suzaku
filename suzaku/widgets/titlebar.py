@@ -17,15 +17,11 @@ class SkWindowCommand(SkCard):
         **kwargs,
     ):
         super().__init__(parent, style=style, **kwargs)
-        self.close = SkCloseButton(
-            self, command=lambda: self.window.can_be_close(True)
-        ).box(side="right", padx=0, pady=0, expand=True)
-        self.maximize = SkMaximizeButton(self).box(
+        self.close = SkCloseButton(self, command=lambda: self.window.can_be_close(True)).box(
             side="right", padx=0, pady=0, expand=True
         )
-        self.minimize = SkMinimizeButton(self).box(
-            side="right", padx=0, pady=0, expand=True
-        )
+        self.maximize = SkMaximizeButton(self).box(side="right", padx=0, pady=0, expand=True)
+        self.minimize = SkMinimizeButton(self).box(side="right", padx=0, pady=0, expand=True)
 
 
 class SkTitleBar(SkCard):
@@ -110,6 +106,6 @@ class SkTitleBar(SkCard):
         self._y1 = None
 
 
-def titlebar(window):
+def titlebar(window) -> SkTitleBar:
     window.window_attr("border", False)
     return SkTitleBar(window).box(side="top", padx=0, pady=0)

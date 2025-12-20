@@ -1,8 +1,8 @@
 import skia
 
+from ..event import SkEvent
 from .container import SkContainer
 from .textbutton import SkTextButton
-from ..event import SkEvent
 
 
 class SkTabButton(SkTextButton):

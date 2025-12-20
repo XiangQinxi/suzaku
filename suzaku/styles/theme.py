@@ -1,12 +1,12 @@
 from __future__ import annotations as _
 
+import inspect
 import json
 import os
 import pathlib
 import re
 import typing
 import warnings
-import inspect
 
 from . import color
 

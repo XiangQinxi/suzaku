@@ -1,8 +1,8 @@
 import skia
 
+from ..const import Orient
 from ..event import SkEvent
 from .widget import SkWidget
-from ..const import Orient
 
 
 class SkSlider(SkWidget):

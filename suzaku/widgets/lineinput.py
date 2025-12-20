@@ -603,11 +603,11 @@ class SkLineInput(SkWidget):
     # region Draw 绘制
 
     def blink(self, event=None):
-        self.cursor_visible = not self.cursor_visible
-        self.need_redraw = True
-        # 【仅当输入框获得焦点时光标闪烁】
-        # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
         if self.is_focus:
+            self.cursor_visible = not self.cursor_visible
+            # 【仅当输入框获得焦点时光标闪烁】
+            # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
+            self.update(True)
             blink_interval = self.cget("blink_interval")
             self.bind(f"delay[{blink_interval}]", self.blink)
 

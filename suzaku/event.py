@@ -1,13 +1,11 @@
 from __future__ import annotations as _
 
+import collections.abc
+import re
 import threading
 import time
 import typing
 import warnings
-import collections.abc
-
-import re
-
 
 # [TODO] Implementation of repeat events
 # [TODO] Fix a type error in SkEventHandling.bind()
