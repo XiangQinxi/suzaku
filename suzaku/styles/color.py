@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 import warnings
+import math
 
 import skia
 
@@ -127,14 +128,112 @@ class SkColor:
             raise ValueError("HEX 颜色格式应为 #RRGGBB 或 #RRGGBBAA")
 
 
+anchor_angle_map = {
+    "n": 90,
+    "s": 270,
+    "e": 0,
+    "w": 180,
+    "nw": 135,
+    "ne": 45,
+    "sw": 225,
+    "se": 315,
+}
+
+
 class SkGradient:
     """A class for handling gradient styles, returning `skia.GradientShader` to make it easier to use."""
 
     gradient: skia.GradientShader | None
 
     @staticmethod
+    def line_rect_intersection(
+        w: float | int,
+        h: float | int,
+        x: float | int = 0,
+        y: float | int = 0,
+        angle_deg: float = None,
+        slope: float = None,
+    ) -> typing.List[typing.Tuple[float, float]]:
+        """
+        计算经过矩形中心的直线与矩形的交点
+
+        Parameters:
+            w: 矩形宽度
+            h: 矩形高度
+            angle_deg: 直线角度（度），0度为水平向右，90度为垂直向上
+            slope: 直线斜率（k），如果提供angle_deg，则忽略slope
+
+        Returns:
+            交点列表，通常有2个点（直线穿过矩形）
+        """
+        # 矩形中心
+        center_x = w / 2
+        center_y = h / 2
+
+        # 计算斜率
+        if angle_deg is not None:
+            # 角度转弧度
+            angle_rad = math.radians(angle_deg)
+
+            # 处理垂直情况（角度为90度或270度）
+            if abs(angle_deg % 180 - 90) < 1e-10:
+                slope = float("inf")  # 无穷大，表示垂直线
+            else:
+                slope = math.tan(angle_rad)
+        elif slope is None:
+            raise ValueError("Must provide angle_deg or slope parameter")
+
+        intersections = []
+
+        # 情况1：垂直线 (x = center_x)
+        if slope == float("inf"):
+            # 与上下边相交
+            intersections.append((center_x + x, 0 + y))  # 上边
+            intersections.append((center_x + x, h + y))  # 下边
+            return intersections
+
+        # 情况2：水平线 (y = center_y)
+        if abs(slope) < 1e-10:
+            # 与左右边相交
+            intersections.append((0 + x, center_y + y))  # 左边
+            intersections.append((w + x, center_y + y))  # 右边
+            return intersections
+
+        # 情况3：一般斜线
+        # 直线方程: y = slope * (x - center_x) + center_y
+
+        # 1. 与左边相交 (x = 0)
+        y_left = slope * (0 - center_x) + center_y
+        if 0 <= y_left <= h:
+            intersections.append((0 + x, y_left + y))
+
+        # 2. 与右边相交 (x = w)
+        y_right = slope * (w - center_x) + center_y
+        if 0 <= y_right <= h:
+            intersections.append((w + x, y_right + y))
+
+        # 3. 与上边相交 (y = 0)
+        # 从方程解x: 0 = slope * (x - center_x) + center_y
+        x_top = center_x - center_y / slope
+        if 0 <= x_top <= w:
+            intersections.append((x_top + x, 0 + y))
+
+        # 4. 与下边相交 (y = h)
+        x_bottom = center_x + (h - center_y) / slope
+        if 0 <= x_bottom <= w:
+            intersections.append((x_bottom + x, h + y))
+
+        # 确保只有2个交点（直线穿过矩形）
+        if len(intersections) > 2:
+            # 按x坐标排序，取第一个和最后一个
+            intersections.sort(key=lambda p: p[0])
+            return [intersections[0], intersections[-1]]
+
+        return intersections
+
+    @staticmethod
     def get_anchor_pos(widget: SkWidget, anchor) -> tuple[int | float, int | float]:
-        """Get widget`s anchor position
+        """Get widget's anchor position
         (Relative widget position, not absolute position within the window)
 
         :param widget: The SkWidget
@@ -244,8 +343,8 @@ class SkGradient:
                     skia.ColorSetA(_color, int(skia.ColorGetA(_color) * opacity))
                     colors.append(_color)
 
-            if start_pos is None or end_pos is None:
-                if widget:
+            if all(((start_pos is None or end_pos is None), widget)):
+                if "start_anchor" in config or "end_anchor" in config:
                     if "start_anchor" in config:
                         start_anchor = config["start_anchor"]
                     else:
@@ -258,22 +357,38 @@ class SkGradient:
                         end_anchor: typing.Literal[
                             "nw", "n", "ne", "w", "e", "sw", "s", "se", "center"
                         ] = "s"
+                    start_pos = tuple(self.get_anchor_pos(widget, start_anchor))
+                    end_pos = tuple(self.get_anchor_pos(widget, end_anchor))
+                elif "direction" in config:
+                    direction = config["direction"]
+                    if isinstance(direction, int | float):
+                        angle = direction
+                    elif isinstance(direction, str):
+                        if direction in anchor_angle_map:
+                            angle = anchor_angle_map[direction]
+                        else:
+                            raise ValueError(f"invalid direction: {direction}")
+                    else:
+                        raise ValueError(f"invalid direction: {direction}")
+                    start_pos, end_pos = self.line_rect_intersection(
+                        widget.width,
+                        widget.height,
+                        widget.canvas_x,
+                        widget.canvas_y,
+                        angle_deg=angle,
+                    )
 
-            if widget:
-                self.gradient = skia.GradientShader.MakeLinear(
-                    positions=positions,
-                    points=[
-                        tuple(self.get_anchor_pos(widget, start_anchor)),
-                        tuple(self.get_anchor_pos(widget, end_anchor)),
-                    ],  # [ (x, y), (x1, y1) ]
-                    colors=colors,  # [ Color1, Color2, Color3 ]
-                )
-            else:
-                self.gradient = skia.GradientShader.MakeLinear(
-                    positions=positions,
-                    points=[start_pos, end_pos],  # [ (x, y), (x1, y1) ]
-                    colors=colors,  # [ Color1, Color2, Color3 ]
-                )
+                else:
+                    raise ValueError("must provide direction or start_anchor and end_anchor")
+
+            self.gradient = skia.GradientShader.MakeLinear(
+                positions=positions,
+                points=[
+                    start_pos,
+                    end_pos,
+                ],  # [ (x, y), (x1, y1) ]
+                colors=colors,  # [ Color1, Color2, Color3 ]
+            )
 
             return self
         else:

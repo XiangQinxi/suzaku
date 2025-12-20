@@ -1,21 +1,8 @@
 from suzaku import *
 
-root = Sk(size=(400, 300), title="Minimal", minsize=(360, 80), theme=light_theme)
-titlebar = titlebar(root)
+root = Sk(size=(400, 300), title="Slider Test", minsize=(360, 80), theme=light_theme)
 
-
-def switch():
-    if switch_theme.checked:
-        root.apply_theme(dark_theme)
-    else:
-        root.apply_theme(light_theme)
-
-
-switch_theme = SkSwitch(titlebar, text="Dark mode", command=switch).box(
-    side="right",
-    padx=0,
-)
-
-slider = SkSlider(root, tick=10).box(side="top")
+slider = SkSlider(root, tick=10).fixed(10, 10, 200, 20)
+slider2 = SkSlider(root, tick=10, orient=VERTICAL).fixed(10, 10, 100, 100)
 
 root.mainloop()

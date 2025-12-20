@@ -37,9 +37,8 @@
         "size": [0, 35],
         "radius": 5,
         "bg": [
-          "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+          "linear_gradient", {
+            "direction": "n",
             "colors": {
               "0%": [235, 235, 235, 255],
               "100%": [200, 200, 200, 255]
@@ -53,9 +52,8 @@
       },
       "hover": {
         "bg": [
-          "lg", {
-            "start_anchor": "n",
-            "end_anchor": "s",
+          "linear_gradient", {
+            "direction": "n",
             "colors": {
               "0%": [245, 245, 245, 255],
               "100%": [200, 200, 200, 255]
@@ -70,8 +68,7 @@
       "press": {
         "bg": [
           "lg", {
-            "start_anchor": "n",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [200, 200, 200, 255],
               "100%": [235, 235, 235, 255]
@@ -129,8 +126,7 @@
         "radius": 5,
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [235, 235, 235, 255],
               "100%": [200, 200, 200, 255]
@@ -315,8 +311,7 @@
       "unchecked-rest": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [235, 235, 235, 255],
               "100%": [200, 200, 200, 255]
@@ -339,8 +334,7 @@
       "checked-rest": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [40, 130, 255, 255],
               "100%": [40, 130, 255, 150]
@@ -541,7 +535,7 @@
 
     "SkSlider.Thumb": {
       "rest": {
-        "size": [20, 20],
+        "size": [40, 20],
         "bg": [245, 245, 245, 255],
         "bd": [0, 0, 0, 25],
         "width": 2,
@@ -569,8 +563,7 @@
       "unchecked-rest": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [235, 235, 235, 255],
               "100%": [200, 200, 200, 255]
@@ -585,8 +578,7 @@
       "unchecked-hover": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [235, 235, 235, 235],
               "100%": [200, 200, 200, 215]
@@ -601,8 +593,7 @@
       "unchecked-press": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [235, 235, 235, 200],
               "100%": [200, 200, 200, 180]
@@ -617,8 +608,7 @@
       "checked-rest": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [40, 130, 255, 150],
               "100%": [40, 130, 255, 255]
@@ -633,8 +623,7 @@
       "checked-hover": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [40, 130, 255, 255],
               "100%": [40, 130, 255, 150]
@@ -649,8 +638,7 @@
       "checked-press": {
         "bg": [
           "lg", {
-            "start_anchor": "center",
-            "end_anchor": "s",
+            "direction": "n",
             "colors": {
               "0%": [40, 130, 255, 255],
               "100%": [40, 130, 255, 150]
