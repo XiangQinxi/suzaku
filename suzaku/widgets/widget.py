@@ -266,9 +266,10 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
     # region Draw the widget 绘制组件
 
     def update(self, redraw: bool | None = None) -> None:
-        # self.trigger("update", SkEvent(widget=self, event_type="update"))
         if redraw is not None:
             self.need_redraw = redraw
+            if redraw:
+                self.trigger("update", SkEvent(widget=self, event_type="update"))
 
         if "SkContainer" in SkMisc.sk_get_type(self):
             from .container import SkContainer
@@ -399,9 +400,9 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
     def metrics(self):
         return self.cget("font").getMetrics()
 
-    def measure_text(self, text: str, *args) -> float | int:
+    def measure_text(self, text, *args) -> float | int:
         font: skia.Font = self.cget("font")
-        return font.measureText(text, *args)
+        return font.measureText(str(text), *args)
 
     @property
     def x(self):
