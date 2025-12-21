@@ -404,6 +404,25 @@
       }
     },
 
+    "SkProgressBar.Progress": {
+      "rest": {
+        "size": 8,
+        "bg": [40, 130, 255, 215],
+        "width": 0,
+        "radius": 99
+      }
+    },
+
+    "SkProgressBar.Rail": {
+      "rest": {
+        "size": 10,
+        "bg": [255, 255, 255, 30],
+        "width": 2,
+        "bd": [255, 255, 255, 25],
+        "radius": 99
+      }
+    },
+
     "SkSeparator": {
       "rest": {
         "fg": {"color_palette": "bd"}

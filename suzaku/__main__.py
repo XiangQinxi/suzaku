@@ -18,7 +18,7 @@ if __name__ == "__main__":
             anti_alias=True,
             parent=None,
             title=f"Suzaku GUI",
-            size=(280, 630),
+            size=(320, 650),
         )
         window.minsize(100, 80)
         window.resizable(True)
@@ -88,6 +88,43 @@ if __name__ == "__main__":
 
             SkSlider(tab_widgets).box(padx=10, pady=(10, 0))
 
+            frame1 = SkFrame(tab_widgets).box(padx=10, pady=(10, 0))
+
+            var2 = SkFloatVar(25)
+
+            progress = SkProgressBar(frame1, variable=var2).grid(
+                row=0, column=0, columnspan=3, padx=0, pady=5
+            )
+
+            def start(_=None):
+                progress.configure(value=progress.cget("value") * 1.1 + 0.1)
+                start_button.configure(disabled=True)
+                progress.update(True)
+                start_button.update(True)
+                if progress.cget("value") < progress.cget("maxvalue"):
+                    window.bind("delay[10ms]", start)
+                else:
+                    start_button.configure(disabled=False)
+                    start_button.update(True)
+
+            SkTextButton(
+                frame1,
+                text="Increase",
+                command=lambda: progress.configure(value=progress.cget("value") + 10),
+            ).grid(row=1, column=0, padx=3, pady=3)
+
+            SkTextButton(
+                frame1,
+                text="Decrease",
+                command=lambda: progress.configure(value=progress.cget("value") - 10),
+            ).grid(row=1, column=1, padx=3, pady=3)
+
+            start_button = SkTextButton(frame1, text="Start", command=start).grid(
+                row=1, column=2, padx=3, pady=3
+            )
+
+            SkLabel(frame1, textvariable=var2).grid(row=1, column=3, padx=3, pady=3)
+
             SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
             SkText(tab_widgets, text="SkText").box(padx=10, pady=(10, 0))
@@ -129,7 +166,7 @@ if __name__ == "__main__":
             SkTextButton(
                 tab_settings,
                 text="Screenshot (wait 3s)",
-                command=lambda: window.bind("delay[3]", lambda _: window.save()),
+                command=lambda: window.bind("delay[3s]", lambda _: window.save()),
             ).box(padx=10, pady=(10, 0))
 
             def anti_alias():

@@ -34,11 +34,14 @@ class SkVar(SkEventHandling):
         Returns:
             None
         """
-        if not type(value) is self._value_type:
-            raise ValueError(f"Value must be {self._value_type}")
         if self._value != value:
-            self._value = value
-            self.trigger(f"change", SkEvent(self, "change", value=value))
+            try:
+                self._value = self._value_type(value)
+            except ValueError:
+                pass
+            else:
+                self.trigger(f"change", SkEvent(self, "change", value=value))
+
         return self
 
     def get(self) -> typing.Any:

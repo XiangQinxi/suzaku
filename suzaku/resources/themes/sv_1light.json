@@ -518,6 +518,30 @@
       }
     },
 
+    "SkProgressBar": {
+      "rest": {
+        "size": [120, 5]
+      }
+    },
+
+    "SkProgressBar.Progress": {
+      "rest": {
+        "size": 5,
+        "bg": {"color_palette": "default_accent"},
+        "width": 0,
+        "radius": 4
+      }
+    },
+
+    "SkProgressBar.Rail": {
+      "rest": {
+        "size": 3,
+        "bg": {"color_palette": "default_strong_bg"},
+        "width": 0,
+        "radius": 4
+      }
+    },
+
     "SkSlider": {
       "rest": {
         "size": [120, 20]

@@ -50,7 +50,7 @@ class SkDelayTask(SkBoundTask):
     """A class to represent delay tasks"""
 
     def __init__(
-        self, id_: str, target: typing.Callable | typing.Iterable, delay_, *args, **kwargs
+        self, id_: str, target: typing.Callable | typing.Iterable, delay_: str, *args, **kwargs
     ):
         """Inherited from SkBoundTask, used to store tasks bound to `delay` events.
 
@@ -60,6 +60,13 @@ class SkDelayTask(SkBoundTask):
         """
         SkBoundTask.__init__(self, id_, target, *args, **kwargs)  # For other things,same as
         # SkBoundTask
+        if delay_.endswith("s"):
+            if delay_.endswith("ms"):
+                delay_ = float(delay_[:-2]) / 1000
+            else:
+                delay_ = float(delay_[:-1])
+        else:
+            delay_ = float(delay_)
         self.target_time = float(time.time()) + delay_  # To store when to execute the task
 
 
@@ -293,7 +300,7 @@ class SkEventHandling:
                 task = SkDelayTask(
                     task_id,
                     target,  # I will fix this type error later (ignore is ur type check is off)
-                    float(parsed_event_type["params"][0]),
+                    parsed_event_type["params"][0],
                     multithread,
                     _keep_at_clear,
                 )

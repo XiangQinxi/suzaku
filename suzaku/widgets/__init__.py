@@ -42,6 +42,9 @@ from .messagebox import SkMessageBox, show_message  # ✅ 但是不是很完善
 from .mutiline_input import SkMultiLineInput  # ⛔ 无任何功能
 from .popup import SkPopup  # ✅
 from .popupmenu import SkPopupMenu  # ✅
+from .progressbar import SkProgressBar  # ⛔
+
+SkProgressbar = SkProgressBar
 
 SkPopupmenu = SkPopupMenu
 from .radiobox import SkRadioBox  # ✅
@@ -56,7 +59,7 @@ from .sizegrip import SkSizeGrip  # ✅
 SkSizegrip = SkSizeGrip
 from .slider import SkSlider  # ✅
 from .stack import SkStack  # ✅
-from .tipbar import SkTipBar
+from .tipbar import SkTipBar  # ✅
 
 SkStatusbar = SkStatusBar = SkTipBar
 from .switch import SkSwitch  # ✅
