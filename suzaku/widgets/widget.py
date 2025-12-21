@@ -269,7 +269,8 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
         if redraw is not None:
             self.need_redraw = redraw
             if redraw:
-                self.trigger("update", SkEvent(widget=self, event_type="update"))
+                pass
+                # self.trigger("update", SkEvent(widget=self, event_type="update"))
 
         if "SkContainer" in SkMisc.sk_get_type(self):
             from .container import SkContainer
