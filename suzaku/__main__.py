@@ -27,7 +27,8 @@ if __name__ == "__main__":
         var1 = SkBooleanVar()
         var1.bind("change", lambda evt: print("Changed:", evt["value"]))
 
-        headerbar = titlebar(window)
+        headerbar = SkTitlebar(window).box(side="top", padx=0, pady=0)
+        headerbar.hide()
 
         menubar = SkMenuBar(window)
         menubar.box(side="top", padx=0, pady=0)
@@ -134,11 +135,28 @@ if __name__ == "__main__":
             def anti_alias():
                 window.anti_alias = switch.checked
 
+            def custom_titlebar():
+                window.window_attr("border", not switch2.checked)
+                if switch2.checked:
+                    headerbar.show()
+                else:
+                    headerbar.hide()
+                window.update_layout()
+                window.update(True)
+                headerbar.update(True)
+
             switch = SkSwitch(
                 tab_settings,
                 text="Enabled Anti Aliasing",
                 command=anti_alias,
                 default=True,
+            ).box(padx=10, pady=(10, 0))
+
+            switch2 = SkSwitch(
+                tab_settings,
+                text="Enabled Custom Titlebar",
+                command=custom_titlebar,
+                default=False,
             ).box(padx=10, pady=(10, 0))
 
         tab2()

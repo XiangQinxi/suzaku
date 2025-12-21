@@ -475,6 +475,8 @@ class SkContainer:
         fixed_children: list[SkWidget] = []  # expand=False children
 
         for child in children:
+            if not child.visible:
+                continue
             layout_config = child.layout_config["box"]
             side = layout_config["side"].lower()
 

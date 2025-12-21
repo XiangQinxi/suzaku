@@ -67,7 +67,7 @@ if __name__ == "__main__":
                 padx=10, pady=(10, 0)
             )
 
-            combobox = SkCombobox(tab_widgets, values=["Item 1", "Item 2"], readonly=False).box(
+            combobox = SkComboBox(tab_widgets, values=["Item 1", "Item 2"], readonly=False).box(
                 padx=10, pady=(10, 0)
             )
             combobox.bind(
@@ -154,7 +154,7 @@ if __name__ == "__main__":
         tabs.box(padx=10, pady=10, expand=True)
 
         statusbar = SkCard(window)
-        sizegrip = SkSizegrip(statusbar)
+        sizegrip = SkSizeGrip(statusbar)
         sizegrip.box(side="right", padx=5, pady=5)
         statusbar.box(side="bottom", padx=0, pady=0)
 

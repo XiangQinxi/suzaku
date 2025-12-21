@@ -1,6 +1,6 @@
 [project]
 name = "suzaku"
-version = "0.2.0"
+version = "0.2.1"
 description = "Yet another GUI lib, looks and performs better than tkinter."
 keywords = ["suzaku","future","lightweight","gui","framework"]
 authors = [
