@@ -168,6 +168,7 @@ class SkWindowBase(SkEventHandling, SkMisc):
         ####################
 
         self.the_window = self.create()
+        self.need_redraw: bool = False
         self.alive = True
         self.create_bind()
 
@@ -327,12 +328,12 @@ class SkWindowBase(SkEventHandling, SkMisc):
             if self.mode == "input" or redraw:
                 self.draw()
             else:
-                for child in self.children:
-                    if not isinstance(child, SkWindowBase):
-                        if child.need_redraw:
-                            self.draw()
-                            return
 
+                if self.need_redraw:
+                    self.draw()
+                    self.need_redraw = False
+            # for child in self.children:
+            #    child.update(redraw=False, update_event=True)
             # self.update_layout: typing.Callable
             # self.post()
 

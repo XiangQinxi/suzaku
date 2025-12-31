@@ -153,7 +153,6 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
         self.drop_shadow = SkDropShadow()
         self.button: typing.Literal[0, 1, 2] = 0
         self.click_time: float | int = 0
-        self.need_redraw: bool = False
 
         def _on_motion(event: SkEvent):
             self.mouse_x = event["x"]
@@ -265,17 +264,17 @@ class SkWidget(SkEventHandling, SkMisc, SkDraw):
 
     # region Draw the widget 绘制组件
 
-    def update(self, redraw: bool | None = None) -> None:
-        if redraw is not None:
-            self.need_redraw = redraw
-            if redraw:
-                pass
-                # self.trigger("update", SkEvent(widget=self, event_type="update"))
+    def update(self, redraw: bool | None = None, update_event: bool | None = True) -> None:
+        if redraw:
+            self.window.need_redraw = redraw
 
         if "SkContainer" in SkMisc.sk_get_type(self):
             from .container import SkContainer
 
             SkContainer.update(self)
+
+        if update_event:
+            self.trigger("update", SkEvent(widget=self, event_type="update"))
 
         self._pos_update()
 

@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
             SkSwitch(tab_widgets, text="SkSwitch", variable=var1).box(padx=10, pady=(10, 0))
 
-            SkSlider(tab_widgets).box(padx=10, pady=(10, 0))
+            SkSlider(tab_widgets, tick=10).box(padx=10, pady=(10, 0))
 
             frame1 = SkFrame(tab_widgets).box(padx=10, pady=(10, 0))
 

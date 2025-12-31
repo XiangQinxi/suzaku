@@ -66,7 +66,7 @@ class SkLineInput(SkWidget):
         # Others
         self._right = 0  # 文本右边离画布的距离
         self.cursor_visible = True  # 文本光标是否可显
-        self.attributes["blink_interval"] = 0.5  # 闪烁间隔 (毫秒)
+        self.attributes["blink_interval"] = 500  # 闪烁间隔 (毫秒)
         self.textvariable = textvariable
         self.focusable = True
         self.undo_stack = []
@@ -607,9 +607,9 @@ class SkLineInput(SkWidget):
             self.cursor_visible = not self.cursor_visible
             # 【仅当输入框获得焦点时光标闪烁】
             # 【如果一同执行，会导致只有最后一个输入框的光标闪烁】
-            self.update(True)
             blink_interval = self.cget("blink_interval")
-            self.bind(f"delay[{blink_interval}]", self.blink)
+            self.bind(f"delay[{blink_interval}ms]", self.blink)
+            # self.update(True, update_event=False)
 
     def _on_mouse_press(self, event: SkEvent):
         if self.cget("disabled"):

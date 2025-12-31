@@ -39,6 +39,7 @@ def init_glfw() -> None:
     glfw.window_hint(glfw.STENCIL_BITS, 8)
     glfw.window_hint(glfw.TRANSPARENT_FRAMEBUFFER, True)
     glfw.window_hint(glfw.WIN32_KEYBOARD_MENU, True)
+    # glfw.window_hint(glfw)
     glfw.window_hint(glfw.COCOA_RETINA_FRAMEBUFFER, True)
 
 
@@ -58,9 +59,12 @@ def init_sdl2() -> None:
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_JPG)
 
-    from sdl2 import (SDL_GL_CONTEXT_MAJOR_VERSION,
-                      SDL_GL_CONTEXT_MINOR_VERSION,
-                      SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_SetAttribute)
+    from sdl2 import (
+        SDL_GL_CONTEXT_MAJOR_VERSION,
+        SDL_GL_CONTEXT_MINOR_VERSION,
+        SDL_GL_CONTEXT_PROFILE_MASK,
+        SDL_GL_SetAttribute,
+    )
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3)

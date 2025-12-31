@@ -242,15 +242,14 @@ class SkEventHandling:
         # Parse event type string
         parsed_event_type = self.parse_event_type_str(event_type)
         # Create a default SkEvent object if not specified
-        if event_obj == None:
-            event_obj = SkEvent(widget=self, event_type=list(parsed_event_type.keys())[0])
+        if event_obj is None:
+            event_obj = SkEvent(widget=self, event_type=tuple(parsed_event_type.keys())[0])
         # Add the event to event lists (the widget itself and the global list)
         self.latest_event = event_obj
         SkEvent.latest = event_obj
         # Find targets
-        targets = []
-        targets.append(parsed_event_type["type"])
-        if parsed_event_type["params"] == []:
+        targets = [parsed_event_type["type"]]
+        if not parsed_event_type["params"]:
             targets.append(parsed_event_type["type"] + "[*]")
         else:
             targets.append(event_type)
