@@ -3,6 +3,7 @@ import skia
 from ..const import Orient
 from ..event import SkEvent
 from .widget import SkWidget
+from ..var import SkIntVar, SkFloatVar
 
 
 class SkSlider(SkWidget):
@@ -17,6 +18,7 @@ class SkSlider(SkWidget):
         minvalue: int | float = 0,
         maxvalue: int | float = 100,
         style: str = "SkSlider",
+        variable: SkFloatVar | SkIntVar | None = None,
         **kwargs,
     ):
         super().__init__(parent, style_name=style, **kwargs)
@@ -50,10 +52,44 @@ class SkSlider(SkWidget):
         self.attributes["value"]: int | float = value
         self.attributes["minvalue"]: int | float = minvalue
         self.attributes["maxvalue"]: int | float = maxvalue
+        self.attributes["variable"]: SkFloatVar | SkIntVar | None = variable
+
+        if variable:
+            variable.bind("change", self._on_variable_change)
+
+    def _on_variable_change(self, event: SkEvent = None):
+        """【处理变量变化事件】"""
+        self.update(True)
+
+    @property
+    def value(self):
+        if self.cget("variable"):
+            return self.cget("variable").get()
+        return self.cget("value")
+
+    @value.setter
+    def value(self, value: int | float):
+        raw_value = value
+
+        tick = self.attributes.get("tick")
+        if tick and tick > 0:
+            # 对齐到最近的tick倍数
+            aligned_value = round(raw_value / tick) * tick
+            # 确保不超出范围
+            min_value = self.attributes.get("minvalue", 0)
+            max_value = self.attributes.get("maxvalue", 100)
+            aligned_value = max(min_value, min(max_value, aligned_value))
+            value = aligned_value
+        else:
+            value = raw_value
+
+        self.attributes["value"] = value
+        if self.cget("variable"):
+            self.cget("variable").set(value)
 
     @property
     def percent(self):
-        return self.cget("value") / (self.cget("maxvalue") - self.cget("minvalue"))
+        return self.value / (self.cget("maxvalue") - self.cget("minvalue"))
 
     @percent.setter
     def percent(self, value: float):
@@ -63,19 +99,7 @@ class SkSlider(SkWidget):
 
     def set_attribute(self, **kwargs):
         if "value" in kwargs:
-            raw_value = kwargs.pop("value")
-
-            tick = self.attributes.get("tick")
-            if tick and tick > 0:
-                # 对齐到最近的tick倍数
-                aligned_value = round(raw_value / tick) * tick
-                # 确保不超出范围
-                min_value = self.attributes.get("minvalue", 0)
-                max_value = self.attributes.get("maxvalue", 100)
-                aligned_value = max(min_value, min(max_value, aligned_value))
-                self.attributes["value"] = aligned_value
-            else:
-                self.attributes["value"] = raw_value
+            self.value = kwargs.pop("value")
 
         super().set_attribute(**kwargs)
 
@@ -138,7 +162,7 @@ class SkSlider(SkWidget):
                 )
 
         # Progress进度条
-        if self.cget("value") > self.cget("minvalue"):
+        if self.value > self.cget("minvalue"):
             progress_selector = self.style_name + ".Progress"
             progress_half_size = self._style2(self.theme, progress_selector, "size", 0) / 2
             if progress_half_size > 0:

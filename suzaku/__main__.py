@@ -18,7 +18,7 @@ if __name__ == "__main__":
             anti_alias=True,
             parent=None,
             title=f"Suzaku GUI",
-            size=(320, 650),
+            size=(305, 680),
         )
         window.minsize(100, 80)
         window.resizable(True)
@@ -86,14 +86,16 @@ if __name__ == "__main__":
 
             SkSwitch(tab_widgets, text="SkSwitch", variable=var1).box(padx=10, pady=(10, 0))
 
-            SkSlider(tab_widgets, tick=10).box(padx=10, pady=(10, 0))
-
             frame1 = SkFrame(tab_widgets).box(padx=10, pady=(10, 0))
 
             var2 = SkFloatVar(25)
 
-            progress = SkProgressBar(frame1, variable=var2).grid(
+            SkSlider(frame1, tick=10, variable=var2).grid(
                 row=0, column=0, columnspan=3, padx=0, pady=5
+            )
+
+            progress = SkProgressBar(frame1, variable=var2).grid(
+                row=1, column=0, columnspan=3, padx=0, pady=5
             )
 
             def start(_=None):
@@ -111,19 +113,19 @@ if __name__ == "__main__":
                 frame1,
                 text="Increase",
                 command=lambda: progress.configure(value=progress.cget("value") + 10),
-            ).grid(row=1, column=0, padx=3, pady=3)
+            ).grid(row=2, column=0, padx=3, pady=3)
 
             SkTextButton(
                 frame1,
                 text="Decrease",
                 command=lambda: progress.configure(value=progress.cget("value") - 10),
-            ).grid(row=1, column=1, padx=3, pady=3)
+            ).grid(row=2, column=1, padx=3, pady=3)
 
             start_button = SkTextButton(frame1, text="Start", command=start).grid(
-                row=1, column=2, padx=3, pady=3
+                row=2, column=2, padx=3, pady=3
             )
 
-            SkLabel(frame1, textvariable=var2).grid(row=1, column=3, padx=3, pady=3)
+            SkLabel(frame1, textvariable=var2).grid(row=3, column=0, columnspan=3, padx=3, pady=3)
 
             SkSeparator(tab_widgets, orient=Orient.H).box(padx=0, pady=(10, 0))
 
