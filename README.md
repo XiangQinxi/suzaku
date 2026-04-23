@@ -6,6 +6,8 @@ Advanced UI module based on `skia-python`, `pyopengl` and `glfw`.
 > 
 > versions under dev are provided for evaluation purposes.
 
+## We Are Starting Over...
+This project is not abandoned, instead, we are working on a complete refactor in [charmy-dev/charmy](https://github.com/charmy-dev/charmy)
 
 ---
 
